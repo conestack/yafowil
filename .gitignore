@@ -1,0 +1,16 @@
+parts
+bin
+eggs
+downloads
+*.egg-info
+develop-eggs
+.installed.cfg
+*.pyc
+*.pyo
+src/packages
+*~
+.pydevproject
+.project
+var
+.DS_Store
+*#*
