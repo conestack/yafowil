@@ -1,0 +1,41 @@
+Test the label and its flavors
+==============================
+
+default::
+
+    >>> import yafowil.base
+    >>> import yafowil.labeled
+    >>> props = {'label': 'LABEL'}
+    >>> data = yafowil.base.RuntimeData()
+    >>> data['rendered'].append(u'<RUBBISH>')
+    >>> data['rendered'].append(u'<INNER-WIDGET>')
+    >>> yafowil.labeled.label_renderer('MYUID', data, props)
+    u'<label for="input-MYUID" id="label-MYUID">LABEL</label><INNER-WIDGET>'
+
+label after widget
+
+    >>> props['labelpos'] = 'after'
+    >>> yafowil.labeled.label_renderer('MYUID', data, props)
+    u'<INNER-WIDGET><label for="input-MYUID" id="label-MYUID">LABEL</label>'
+    
+same with inner label::
+
+    >>> props['labelpos'] = 'inner'
+    >>> yafowil.labeled.label_renderer('MYUID', data, props)
+    u'<label for="input-MYUID" id="label-MYUID">LABEL<INNER-WIDGET></label>'
+
+and back to default with error class applied::
+
+    >>> del props['labelpos']
+    >>> data['errors'].append(yafowil.base.ExtractionError('Shit happens.'))    
+    >>> yafowil.labeled.label_renderer('MYUID', data, props)
+    u'<label class="error" for="input-MYUID" id="label-MYUID">LABEL</label><INNER-WIDGET>'
+    
+from factory::
+
+    >>> widget = yafowil.base.factory('field.file', 'MYFILE', {}, 
+    ...                               {'label': 'MY FILE'})
+    >>> widget()
+    u'<div class="field" id="field-MYFILE"><label for="input-MYFILE" 
+    id="label-MYFILE">MY FILE</label><input id="input-MYFILE" name="MYFILE" 
+    type="file" value="" /></div>'

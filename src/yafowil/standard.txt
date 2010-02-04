@@ -1,0 +1,103 @@
+Preparation
+===========
+
+Trigger registry by importing
+
+    >>> import yafowil.standard
+        
+Text Input Widget
+=================
+::
+
+    >>> from yafowil.base import factory
+    >>> inputwidget = factory('text', 'MYTEXT', 'Test Text',
+    ...                       {'css': {'input': 'inputcss'}})    
+    >>> inputwidget()
+    u'<input id="input-MYTEXT" name="MYTEXT" type="text" value="Test Text" />'
+
+    >>> inputwidget = factory('hidden', 'MYHIDDEN', 'Test Hidden',
+    ...                       {'css': {'input': 'inputcss'}})    
+    >>> inputwidget()
+    u'<input id="input-MYHIDDEN" name="MYHIDDEN" type="hidden" value="Test Hidden" />'
+    
+    >>> inputwidget = factory('radio', 'MYRADIO', 'Test Radio',
+    ...                       {'css': {'input': 'inputcss'}})    
+    >>> inputwidget()
+    u'<input id="input-MYRADIO" name="MYRADIO" type="radio" value="Test Radio" />'
+
+    >>> inputwidget = factory('checkbox', 'MYCHECKBOX', 'Test Checkbox',
+    ...                       {'css': {'input': 'inputcss'}})    
+    >>> inputwidget()
+    u'<input id="input-MYCHECKBOX" name="MYCHECKBOX" type="checkbox" value="Test Checkbox" />'
+
+    >>> inputwidget = factory('file', 'MYFILE', 'Test File',
+    ...                       {'css': {'input': 'inputcss'}})    
+    >>> inputwidget()
+    u'<input id="input-MYFILE" name="MYFILE" type="file" value="" />'
+    
+Required Input Widget
+=====================    
+::
+
+    >>> inputwidget = factory('text', 'REQUIRED', 'Test Text',
+    ...                       {'required': True})    
+    >>> inputwidget()
+    u'<input class="required" id="input-REQUIRED" name="REQUIRED" type="text" 
+    value="Test Text" />'
+
+    >>> data = inputwidget.extract({'REQUIRED': ''})
+    >>> data
+    {'errors': [ExtractionError('Mandatory field was empty',)], 'extracted': [''], 
+    'input_field_type': 'text', 'rendered': [], 'request': {'REQUIRED': ''}, 
+    'value': 'Test Text'}
+    
+    >>> inputwidget(data=data)
+    u'<input class="error required" id="input-REQUIRED" name="REQUIRED" type="text" 
+    value="Test Text" />'
+    
+Textarea Widget
+===============
+::
+
+    >>> inputwidget = factory('textarea', 'MYTEXTAREA', 'Test Textarea',
+    ...                       dict(label='Test Textarea Widget',
+    ...                            css={'input': 'inputcss', 
+    ...                                 'label': 'labelcss'},
+    ...                            id={'label': 'TestLabelId'}))
+    >>> inputwidget()
+    u'<textarea cols="80" id="input-MYTEXTAREA" name="MYTEXTAREA" rows="25">Test Textarea</textarea>'
+
+Selection Widget
+================
+::
+
+    >>> selectwidget = factory('select', 'MYSELECT', ['one', 'three'],
+    ...                       {'vocabulary': [('one','One'), 
+    ...                                       ('two', 'Two'), 
+    ...                                       ('three', 'Three'),
+    ...                                       ('four', 'Four')],
+    ...                       'label': 'Test Selection Widget',
+    ...                       'css': {'selection': 'selectioncss', 
+    ...                               'label': 'labelcss'}})
+    >>> selectwidget()
+    u'<select id="input-MYSELECT" name="MYSELECT"><option id="input-MYSELECT-one" selected="selected" value="one">One</option><option id="input-MYSELECT-two" value="two">Two</option><option id="input-MYSELECT-three" selected="selected" value="three">Three</option><option id="input-MYSELECT-four" value="four">Four</option></select>'
+
+    >>> data = selectwidget.extract({'MYSELECT': 'two'})
+    >>> selectwidget(data=data)
+    u'<select id="input-MYSELECT" name="MYSELECT"><option id="input-MYSELECT-one" 
+    value="one">One</option><option id="input-MYSELECT-two" selected="selected" 
+    value="two">Two</option><option id="input-MYSELECT-three" 
+    value="three">Three</option><option id="input-MYSELECT-four" 
+    value="four">Four</option></select>'
+    
+Submit Widget
+=============
+::
+
+    >>> inputwidget = factory('submit','formname', 'ignored',
+    ...                       dict(label='Test Submit',
+    ...                            css={'input': 'submitcss'})
+    ... )    
+    >>> inputwidget()
+    u'<input id="action-formname" name="formname" type="submit" value="Test Submit" />'
+ 

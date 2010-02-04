@@ -1,0 +1,32 @@
+.. YAFOWIL documentation master file, created by
+   sphinx-quickstart on Wed Jan 20 21:15:29 2010.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to YAFOWIL's documentation!
+===================================
+
+YAFOWIL offers am extensible and reusable set of form widgets, independent from 
+any web-framework, but easy to use in any web-framework.
+
+YAFOWIL in its core is pure Python without any dependencies. 
+
+Contents:
+
+.. toctree::
+   :maxdepth: 2
+   
+   introduction
+   examples
+   architecture
+   extend
+   Widget Library <widgets/widgets>
+   api
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+

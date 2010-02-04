@@ -1,0 +1,207 @@
+Test UNSET
+==========
+::
+
+    >>> from yafowil.base import UNSET
+    >>> UNSET
+    <UNSET>
+    
+    >>> str(UNSET)
+    ''
+
+    >>> bool(UNSET)
+    False
+
+Test Runtime Data
+=================
+::    
+
+    >>> from yafowil.base import RuntimeData
+    >>> data = RuntimeData()
+    >>> sorted(data.keys())
+    ['errors', 'extracted', 'rendered']
+    
+    >>> data['custom'] = 'customdata'
+    >>> data
+    {'custom': 'customdata', 'errors': [], 'extracted': [], 'rendered': []}
+    
+    >>> data.last_extracted
+    <UNSET>
+    
+    >>> data.has_extracted
+    False
+
+    >>> data['extracted'].append(dict())
+    >>> data.has_extracted
+    False
+
+    >>> data['extracted'].append(dict(key='value'))
+    >>> data.has_extracted
+    True
+
+    >>> data['extracted'].append(dict(key='value', key2=RuntimeData()))
+    >>> data.has_extracted
+    Traceback (most recent call last):
+    ...
+    ValueError
+
+    >>> data['extracted'].append(dict(key=RuntimeData()))
+    >>> data.has_extracted
+    False
+
+    >>> subdata = RuntimeData()
+    >>> subdata['extracted'].append('subvalue')
+    >>> data['extracted'].append(dict(key=subdata))
+    >>> data.has_extracted
+    True
+        
+    >>> data.last_rendered
+    u''
+    
+    >>> data['extracted'].append('first')    
+    >>> data['extracted'].append('second')    
+    >>> data['extracted'].append('last')    
+    >>> data.last_extracted
+    'last'    
+
+    >>> data['rendered'].append('first')    
+    >>> data['rendered'].append('second')    
+    >>> data['rendered'].append('last')    
+    >>> data.last_rendered
+    'last'
+        
+Test Base Widget
+================
+::
+
+    >>> from yafowil.base import Widget
+    >>> from yafowil.base import ExtractionError 
+    
+Create some test dummies::
+
+    >>> def test_extractor(uname, data, props):
+    ...     return 'e1'
+
+    >>> def test_extractor2(uname, data, props):
+    ...     return 'e2'
+
+    >>> def test_extractor3(uname, data, props):
+    ...     try:
+    ...         return int(data['value'])
+    ...     except:
+    ...         raise ExtractionError('e3: Integer expected, got %s' % \
+    ...                               data['value'])
+    ...     return value
+    
+    >>> def test_renderer(uname, data, props):
+    ...     return 'r1', str(uname), str(data), str(props)
+
+    >>> def test_renderer2(uname, data, props):
+    ...     return 'r2', str(uname), str(data), str(props)
+    
+    >>> def test_preprocessor(uname, data, props):
+    ...     data['test_preprocessor'] = 'called'
+    ...     return data
+    
+    >>> def test_getter():
+    ...     return 'Test Value'
+
+    >>> def test_getter2():
+    ...     return 123
+
+Test the base widget class::    
+    
+    >>> test_request = {'MYUID': 'New Test Value'}
+    >>> testwidget = Widget('MYUID', test_getter, 
+    ...                     [test_extractor], 
+    ...                     [test_renderer], 
+    ...                     [test_preprocessor],
+    ...                     dict(test1='Test1', test2='Test2'))    
+    >>> testwidget.extract(test_request)
+    {'errors': [], 'extracted': ['e1'], 'rendered': [], 'request': {'MYUID': 
+    'New Test Value'}, 'test_preprocessor': 'called', 'value': 'Test Value'}
+    
+    >>> testwidget = Widget('MYUID', test_getter, 
+    ...                     [test_extractor], 
+    ...                     [test_renderer], 
+    ...                     [],
+    ...                     dict(test1='Test1', test2='Test2'))    
+    >>> testwidget()
+    ('r1', 'MYUID', "{'errors': [], 'extracted': [], 
+    'rendered': [], 'request': {}, 'value': 'Test Value'}", "{'test1': 'Test1', 
+    'test2': 'Test2'}")
+    
+    >>> testwidget = Widget('MYUID2', test_getter, 
+    ...                     [test_extractor, test_extractor2], 
+    ...                     [test_renderer, test_renderer2], 
+    ...                     [],
+    ...                     dict(test1='Test1', test2='Test2'))
+    >>> testwidget()
+    ('r2', 'MYUID2', '{\'errors\': [], \'extracted\': [], \'rendered\': 
+    [(\'r1\', \'MYUID2\', "{\'errors\': [], \'extracted\': [], \'rendered\': [], 
+    \'request\': {}, \'value\': \'Test Value\'}", "{\'test1\': \'Test1\', \'test2\': 
+    \'Test2\'}")], \'request\': {}, \'value\': \'Test Value\'}', "{'test1': 'Test1', 
+    'test2': 'Test2'}")
+
+    >>> testwidget = Widget('MYUID2', test_getter, 
+    ...                     [test_extractor3], 
+    ...                     [test_renderer], 
+    ...                     [],
+    ...                     dict(test1='Test1', test2='Test2'))
+
+    >>> testwidget.extract({})
+    {'errors': [ExtractionError('e3: Integer expected, got Test Value',)], 
+    'extracted': [], 'rendered': [], 'request': {}, 'value': 'Test Value'}
+    
+    >>> testwidget = Widget('MYUID2', test_getter2, 
+    ...                     [test_extractor3], 
+    ...                     [test_renderer], 
+    ...                     [],
+    ...                     dict(test1='Test1', test2='Test2'))
+
+    >>> testwidget.extract({})
+    {'errors': [], 'extracted': [123], 'rendered': [], 'request': {}, 'value': 123}
+
+        
+Test the factory
+================
+
+    >>> from yafowil.base import Factory
+    >>> factory = Factory()
+    >>> factory.register('widget_test', [test_extractor], [test_renderer])
+    >>> factory.extractors('widget_test')
+    [<function test_extractor at ...>]
+    
+    >>> factory.renderers('widget_test')
+    [<function test_renderer at ...>]
+    
+    >>> testwidget = factory('widget_test', 'MYFAC', test_getter, 
+    ...                      dict(foo='bar'))
+    >>> testwidget()
+    ('r1', 'MYFAC', "{'errors': [], 'extracted': [], 'rendered': [], 'request': 
+    {}, 'value': 'Test Value'}", "{'foo': 'bar'}")
+
+Test the Vocabulary
+===================
+
+    >>> from yafowil.base import vocabulary
+    >>> vocabulary('foo')
+    [('foo', 'foo')]
+
+    >>> vocabulary({'key': 'value'})
+    [('key', 'value')]
+
+    >>> vocabulary(['value', 'value2'])
+    [('value', 'value'), ('value2', 'value2')]
+
+    >>> vocabulary([('key', 'value'), ('key2', 'value2')])
+    [('key', 'value'), ('key2', 'value2')]
+        
+Test Tag renderer
+=================
+::
+    >>> from yafowil.base import tag
+    >>> a = {'class': u'fancy', 'id': '2f5b8a234ff'}
+    >>> tag('p', 'Lorem Ipsum. ', u'Hello World!', 
+    ...     class_='fancy', id='2f5b8a234ff')
+    u'<p class="fancy" id="2f5b8a234ff">Lorem Ipsum. Hello World!</p>' 
