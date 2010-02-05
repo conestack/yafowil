@@ -50,10 +50,11 @@ factory.register('compound',
 
 def fieldset_renderer(uname, data, properties):
     fieldset_id = properties.get('id',{}).get('fieldset', cssid(uname, 'fieldset'))
+    class_ = properties.get('class',{}).get('fieldset', None)
     rendered = data.last_rendered
     if properties.get('legend', False):
         rendered = tag('legend', properties.get('legend')) + rendered
-    return tag('fieldset', rendered, id=fieldset_id)   
+    return tag('fieldset', rendered, id=fieldset_id, class_=class_)   
 
 factory.register('fieldset', 
                  factory.extractors('compound'), 
