@@ -92,6 +92,7 @@ class ArrayWidgetFactory(object):
     def names(self):
         if hasattr(self, '_names'):
             return self._names
+        self._names = None
         swidget = self.data.get('widget', self.properties.get('widget'))
         minimal = self.properties.get('min', 1)
         additional = self.properties.get('additional', 0)
@@ -99,7 +100,7 @@ class ArrayWidgetFactory(object):
         if self.data.last_extracted:
             # extraction worked already             
             length = len(self.data.last_extracted)    
-        elif length is None and self.data['request']:
+        elif self.data['request']:
             # before extractors run we need to check the request
             self._names = list()           
             matching = list()
@@ -111,7 +112,7 @@ class ArrayWidgetFactory(object):
                 if match:
                     self._names.append(match.groups()[0]) 
                 self._names.sort()
-            return self._names
+            length = len(self._names)
         if length is None and self.data['value']:
             # from value
             length = len(self.data['value'])            
@@ -122,7 +123,14 @@ class ArrayWidgetFactory(object):
             length += additional
         if length < minimal:
             length = minimal
-        self._names = self._make_names(swidget.uname, length)
+        if self._names is None:
+            self._names = self._make_names(swidget.uname, length)
+        else:
+            if length < len(self._names):
+                self._names = self._names[:length]
+            elif length > len(self._names):
+                newnames = self._make_names(swidget.uname, length)
+                self._names += newnames[len(self._names):]
         return self._names
                 
     def __iter__(self):
