@@ -1,0 +1,88 @@
+Preparation
+===========
+
+    >>> import yafowil.standard
+    >>> from yafowil.base import factory, RuntimeData
+    >>> widget = factory('text', 'inner', 'value')
+
+Test Array
+==========
+
+First the Iterator.
+::
+
+    >>> from yafowil.compound import ArrayWidgetFactory
+    >>> data = RuntimeData()
+    >>> data['value'] = None
+    >>> data['request'] = {}
+    >>> arrayfactory = ArrayWidgetFactory('base', data, {'widget': widget})
+    >>> [_.uname for _ in arrayfactory]
+    ['inner-0000000']
+
+    >>> arrayfactory = ArrayWidgetFactory('base', data, {'widget': widget, 'min': 0})
+    >>> [_.uname for _ in arrayfactory]
+    []
+
+    >>> arrayfactory = ArrayWidgetFactory('base', data, {'widget': widget, 'min': 3})
+    >>> [_.uname for _ in arrayfactory]
+    ['inner-0000000', 'inner-0000001', 'inner-0000002']
+    
+    >>> arrayfactory = ArrayWidgetFactory('base', data, {'widget': widget})
+    >>> data['extracted'].append(['foo', 'bar'])
+    >>> [_.uname for _ in arrayfactory]
+    ['inner-0000000', 'inner-0000001']
+
+    >>> arrayfactory = ArrayWidgetFactory('base', data, {'widget': widget})
+    >>> data['extracted'] = []
+    >>> data['value'] = ['foo', 'bar']
+    >>> [_.uname for _ in arrayfactory]
+    ['inner-0000000', 'inner-0000001']
+
+    >>> arrayfactory = ArrayWidgetFactory('base', data, {'widget': widget})
+    >>> data['extracted'] = []
+    >>> data['request'] = {'base.inner-0000000': 'one', 
+    ...                    'base.inner-0000001': 'two'}
+    >>> data['value'] = []
+    >>> [_.uname for _ in arrayfactory]
+    ['inner-0000000', 'inner-0000001']
+
+    
+Then the array via factory.
+::    
+    
+    >>> awidget = factory('array', 'ARRAY', [], {'widget': widget})
+    >>> data = awidget.extract({})
+    >>> data
+    {'errors': [], 'extracted': [{'inner-0000000': {'errors': [], 'extracted': 
+    [<UNSET>, <UNSET>], 'input_field_type': 'text', 'rendered': [], 'request': {}, 
+    'value': 'value'}}, [{'errors': [], 'extracted': [<UNSET>, <UNSET>], 
+    'input_field_type': 'text', 'rendered': [], 'request': {}, 'value': 'value'}]], 
+    'rendered': [], 'request': {}, 'value': {'inner-0000000': {}}, 'widgets': 
+    [<yafowil.base.Widget object at ...>]}
+    
+    >>> awidget(data=data)
+    u'<input id="input-ARRAY-inner-0000000" name="ARRAY.inner-0000000" 
+    type="text" value="value" />'
+
+When we get additional data from request, we want it extracted.
+::
+
+    >>> data = awidget.extract({'ARRAY.inner-0000000': 'one',
+    ...                        'ARRAY.inner-0000001': 'two'})
+    >>> [_['extracted'] for _ in data.last_extracted]
+    [['one', 'one'], ['two', 'two']]
+    
+    >>> awidget(data=data)
+    u'<input id="input-ARRAY-inner-0000000" name="ARRAY.inner-0000000" type="text" 
+    value="one" /><input id="input-ARRAY-inner-0000001" name="ARRAY.inner-0000001" 
+    type="text" value="two" />'
+
+Render additional.
+::        
+
+    >>> awidget = factory('array', 'ADD', [], {'widget': widget, 
+    ...                                         'additional': 2})
+    >>> awidget()
+    u'<input id="input-ADD-inner-0000000" name="ADD.inner-0000000" type="text" 
+    value="value" /><input id="input-ADD-inner-0000001" name="ADD.inner-0000001" 
+    type="text" value="value" />'   
