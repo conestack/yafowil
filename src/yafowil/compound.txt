@@ -9,8 +9,23 @@ Test Rendering of Compound
 
     >>> import yafowil.compound
     >>> compound = factory('compound', 
-    ...                    'COMPOUND', {'inner': 'somevalue', 
-    ...                                 'inner2': 'othervalue'})
+    ...                    'COMPOUND', 
+    ...                    {'inner': 'somevalue', 
+    ...                     'inner2': 'othervalue'})
+    >>> compound['inner'] = factory('text', 'inner', 'value1')
+    >>> compound['inner2'] = factory('text', 'inner2', 'value2')
+    >>> compound()
+    u'<input id="input-COMPOUND-inner" name="COMPOUND.inner" type="text" 
+    value="value1" /><input id="input-COMPOUND-inner2" name="COMPOUND.inner2" 
+    type="text" value="value2" />'
+    
+Same with delegation switched on:
+
+    >>> compound = factory('compound', 
+    ...                    'COMPOUND', 
+    ...                    {'inner': 'somevalue', 
+    ...                     'inner2': 'othervalue'},
+    ...                    {'delegation': True})
     >>> compound['inner'] = factory('text', 'inner', 'value')
     >>> compound['inner2'] = factory('text', 'inner2', 'value')
     >>> compound()
@@ -28,8 +43,7 @@ Test Extraction of Widget
     'inner': {'errors': [], 'extracted': ['newvalue', 'newvalue'], 
     'input_field_type': 'text', 'rendered': [], 'request': {'COMPOUND.inner': 'newvalue'}, 
     'value': 'somevalue'}}], 'rendered': [], 'request': {'COMPOUND.inner': 'newvalue'}, 
-    'value': {'inner2': 'othervalue', 'inner': 'somevalue'}, 
-    'widgets': [<yafowil.base.Widget object at ...>, <yafowil.base.Widget object at ...>]}
+    'value': {'inner2': 'othervalue', 'inner': 'somevalue'}}
 
 Test Fieldset
 =============

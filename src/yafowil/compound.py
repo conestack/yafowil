@@ -5,7 +5,7 @@ from yafowil.base import (
 )
 
 def compound_extractor(widget, data):
-    result = odict()    
+    result = dict()    
     for childname in widget:
         result[childname] = widget[childname].extract(data['request'])
     return result
@@ -18,10 +18,17 @@ def compound_renderer(widget, data):
             kw['data'] = data['extracted'][0][childname] # XXX First Extracted!?!? looks like a hack
         result += widget[childname](**kw)
     return result
+
+def compound_preprocessor(widget, data):
+    if widget.attributes.get('delegation', False):
+        for childname in widget:
+            widget[childname].getter = data['value'].get(childname, None)
+    return data
         
 factory.register('compound', 
                  [compound_extractor], 
-                 [compound_renderer])
+                 [compound_renderer],
+                 [compound_preprocessor])
 
 def fieldset_renderer(uname, data, properties):
     fieldset_id = properties.get('id',{}).get('fieldset', cssid(uname, 'fieldset'))
