@@ -3,6 +3,7 @@ from yafowil.base import (
     factory,
     tag,
 )
+from yafowil.utils import cssid
 
 def compound_extractor(widget, data):
     result = dict()    
@@ -30,12 +31,14 @@ factory.register('compound',
                  [compound_renderer],
                  [compound_preprocessor])
 
-def fieldset_renderer(uname, data, properties):
-    fieldset_id = properties.get('id',{}).get('fieldset', cssid(uname, 'fieldset'))
-    class_ = properties.get('class',{}).get('fieldset', None)
+def fieldset_renderer(widget, data):
+    fieldset_id = widget.attributes.get('id',{}).get('fieldset', 
+                                                     cssid(widget.uname, 
+                                                           'fieldset'))
+    class_ = widget.attributes.get('class',{}).get('fieldset', None)
     rendered = data.last_rendered
-    if properties.get('legend', False):
-        rendered = tag('legend', properties.get('legend')) + rendered
+    if widget.attributes.get('legend', False):
+        rendered = tag('legend', widget.attributes['legend']) + rendered
     return tag('fieldset', rendered, id=fieldset_id, class_=class_)   
 
 factory.register('fieldset', 
