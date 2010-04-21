@@ -1,14 +1,13 @@
 from yafowil.base import (
     factory,
-    tag,
-    vocabulary,
     UNSET,
     ExtractionError,
 )
 from utils import (
     cssclasses,
     cssid,
-)
+    tag,
+    vocabulary,)
 
 def generic_extractor(widget, data):    
     return data['request'].get(widget.uname, 
