@@ -33,6 +33,7 @@ setup(name='yafowil',
       zip_safe=True,
       install_requires=[
           'setuptools',
+          'zodict',
       ],
       tests_require=tests_require,
       test_suite="yafowil.tests.test_suite",

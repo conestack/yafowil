@@ -3,52 +3,16 @@ Preparation
 
     >>> import yafowil.standard
     >>> from yafowil.base import factory, RuntimeData
-    >>> widget = factory('text', 'inner', 'value')
-    >>> widget2 = factory('text', 'inner2', 'value2')
-
-Test Preprocessing of Compound
-=============================
-
-    >>> from yafowil.compound import compound_preprocessor
-    >>> data = RuntimeData()
-    >>> data['value'] = {'inner': 'othervalue'}
-    >>> data = compound_preprocessor('pre', data, {'widgets': [widget], 
-    ...                                            'inner': 'othervalue'})
-    >>> data['widgets'][0].uname
-    'pre.inner'
-    
-    >>> data['widgets'][0].uname_original
-    'inner'
-
-    >>> data['widgets'][0] is widget
-    False
-
-    >>> data['widgets'][0].getter
-    'value'
-
-    >>> data = compound_preprocessor('pre', data, {'widgets': [widget], 
-    ...                                            'delegate': True,
-    ...                                            'inner': 'othervalue'})
-    Traceback (most recent call last):
-    ...
-    ValueError: key "widgets" found in both, properties and runtime data.
-    
-    >>> del data['widgets']
-    >>> data = compound_preprocessor('pre', data, {'widgets': [widget], 
-    ...                                            'delegate': True,
-    ...                                            'inner': 'othervalue'})
-    >>> data['widgets'][0].getter
-    'othervalue'
-    
     
 Test Rendering of Compound
 ==========================
 
+    >>> import yafowil.compound
     >>> compound = factory('compound', 
     ...                    'COMPOUND', {'inner': 'somevalue', 
-    ...                                 'inner2': 'othervalue'},
-    ...                    {'widgets': [widget, widget2],
-    ...                     'delegate': True})
+    ...                                 'inner2': 'othervalue'})
+    >>> compound['inner'] = factory('text', 'inner', 'value')
+    >>> compound['inner2'] = factory('text', 'inner2', 'value')
     >>> compound()
     u'<input id="input-COMPOUND-inner" name="COMPOUND.inner" type="text" 
     value="somevalue" /><input id="input-COMPOUND-inner2" name="COMPOUND.inner2" 

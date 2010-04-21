@@ -1,12 +1,7 @@
 import sys
 import copy
 import re
-from yafowil.base import (
-    factory,
-    cssid,
-    tag,
-    ExtractionError,
-)
+from yafowil.base import factory
 
 class ArrayWidgetFactory(object):    
     
@@ -33,7 +28,6 @@ class ArrayWidgetFactory(object):
         elif self.data['request']:
             # before extractors run we need to check the request
             self._names = list()           
-            matching = list()
             full_uname = '%s\.(%s' % (self.uname.replace('.', '\.'), 
                                       swidget.uname)
             matcher = re.compile('%s-[0-9]*).*' % full_uname)
@@ -71,7 +65,7 @@ class ArrayWidgetFactory(object):
             while True:                        
                 if count >= len(names) \
                    or count >= self.properties.get('max', sys.maxint):
-                     return                
+                    return                
                 widget = copy.copy(swidget)
                 widget.uname = names[count]
                 yield widget                 

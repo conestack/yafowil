@@ -79,13 +79,13 @@ Test Base Widget
     
 Create some test dummies::
 
-    >>> def test_extractor(uname, data, props):
+    >>> def test_extractor(widget, data):
     ...     return 'e1'
 
-    >>> def test_extractor2(uname, data, props):
+    >>> def test_extractor2(widget, data):
     ...     return 'e2'
 
-    >>> def test_extractor3(uname, data, props):
+    >>> def test_extractor3(widget, data):
     ...     try:
     ...         return int(data['value'])
     ...     except:
@@ -93,13 +93,13 @@ Create some test dummies::
     ...                               data['value'])
     ...     return value
     
-    >>> def test_renderer(uname, data, props):
-    ...     return 'r1', str(uname), str(data), str(props)
+    >>> def test_renderer(widget, data):
+    ...     return 'r1', widget.__name__, str(data), str(widget.attributes)
 
-    >>> def test_renderer2(uname, data, props):
-    ...     return 'r2', str(uname), str(data), str(props)
+    >>> def test_renderer2(widget, data):
+    ...     return 'r2', widget.__name__, str(data), str(widget.attributes)
     
-    >>> def test_preprocessor(uname, data, props):
+    >>> def test_preprocessor(widget, data):
     ...     data['test_preprocessor'] = 'called'
     ...     return data
     

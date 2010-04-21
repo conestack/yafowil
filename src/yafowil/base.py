@@ -1,3 +1,5 @@
+from zodict import LifecycleNode
+
 class Unset(object): 
     
     def __nonzero__(self):
@@ -87,7 +89,7 @@ class ExtractionError(Exception):
         super(ExtractionError, self).__init__(msg)
         self.abort = abort
 
-class Widget(object):
+class Widget(LifecycleNode):
     """Base Widget Class
     """
     def __init__(self, uniquename, value_or_getter, extractors, renderers, 
@@ -96,7 +98,7 @@ class Widget(object):
         
         ``uniquename``
             id as string containing characters from a-z, A-Z, 0-9 only. Must not
-            start with numerical character. Must be unique within the form.
+            start with numerical character. 
             
         ``value_or_getter``
             either a callable or the value itself. If callable, its called 
@@ -125,12 +127,14 @@ class Widget(object):
             arbitrary dict-like passed through for use in renderer and 
             extractor, static data must never be modifed!
         """
+        super(Widget, self).__init__(uniquename)
         self.getter = value_or_getter
         self.extractors = extractors
         self.renderers = renderers
         self.preprocessors = preprocessors or list()
-        self.uname = uniquename
-        self.properties = properties
+        self.__name__ = uniquename
+        for key in properties:
+            self.attributes[key] = properties[key]
     
     @property
     def _value(self):
@@ -153,13 +157,17 @@ class Widget(object):
         """
         if data is None:
             data = RuntimeData()
-        data = self._runpreprocessors(self._value, request, data)
+        data = self._runpreprocessors(request, data)
         if request and not data['extracted']:
             self.extract(request)
         for renderer in self.renderers:
-            data['rendered'].append(
-                renderer(self.uname, data, self.properties)
-            )            
+            try:
+                value = renderer(self, data)
+            except Exception, e:
+                e.args = [_ for _ in e.args]+[str(renderer)]
+                raise e
+            
+            data['rendered'].append(value)            
         return data.last_rendered    
     
     def extract(self, request):
@@ -169,26 +177,36 @@ class Widget(object):
             expects a dict-like object       
 
         """
-        data = RuntimeData()
-        data = self._runpreprocessors(self._value, request, data)
+        data = self._runpreprocessors(request, RuntimeData())
         for extractor in self.extractors:            
             try:
-                value = extractor(self.uname, data, self.properties)
+                value = extractor(self, data)
             except ExtractionError, e:
                 data['errors'].append(e)
                 if e.abort:
                     break
+            except Exception, e:
+                e.args = [_ for _ in e.args]+[str(extractor)]
+                raise e
             else:
                 data['extracted'].append(value)
         return data
+    
+    @property
+    def uname(self):
+        return '.'.join(self.path)
 
-    def _runpreprocessors(self, value, request, data):                
+    def _runpreprocessors(self, request, data):                
         if 'value' in data and 'request' in data:
             return data
-        data['value'] = value
+        data['value'] = self._value
         data['request'] = request
         for pp in self.preprocessors:
-            data = pp(self.uname, data, self.properties)
+            try:
+                data = pp(self, data)
+            except Exception, e:
+                e.args = [_ for _ in e.args]+[str(pp)]
+                raise e
         return data
         
 class Factory(object):
@@ -252,11 +270,6 @@ def vocabulary(definition):
         return new_vocab
     return definition
 
-
-def cssid(uname, prefix):
-    uname = uname.replace('.', '-')
-    return "%s-%s" % (prefix, uname)
-    
 def tag(name, *inners, **attributes):
     """Generates some xml/html tag.
         
