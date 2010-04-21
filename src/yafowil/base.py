@@ -89,7 +89,6 @@ class ExtractionError(Exception):
         super(ExtractionError, self).__init__(msg)
         self.abort = abort
 
-###
 class Widget(LifecycleNode):
     """Base Widget Class
     """

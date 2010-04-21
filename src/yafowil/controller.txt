@@ -1,0 +1,38 @@
+Required imports
+::
+
+    >>> import yafowil.standard
+    >>> import yafowil.compound
+    >>> from yafowil.base import factory
+    >>> from yafowil.controller import Controller
+
+Create a widget tree
+::
+
+    >>> class Context(object):
+    ...     value = 'hello world'    
+    
+    >>> context = Context()
+    
+    >>> def getter(request):
+    ...     return request.context.value
+    
+    >>> form = factory(u'compound', name='testform')
+    >>> form['field1'] = factory('input',
+    ...                          value_or_getter=getter)
+    >>> form['field2'] = factory('input',
+    ...                          value_or_getter=getter)
+    
+    >>> def handler(request, data):
+    ...     print data
+    
+    >>> actionprops = {
+    ...     'expression': True,
+    ...     'handler': handler,
+    ...     'next': None, # callable, its result is returned by Controller.__call__
+    ...     'label': 'Save',
+    ... }
+    
+    >>> form['save'] = factory('action', properties=actionprops)
+    >>> controller = Controller(form)
+    >>> controller(request)
