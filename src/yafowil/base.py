@@ -239,3 +239,9 @@ class Factory(object):
         return self._global_preprocessors + self._factories[name][2]
     
 factory = Factory()
+
+def register_renderer_prefixed(prefix, registered_name, renderers):
+    factory.register('%s.%s' % (prefix, registered_name), 
+                     factory.extractors(registered_name), 
+                     factory.renderers(registered_name) + renderers,
+                     factory.preprocessors(registered_name))

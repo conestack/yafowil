@@ -1,0 +1,24 @@
+Test the Vocabulary
+===================
+
+    >>> from yafowil.utils import vocabulary
+    >>> vocabulary('foo')
+    [('foo', 'foo')]
+
+    >>> vocabulary({'key': 'value'})
+    [('key', 'value')]
+
+    >>> vocabulary(['value', 'value2'])
+    [('value', 'value'), ('value2', 'value2')]
+
+    >>> vocabulary([('key', 'value'), ('key2', 'value2')])
+    [('key', 'value'), ('key2', 'value2')]
+        
+Test Tag renderer
+=================
+::
+    >>> from yafowil.utils import tag
+    >>> a = {'class': u'fancy', 'id': '2f5b8a234ff'}
+    >>> tag('p', 'Lorem Ipsum. ', u'Hello World!', 
+    ...     class_='fancy', id='2f5b8a234ff')
+    u'<p class="fancy" id="2f5b8a234ff">Lorem Ipsum. Hello World!</p>' 
