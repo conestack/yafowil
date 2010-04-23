@@ -14,7 +14,7 @@ TESTFILES = [
     #'array.txt',
     #'combined.txt',
     'controller.txt',
-    'labeled.txt',
+    #'labeled.txt',
 ]
 
 def test_suite():

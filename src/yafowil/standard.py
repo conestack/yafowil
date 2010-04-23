@@ -21,6 +21,26 @@ def generic_required_extractor(widget, data):
         raise ExtractionError('Mandatory field was empty')
     return extracted
 
+def action_extractor(widget, data):
+    path = '.'.join(widget.path)
+    if data['request'].get('action.%s' % path, False):
+        data['request']['triggered_action'] = path
+
+def submit_renderer(widget, data):
+    attrs = widget.attributes
+    input_attrs = {
+        'type': 'submit',
+        'class_': attrs.get('class_', ''),
+        'value': attrs['label'],
+    }
+    if attrs.get('action'):
+        input_attrs['name_'] = 'action.%s' % '.'.join(widget.path)
+    return tag('input', **input_attrs)
+
+factory.register('submit', 
+                 [action_extractor], 
+                 [submit_renderer])
+
 def input_generic_renderer(widget, data):
     attr = widget.attributes
     itype = data.get('input_field_type', 0) or attr.get('type', None)
@@ -121,19 +141,4 @@ def textarea_renderer(widget, data):
 
 factory.register('textarea', 
                  [generic_extractor, generic_required_extractor], 
-                 [textarea_renderer])    
-
-def submit_renderer(widget, data):
-    attr = widget.attributes
-    input_attrs = {
-        'type': 'submit',
-        'class_': attr.get('class',{}).get('input', None),
-        'value': attr.get('label', widget.__name__),
-        'name_': widget.uname, 
-        'id': attr.get('id',{}).get('input', cssid(widget.uname, 'action')),
-    }
-    return tag('input', **input_attrs)      
-
-factory.register('submit', 
-                 [generic_extractor], 
-                 [submit_renderer])
+                 [textarea_renderer])

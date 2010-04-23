@@ -18,21 +18,37 @@ Create a widget tree
     ...     return request.context.value
     
     >>> form = factory(u'compound', name='testform')
-    >>> form['field1'] = factory('input',
+    >>> form['field1'] = factory('text',
     ...                          value_or_getter=getter)
-    >>> form['field2'] = factory('input',
+    >>> form['field2'] = factory('text',
     ...                          value_or_getter=getter)
     
     >>> def handler(request, data):
     ...     print data
     
-    >>> actionprops = {
+    >>> props = {
+    ...     'action': 'save',
     ...     'expression': True,
     ...     'handler': handler,
     ...     'next': None, # callable, its result is returned by Controller.__call__
     ...     'label': 'Save',
     ... }
     
-    >>> form['save'] = factory('action', properties=actionprops)
+    >>> form['save'] = factory('submit', properties=props)
+    >>> form.printtree()
+    <class 'yafowil.base.Widget'>: testform
+      <class 'yafowil.base.Widget'>: field1
+      <class 'yafowil.base.Widget'>: field2
+      <class 'yafowil.base.Widget'>: save
+    
+    >>> class Request(dict):
+    ...     context = context
+    
+    >>> request = Request()
+    >>> request['action.testform.save'] = '1'
+    
+    >>> form(request)
+    
     >>> controller = Controller(form)
+    
     >>> controller(request)

@@ -90,14 +90,14 @@ Selection Widget
     value="three">Three</option><option id="input-MYSELECT-four" 
     value="four">Four</option></select>'
     
-Submit Widget
-=============
+Submit Widget (action)
+======================
 ::
 
-    >>> inputwidget = factory('submit','formname', 'ignored',
-    ...                       dict(label='Test Submit',
-    ...                            css={'input': 'submitcss'})
-    ... )    
-    >>> inputwidget()
-    u'<input id="action-formname" name="formname" type="submit" value="Test Submit" />'
- 
+    >>> props = {
+    ...     'action': True,
+    ...     'label': 'Action name',
+    ... }
+    >>> widget = factory('submit', 'save', properties=props)
+    >>> widget()
+    u'<input class="" name="action.save" type="submit" value="Action name" />'

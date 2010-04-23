@@ -166,8 +166,13 @@ class Widget(LifecycleNode):
                 e.args = [_ for _ in e.args]+[str(renderer)]
                 raise e
             
-            data['rendered'].append(value)            
-        return data.last_rendered    
+            data['rendered'].append(value)
+        return data.last_rendered
+    
+    def __setitem__(self, name, widget):
+        if not widget.__name__:
+            widget.__name__ = name
+        LifecycleNode.__setitem__(self, name, widget)
     
     def extract(self, request):
         """extract the data from the request by calling the given extractors. 
