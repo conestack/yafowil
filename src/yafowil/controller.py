@@ -26,7 +26,7 @@ class Controller(object):
     
     @property
     def actions(self, widget):
-        return [w for w in self.widget.values() if w.uniquename == 'action']
+        return [w for w in self.widget.values() if w.widgetname == 'action']
     
     def triggered(self, request, action):
         return request.params.get('action.%s' % '.'.join(action.path))
