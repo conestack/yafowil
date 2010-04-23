@@ -1,9 +1,11 @@
 from odict import odict
 from yafowil.base import (
     factory,
+)
+from yafowil.utils import (
+    cssid, 
     tag,
 )
-from yafowil.utils import cssid
 
 def compound_extractor(widget, data):
     result = dict()    

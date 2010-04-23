@@ -13,8 +13,8 @@ TESTFILES = [
     'compound.txt',
     #'array.txt',
     #'combined.txt',
-    #'labeled.txt',
     'controller.txt',
+    'labeled.txt',
 ]
 
 def test_suite():

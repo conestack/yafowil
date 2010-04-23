@@ -9,7 +9,8 @@ default::
     >>> data = yafowil.base.RuntimeData()
     >>> data['rendered'].append(u'<RUBBISH>')
     >>> data['rendered'].append(u'<INNER-WIDGET>')
-    >>> yafowil.labeled.label_renderer('MYUID', data, props)
+    >>> widget = yafowil.base.Widget([], [], [], 'MYUID', '', props)
+    >>> yafowil.labeled.label_renderer(widget, data)
     u'<label for="input-MYUID" id="label-MYUID">LABEL</label><INNER-WIDGET>'
 
 label after widget

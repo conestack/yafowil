@@ -92,17 +92,9 @@ class ExtractionError(Exception):
 class Widget(LifecycleNode):
     """Base Widget Class
     """
-    def __init__(self, uniquename, value_or_getter, extractors, renderers, 
-                 preprocessors, properties):
+    def __init__(self, extractors, renderers, preprocessors, 
+                 uniquename=None, value_or_getter=None, properties=dict()):
         """Initialize the widget. 
-        
-        ``uniquename``
-            id as string containing characters from a-z, A-Z, 0-9 only. Must not
-            start with numerical character. 
-            
-        ``value_or_getter``
-            either a callable or the value itself. If callable, its called 
-            before passing to given ``renderer`` 
             
         ``extractors``
             list of callables extracting the data and returning it. Each 
@@ -121,8 +113,16 @@ class Widget(LifecycleNode):
 
         ``preprocessors``
             list of callables executed before extract or rendering. Executed 
-            only once for a given runtime data. has same signature a s extract. 
+            only once for a given runtime data. has same signature a s extract.
+             
+        ``uniquename``
+            id as string containing characters from a-z, A-Z, 0-9 only. Must not
+            start with numerical character. 
             
+        ``value_or_getter``
+            either a callable or the value itself. If callable, its called 
+            before passing to given ``renderer`` 
+                        
         ``properties``
             arbitrary dict-like passed through for use in renderer and 
             extractor, static data must never be modifed!
@@ -136,10 +136,9 @@ class Widget(LifecycleNode):
         for key in properties:
             self.attributes[key] = properties[key]
     
-    @property
-    def _value(self):
+    def _value(self, request):
         if callable(self.getter):
-            return self.getter()
+            return self.getter(request)
         return self.getter
         
     def __call__(self, request={}, data=None):
@@ -199,7 +198,7 @@ class Widget(LifecycleNode):
     def _runpreprocessors(self, request, data):                
         if 'value' in data and 'request' in data:
             return data
-        data['value'] = self._value
+        data['value'] = self._value(request)
         data['request'] = request
         for pp in self.preprocessors:
             try:
@@ -221,13 +220,14 @@ class Factory(object):
     def register_global_preprocessors(self, preprocessors):
         self._global_preprocessors += preprocessors
         
-    def __call__(self, widgetname, uniquename, value_or_getter, 
-                 properties=None):
-        if properties is None:
-            properties = dict()
-        extractors, renderers, preproc = self._factories[widgetname]
-        return Widget(uniquename, value_or_getter, extractors, renderers, 
-                      self._global_preprocessors + preproc, properties)
+    def __call__(self, registeredname, 
+                 name=None, value_or_getter=None, properties=dict()):
+        extractors, renderers, preproc = self._factories[registeredname]
+        return Widget(extractors, renderers, 
+                      self._global_preprocessors + preproc, 
+                      uniquename=name, 
+                      value_or_getter=value_or_getter, 
+                      properties=properties)
     
     def extractors(self, name):
         return self._factories[name][0]
@@ -240,78 +240,8 @@ class Factory(object):
     
 factory = Factory()
 
-def vocabulary(definition):
-    """Convert different kinds of input into a list of bi-tuples, both strings.
-    """
-    if callable(definition):
-        definition = definition() 
-    if isinstance(definition, basestring):
-        return [(definition, definition),]
-    # dict-like
-    if hasattr(definition, '__getitem__') and hasattr(definition, 'keys'):
-        return [(_, definition[_]) for _ in definition.keys()]
-    
-    # iterable
-    if hasattr(definition, '__iter__'):
-        new_vocab = []
-        for entry in definition:
-            if isinstance(entry, basestring):
-                # entry is a string
-                new_vocab.append((entry, entry))
-            elif hasattr(entry, '__iter__'):
-                # entry is a sequence
-                parts = [_ for _ in entry]
-                if len(parts) > 1:
-                    # take first two parts and skips others
-                    new_vocab.append(entry[0:2])
-                else:
-                    # rare case, inner has one value only
-                    new_vocab.append((entry[0], entry[0]))
-        return new_vocab
-    return definition
-
-def tag(name, *inners, **attributes):
-    """Generates some xml/html tag.
-        
-    ``name``
-        name of a valid tag
-        
-    ``inners``
-        inner content of the tag. If empty a closed tag is generated
-    
-    ``attributes``
-        attributes of the tag, leading or trailing ``_`` underscores are 
-        omitted from keywords.
-
-    Example::
-
-        >>> tag('p', 'Lorem Ipsum.', u'Hello World!', 
-        ...     class_='fancy', id='2f5b8a234ff')
-        <p class="fancy" id="2f5b8a234ff">Lorem Ipsum. Hello World.</p>
-    
-    """
-    cl = list()
-    for key, value in attributes.items():
-        if value is None:
-            continue
-        if not isinstance(value, unicode):
-            value = str(value).decode('utf-8')
-        cl.append((key.strip('_'), value))
-    attributes = u''
-    if cl:
-        attributes = u' %s' % u' '.join(sorted([u'%s="%s"' % _ for _ in cl]))     
-    cl = list()
-    for inner in inners:
-        if not isinstance(inner, unicode):
-            inner = str(inner).decode('utf-8')
-        cl.append(inner)
-    if not cl:
-        return u'<%(name)s%(attrs)s />' % {
-            'name': name,
-            'attrs': attributes,
-        }
-    return u'<%(name)s%(attrs)s>%(value)s</%(name)s>' % {
-        'name': name,
-        'attrs': attributes,
-        'value': u''.join(i for i in cl),
-    }
+def register_renderer_prefixed(prefix, registered_name, renderers):
+    factory.register('%s.%s' % (prefix, registered_name), 
+                     factory.extractors(registered_name), 
+                     factory.renderers(registered_name) + renderers,
+                     factory.preprocessors(registered_name))
