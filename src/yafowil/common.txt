@@ -3,7 +3,7 @@ Preparation
 
 Trigger registry by importing
 
-    >>> import yafowil.standard
+    >>> import yafowil.common
         
 Text Input Widget
 =================

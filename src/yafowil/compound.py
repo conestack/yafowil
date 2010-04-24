@@ -18,7 +18,8 @@ def compound_renderer(widget, data):
     for childname in widget:
         kw = dict() 
         if data['extracted']: 
-            kw['data'] = data['extracted'][0][childname] # XXX First Extracted!?!? looks like a hack
+            # XXX First Extracted!?!? looks like a hack
+            kw['data'] = data['extracted'][0][childname]
         kw['request'] = data['request']
         result += widget[childname](**kw)
     return result
@@ -46,23 +47,23 @@ def fieldset_renderer(widget, data):
 
 factory.register('fieldset', 
                  factory.extractors('compound'), 
-                 factory.renderers('compound')+[fieldset_renderer],
+                 factory.renderers('compound') + [fieldset_renderer],
                  factory.preprocessors('compound'))
 
-# XXX outdated, controller takes over here
-def form_renderer(uname, data, properties):
-    method = properties.get('method', None)
+def form_renderer(widget, data):
+    props = widget.attrs
+    method = props.get('method', 'post')
     enctype_default = method == 'post' and 'multipart/form-data' or None
     form_attrs = {
-        'action': properties['action'],
+        'action': props.action,
         'method': method,
-        'enctype': properties.get('enctype', enctype_default),
-        'class_': properties.get('class', {}).get('form', None),
-        'id': properties.get('id', {}).get('form', 'form-%s' % uname),
+        'enctype': props.get('enctype', enctype_default),
+        'class_': props.get('class_'),
+        'id': 'form-%s' % '-'.join(widget.path),
     }
     return tag('form', data.last_rendered, **form_attrs)
 
 factory.register('form', 
                  factory.extractors('compound'), 
-                 factory.renderers('compound')+[form_renderer],
+                 factory.renderers('compound') + [form_renderer],
                  factory.preprocessors('compound'))

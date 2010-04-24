@@ -1,11 +1,11 @@
 Preparation
-===========
+::
 
-    >>> import yafowil.standard
+    >>> import yafowil.common
     >>> from yafowil.base import factory, RuntimeData
     
 Test Rendering of Compound
-==========================
+::
 
     >>> import yafowil.compound
     >>> compound = factory('compound', 
@@ -20,6 +20,7 @@ Test Rendering of Compound
     type="text" value="value2" />'
     
 Same with delegation switched on:
+::
 
     >>> compound = factory('compound', 
     ...                    'COMPOUND', 
@@ -34,7 +35,7 @@ Same with delegation switched on:
     type="text" value="othervalue" />'
 
 Test Extraction of Widget
-=========================
+::
 
     >>> compound.extract({'COMPOUND.inner': 'newvalue'})
     {'errors': [], 'extracted': [{'inner2': {'errors': [], 
@@ -46,12 +47,12 @@ Test Extraction of Widget
     'value': {'inner2': 'othervalue', 'inner': 'somevalue'}}
 
 Test Fieldset
-=============
 ::
 
     >>> compound = factory('fieldset', 
-    ...                    'COMPOUND', {'inner': 'somevalue', 
-    ...                                 'inner2': 'othervalue'})
+    ...                    'COMPOUND',
+    ...                    {'inner': 'somevalue', 
+    ...                     'inner2': 'othervalue'})
     >>> compound['inner'] = factory('text', 'inner', 'value')
     >>> compound['inner2'] = factory('text', 'inner2', 'value2')
     >>> compound()
@@ -59,4 +60,13 @@ Test Fieldset
     name="COMPOUND.inner" type="text" value="value" /><input 
     id="input-COMPOUND-inner2" name="COMPOUND.inner2" type="text" 
     value="value2" /></fieldset>'
-    
+
+Test Form
+::
+
+    >>> form = factory('form',
+    ...                'FORM',
+    ...                properties={'action': 'http://fubar.com'})
+    >>> form({})
+    u'<form action="http://fubar.com" enctype="multipart/form-data" 
+    id="form-FORM" method="post"></form>'

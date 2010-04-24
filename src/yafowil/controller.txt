@@ -1,7 +1,7 @@
 Required imports
 ::
 
-    >>> import yafowil.standard
+    >>> import yafowil.common
     >>> import yafowil.compound
     >>> from yafowil.base import factory
     >>> from yafowil.controller import Controller
@@ -14,27 +14,41 @@ Create a widget tree
     
     >>> context = Context()
     
+    XXX: need widget as well in getter for generic getters mapping to fieldnames
     >>> def getter(request):
     ...     return request.context.value
     
-    >>> form = factory(u'compound', name='testform')
+    >>> form = factory(u'form',
+    ...                name='testform',
+    ...                properties={'action': 'http://fubar.com'})
     >>> form['field1'] = factory('text',
     ...                          value_or_getter=getter)
     >>> form['field2'] = factory('text',
-    ...                          value_or_getter=getter)
+    ...                          value_or_getter='',
+    ...                          properties={'required': True})
     
-    >>> def handler(request, data):
-    ...     print data
+    >>> def handler(request, widget):
+    ...     print request
+    
+    >>> def next(request):
+    ...     return 'next return value'
     
     >>> props = {
     ...     'action': 'save',
     ...     'expression': True,
     ...     'handler': handler,
-    ...     'next': None, # callable, its result is returned by Controller.__call__
+    ...     'next': next,
     ...     'label': 'Save',
     ... }
     
-    >>> form['save'] = factory('submit', properties=props)
+    >>> form['save'] = factory('submit',
+    ...                        properties={
+    ...                            'action': 'save',
+    ...                            'expression': True,
+    ...                            'handler': handler,
+    ...                            'next': next,
+    ...                            'label': 'Save',
+    ...                        })
     >>> form.printtree()
     <class 'yafowil.base.Widget'>: testform
       <class 'yafowil.base.Widget'>: field1
@@ -45,11 +59,32 @@ Create a widget tree
     ...     context = context
     
     >>> request = Request()
-    >>> request['action.testform.save'] = '1'
     
     >>> form(request)
-    u'<input id="input-testform-field1" name="testform.field1" type="text" value="hello world" /><input id="input-testform-field2" name="testform.field2" type="text" value="hello world" /><input class="" id="input-testform-save" name="action.testform.save" type="submit" value="Save" />'
+    u'<form action="http://fubar.com" enctype="multipart/form-data" 
+    id="form-testform" method="post"><input id="input-testform-field1" 
+    name="testform.field1" type="text" value="hello world" /><input 
+    class="required" id="input-testform-field2" name="testform.field2" 
+    type="text" value="" /><input class="" id="input-testform-save" 
+    name="action.testform.save" type="submit" value="Save" /></form>'
+
+Create controller for form.
+::
+
+    >>> controller = Controller(form)
     
-    >>> #controller = Controller(form)
+If action is not triggered, ``__call__`` of controller returns ``None`` and
+``Controller.error`` is ``False``.
+::
     
+    >>> controller(request)
+    >>> controller.error
+    False
+
+Now trigger our save action. Controller must result in an error, since we have
+a requred field.
+
+    >>> request['action.testform.save'] = '1'
     >>> #controller(request)
+    XXX: fails - required field not recognized
+    

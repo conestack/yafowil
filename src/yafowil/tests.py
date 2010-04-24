@@ -9,7 +9,7 @@ optionflags = doctest.NORMALIZE_WHITESPACE | \
 
 TESTFILES = [
     'base.txt',
-    'standard.txt',
+    'common.txt',
     'compound.txt',
     #'array.txt',
     #'combined.txt',
