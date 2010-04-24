@@ -19,6 +19,7 @@ def compound_renderer(widget, data):
         kw = dict() 
         if data['extracted']: 
             kw['data'] = data['extracted'][0][childname] # XXX First Extracted!?!? looks like a hack
+        kw['request'] = data['request']
         result += widget[childname](**kw)
     return result
 

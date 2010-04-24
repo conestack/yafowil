@@ -48,7 +48,8 @@ Create a widget tree
     >>> request['action.testform.save'] = '1'
     
     >>> form(request)
+    u'<input id="input-testform-field1" name="testform.field1" type="text" value="hello world" /><input id="input-testform-field2" name="testform.field2" type="text" value="hello world" /><input class="" id="input-testform-save" name="action.testform.save" type="submit" value="Save" />'
     
-    >>> controller = Controller(form)
+    >>> #controller = Controller(form)
     
-    >>> controller(request)
+    >>> #controller(request)

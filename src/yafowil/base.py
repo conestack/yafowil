@@ -163,7 +163,7 @@ class Widget(LifecycleNode):
             try:
                 value = renderer(self, data)
             except Exception, e:
-                e.args = [_ for _ in e.args]+[str(renderer)]
+                e.args = [a for a in e.args] + [str(renderer)] + self.path
                 raise e
             
             data['rendered'].append(value)
@@ -190,7 +190,7 @@ class Widget(LifecycleNode):
                 if e.abort:
                     break
             except Exception, e:
-                e.args = [_ for _ in e.args]+[str(extractor)]
+                e.args = [a for a in e.args] + [str(extractor)] + self.path
                 raise e
             else:
                 data['extracted'].append(value)
@@ -209,7 +209,7 @@ class Widget(LifecycleNode):
             try:
                 data = pp(self, data)
             except Exception, e:
-                e.args = [_ for _ in e.args]+[str(pp)]
+                e.args = [a for a in e.args] + [str(pp)] + self.path
                 raise e
         return data
         

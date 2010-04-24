@@ -29,6 +29,7 @@ def action_extractor(widget, data):
 def submit_renderer(widget, data):
     attrs = widget.attributes
     input_attrs = {
+        'id': 'input-%s' % '-'.join(widget.path),
         'type': 'submit',
         'class_': attrs.get('class_', ''),
         'value': attrs['label'],

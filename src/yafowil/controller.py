@@ -20,8 +20,8 @@ class Controller(object):
         self.handle(self.widget, request)
         for action in self.actions:
             if self.triggered(request, action):
-                if action.attributes.next:
-                    return action.attributes.next()
+                if action.attributes.get('next'):
+                    return action.attributes['next'](request)
         return None
     
     @property
@@ -29,7 +29,7 @@ class Controller(object):
         return [w for w in self.widget.values() if w.attributes.get('action')]
     
     def triggered(self, request, action):
-        return request.params.get('action.%s' % '.'.join(action.path))
+        return request.get('action.%s' % '.'.join(action.path))
     
     def handle(self, widget, request):
         for action in self.actions:

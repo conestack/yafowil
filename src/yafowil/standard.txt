@@ -100,4 +100,4 @@ Submit Widget (action)
     ... }
     >>> widget = factory('submit', 'save', properties=props)
     >>> widget()
-    u'<input class="" name="action.save" type="submit" value="Action name" />'
+    u'<input class="" id="input-save" name="action.save" type="submit" value="Action name" />'
