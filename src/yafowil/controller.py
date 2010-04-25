@@ -15,19 +15,20 @@ class Controller(object):
         """Perform form processing for widget.
         """
         data = self.widget.extract(request)
-        self.error = self._error(data)
+        self.error = False
+        self._error(data)
         if self.error:
             return None
         self.handle(self.widget, request)
         for action in self.actions:
             if self.triggered(request, action):
-                if action.attributes.get('next'):
-                    return action.attributes.next(request)
+                if action.attrs.get('next'):
+                    return action.attrs.next(request)
         return None
     
     @property
     def actions(self):
-        return [w for w in self.widget.values() if w.attributes.get('action')]
+        return [w for w in self.widget.values() if w.attrs.get('action')]
     
     def triggered(self, request, action):
         return request.get('action.%s' % '.'.join(action.path))
@@ -36,18 +37,16 @@ class Controller(object):
         for action in self.actions:
             if self.triggered(request, action):
                 if action.attributes.get('handler'):
-                    action.attributes.handler(widget, request)
+                    action.attributes.handler(request, widget)
         for sub in widget.values():
             self.handle(sub, request)
     
     def _error(self, data):
-        if isinstance(data, dict):
-            if data.get('errors'):
-                return True
-        else:
-            return False
+        if data.get('errors'):
+            self.error = True
+            return
         for sub in data['extracted']:
+            if not isinstance(sub, dict):
+                continue
             for key in sub.keys():
-                if self._error(sub[key]['extracted']):
-                    return True
-        return False
+                self._error(sub[key])

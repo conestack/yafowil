@@ -11,13 +11,12 @@ from utils import (
 
 def generic_extractor(widget, data):    
     return data['request'].get(widget.uname, 
-                               widget.attributes.get('default', UNSET))               
+                               widget.attrs.get('default', UNSET))               
 
 def generic_required_extractor(widget, data):
-    extracted = data.last_extracted     
-    if widget.attributes.get('required', False) \
-       and extracted is not UNSET \
-       and not bool(extracted):
+    extracted = data.last_extracted
+    if widget.attrs.get('required', False) \
+       and (extracted is UNSET or not bool(extracted)):
         raise ExtractionError('Mandatory field was empty')
     return extracted
 

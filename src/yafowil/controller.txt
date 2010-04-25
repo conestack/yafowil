@@ -6,18 +6,23 @@ Required imports
     >>> from yafowil.base import factory
     >>> from yafowil.controller import Controller
 
-Create a widget tree
+Dummy context
 ::
 
     >>> class Context(object):
     ...     value = 'hello world'    
-    
     >>> context = Context()
-    
+
+Dumy getter
+::
+
     XXX: need widget as well in getter for generic getters mapping to fieldnames
     >>> def getter(request):
     ...     return request.context.value
-    
+
+Create Widget tree
+::
+ 
     >>> form = factory(u'form',
     ...                name='testform',
     ...                properties={'action': 'http://fubar.com'})
@@ -26,12 +31,23 @@ Create a widget tree
     >>> form['field2'] = factory('text',
     ...                          value_or_getter='',
     ...                          properties={'required': True})
-    
+
+Define action ``handler``
+::
+
     >>> def handler(request, widget):
-    ...     print request
-    
+    ...     print 'handler called "%s"' % '.'.join(widget.path)
+
+Define action ``next``
+::
+
     >>> def next(request):
     ...     return 'next return value'
+
+Indicate widget to be an ``action`` definition by setting ``action`` attribute
+to widget properties. ``expression``, ``handler`` and ``next`` are action
+referring properties.
+::
     
     >>> props = {
     ...     'action': 'save',
@@ -40,26 +56,31 @@ Create a widget tree
     ...     'next': next,
     ...     'label': 'Save',
     ... }
-    
-    >>> form['save'] = factory('submit',
-    ...                        properties={
-    ...                            'action': 'save',
-    ...                            'expression': True,
-    ...                            'handler': handler,
-    ...                            'next': next,
-    ...                            'label': 'Save',
-    ...                        })
+
+Add save action.
+::
+
+    >>> form['save'] = factory('submit', properties=props)
+
+Check widget tree
+::
+
     >>> form.printtree()
     <class 'yafowil.base.Widget'>: testform
       <class 'yafowil.base.Widget'>: field1
       <class 'yafowil.base.Widget'>: field2
       <class 'yafowil.base.Widget'>: save
-    
+
+Dummy request
+::
+  
     >>> class Request(dict):
     ...     context = context
-    
     >>> request = Request()
-    
+
+Render form
+::
+
     >>> form(request)
     u'<form action="http://fubar.com" enctype="multipart/form-data" 
     id="form-testform" method="post"><input id="input-testform-field1" 
@@ -73,18 +94,44 @@ Create controller for form.
 
     >>> controller = Controller(form)
     
-If action is not triggered, ``__call__`` of controller returns ``None`` and
-``Controller.error`` is ``False``.
+If action is not triggered, ``__call__`` of controller returns ``None``.
 ::
     
+    >>> controller(request)
+    
+Since validation failed due to missing required field, ``error`` is True
+::
+
+    >>> controller.error
+    True
+
+Provide required field
+::
+
+    >>> request['testform.field2'] = '1'
     >>> controller(request)
     >>> controller.error
     False
 
-Now trigger our save action. Controller must result in an error, since we have
-a requred field.
+Trigger save action without required field
+::
 
+    >>> del request['testform.field2']
     >>> request['action.testform.save'] = '1'
-    >>> #controller(request)
-    XXX: fails - required field not recognized
+    >>> controller(request)
+    >>> controller.error
+    True
+
+Trigger action with valid input
+::
+
+    >>> request['testform.field2'] = '1'
+    >>> controller(request)
+    handler called "testform"
+    handler called "testform.field1"
+    handler called "testform.field2"
+    handler called "testform.save"
+    'next return value'
     
+    >>> controller.error
+    False

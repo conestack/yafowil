@@ -39,17 +39,31 @@ Required Input Widget
 =====================    
 ::
 
-    >>> inputwidget = factory('text', 'REQUIRED', 'Test Text',
-    ...                       {'required': True})    
+    >>> inputwidget = factory('text', 'REQUIRED', '',
+    ...                       {'required': True})
     >>> inputwidget()
     u'<input class="required" id="input-REQUIRED" name="REQUIRED" type="text" 
-    value="Test Text" />'
+    value="" />'
 
+    >>> data = inputwidget.extract({})
+    >>> data
+    {'errors': [ExtractionError('Mandatory field was empty',)], 
+    'extracted': [<UNSET>], 'input_field_type': 'text', 'rendered': [], 
+    'request': {}, 'value': ''}
+    
     >>> data = inputwidget.extract({'REQUIRED': ''})
     >>> data
-    {'errors': [ExtractionError('Mandatory field was empty',)], 'extracted': [''], 
-    'input_field_type': 'text', 'rendered': [], 'request': {'REQUIRED': ''}, 
-    'value': 'Test Text'}
+    {'errors': [ExtractionError('Mandatory field was empty',)], 
+    'extracted': [''], 'input_field_type': 'text', 'rendered': [], 
+    'request': {'REQUIRED': ''}, 'value': ''}
+    
+    >>> inputwidget = factory('text', 'REQUIRED', 'Test Text',
+    ...                       {'required': True})
+    >>> data = inputwidget.extract({'REQUIRED': ''})
+    >>> data
+    {'errors': [ExtractionError('Mandatory field was empty',)], 
+    'extracted': [''], 'input_field_type': 'text', 'rendered': [], 
+    'request': {'REQUIRED': ''}, 'value': 'Test Text'}
     
     >>> inputwidget(data=data)
     u'<input class="error required" id="input-REQUIRED" name="REQUIRED" type="text" 
