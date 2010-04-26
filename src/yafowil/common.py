@@ -61,26 +61,18 @@ class InputGenericPreprocessor(object):
     def __call__(self, widget, data):
         data['input_field_type'] = self.inputtype   
         return data 
+    
+def register_generic_input(subtype):
+    factory.register(subtype, 
+                     [generic_extractor, generic_required_extractor], 
+                     [input_generic_renderer],
+                     [InputGenericPreprocessor(subtype)])
 
-factory.register('text', 
-                 [generic_extractor, generic_required_extractor], 
-                 [input_generic_renderer],
-                 [InputGenericPreprocessor('text')])
-
-factory.register('hidden', 
-                 [generic_extractor, generic_required_extractor], 
-                 [input_generic_renderer],
-                 [InputGenericPreprocessor('hidden')])
-
-factory.register('radio', 
-                 [generic_extractor, generic_required_extractor], 
-                 [input_generic_renderer],
-                 [InputGenericPreprocessor('radio')])
-
-factory.register('checkbox', 
-                 [generic_extractor, generic_required_extractor], 
-                 [input_generic_renderer],
-                 [InputGenericPreprocessor('checkbox')])
+register_generic_input('text')
+register_generic_input('password')
+register_generic_input('hidden')
+register_generic_input('radio')
+register_generic_input('checkbox')
 
 def input_file_renderer(widget, data):
     input_attrs = {
