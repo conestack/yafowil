@@ -1,6 +1,4 @@
-from yafowil.base import (
-    register_renderer_prefixed,
-)
+from yafowil.base import factory
 from yafowil.utils import ( 
     tag,
     cssid, 
@@ -20,6 +18,7 @@ def label_renderer(widget, data):
         return data.last_rendered + tag('label', label_text, **label_attrs)
     return tag('label', label_text, **label_attrs) + data.last_rendered
 
+factory.register('label', [], [label_renderer])
 
 def field_renderer(widget, data):
     div_attrs = {
@@ -28,22 +27,4 @@ def field_renderer(widget, data):
     }
     return tag('div', data.last_rendered, **div_attrs)
 
-def register_as_labeled_and_field(registered_name):
-    register_renderer_prefixed('label', registered_name, [label_renderer])
-    register_renderer_prefixed('field', registered_name, 
-                               [label_renderer, field_renderer])
-
-register_as_labeled_and_field('text')
-register_as_labeled_and_field('select')
-register_as_labeled_and_field('file')
-register_as_labeled_and_field('textarea')
-#
-#factory.register('field.submit', 
-#                 factory.extractors('submit'), 
-#                 factory.renderers('submit') + [field_renderer],
-#                 factory.preprocessors('submit'))
-#
-#factory.register('field.array', 
-#                 factory.extractors('array'), 
-#                 factory.renderers('array') + [label_renderer, field_renderer],
-#                 factory.preprocessors('array'))
+factory.register('field', [], [label_renderer, field_renderer])

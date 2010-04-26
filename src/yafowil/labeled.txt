@@ -33,7 +33,7 @@ and back to default with error class applied::
     
 from factory::
 
-    >>> widget = yafowil.base.factory('field.file', 'MYFILE', \
+    >>> widget = yafowil.base.factory('field:file', 'MYFILE', \
     ...                               properties={'label': 'MY FILE'})
     >>> widget()
     u'<div id="field-MYFILE"><label for="input-MYFILE" 

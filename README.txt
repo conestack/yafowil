@@ -11,28 +11,40 @@ browser per widget.
 Widgets are just configuration. Yafowil does not provide classes for widgets, 
 but a factory where you can fetch your widgets from - and register your own. 
  
-Yafowil aims to have **no dependencies in core other than Python**. It also does 
-not know about data-storage. 
+Yafowil aims to have no dependencies to any framework. It utilizes ``Node`` from 
+``zodict``. And so it has flimsy dependecies to ``zope.location``. It also does 
+not know about data-storage, but offers you a hook to add your handler. 
 
 Tired of inventing widgets again and again after switching the python framework 
-Yafowil is intentionally written framework-independent. by just feeding it with 
+Yafowil is intentionally written framework-independent. By just feeding it with 
 configuration it can be used and extended in most of existing python web 
 frameworks. Zope, Bfg and Django are hot candidates.   
 
 It provides widgets for all HTML standard inputs, Such as: text, textarea, 
 dropdown, checkbox, radiobutton, file, hidden, submit. 
 
+There are different possibilities to group or wrap widgets and their behaviour.
+
+First you can register chains of renderers and/or extractors under an own name.
+
+Sesond you can request such chains from the factory. I.e. by calling 
+``widget = factory('field:label:text')``. 
+
 Additional it provides the possibility to build compounds (aka subforms). 
-The main form is also just a compound. Fieldset is a kind of compound.
+The main form is also just a compound. Fieldset is a kind of compound. Compounds
+are built using the dict-like and location aware ``Node`` mentioned above.
 
-With an ``array`` repeating any widget several times is possible. 
+If one needs an compound several times, it can be build at factory time by 
+registering one or more subwidget functions. A good example for such a static 
+compound is a validating password widgets (those annoying ones where you need to 
+enter your password twice. Its an compound of two simple password widgets plus an 
+validation (extractor) on the surrounding compund.
 
-Some more complex widgets are provided too, such as the ``select_or_add``. It 
-serves also as an example how to build own widgets combining more than one 
-field.
+With an ``array`` repeating any widget several times is possible. An array is an 
+special dynamic compound.
 
 Other widgets are provided in separate packages. The idea is to use the same 
-namespace: ``yafowil.*``.
+namespace: ``yafowil.*``. 
 
 Architecture
 ============
@@ -52,20 +64,24 @@ renderers
 extractors
     list of callables getting form data out of request, providing it dict-like.
 
+subwidgets
+    list of callables constructing contained widgets at factory time.
+
 Also passed is some static configuration:
 
-- unique name as string,
+- name as string,
 - arbitary properties as general keyword arguments (for read-only use).
  
-Different widget flavors - combinations of preprocessors, extractors and 
-renderers - are registered in a registry. This registry is also a factory
+Different widget flavors - combinations of preprocessors, extractors, renderers
+and subwidgets - are registered in a registry. This registry is also a factory
 spitting out configured widgets by name.  
 
 Behaviour
 =========
  
 To get an instance of the widget call the factory and pass the registered name, 
-a unique name for this widget instance, the value and arbitrary properties.
+a unique name for this widget instance, the value (or an getter) and arbitrary 
+properties.
 
 Widget instances are providing two functionalities:
 

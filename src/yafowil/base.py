@@ -190,10 +190,6 @@ class Widget(LifecycleNode):
             else:
                 data['extracted'].append(value)
         return data
-    
-    @property
-    def uname(self):
-        return '.'.join(self.path)
 
     def _runpreprocessors(self, request, data):                
         if 'value' in data and 'request' in data:
@@ -225,11 +221,20 @@ class Factory(object):
     def register_global_preprocessors(self, preprocessors):
         self._global_preprocessors += preprocessors
         
-    def __call__(self, reg_name, 
+    def __call__(self, reg_names, 
                  name=None, value_or_getter=None, properties=dict()):
-        extractors, renderers, preproc, subwidgets = self._factories[reg_name]
+        extractors = []
+        renderers = []
+        preprocessors = []
+        subwidgets = []
+        for reg_name in reg_names.split(':'):                   
+            ex, ren, pre, sub = self._factories[reg_name]
+            extractors = ex + extractors
+            renderers = ren + renderers
+            preprocessors = preprocessors + pre
+            subwidgets = subwidgets + sub
         widget = Widget(extractors, renderers, 
-                        self._global_preprocessors + preproc, 
+                        self._global_preprocessors + preprocessors, 
                         uniquename=name, 
                         value_or_getter=value_or_getter, 
                         properties=properties)
@@ -250,10 +255,3 @@ class Factory(object):
         return self._factories[name][3]
     
 factory = Factory()
-
-def register_renderer_prefixed(prefix, registered_name, renderers):
-    factory.register('%s.%s' % (prefix, registered_name), 
-                     factory.extractors(registered_name), 
-                     factory.renderers(registered_name) + renderers,
-                     factory.preprocessors(registered_name),
-                     factory.subwidgets(registered_name))

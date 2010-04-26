@@ -165,7 +165,7 @@ Test the base widget class::
         
 Test the factory
 ================
-
+::
     >>> from yafowil.base import Factory
     >>> factory = Factory()
     >>> factory.register('widget_test', [test_extractor], [test_renderer])
@@ -181,9 +181,9 @@ Test the factory
     ('r1', 'MYFAC', "{'errors': [], 'extracted': [], 'rendered': [], 'request': 
     {}, 'value': 'Test Value'}", "{'foo': 'bar'}")
     
-subwidgets in the factory
-------------------------- 
-    
+We can create sets of static subwidgets, i.e. to have a validating password
+field with two input fields in. Here a simpler example:: 
+
     >>> def create_static_compound(widget, factory):
     ...     widget['one'] = factory('widget_test', widget.attrs)
     ...     widget['two'] = factory('widget_test', widget.attrs)
@@ -194,3 +194,40 @@ subwidgets in the factory
     >>> widget = factory('static_compound', {})
     >>> widget.keys()
     ['one', 'two']
+        
+request chains via factory
+--------------------------
+
+Sometimes we want to wrap inputs by UI candy, primary for usability reasons. 
+This might be a label, some error output or div around. We dont want to register
+an amount of X possible widgets with an amount of Y possible wrappers. Therefore
+we can factor a widget in a chain defined colon-separated, i.e 'outer:inner' or 
+'field:error:text'. Chaining works for all parts: renderers, extractors, 
+preprocessors and subwidgets. Most inner and first executed is right (we prefix 
+with wrappers)!
+::
+
+    >>> def inner_renderer(widget, data):
+    ...     return u'<INNER />'
+
+    >>> def inner_extractor(widget, data):
+    ...     return ['extracted inner']
+
+    >>> def outer_renderer(widget, data):
+    ...     return u'<OUTER>%s</OUTER>' % data.last_rendered
+    
+    >>> def outer_extractor(widget, data):
+    ...     return data.last_extracted + ['extracted outer']
+        
+    >>> factory.register('inner', [inner_extractor], [inner_renderer])
+    >>> factory.register('outer', [outer_extractor], [outer_renderer])
+    >>> widget = factory('outer:inner')
+    >>> data = widget.extract({})
+    >>> data.last_extracted
+    ['extracted inner', 'extracted outer']
+    
+    >>> widget(data)
+    u'<OUTER><INNER /></OUTER>'
+    
+    
+    
