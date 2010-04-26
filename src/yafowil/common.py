@@ -17,6 +17,8 @@ def generic_required_extractor(widget, data):
     extracted = data.last_extracted
     if widget.attrs.get('required', False) \
        and (extracted is UNSET or not bool(extracted)):
+        if isinstance(widget.attributes['required'], basestring):
+            raise ExtractionError(widget.attributes['required'])
         raise ExtractionError('Mandatory field was empty')
     return extracted
 
@@ -127,6 +129,39 @@ def submit_renderer(widget, data):
         input_attrs['name_'] = 'action.%s' % '.'.join(widget.path)
     return tag('input', **input_attrs)
 
-factory.register('submit', 
-                 [action_extractor], 
-                 [submit_renderer])
+factory.register('submit', [action_extractor], [submit_renderer])
+
+def label_renderer(widget, data):
+    label_text = widget.attributes.get('label', widget.__name__)
+    label_attrs = {
+        'id': cssid(widget, 'label'),
+        'for_': cssid(widget, 'input'),
+    }
+    pos = widget.attributes.get('labelpos', None)
+    if pos == 'inner':
+        return tag('label', label_text, data.last_rendered, **label_attrs)
+    elif pos == 'after':
+        return data.last_rendered + tag('label', label_text, **label_attrs)
+    return tag('label', label_text, **label_attrs) + data.last_rendered
+
+factory.register('label', [], [label_renderer])
+
+def field_renderer(widget, data):
+    div_attrs = {
+        'id': cssid(widget, 'field'),
+        'class_': cssclasses(widget, data)
+    }
+    return tag('div', data.last_rendered, **div_attrs)
+
+factory.register('field', [], [field_renderer])
+
+def error_renderer(widget, data):
+    content = list()
+    for error in data['errors']:
+        content.append(tag('p', str(error), class_='errormessage'))
+    if not content:
+        return data.last_rendered
+    content += [data.last_rendered]
+    return tag('div', *content, class_='errors')
+
+factory.register('error', [], [error_renderer])

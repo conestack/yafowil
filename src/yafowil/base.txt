@@ -116,7 +116,18 @@ Test the base widget class::
     ...                     [test_renderer], 
     ...                     [test_preprocessor],
     ...                     'MYUID', test_getter,
-    ...                     dict(test1='Test1', test2='Test2'))    
+    ...                     dict(test1='Test1', test2='Test2'))
+        
+    >>> testwidget() 
+    ('r1', 'MYUID', "{'errors': [], 'extracted': [], 'rendered': [], 'request': 
+    {}, 'test_preprocessor': 'called', 'value': 'Test Value'}", "{'test1': 
+    'Test1', 'test2': 'Test2'}")
+
+    >>> testwidget(request=test_request) 
+    ('r1', 'MYUID', "{'errors': [], 'extracted': ['e1'], 'rendered': [], 'request': 
+    {'MYUID': 'New Test Value'}, 'test_preprocessor': 'called', 'value': 
+    'Test Value'}", "{'test1': 'Test1', 'test2': 'Test2'}")
+    
     >>> testwidget.extract(test_request)
     {'errors': [], 'extracted': ['e1'], 'rendered': [], 'request': {'MYUID': 
     'New Test Value'}, 'test_preprocessor': 'called', 'value': 'Test Value'}
