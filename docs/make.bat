@@ -3,8 +3,8 @@
 REM Command file for Sphinx documentation
 
 set SPHINXBUILD=sphinx-build
-set BUILDDIR=/home/rnix/workspace/mdb-backend/devsrc/yafowil/docs
-set ALLSPHINXOPTS=-d %BUILDDIR%/doctrees %SPHINXOPTS% /home/rnix/workspace/mdb-backend/devsrc/yafowil/docs-source
+set BUILDDIR=/home/jensens/workspace/yafowil/yafowil/docs
+set ALLSPHINXOPTS=-d %BUILDDIR%/doctrees %SPHINXOPTS% /home/jensens/workspace/yafowil/yafowil/docs-source
 if NOT "%PAPER%" == "" (
 	set ALLSPHINXOPTS=-D latex_paper_size=%PAPER% %ALLSPHINXOPTS%
 )

@@ -73,19 +73,17 @@ def tag(name, *inners, **attributes):
         'attrs': attributes,
         'value': u''.join(i for i in cl),
     }
-def cssid(uname, prefix):
-    uname = uname.replace('.', '-')
-    return "%s-%s" % (prefix, uname)
+def cssid(widget, prefix, postfix=None):
+    id = "%s-%s" % (prefix, '-'.join(widget.path))
+    if postfix is not None:
+        id = '%s-%s' % (id, postfix) 
+    return id
     
-# XXX ist das sinnvoll???
-def cssclasses(widget, data, specific, additional=[]):
+def cssclasses(widget, data, additional=[]):
     _classes = list()
-    attr = widget.attributes
-    if attr.get('class', {}).get(specific, False):
-        _classes.append(attr['class'][specific])      
     if data['errors']:
         _classes.append('error')
-    if attr.get('required', None):
+    if widget.attrs.get('required', False):
         _classes.append('required')        
     if additional:
         _classes += additional

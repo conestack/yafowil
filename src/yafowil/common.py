@@ -4,13 +4,13 @@ from yafowil.base import (
     ExtractionError,
 )
 from utils import (
-    cssclasses,
     cssid,
+    cssclasses,
     tag,
     vocabulary,)
 
 def generic_extractor(widget, data):    
-    return data['request'].get(widget.uname, 
+    return data['request'].get('.'.join(widget.path), 
                                widget.attrs.get('default', UNSET))               
 
 def generic_required_extractor(widget, data):
@@ -42,15 +42,14 @@ factory.register('submit',
                  [submit_renderer])
 
 def input_generic_renderer(widget, data):
-    attr = widget.attributes
-    itype = data.get('input_field_type', 0) or attr.get('type', None)
     input_attrs = {
-        'type': itype,
-        'class_': cssclasses(widget, data, 'input'),
+        'type': data.get('input_field_type', 0) or \
+                widget.attrs.get('type', None),
         'value':  data['extracted'] and data.last_extracted \
                   or data['value'] or '',
-        'name_': widget.uname,
-        'id': attr.get('id', {}).get('input', cssid(widget.uname, 'input')),        
+        'name_': '.'.join(widget.path),
+        'id': cssid(widget, 'input'),    
+        'class_': cssclasses(widget, data),    
     }
     return tag('input', **input_attrs)
     
@@ -85,13 +84,11 @@ factory.register('checkbox',
 
 def input_file_renderer(widget, data):
     input_attrs = {
-        'type': 'file',              
-        'class_': cssclasses(widget, data, 'input'),
+        'type': 'file',
         'value':  '',
-        'name_': widget.uname,
-        'accept': widget.attributes.get('accept', None),
-        'id': widget.attributes.get('id', {}).get('input', cssid(widget.uname, 
-                                                                 'input')),        
+        'name_': '.'.join(widget.path),
+        'accept': widget.attrs.get('accept', None),
+        'id': cssid(widget, 'input'),
     }
     return tag('input', **input_attrs)
     
@@ -107,16 +104,15 @@ def select_renderer(widget, data):
         value = [value]
     for key, term in vocabulary(attr.get('vocabulary', [])):
         option_attrs = {
-            'class_': attr.get('class', {}).get('option', None),
             'selected': (key in value) and 'selected' or None,
             'value': key,
-            'id': cssid('%s-%s' % (widget.uname, key), 'input'),
+            'id': cssid(widget, 'input', key),
         }
         optiontags.append(tag('option', term, **option_attrs))
     select_attrs = {
-        'class_': cssclasses(widget, data, 'input'),
-        'name_': widget.uname,
-        'id': attr.get('id', {}).get('input', cssid(widget.uname, 'input')),
+        'name_': '.'.join(widget.path),
+        'class_': cssclasses(widget, data),
+        'id': cssid(widget, 'input'),
         'multiple': attr.get('multiple', None) and 'multiple',
     }
     return tag('select', *optiontags, **select_attrs)
@@ -128,9 +124,9 @@ factory.register('select',
 def textarea_renderer(widget, data):
     attr = widget.attributes
     area_attrs = {
-        'class_': cssclasses(widget, data, 'input'),
-        'name_': widget.uname,
-        'id': attr.get('id', {}).get('input', cssid(widget.uname, 'input')),
+        'name_': '.'.join(widget.path),
+        'class_': cssclasses(widget, data),        
+        'id': cssid(widget, 'input'),
         'wrap': attr.get('wrap', None),
         'cols': attr.get('cols', 80),
         'rows': attr.get('rows', 25),

@@ -180,3 +180,17 @@ Test the factory
     >>> testwidget()
     ('r1', 'MYFAC', "{'errors': [], 'extracted': [], 'rendered': [], 'request': 
     {}, 'value': 'Test Value'}", "{'foo': 'bar'}")
+    
+subwidgets in the factory
+------------------------- 
+    
+    >>> def create_static_compound(widget, factory):
+    ...     widget['one'] = factory('widget_test', widget.attrs)
+    ...     widget['two'] = factory('widget_test', widget.attrs)
+        
+    >>> factory.register('static_compound', [], [], 
+    ...                  subwidgets=[create_static_compound])
+    
+    >>> widget = factory('static_compound', {})
+    >>> widget.keys()
+    ['one', 'two']

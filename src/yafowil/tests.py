@@ -11,10 +11,9 @@ TESTFILES = [
     'base.txt',
     'common.txt',
     'compound.txt',
-    #'array.txt',
-    #'combined.txt',
     'controller.txt',
-    #'labeled.txt',
+    'labeled.txt',
+    #'array.txt',
 ]
 
 def test_suite():

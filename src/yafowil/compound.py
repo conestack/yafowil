@@ -36,14 +36,11 @@ factory.register('compound',
                  [compound_preprocessor])
 
 def fieldset_renderer(widget, data):
-    fieldset_id = widget.attributes.get('id',{}).get('fieldset', 
-                                                     cssid(widget.uname, 
-                                                           'fieldset'))
-    class_ = widget.attributes.get('class',{}).get('fieldset', None)
+    fieldset_id = cssid(widget, 'fieldset')
     rendered = data.last_rendered
     if widget.attributes.get('legend', False):
         rendered = tag('legend', widget.attributes['legend']) + rendered
-    return tag('fieldset', rendered, id=fieldset_id, class_=class_)   
+    return tag('fieldset', rendered, id=fieldset_id)   
 
 factory.register('fieldset', 
                  factory.extractors('compound'), 

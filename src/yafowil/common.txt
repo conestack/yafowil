@@ -10,28 +10,23 @@ Text Input Widget
 ::
 
     >>> from yafowil.base import factory
-    >>> inputwidget = factory('text', 'MYTEXT', 'Test Text',
-    ...                       {'css': {'input': 'inputcss'}})    
+    >>> inputwidget = factory('text', 'MYTEXT', 'Test Text')    
     >>> inputwidget()
     u'<input id="input-MYTEXT" name="MYTEXT" type="text" value="Test Text" />'
 
-    >>> inputwidget = factory('hidden', 'MYHIDDEN', 'Test Hidden',
-    ...                       {'css': {'input': 'inputcss'}})    
+    >>> inputwidget = factory('hidden', 'MYHIDDEN', 'Test Hidden')    
     >>> inputwidget()
     u'<input id="input-MYHIDDEN" name="MYHIDDEN" type="hidden" value="Test Hidden" />'
     
-    >>> inputwidget = factory('radio', 'MYRADIO', 'Test Radio',
-    ...                       {'css': {'input': 'inputcss'}})    
+    >>> inputwidget = factory('radio', 'MYRADIO', 'Test Radio')    
     >>> inputwidget()
     u'<input id="input-MYRADIO" name="MYRADIO" type="radio" value="Test Radio" />'
 
-    >>> inputwidget = factory('checkbox', 'MYCHECKBOX', 'Test Checkbox',
-    ...                       {'css': {'input': 'inputcss'}})    
+    >>> inputwidget = factory('checkbox', 'MYCHECKBOX', 'Test Checkbox')    
     >>> inputwidget()
     u'<input id="input-MYCHECKBOX" name="MYCHECKBOX" type="checkbox" value="Test Checkbox" />'
 
-    >>> inputwidget = factory('file', 'MYFILE', 'Test File',
-    ...                       {'css': {'input': 'inputcss'}})    
+    >>> inputwidget = factory('file', 'MYFILE', 'Test File')    
     >>> inputwidget()
     u'<input id="input-MYFILE" name="MYFILE" type="file" value="" />'
     
@@ -103,6 +98,10 @@ Selection Widget
     value="two">Two</option><option id="input-MYSELECT-three" 
     value="three">Three</option><option id="input-MYSELECT-four" 
     value="four">Four</option></select>'
+    
+File Widget
+===========
+    
     
 Submit Widget (action)
 ======================

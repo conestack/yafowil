@@ -219,20 +219,25 @@ class Factory(object):
         self._factories = dict()
         self._global_preprocessors = list()
         
-    def register(self, name, extractors, renderers, preprocessors=None):
-        self._factories[name] = (extractors, renderers, preprocessors or list())
+    def register(self, name, extractors, renderers, 
+                 preprocessors=[], subwidgets=[]):
+        self._factories[name] = (extractors, renderers, 
+                                 preprocessors, subwidgets)
         
     def register_global_preprocessors(self, preprocessors):
         self._global_preprocessors += preprocessors
         
-    def __call__(self, registeredname, 
+    def __call__(self, reg_name, 
                  name=None, value_or_getter=None, properties=dict()):
-        extractors, renderers, preproc = self._factories[registeredname]
-        return Widget(extractors, renderers, 
-                      self._global_preprocessors + preproc, 
-                      uniquename=name, 
-                      value_or_getter=value_or_getter, 
-                      properties=properties)
+        extractors, renderers, preproc, subwidgets = self._factories[reg_name]
+        widget = Widget(extractors, renderers, 
+                        self._global_preprocessors + preproc, 
+                        uniquename=name, 
+                        value_or_getter=value_or_getter, 
+                        properties=properties)
+        for subwidget_func in subwidgets:
+            subwidget_func(widget, self)
+        return widget
     
     def extractors(self, name):
         return self._factories[name][0]
@@ -242,6 +247,9 @@ class Factory(object):
 
     def preprocessors(self, name):
         return self._global_preprocessors + self._factories[name][2]
+
+    def subwidgets(self, name):
+        return self._factories[name][3]
     
 factory = Factory()
 
@@ -249,4 +257,5 @@ def register_renderer_prefixed(prefix, registered_name, renderers):
     factory.register('%s.%s' % (prefix, registered_name), 
                      factory.extractors(registered_name), 
                      factory.renderers(registered_name) + renderers,
-                     factory.preprocessors(registered_name))
+                     factory.preprocessors(registered_name),
+                     factory.subwidgets(registered_name))
