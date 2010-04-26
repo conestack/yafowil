@@ -27,4 +27,22 @@ def field_renderer(widget, data):
     }
     return tag('div', data.last_rendered, **div_attrs)
 
+# XXX: decouple label and field?
 factory.register('field', [], [label_renderer, field_renderer])
+
+def error_extractor(widget, data):
+    #XXX:  not called ???
+    extracted = data.last_extracted
+    if extracted is UNSET or not bool(extracted):
+        raise ExtractionError('No password given')
+    return extracted
+
+def error_renderer(widget, data):
+    errors = ['1', '2', '3']
+    content = list()
+    for error in errors:
+        content.append(tag('p', str(error), class_='errormessage'))
+    content += [data.last_rendered]
+    return tag('div', *content, class_='error')
+
+factory.register('error', [error_extractor], [error_renderer])

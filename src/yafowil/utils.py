@@ -73,6 +73,7 @@ def tag(name, *inners, **attributes):
         'attrs': attributes,
         'value': u''.join(i for i in cl),
     }
+
 def cssid(widget, prefix, postfix=None):
     id = "%s-%s" % (prefix, '-'.join(widget.path))
     if postfix is not None:

@@ -14,7 +14,11 @@ Text Input Widget
     >>> inputwidget()
     u'<input id="input-MYTEXT" name="MYTEXT" type="text" value="Test Text" />'
 
-    >>> inputwidget = factory('hidden', 'MYHIDDEN', 'Test Hidden')    
+    >>> inputwidget = factory('password', 'MYPASSWORD', '')
+    >>> inputwidget()
+    u'<input id="input-MYPASSWORD" name="MYPASSWORD" type="password" value="" />'
+
+    >>> inputwidget = factory('hidden', 'MYHIDDEN', 'Test Hidden')
     >>> inputwidget()
     u'<input id="input-MYHIDDEN" name="MYHIDDEN" type="hidden" value="Test Hidden" />'
     

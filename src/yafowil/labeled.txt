@@ -1,7 +1,8 @@
 Test the label and its flavors
 ==============================
 
-default::
+Default
+::
 
     >>> import yafowil.base
     >>> import yafowil.labeled
@@ -13,25 +14,29 @@ default::
     >>> yafowil.labeled.label_renderer(widget, data)
     u'<label for="input-MYUID" id="label-MYUID">LABEL</label><INNER-WIDGET>'
 
-label after widget
+Label after widget
+::
 
     >>> widget.attrs['labelpos'] = 'after'
     >>> yafowil.labeled.label_renderer(widget, data)
     u'<INNER-WIDGET><label for="input-MYUID" id="label-MYUID">LABEL</label>'
     
-same with inner label::
+Same with inner label
+::
 
     >>> widget.attrs['labelpos'] = 'inner'
     >>> yafowil.labeled.label_renderer(widget, data)
     u'<label for="input-MYUID" id="label-MYUID">LABEL<INNER-WIDGET></label>'
 
-and back to default with error class applied::
+And back to default with error class applied
+::
 
     >>> del  widget.attrs['labelpos']  
     >>> yafowil.labeled.label_renderer(widget, data)
     u'<label for="input-MYUID" id="label-MYUID">LABEL</label><INNER-WIDGET>'
     
-from factory::
+Chained file inside field
+::
 
     >>> widget = yafowil.base.factory('field:file', 'MYFILE', \
     ...                               properties={'label': 'MY FILE'})
@@ -39,3 +44,17 @@ from factory::
     u'<div id="field-MYFILE"><label for="input-MYFILE" 
     id="label-MYFILE">MY FILE</label><input id="input-MYFILE" name="MYFILE" 
     type="file" value="" /></div>'
+
+Chained password inside error inside field
+::
+
+    >>> widget = yafowil.base.factory('field:error:password',
+    ...                               'password',
+    ...                               properties={'label': 'Password',
+    ...                                           'required': True})
+    >>> widget({'password': None})
+    u'<div class="required" id="field-password"><label for="input-password" 
+    id="label-password">Password</label><div class="error"><p 
+    class="errormessage">1</p><p class="errormessage">2</p><p 
+    class="errormessage">3</p><input class="required" id="input-password" 
+    name="password" type="password" value="" /></div></div>'
