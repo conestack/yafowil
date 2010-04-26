@@ -1,4 +1,139 @@
 Architecture
 ============
 
-Write Me
+Base Principles
+---------------
+
+YAFOWIL is based on a set of core ideas:
+
+1. Less architecture as possible.
+
+2. Don't mess with some framework
+
+3. Use the power of Python.
+
+4. Separation of concerns
+
+5. Do it on runtime, change it on runtime.
+
+6. Don't fight with storage.
+
+7. Build chains and trees with lists and dict api.
+
+Callables everywhere
+--------------------
+
+If you work with YAFOWIL first time it probably feel a bit different compared to
+other multiple class inheritating, schema based forms. Instaed YAFOWIL uses 
+simple callables at several places. You never need to inherit any class from
+yafowil.* (and if you think you need to you didnt understand the architecture).
+
+Callables are used for every extensible aspect of YAFOWIL. Then they are bundled
+and passed - as blueprints - to a factory. 
+
+state at runtime
+----------------
+
+While one cycle (request to response) runs the state of the widget is kept in
+a runtime data object. It collects all information like value, request, errors 
+happend, and the rendered widget.
+
+The widget
+----------
+
+The Widget class is generic. First: You never need to make instanciate it direct 
+(the factory is the only place where this happens). Second: Except some very 
+special cases you never touch it further, delegate it to the controller.
+
+Only at creation time of Widgets you need to use its dict-like api. This is the
+case if you create compounds of widgets, like a form.   
+
+The Factory has the Plan
+------------------------
+
+The factory registers this blueprints mentioned above. Its the generic plan for 
+a widget. 
+
+parts of the plan
+-----------------
+
+The plan consists of 4 chains of callables. Each chain has different 
+responsibilities.
+
+extractors
+    An extractor is responsible to get, convert and validate the data of the 
+    current widget in context from the request. It is a callable expecting the 
+    widget instance and the runtime data (with request, errors and values) 
+    as parameters. 
+
+chain of extractors (1st)
+    Usally extractors are chained. Example: An Integer Field consists of the
+    pure extractor which results in a string. Next extractor in the chain is 
+    responsible to convert it to an integer. If it fails an error is marked, 
+    otherwise the value on data is of type ``int``. If only positive 
+    integers are allowed we can add a validating extractor to the chain.
+    
+renderer
+    A Renderer is responsible to turn the widget into text (unicode) ready to be
+    passed to the response. It is a callable expecting the widget instance and 
+    the runtime data (after extraction run) as parameters.  It can utilize any 
+    templating language. YAFOWIL has no preferences nor does it support any 
+    specific template language. All internal rendering in YAFOWIL happens in 
+    pure python 
+    
+chain of renderers (2nd)
+    Renderes can be chained. The second renderer in the chain can access the 
+    rendered output of the first and so on. Thus a simple input widget can be
+    wrapped with a label etc.
+    
+preprocessors
+     A Preprocessor can be used in many different ways. It is executed in one
+     run once direct after runtime data is created. Its gets widget and runtime 
+     data as parameters.  
+     
+preprocessor (global) 
+    A spezial preprocessor is the factory global preprocessor. If registered it
+    will be executed for every widget before all other preprocessors are 
+    running. It can be used to do framework specific conversions i.e. of the 
+    request.
+    
+chain of preprocessors (3rd)
+    Preprocessors can be chained. The chain of preprocessors is executed once 
+    per runtime data object. 
+    
+
+subwidget
+    A subwidget is a callable responsible to automatically populate a widget
+    with children widgets. It expects the widget and the factory itself as 
+    parameters. Its a kind of automatic compound. Its is executed at
+    factoring time, iow when the factory is called to produce a widget right 
+    after the parent widget is created and configured. Its intended use is to 
+    make it easy to provide groups of widgets which are always the same. I.e.
+    a password validation widget consisting of two password input fields.
+    
+chain of subwidgets (4th)
+    subwidgets can be chained. The chain is executed one after one at factoring 
+    time once per widget instance.
+    
+combining plans
+---------------
+
+Usally we have some common widgets, i.e a pure textarea, and then we need some 
+label, description, errors happend, maybe a table cell or a div around and so 
+on. And it can be very different dependent on the framework used or the design
+we need to implement. But the core functionality is always the same. In other 
+words: The input field and its behavior is stable, the eye-candy around is not.
+
+Its what the user of YAFOWIL can change with easy. At factoring time, when the
+widget is requested from the factory, additional configurations can be added by
+passing a colon separated list of names, i.e ``label:textarea`` or 
+``myproject.field:label:textarea`` and so on. Thus we can add every type of 
+chain: extractors (conversion, validation), renderers (wrap eye candy), 
+preprocessors and even subwidgets. 
+
+
+
+ 
+
+
+    

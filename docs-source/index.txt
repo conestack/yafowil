@@ -9,8 +9,6 @@ Welcome to YAFOWIL's documentation!
 YAFOWIL offers am extensible and reusable set of form widgets, independent from 
 any web-framework, but easy to use in any web-framework.
 
-YAFOWIL in its core is pure Python without any dependencies. 
-
 Contents:
 
 .. toctree::

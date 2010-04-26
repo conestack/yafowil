@@ -87,7 +87,7 @@ Widget instances are providing two functionalities:
 
 extract
     to get values from request as runtime-data back. Extraction means also
-    type-conversion or validation. This is all coupled and doing all in one 
+    type-conversion or validation. This is all coupled and doing it all in one 
     pipeline makes life easier. In the chain or pipeline of extractors each 
     extractor get the values of all previous extractions with the runtime-data.
     If an extractor fails it raises an exception. If ``abort`` (default is on) 
@@ -96,15 +96,15 @@ extract
     runtime-data. 
         
 render on ``__call__``
-    to get the markup of the widget created. you can either pass already 
-    extracted runtime data or if not passed it will be called internally.
+    to get the markup of the widget created either pass already extracted 
+    runtime data or - if not passed - it will be called internally.
     In the chain or pipeline of renderers each renderer get the values of all 
     previous rendered with the runtime-data. It has also access to extractions
     and errors.
     
 In both cases the preprocessors are called, but only once for each runtime-data.
-There are two type of preprocessors: global and by registered widget. Global
-ones are called first. In the preprocessors it is also possible to wrap the 
+There are two type of preprocessors: global and by widget registered. Global
+ones are called first. Hint: In the preprocessors it is also possible to wrap the 
 request or value, i.e. in order to use a request provided by some framework as 
 input.   
 
@@ -118,28 +118,30 @@ First we import ``factory``::
 
     >>> from yafowil.base import factory
 
+Second we import ``yafowil.commom`` to trigger registration.
+    
+    >>> import yafowil.common
+
 To produce a text input field ask the factory::
 
     >>> textinput = factory('text', 'street', '')
     >>> textinput()
     u'<input id="input-street" name="street" type="text" value="" />'
 
-Provide a css class and a value::    
+Provide a value::    
     
-    >>> textinput = factory('text', 'street', 'Seeweg 12', 
-    ...                     {'css': {'input': 'aclass'}})
+    >>> textinput = factory('text', 'street', 'Seeweg 12')
     >>> textinput()
-    u'<input class="aclass" id="input-street" name="street" type="text" value="Seeweg 12" />'
+    u'<input id="input-street" name="street" type="text" value="Seeweg 12" />'
     
 The same with label::
 
-    >>> textinput = factory('labeled.text', 'street', 'Seeweg 12', 
-    ...                     {'css': {'input': 'aclass'},
-    ...                      'label':'street'})    
+    >>> import yafowil.labeled
+    >>> textinput = factory('label:text', 'street', 'Seeweg 12', 
+    ...                     {'label':'street'})    
     >>> textinput()
-    u'<label for="input-street" id="label-street">Street<input 
-    class="aclass" id="input-street" name="street" type="text" 
-    value="Seeweg 12" /></label>'
+    u'<label for="input-street" id="label-street">Street<input id="input-street" 
+    name="street" type="text" value="Seeweg 12" /></label>'
     
 Request is assumed as just a dict-like (you may need to wrap your actual request 
 to use it). Let get values from it::
@@ -152,23 +154,24 @@ to use it). Let get values from it::
 To re-render the widget pass the extracted runtime data::
 
     >>> textinput(data=data)
-    >>> u'<label for="input-street" id="label-street">Street<input 
-    class="aclass" id="input-street" name="street" type="text" 
-    value="Angerzellgasse 4" /></label>'
+    u'<label for="input-street" id="label-street">Street<input id="input-street" 
+    name="street" type="text" value="Angerzellgasse 4" /></label>'
    
 
 Changes
 =======
 
-1.0 (work in progress)
+1.0 
 ----------------------
 
 - Initial: Make it work (jensens)
 
 Credits
-=======
+======= 
 
 - Written and concepted by Jens W. Klein <jens@bluedynamics.com>
+
+- Major contributions by Robert Niederrreiter <robertn@bluedynamics.com>
 
 - Credits to Christian Scholz aka MrTopf for the good discussion about formlibs
   simplified. 
