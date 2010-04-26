@@ -1,4 +1,3 @@
-from odict import odict
 from yafowil.base import (
     factory,
 )

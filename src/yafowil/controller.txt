@@ -13,12 +13,11 @@ Dummy context
     ...     value = 'hello world'    
     >>> context = Context()
 
-Dumy getter
+Dummy getter
 ::
 
-    XXX: need widget as well in getter for generic getters mapping to fieldnames
-    >>> def getter(request):
-    ...     return request.context.value
+    >>> def getter(widget, data):
+    ...     return data['request'].context.value
 
 Create Widget tree
 ::
@@ -35,7 +34,7 @@ Create Widget tree
 Define action ``handler``
 ::
 
-    >>> def handler(request, widget):
+    >>> def handler(widget, data):
     ...     print 'handler called "%s"' % '.'.join(widget.path)
 
 Define action ``next``

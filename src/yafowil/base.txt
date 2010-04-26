@@ -103,10 +103,10 @@ Create some test dummies::
     ...     data['test_preprocessor'] = 'called'
     ...     return data
     
-    >>> def test_getter(request):
+    >>> def test_getter(widget, data):
     ...     return 'Test Value'
 
-    >>> def test_getter2(request):
+    >>> def test_getter2(widget, data):
     ...     return 123
 
 Test the base widget class::    

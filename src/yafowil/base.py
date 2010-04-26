@@ -135,11 +135,6 @@ class Widget(LifecycleNode):
         self.__name__ = uniquename
         for key in properties:
             self.attributes[key] = properties[key]
-    
-    def _value(self, request):
-        if callable(self.getter):
-            return self.getter(request)
-        return self.getter
         
     def __call__(self, request={}, data=None):
         """renders the widget.
@@ -203,8 +198,11 @@ class Widget(LifecycleNode):
     def _runpreprocessors(self, request, data):                
         if 'value' in data and 'request' in data:
             return data
-        data['value'] = self._value(request)
         data['request'] = request
+        if callable(self.getter):
+            data['value'] = self.getter(self, data)
+        else:
+            data['value'] = self.getter        
         for pp in self.preprocessors:
             try:
                 data = pp(self, data)

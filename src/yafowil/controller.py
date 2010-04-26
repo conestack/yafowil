@@ -19,7 +19,7 @@ class Controller(object):
         self._error(data)
         if self.error:
             return None
-        self.handle(self.widget, request)
+        self.handle(self.widget, data)
         for action in self.actions:
             if self.triggered(request, action):
                 if action.attrs.get('next'):
@@ -33,13 +33,14 @@ class Controller(object):
     def triggered(self, request, action):
         return request.get('action.%s' % '.'.join(action.path))
     
-    def handle(self, widget, request):
+    def handle(self, widget, data):
         for action in self.actions:
-            if self.triggered(request, action):
+            if self.triggered(data['request'], action):
                 if action.attributes.get('handler'):
-                    action.attributes.handler(request, widget)
+                    action.attributes.handler(widget, data)
         for sub in widget.values():
-            self.handle(sub, request)
+            #  XXX: delegation in data needed
+            self.handle(sub, data)
     
     def _error(self, data):
         if data.get('errors'):
