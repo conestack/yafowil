@@ -65,8 +65,8 @@ Test Form
 ::
 
     >>> form = factory('form',
-    ...                'FORM',
-    ...                properties={'action': 'http://fubar.com'})
+    ...                name = 'FORM',
+    ...                props={'action': 'http://fubar.com'})
     >>> form({})
     u'<form action="http://fubar.com" enctype="multipart/form-data" 
     id="form-FORM" method="post"></form>'

@@ -24,12 +24,12 @@ Create Widget tree
  
     >>> form = factory(u'form',
     ...                name='testform',
-    ...                properties={'action': 'http://fubar.com'})
+    ...                props={'action': 'http://fubar.com'})
     >>> form['field1'] = factory('text',
-    ...                          value_or_getter=getter)
+    ...                          value=getter)
     >>> form['field2'] = factory('text',
-    ...                          value_or_getter='',
-    ...                          properties={'required': True})
+    ...                          value='',
+    ...                          props={'required': True})
 
 Define action ``handler``
 ::
@@ -59,7 +59,7 @@ referring properties.
 Add save action.
 ::
 
-    >>> form['save'] = factory('submit', properties=props)
+    >>> form['save'] = factory('submit', props=props)
 
 Check widget tree
 ::

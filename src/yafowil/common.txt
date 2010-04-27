@@ -125,7 +125,7 @@ Submit Widget (action)
     ...     'action': True,
     ...     'label': 'Action name',
     ... }
-    >>> widget = factory('submit', 'save', properties=props)
+    >>> widget = factory('submit', name='save', props=props)
     >>> widget()
     u'<input class="" id="input-save" name="action.save" type="submit" value="Action name" />'
     
@@ -165,8 +165,8 @@ Field Widget
 Chained file inside field with label
 ::
 
-    >>> widget = factory('field:label:file', 'MYFILE', \
-    ...                   properties={'label': 'MY FILE'})
+    >>> widget = factory('field:label:file', name='MYFILE', \
+    ...                   props={'label': 'MY FILE'})
     >>> widget()
     u'<div id="field-MYFILE"><label for="input-MYFILE" 
     id="label-MYFILE">MY FILE</label><input id="input-MYFILE" name="MYFILE" 
@@ -178,10 +178,9 @@ Error Widget
 Chained password inside error inside field
 ::
 
-    >>> widget = yafowil.base.factory('field:error:password',
-    ...                               'password',
-    ...                               properties={'label': 'Password',
-    ...                                       'required': 'No password given!'})
+    >>> widget = factory('field:error:password', name='password',
+    ...                  props={'label': 'Password',
+    ...                         'required': 'No password given!'})
     
     >>> widget({'password': ''})
     u'<div class="error required" id="field-password"><div class="errors"><p 

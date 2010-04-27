@@ -202,7 +202,7 @@ field with two input fields in. Here a simpler example::
     >>> factory.register('static_compound', [], [], 
     ...                  subwidgets=[create_static_compound])
     
-    >>> widget = factory('static_compound', {})
+    >>> widget = factory('static_compound', props={})
     >>> widget.keys()
     ['one', 'two']
         
@@ -240,5 +240,30 @@ with wrappers)!
     >>> widget(data)
     u'<OUTER><INNER /></OUTER>'
     
+
+inject custom specials parts in the chain.
+------------------------------------------
+
+You may need an behavior just one time and just for one special widget. Here
+you can inject your custom special render or extractor into the chain::
     
+    >>> def special_renderer(widget, data):
+    ...     return u'<SPECIAL>%s</SPECIAL>' % data.last_rendered
+
+    >>> def special_extractor(widget, data):
+    ...     return data.last_extracted + ['extracted special']
+        
+    >>> widget = factory('outer:*special:inner', 
+    ...                  custom={'special': ([special_extractor], 
+    ...                                      [special_renderer], 
+    ...                                      [], [])})
+    >>> data = widget.extract({})
+    >>> data.last_extracted
+    ['extracted inner', 'extracted special', 'extracted outer']
+
+    >>> widget(data)
+    u'<OUTER><SPECIAL><INNER /></SPECIAL></OUTER>'
+
+     
+ 
     

@@ -214,6 +214,8 @@ class Factory(object):
         
     def register(self, name, extractors, renderers, 
                  preprocessors=[], subwidgets=[]):
+        if name.startswith('*'):
+            raise ValueError, 'Asterisk * as first sign not allowed as name.'
         self._factories[name] = (extractors, renderers, 
                                  preprocessors, subwidgets)
         
@@ -221,13 +223,19 @@ class Factory(object):
         self._global_preprocessors += preprocessors
         
     def __call__(self, reg_names, 
-                 name=None, value_or_getter=None, properties=dict()):
+                 name=None, 
+                 value=None, 
+                 props=dict(),
+                 custom=dict()):
         extractors = []
         renderers = []
         preprocessors = []
         subwidgets = []
-        for reg_name in reg_names.split(':'):                   
-            ex, ren, pre, sub = self._factories[reg_name]
+        for reg_name in reg_names.split(':'):
+            if reg_name.startswith('*'):
+                ex, ren, pre, sub = custom[reg_name[1:]] 
+            else:                   
+                ex, ren, pre, sub = self._factories[reg_name]
             extractors = ex + extractors
             renderers = ren + renderers
             preprocessors = preprocessors + pre
@@ -235,8 +243,8 @@ class Factory(object):
         widget = Widget(extractors, renderers, 
                         self._global_preprocessors + preprocessors, 
                         uniquename=name, 
-                        value_or_getter=value_or_getter, 
-                        properties=properties)
+                        value_or_getter=value, 
+                        properties=props)
         for subwidget_func in subwidgets:
             subwidget_func(widget, self)
         return widget
