@@ -156,6 +156,7 @@ def error_renderer(widget, data):
     if not content:
         return data.last_rendered
     content += [data.last_rendered]
-    return tag('div', *content, class_='error')
+    divattrs = dict(class_='error') 
+    return tag('div', *content, **divattrs)
 
 factory.register('error', [], [error_renderer])
