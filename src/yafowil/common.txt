@@ -183,11 +183,11 @@ Chained password inside error inside field
     ...                         'required': 'No password given!'})
     
     >>> widget({'password': ''})
-    u'<div class="error required" id="field-password"><div class="errors"><p 
-    class="errormessage">No password given!</p><input class="error required" 
-    id="input-password" name="password" type="password" value="" /></div></div>'
+    u'<div id="field-password"><div class="error"><div class="errormessage">No 
+    password given!</div><input class="error required" id="input-password" 
+    name="password" type="password" value="" /></div></div>'
     
     >>> widget({'password': 'secret'})
-    u'<div class="required" id="field-password"><input class="required" 
-    id="input-password" name="password" type="password" value="secret" /></div>'
+    u'<div id="field-password"><input class="required" id="input-password" 
+    name="password" type="password" value="secret" /></div>'
     
