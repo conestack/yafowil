@@ -172,7 +172,7 @@ Test the base widget class::
 
     >>> testwidget.extract({})
     {'errors': [], 'extracted': [123], 'rendered': [], 'request': {}, 'value': 123}
-
+    
         
 Test the factory
 ================
@@ -264,6 +264,22 @@ you can inject your custom special render or extractor into the chain::
     >>> widget(data)
     u'<OUTER><SPECIAL><INNER /></SPECIAL></OUTER>'
 
-     
+
+prefixes with widgets and factories
+-----------------------------------
  
+Factory called widget attributes should now about its factory name with a 
+prefix. 
+
+    >>> def prefix_renderer(widget, data):
+    ...     return u'<ID>%s</ID>' % widget.attrs.id
+    
+    >>> factory.register('prefix', [], [prefix_renderer])
+    >>> widget = factory('prefix', props={'prefix.id': 'Test'})
+    >>> widget()
+    u'<ID>Test</ID>'
+
+    >>> widget = factory('prefix', props={'id': 'Test2'})
+    >>> widget()
+    u'<ID>Test2</ID>'
     

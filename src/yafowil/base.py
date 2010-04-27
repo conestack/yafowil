@@ -1,5 +1,6 @@
 from threading import RLock
 from zodict import LifecycleNode
+from zodict.node import NodeAttributes
 
 class Unset(object): 
     
@@ -89,10 +90,22 @@ class ExtractionError(Exception):
         """
         super(ExtractionError, self).__init__(msg)
         self.abort = abort
-
+        
+class WidgetAttributes(NodeAttributes):
+    
+    def __getitem__(self, name):
+        prefixed = '%s.%s' % (self._node.current_prefix or '', name)
+        value = super(WidgetAttributes, self).get(prefixed, UNSET)
+        if value is UNSET:
+            return super(WidgetAttributes, self).__getitem__(name)
+        return value
+        
 class Widget(LifecycleNode):
     """Base Widget Class
     """
+    
+    attributes_factory = WidgetAttributes
+    
     def __init__(self, extractors, renderers, preprocessors, 
                  uniquename=None, value_or_getter=None, properties=dict(),
                  ):
@@ -172,7 +185,6 @@ class Widget(LifecycleNode):
             try:
                 value = renderer(self, data)
             except Exception, e:
-                import pdb;pdb.set_trace()
                 self.current_prefix = None
                 self.unlock()
                 e.args = [a for a in e.args] + [str(renderer)] + self.path
