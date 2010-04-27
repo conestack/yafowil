@@ -112,9 +112,9 @@ Create some test dummies::
 Test the base widget class::    
     
     >>> test_request = {'MYUID': 'New Test Value'}
-    >>> testwidget = Widget([test_extractor], 
-    ...                     [test_renderer], 
-    ...                     [test_preprocessor],
+    >>> testwidget = Widget([('1', test_extractor)], 
+    ...                     [('1', test_renderer)], 
+    ...                     [('1', test_preprocessor)],
     ...                     'MYUID', test_getter,
     ...                     dict(test1='Test1', test2='Test2'))
         
@@ -132,8 +132,8 @@ Test the base widget class::
     {'errors': [], 'extracted': ['e1'], 'rendered': [], 'request': {'MYUID': 
     'New Test Value'}, 'test_preprocessor': 'called', 'value': 'Test Value'}
     
-    >>> testwidget = Widget([test_extractor], 
-    ...                     [test_renderer], 
+    >>> testwidget = Widget([('1', test_extractor)], 
+    ...                     [('1', test_renderer)], 
     ...                     [],
     ...                     'MYUID', test_getter,
     ...                     dict(test1='Test1', test2='Test2'))    
@@ -142,8 +142,8 @@ Test the base widget class::
     'rendered': [], 'request': {}, 'value': 'Test Value'}", "{'test1': 'Test1', 
     'test2': 'Test2'}")
     
-    >>> testwidget = Widget([test_extractor, test_extractor2], 
-    ...                     [test_renderer, test_renderer2], 
+    >>> testwidget = Widget([('1', test_extractor), ('2', test_extractor2)], 
+    ...                     [('1', test_renderer), ('2', test_renderer2)], 
     ...                     [],
     ...                     'MYUID2', test_getter,
     ...                     dict(test1='Test1', test2='Test2'))
@@ -154,8 +154,8 @@ Test the base widget class::
     \'Test2\'}")], \'request\': {}, \'value\': \'Test Value\'}', "{'test1': 'Test1', 
     'test2': 'Test2'}")
 
-    >>> testwidget = Widget([test_extractor3], 
-    ...                     [test_renderer], 
+    >>> testwidget = Widget([('1', test_extractor3)], 
+    ...                     [('1', test_renderer)], 
     ...                     [],
     ...                     'MYUID2', test_getter,
     ...                     dict(test1='Test1', test2='Test2'))
@@ -164,8 +164,8 @@ Test the base widget class::
     {'errors': [ExtractionError('e3: Integer expected, got Test Value',)], 
     'extracted': [], 'rendered': [], 'request': {}, 'value': 'Test Value'}
     
-    >>> testwidget = Widget([test_extractor3], 
-    ...                     [test_renderer], 
+    >>> testwidget = Widget([('1', test_extractor3)], 
+    ...                     [('1', test_renderer)], 
     ...                     [],
     ...                     'MYUID2', test_getter2,
     ...                     dict(test1='Test1', test2='Test2'))
@@ -186,8 +186,8 @@ Test the factory
     >>> factory.renderers('widget_test')
     [<function test_renderer at ...>]
     
-    >>> testwidget = factory('widget_test', 'MYFAC', test_getter, 
-    ...                      dict(foo='bar'))
+    >>> testwidget = factory('widget_test', name='MYFAC', value=test_getter, 
+    ...                      props=dict(foo='bar'))
     >>> testwidget()
     ('r1', 'MYFAC', "{'errors': [], 'extracted': [], 'rendered': [], 'request': 
     {}, 'value': 'Test Value'}", "{'foo': 'bar'}")

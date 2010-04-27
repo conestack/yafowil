@@ -10,7 +10,7 @@ Text Input Widget
 ::
 
     >>> from yafowil.base import factory
-    >>> inputwidget = factory('text', 'MYTEXT', 'Test Text')    
+    >>> inputwidget = factory('text', name='MYTEXT', value='Test Text')    
     >>> inputwidget()
     u'<input id="input-MYTEXT" name="MYTEXT" type="text" value="Test Text" />'
 
@@ -44,6 +44,7 @@ Required Input Widget
     u'<input class="required" id="input-REQUIRED" name="REQUIRED" type="text" 
     value="" />'
 
+    >> interact(locals())
     >>> data = inputwidget.extract({})
     >>> data
     {'errors': [ExtractionError('Mandatory field was empty',)], 

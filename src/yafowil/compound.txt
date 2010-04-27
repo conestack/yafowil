@@ -8,12 +8,11 @@ Test Rendering of Compound
 ::
 
     >>> import yafowil.compound
-    >>> compound = factory('compound', 
-    ...                    'COMPOUND', 
-    ...                    {'inner': 'somevalue', 
-    ...                     'inner2': 'othervalue'})
-    >>> compound['inner'] = factory('text', 'inner', 'value1')
-    >>> compound['inner2'] = factory('text', 'inner2', 'value2')
+    >>> compound = factory('compound', name='COMPOUND', 
+    ...                    value={'inner': 'somevalue', 
+    ...                           'inner2': 'othervalue'})
+    >>> compound['inner'] = factory('text', value='value1')
+    >>> compound['inner2'] = factory('text', value='value2')
     >>> compound()
     u'<input id="input-COMPOUND-inner" name="COMPOUND.inner" type="text" 
     value="value1" /><input id="input-COMPOUND-inner2" name="COMPOUND.inner2" 

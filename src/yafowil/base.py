@@ -1,3 +1,4 @@
+from threading import RLock
 from zodict import LifecycleNode
 
 class Unset(object): 
@@ -93,28 +94,31 @@ class Widget(LifecycleNode):
     """Base Widget Class
     """
     def __init__(self, extractors, renderers, preprocessors, 
-                 uniquename=None, value_or_getter=None, properties=dict()):
+                 uniquename=None, value_or_getter=None, properties=dict(),
+                 ):
         """Initialize the widget. 
             
         ``extractors``
-            list of callables extracting the data and returning it. Each 
-            extractor in chain is called. Expects to raise 
-            ``ExtractionException`` and provide error-message if something went 
-            wrong. You can call this validation. 
+            list of tuples with chain part name and callables extracting the 
+            data and returning it. Each extractor in chain is called. Expects 
+            to raise ``ExtractionException`` and provide error-message if 
+            something went wrong. You can call this validation. 
             Need to accept some ``request`` (dict like object), ``value`` 
             (same as while rendering), ``uniquename`` and ``properties``, a 
             dict-like. Properties gets a key ``extracted`` set, a list of 
             results of previous extractors in chain-   
             
         ``renderers``
-            list of callables rendering widget. Need to accept ``value``, 
-            ``uniquename`` and properties as dict-like. Properties gets a key 
-            ``rendered`` set, a list of results of previous extractors in chain.
+            list of tuples with chain part name and callable rendering widget. 
+            Callable need to accept ``value``, ``uniquename`` and properties as 
+            dict-like. Properties gets a key ``rendered`` set, a list of results 
+            of previous extractors in chain. Has same signature a s extract.
 
         ``preprocessors``
-            list of callables executed before extract or rendering. Executed 
-            only once for a given runtime data. has same signature a s extract.
-             
+            list of tuples with chain part name and callable executed before 
+            extract or rendering. Executed only once for a given runtime data.
+            Has same signature a s extract. 
+                         
         ``uniquename``
             id as string containing characters from a-z, A-Z, 0-9 only. Must not
             start with numerical character. 
@@ -133,9 +137,17 @@ class Widget(LifecycleNode):
         self.renderers = renderers
         self.preprocessors = preprocessors or list()
         self.__name__ = uniquename
+        self._lock = RLock()
+        self.current_prefix = None
         for key in properties:
             self.attributes[key] = properties[key]
-        
+            
+    def lock(self):
+        self._lock.acquire()
+
+    def unlock(self):
+        self._lock.release()
+                
     def __call__(self, request={}, data=None):
         """renders the widget.
         
@@ -153,14 +165,21 @@ class Widget(LifecycleNode):
             data = RuntimeData()
             data = self._runpreprocessors(request, data)
         elif data is None and request:
-            data = self.extract(request)                        
-        for renderer in self.renderers:
+            data = self.extract(request)
+        self.lock()         
+        for ren_name, renderer in self.renderers:
+            self.current_prefix = ren_name
             try:
                 value = renderer(self, data)
             except Exception, e:
+                import pdb;pdb.set_trace()
+                self.current_prefix = None
+                self.unlock()
                 e.args = [a for a in e.args] + [str(renderer)] + self.path
                 raise e
             data['rendered'].append(value)
+        self.current_prefix = None
+        self.unlock()                   
         return data.last_rendered
     
     def __setitem__(self, name, widget):
@@ -176,7 +195,9 @@ class Widget(LifecycleNode):
 
         """
         data = self._runpreprocessors(request, RuntimeData())
-        for extractor in self.extractors:            
+        self.lock()         
+        for ex_name, extractor in self.extractors:     
+            self.current_prefix = ex_name
             try:
                 value = extractor(self, data)
             except ExtractionError, e:
@@ -184,10 +205,14 @@ class Widget(LifecycleNode):
                 if e.abort:
                     break
             except Exception, e:
+                self.current_prefix = None
+                self.unlock()                   
                 e.args = [a for a in e.args] + [str(extractor)] + self.path
                 raise e
             else:
                 data['extracted'].append(value)
+        self.current_prefix = None
+        self.unlock()                   
         return data
 
     def _runpreprocessors(self, request, data):                
@@ -198,12 +223,15 @@ class Widget(LifecycleNode):
             data['value'] = self.getter(self, data)
         else:
             data['value'] = self.getter        
-        for pp in self.preprocessors:
+        for ppname, pp in self.preprocessors:
+            data.current_prefix = ppname
             try:
                 data = pp(self, data)
             except Exception, e:
+                data.current_prefix = None 
                 e.args = [a for a in e.args] + [str(pp)] + self.path
                 raise e
+        data.current_prefix = None 
         return data
         
 class Factory(object):
@@ -257,26 +285,32 @@ class Factory(object):
             each chains part is tuple with 4 lists of callables: extractors, 
             renderers, preprocessors, subwidgets.    
         """
-        extractors = []
-        renderers = []
-        preprocessors = []
-        subwidgets = []
+        extractors = list()
+        renderers = list()
+        preprocessors = list()
+        subwidgets = list()
         for reg_name in reg_names.split(':'):
             if reg_name.startswith('*'):
-                ex, ren, pre, sub = custom[reg_name[1:]] 
+                part_name = reg_name[1:]
+                ex, ren, pre, sub = custom[part_name]
             else:                   
-                ex, ren, pre, sub = self._factories[reg_name]
-            extractors = ex + extractors
-            renderers = ren + renderers
-            preprocessors = preprocessors + pre
-            subwidgets = subwidgets + sub
-        widget = Widget(extractors, renderers, 
-                        self._global_preprocessors + preprocessors, 
+                part_name = reg_name
+                ex, ren, pre, sub = self._factories[part_name]
+            extractors    = [(part_name, _) for _ in ex]  + extractors
+            renderers     = [(part_name, _) for _ in ren] + renderers
+            preprocessors = preprocessors + [(part_name, _) for _ in pre]
+            subwidgets    = subwidgets    + [(part_name, _) for _ in sub]
+        global_pre  = [('__GLOBAL__', _) for _ in self._global_preprocessors]
+        widget = Widget(extractors, 
+                        renderers, 
+                        global_pre + preprocessors,
                         uniquename=name, 
                         value_or_getter=value, 
                         properties=props)
-        for subwidget_func in subwidgets:
+        for part_name, subwidget_func in subwidgets:
+            widget.current_prefix = part_name
             subwidget_func(widget, self)
+            widget.current_prefix = None
         return widget
     
     def extractors(self, name):
