@@ -227,6 +227,36 @@ class Factory(object):
                  value=None, 
                  props=dict(),
                  custom=dict()):
+        """creates a widget.
+        
+        ``reg_names``
+            a string defining which widget to build. it contains a colon 
+            separated list of names in the registry. To create a simple 
+            text widget from common its ``text``. To wrap a text widget with
+            a label it is ``label:text``. Latter concatenates the chains of 
+            both. registrations. Custom chains not registered in the registry 
+            can be added by using the asterisk syntax. I.e. injecting an 
+            validating extractor works with ``label:*myextractor:text``. Latter
+            implies to use the ``custom`` keyword argument (see below)   
+            
+        ``name``
+            a name for the widget. optional. if not set it has to be set later
+            at the  ``__name__`` attribute of the widget.
+            if not set the widget wont work. 
+            
+        ``value``
+            a value or a callable used as getter. if a callable is given it has 
+            to accept the widget and runtime data as argument.
+            
+        ``props``
+            dict-like object containing properties to be copied to widgets 
+            attributes.
+            
+        ``custom`` 
+            dict, where keys are matching to asterisk prefixed custom chains.
+            each chains part is tuple with 4 lists of callables: extractors, 
+            renderers, preprocessors, subwidgets.    
+        """
         extractors = []
         renderers = []
         preprocessors = []
