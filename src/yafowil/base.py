@@ -1,5 +1,5 @@
 from threading import RLock
-from zodict import LifecycleNode
+from zodict import AttributedNode
 from zodict.node import NodeAttributes
 
 class Unset(object): 
@@ -100,7 +100,7 @@ class WidgetAttributes(NodeAttributes):
             return super(WidgetAttributes, self).__getitem__(name)
         return value
         
-class Widget(LifecycleNode):
+class Widget(AttributedNode):
     """Base Widget Class
     """
     
@@ -193,11 +193,6 @@ class Widget(LifecycleNode):
         self.current_prefix = None
         self.unlock()                   
         return data.last_rendered
-    
-    def __setitem__(self, name, widget):
-        if not widget.__name__:
-            widget.__name__ = name
-        LifecycleNode.__setitem__(self, name, widget)
     
     def extract(self, request):
         """extract the data from the request by calling the given extractors. 
