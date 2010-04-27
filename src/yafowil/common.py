@@ -112,11 +112,6 @@ factory.register('textarea',
                  [generic_extractor, generic_required_extractor], 
                  [textarea_renderer])
 
-def action_extractor(widget, data):
-    path = '.'.join(widget.path)
-    if data['request'].get('action.%s' % path, False):
-        data['triggered_action'] = path
-
 def submit_renderer(widget, data):
     attrs = widget.attributes
     input_attrs = {
@@ -129,7 +124,7 @@ def submit_renderer(widget, data):
         input_attrs['name_'] = 'action.%s' % '.'.join(widget.path)
     return tag('input', **input_attrs)
 
-factory.register('submit', [action_extractor], [submit_renderer])
+factory.register('submit', [], [submit_renderer])
 
 def label_renderer(widget, data):
     label_text = widget.attributes.get('label', widget.__name__)

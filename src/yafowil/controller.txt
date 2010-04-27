@@ -127,9 +127,6 @@ Trigger action with valid input
     >>> request['testform.field2'] = '1'
     >>> controller(request)
     handler called "testform"
-    handler called "testform.field1"
-    handler called "testform.field2"
-    handler called "testform.save"
     'next return value'
     
     >>> controller.error
