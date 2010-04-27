@@ -171,7 +171,8 @@ Credits
 
 - Written and concepted by Jens W. Klein <jens@bluedynamics.com>
 
-- Major contributions by Robert Niederrreiter <robertn@bluedynamics.com>
+- API review and major contributions by
+  Robert Niederrreiter <rnix@squarewave.at>
 
 - Credits to Christian Scholz aka MrTopf for the good discussion about formlibs
   simplified. 

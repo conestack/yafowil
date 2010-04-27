@@ -1,3 +1,5 @@
+# XXX: kick me out of core!!!
+
 import sys
 import copy
 import re
