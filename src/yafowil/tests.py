@@ -12,7 +12,6 @@ TESTFILES = [
     'common.txt',
     'compound.txt',
     'controller.txt',
-    'labeled.txt',
     #'array.txt',
 ]
 

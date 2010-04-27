@@ -140,27 +140,26 @@ class Widget(LifecycleNode):
         """renders the widget.
         
         ``request`` 
-            expects a dict-like object, if non-empty given extraction takes 
-            place before rendering.      
+            expects a dict-like object; if non-empty given and data is not 
+            passed extraction takes place before rendering. Empty is default.      
         
         ``data``
             runtime data, information collected in one run of the widget. May be
-            passed in i.e if extract was called seperate before it should not 
-            run twice. Expects either a dict-like object or None to create an 
-            empty dict.
+            passed in i.e if extract was called separate before it should not 
+            run twice. Expects either an initialized RuntimeData instance or 
+            None (default) to create an empty.
         """
-        if data is None:
+        if data is None and not request:
             data = RuntimeData()
-        data = self._runpreprocessors(request, data)
-        if request and not data['extracted']:
-            self.extract(request)
+            data = self._runpreprocessors(request, data)
+        elif data is None and request:
+            data = self.extract(request)                        
         for renderer in self.renderers:
             try:
                 value = renderer(self, data)
             except Exception, e:
                 e.args = [a for a in e.args] + [str(renderer)] + self.path
                 raise e
-            
             data['rendered'].append(value)
         return data.last_rendered
     

@@ -67,6 +67,16 @@ Required Input Widget
     >>> inputwidget(data=data)
     u'<input class="error required" id="input-REQUIRED" name="REQUIRED" type="text" 
     value="Test Text" />'
+
+    >>> inputwidget = factory('text', 'REQUIRED', '',
+    ...                       {'required': 'You fool, fill in a value!'})
+    >>> data = inputwidget.extract({})
+    >>> data
+    {'errors': [ExtractionError('You fool, fill in a value!',)], 
+    'extracted': [<UNSET>], 'input_field_type': 'text', 'rendered': [], 
+    'request': {}, 'value': ''}
+    
+    
     
 Textarea Widget
 ===============
@@ -118,3 +128,67 @@ Submit Widget (action)
     >>> widget = factory('submit', 'save', properties=props)
     >>> widget()
     u'<input class="" id="input-save" name="action.save" type="submit" value="Action name" />'
+    
+Label Widget
+============
+
+Default
+::
+    >>> from yafowil.base import Widget, RuntimeData
+    >>> from yafowil.common import label_renderer
+    >>> props = {'label': 'LABEL'}
+    >>> data = RuntimeData()
+    >>> data['rendered'].append(u'<RUBBISH>')
+    >>> data['rendered'].append(u'<INNER-WIDGET>')
+    >>> widget = Widget([], [], [], 'MYUID', '', props)
+    >>> label_renderer(widget, data)
+    u'<label for="input-MYUID" id="label-MYUID">LABEL</label><INNER-WIDGET>'
+
+Label after widget
+::
+
+    >>> widget.attrs['labelpos'] = 'after'
+    >>> label_renderer(widget, data)
+    u'<INNER-WIDGET><label for="input-MYUID" id="label-MYUID">LABEL</label>'
+    
+Same with inner label
+::
+
+    >>> widget.attrs['labelpos'] = 'inner'
+    >>> label_renderer(widget, data)
+    u'<label for="input-MYUID" id="label-MYUID">LABEL<INNER-WIDGET></label>'
+
+
+Field Widget
+============
+    
+Chained file inside field with label
+::
+
+    >>> widget = factory('field:label:file', 'MYFILE', \
+    ...                   properties={'label': 'MY FILE'})
+    >>> widget()
+    u'<div id="field-MYFILE"><label for="input-MYFILE" 
+    id="label-MYFILE">MY FILE</label><input id="input-MYFILE" name="MYFILE" 
+    type="file" value="" /></div>'
+
+Error Widget
+============
+
+Chained password inside error inside field
+::
+
+    >>> widget = yafowil.base.factory('field:error:password',
+    ...                               'password',
+    ...                               properties={'label': 'Password',
+    ...                                       'required': 'No password given!'})
+    
+    >>> widget({'password': ''})
+    u'<div class="error required" id="field-password"><div class="errors"><p 
+    class="errormessage">No password given!</p><input class="error required" 
+    id="input-password" name="password" type="password" value="" /></div></div>'
+    
+    >>> widget({'password': 'secret'})
+    u'<div class="required" id="field-password"><input class="required" 
+    id="input-password" name="password" type="password" value="secret" /></div>'
+    
