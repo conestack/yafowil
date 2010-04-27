@@ -1,4 +1,8 @@
-from yafowil.base import factory
+from yafowil.base import (
+    UNSET,
+    factory,
+    ExtractionError,
+)
 from yafowil.utils import ( 
     tag,
     cssid, 

@@ -113,7 +113,7 @@ factory.register('textarea',
 def action_extractor(widget, data):
     path = '.'.join(widget.path)
     if data['request'].get('action.%s' % path, False):
-        data['request']['triggered_action'] = path
+        data['triggered_action'] = path
 
 def submit_renderer(widget, data):
     attrs = widget.attributes
