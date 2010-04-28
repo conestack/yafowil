@@ -17,7 +17,6 @@ def compound_renderer(widget, data):
     for childname in widget:
         kw = dict() 
         if data['extracted']: 
-            # XXX First Extracted!?!? looks like a hack
             kw['data'] = data['extracted'][0][childname]
         kw['request'] = data['request']
         result += widget[childname](**kw)
@@ -37,28 +36,29 @@ factory.register('compound',
 def fieldset_renderer(widget, data):
     fieldset_id = cssid(widget, 'fieldset')
     rendered = data.last_rendered
-    if widget.attributes.get('legend', False):
-        rendered = tag('legend', widget.attributes['legend']) + rendered
+    if widget.attrs.legend:
+        rendered = tag('legend', widget.attr.legend) + rendered
     return tag('fieldset', rendered, id=fieldset_id)   
 
+factory.defaults['fieldset.legend'] = False
 factory.register('fieldset', 
                  factory.extractors('compound'), 
                  factory.renderers('compound') + [fieldset_renderer],
                  factory.preprocessors('compound'))
 
 def form_renderer(widget, data):
-    props = widget.attrs
-    method = props.get('method', 'post')
-    enctype_default = method == 'post' and 'multipart/form-data' or None
     form_attrs = {
-        'action': props.action,
-        'method': method,
-        'enctype': props.get('enctype', enctype_default),
-        'class_': props.get('class_'),
+        'action': widget.attrs.action,
+        'method': widget.attrs.method,
+        'enctype': widget.attrs.method=='post' and widget.attrs.enctype or None,
+        'class_': widget.attrs.get('class'),
         'id': 'form-%s' % '-'.join(widget.path),
     }
     return tag('form', data.last_rendered, **form_attrs)
 
+factory.defaults['form.method'] = 'post'
+factory.defaults['form.enctype'] = 'multipart/form-data'
+factory.defaults['form.class'] = None
 factory.register('form', 
                  factory.extractors('compound'), 
                  factory.renderers('compound') + [form_renderer],
