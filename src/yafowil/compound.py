@@ -37,7 +37,7 @@ def fieldset_renderer(widget, data):
     fieldset_id = cssid(widget, 'fieldset')
     rendered = data.last_rendered
     if widget.attrs.legend:
-        rendered = tag('legend', widget.attr.legend) + rendered
+        rendered = tag('legend', widget.attrs.legend) + rendered
     return tag('fieldset', rendered, id=fieldset_id)   
 
 factory.defaults['fieldset.legend'] = False
