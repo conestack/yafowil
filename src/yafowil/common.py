@@ -11,16 +11,21 @@ from utils import (
 
 def generic_extractor(widget, data):    
     return data['request'].get('.'.join(widget.path), 
-                               widget.attrs.get('default', UNSET))               
+                               widget.attrs.get('default'))
+    
+factory.defaults['default'] = UNSET
 
 def generic_required_extractor(widget, data):
     extracted = data.last_extracted
-    if widget.attrs.get('required', False) \
+    if widget.attrs.get('required') \
        and (extracted is UNSET or not bool(extracted)):
-        if isinstance(widget.attributes['required'], basestring):
-            raise ExtractionError(widget.attributes['required'])
-        raise ExtractionError('Mandatory field was empty')
+        if isinstance(widget.attrs['required'], basestring):
+            raise ExtractionError(widget.attrs['required'])
+        raise ExtractionError(widget.attrs['required_message'])
     return extracted
+
+factory.defaults['required'] = False
+factory.defaults['required_message'] = u'Mandatory field was empty'          
 
 def input_generic_renderer(widget, data):
     input_attrs = {
@@ -95,68 +100,91 @@ factory.register('select',
                  [select_renderer])
 
 def textarea_renderer(widget, data):
-    attr = widget.attributes
     area_attrs = {
         'name_': '.'.join(widget.path),
         'class_': cssclasses(widget, data),        
         'id': cssid(widget, 'input'),
-        'wrap': attr.get('wrap', None),
-        'cols': attr.get('cols', 80),
-        'rows': attr.get('rows', 25),
-        'readonly': attr.get('readonly', None) and 'readonly',
+        'wrap': widget.attrs.wrap,
+        'cols': widget.attrs.cols,
+        'rows': widget.attrs.rows,
+        'readonly': widget.attrs.readonly and 'readonly',
     }
     value = data['extracted'] and data.last_extracted or data['value'] or ''
     return tag('textarea', value, **area_attrs)
 
+factory.defaults['textarea.wrap'] = None          
+factory.defaults['textarea.cols'] = 80          
+factory.defaults['textarea.rows'] = 25          
+factory.defaults['textarea.readonly'] = None          
 factory.register('textarea', 
                  [generic_extractor, generic_required_extractor], 
                  [textarea_renderer])
 
 def submit_renderer(widget, data):
-    attrs = widget.attributes
     input_attrs = {
         'id': cssid(widget, 'input'),
         'type': 'submit',
-        'class_': attrs.get('class_', ''),
-        'value': attrs['label'],
+        'class_':widget.attrs.get('class'),
+        'value': widget.attrs.get('label', widget.__name__),
     }
-    if attrs.get('action'):
+    if widget.attrs.action:
         input_attrs['name_'] = 'action.%s' % '.'.join(widget.path)
     return tag('input', **input_attrs)
 
+factory.defaults['submit.class'] = None
 factory.register('submit', [], [submit_renderer])
 
 def label_renderer(widget, data):
-    label_text = widget.attributes.get('label', widget.__name__)
+    label_text = widget.attrs.get('label', widget.__name__)
     label_attrs = {
-        'id': cssid(widget, 'label'),
         'for_': cssid(widget, 'input'),
     }
-    pos = widget.attributes.get('labelpos') # default rendering 'before'
+    if widget.attrs.get('class'):
+        label_attrs['class_'] = widget.attrs.get('class')
+    if widget.attrs.withrequired:
+        label_attrs['class_'] = label_attrs.get('class_', '') + ' ' + \
+                                widget.attrs.get('withrequired', 'required')
+    help = u''
+    if widget.attrs.help:
+        help_attrs = {'class_': widget.attrs.helpclass}
+        help = tag('div', widget.attrs.help, help_attrs)
+    pos = widget.attrs.position
     if pos == 'inner':
-        return tag('label', label_text, data.last_rendered, **label_attrs)
+        return tag('label', label_text, help, data.last_rendered, **label_attrs)
     elif pos == 'after':
-        return data.last_rendered + tag('label', label_text, **label_attrs)
-    return tag('label', label_text, **label_attrs) + data.last_rendered
+        return data.last_rendered + tag('label', label_text, help, **label_attrs)
+    return tag('label', label_text, help, **label_attrs) + data.last_rendered
 
+factory.defaults['label.position'] = 'before'
+factory.defaults['label.class'] = None
+factory.defaults['label.withrequired'] = None
+factory.defaults['label.help'] = None
+factory.defaults['label.helpclass'] = 'help'
 factory.register('label', [], [label_renderer])
 
 def field_renderer(widget, data):
     div_attrs = {
         'id': cssid(widget, 'field'),
+        'class_': widget.attrs['class'],
     }
+    if widget.attrs.witherror and data['errors']:
+        div_attrs['class_'] += u' %s' % widget.attrs.witherror
     return tag('div', data.last_rendered, **div_attrs)
 
+factory.defaults['field.class'] = 'field'
+factory.defaults['field.witherror'] = None
 factory.register('field', [], [field_renderer])
 
 def error_renderer(widget, data):
     content = list()
     for error in data['errors']:
-        content.append(tag('div', str(error), class_='errormessage'))
+        content.append(tag('div', str(error), class_=widget.attrs.messageclass))
     if not content:
         return data.last_rendered
     content += [data.last_rendered]
-    divattrs = dict(class_='error') 
+    divattrs = dict(class_=widget.attrs['class']) 
     return tag('div', *content, **divattrs)
 
+factory.defaults['error.class'] = 'error'
+factory.defaults['error.messageclass'] = 'errormessage'
 factory.register('error', [], [error_renderer])

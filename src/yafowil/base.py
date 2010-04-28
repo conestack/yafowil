@@ -99,9 +99,22 @@ class WidgetAttributes(NodeAttributes):
     def __getitem__(self, name):
         prefixed = '%s.%s' % (self._node.current_prefix or '', name)
         value = super(WidgetAttributes, self).get(prefixed, UNSET)
-        if value is UNSET:
-            return super(WidgetAttributes, self).__getitem__(name)
-        return value
+        if value is not UNSET:
+            return value
+        value = super(WidgetAttributes, self).get(name, UNSET)
+        if value is not UNSET:
+            return value
+        node = object.__getattribute__(self, '_node')
+        value = node.defaults.get(prefixed, UNSET)          
+        if value is not UNSET:
+            return value
+        return node.defaults[name]
+    
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
         
 class Widget(AttributedNode):
     """Base Widget Class
@@ -111,6 +124,7 @@ class Widget(AttributedNode):
     
     def __init__(self, extractors, renderers, preprocessors, 
                  uniquename=None, value_or_getter=None, properties=dict(),
+                 defaults=dict()
                  ):
         """Initialize the widget. 
             
@@ -146,12 +160,16 @@ class Widget(AttributedNode):
         ``properties``
             arbitrary dict-like passed through for use in renderer and 
             extractor, static data must never be modifed!
+            
+        ``defaults``
+            a dict with defaults value for the widgets attributes.
         """
         super(Widget, self).__init__(uniquename)
         self.getter = value_or_getter
         self.extractors = extractors
         self.renderers = renderers
         self.preprocessors = preprocessors or list()
+        self.defaults = defaults
         self.__name__ = uniquename
         self._lock = RLock()
         self.current_prefix = None
@@ -249,6 +267,7 @@ class Factory(object):
     def __init__(self):
         self._factories = dict()
         self._global_preprocessors = list()
+        self.defaults = dict()
         
     def register(self, name, extractors, renderers, 
                  preprocessors=[], subwidgets=[]):
@@ -316,7 +335,8 @@ class Factory(object):
                         global_pre + preprocessors,
                         uniquename=name, 
                         value_or_getter=value, 
-                        properties=props)
+                        properties=props,
+                        defaults=self.defaults)
         for part_name, subwidget_func in subwidgets:
             widget.current_prefix = part_name
             subwidget_func(widget, self)

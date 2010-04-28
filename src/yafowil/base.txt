@@ -272,7 +272,7 @@ Factory called widget attributes should now about its factory name with a
 prefix. 
 
     >>> def prefix_renderer(widget, data):
-    ...     return u'<ID>%s</ID>' % widget.attrs.id
+    ...     return u'<ID>%s</ID>' % widget.attrs['id']
     
     >>> factory.register('prefix', [], [prefix_renderer])
     >>> widget = factory('prefix', props={'prefix.id': 'Test'})
@@ -283,3 +283,48 @@ prefix.
     >>> widget()
     u'<ID>Test2</ID>'
     
+    
+modify defaults for widgets attributes via factory
+--------------------------------------------------
+
+1st look for prefixed in attributes
+::
+
+    >>> factory.defaults['id'] = 'Test3'
+    >>> widget = factory('prefix')
+    >>> widget()
+    u'<ID>Test3</ID>'
+
+2nd look for unprefixed in attributes
+::
+
+    >>> factory.defaults['prefix.id'] = 'Test4'
+    >>> widget = factory('prefix')
+    >>> widget()
+    u'<ID>Test4</ID>'
+
+3rd look for prefixed in defaults
+::
+
+    >>> widget = factory('prefix', props={'prefix.id': 'Test'})
+    >>> widget()
+    u'<ID>Test</ID>'
+
+4th look for unprefixed in defaults
+::
+
+    >>> widget = factory('prefix', props={'id': 'Test2'})
+    >>> widget()
+    u'<ID>Test2</ID>'
+
+5th raise keyerror
+
+    >>> del factory.defaults['id']
+    >>> del factory.defaults['prefix.id']
+    >>> widget = factory('prefix')
+    >>> try:
+    ...     widget()
+    ... except KeyError, e:
+    ...     print e
+    ['id', '<function prefix_renderer at ...>', None]
+   
