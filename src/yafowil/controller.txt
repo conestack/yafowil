@@ -91,12 +91,13 @@ Render form
 Create controller for form.
 ::
 
-    >>> controller = Controller(form)
+    >>> controller = Controller(form, request)
     
-If action is not triggered, ``__call__`` of controller returns ``None``.
+If action is not triggered, or ``action['next']`` is not set,
+``Controller.next`` is ``None``.
 ::
     
-    >>> controller(request)
+    >>> controller.next
     
 Since validation failed due to missing required field, ``error`` is True
 ::
@@ -108,7 +109,7 @@ Provide required field
 ::
 
     >>> request['testform.field2'] = '1'
-    >>> controller(request)
+    >>> controller = Controller(form, request)
     >>> controller.error
     False
 
@@ -117,7 +118,7 @@ Trigger save action without required field
 
     >>> del request['testform.field2']
     >>> request['action.testform.save'] = '1'
-    >>> controller(request)
+    >>> controller = Controller(form, request)
     >>> controller.error
     True
 
@@ -125,8 +126,10 @@ Trigger action with valid input
 ::
 
     >>> request['testform.field2'] = '1'
-    >>> controller(request)
+    >>> controller = Controller(form, request)
     handler called "testform"
+    
+    >>> controller.next
     'next return value'
     
     >>> controller.error
