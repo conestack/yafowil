@@ -10,6 +10,7 @@ class Controller(object):
         """
         self.widget = widget
         self.request = request
+        self.performed = False
         self.error = False
         self.next = None
         self.data = self.widget.extract(request)
@@ -17,22 +18,25 @@ class Controller(object):
         if self.error:
             return
         for action in self.actions:
-            if self.triggered(request, action):
-                if action.attributes.get('handler'):
-                    action.attributes.handler(self.widget, self.data)
+            if self.triggered(action):
+                self.performed = True
+                if action.attrs.get('handler'):
+                    action.attrs.handler(self.widget, self.data)
                 if action.attrs.get('next'):
                     self.next = action.attrs.next(request)
     
     @property
     def rendered(self):
+        if not self.performed:
+            return self.widget()
         return self.widget(data=self.data)
     
     @property
     def actions(self):
         return [w for w in self.widget.values() if w.attrs.get('action')]
     
-    def triggered(self, request, action):
-        return request.get('action.%s' % '.'.join(action.path))
+    def triggered(self, action):
+        return self.request.get('action.%s' % '.'.join(action.path))
     
     def _error(self, data):
         if data.get('errors'):
