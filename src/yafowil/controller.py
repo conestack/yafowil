@@ -15,7 +15,6 @@ class Controller(object):
         self.data = self.widget.extract(request)
         self.request = self.data['request']
         self._error(self.data)
-        #import pdb;pdb.set_trace()
         for action in self.actions:
             if self.triggered(action):
                 self.performed = True
@@ -28,7 +27,6 @@ class Controller(object):
     
     @property
     def rendered(self):
-        #import pdb;pdb.set_trace()
         if not self.performed:
             return self.widget()
         return self.widget(data=self.data)
