@@ -128,37 +128,40 @@ Submit Widget (action)
     ... }
     >>> widget = factory('submit', name='save', props=props)
     >>> widget()
-    u'<input class="" id="input-save" name="action.save" type="submit" value="Action name" />'
+    u'<input id="input-save" name="action.save" type="submit" value="Action name" />'
     
 Label Widget
 ============
 
 Default
 ::
-    >>> from yafowil.base import Widget, RuntimeData
-    >>> from yafowil.common import label_renderer
-    >>> props = {'label': 'LABEL'}
-    >>> data = RuntimeData()
-    >>> data['rendered'].append(u'<RUBBISH>')
-    >>> data['rendered'].append(u'<INNER-WIDGET>')
-    >>> widget = Widget([], [], [], 'MYUID', '', props)
-    >>> label_renderer(widget, data)
-    u'<label for="input-MYUID" id="label-MYUID">LABEL</label><INNER-WIDGET>'
 
+    >>> widget = factory('label:file', name='MYFILE', \
+    ...                   props={'label': 'MY FILE'})
+    >>> widget()
+    u'<label for="input-MYFILE">MY FILE</label><input id="input-MYFILE" 
+    name="MYFILE" type="file" value="" />'
+    
 Label after widget
 ::
 
-    >>> widget.attrs['labelpos'] = 'after'
-    >>> label_renderer(widget, data)
-    u'<INNER-WIDGET><label for="input-MYUID" id="label-MYUID">LABEL</label>'
+    >>> widget = factory('label:file', name='MYFILE', \
+    ...                   props={'label': 'MY FILE',
+    ...                          'label.position': 'after'})
+    >>> widget()
+    u'<input id="input-MYFILE" name="MYFILE" type="file" value="" /><label 
+    for="input-MYFILE">MY FILE</label>'
     
 Same with inner label
 ::
 
-    >>> widget.attrs['labelpos'] = 'inner'
-    >>> label_renderer(widget, data)
-    u'<label for="input-MYUID" id="label-MYUID">LABEL<INNER-WIDGET></label>'
-
+    >>> widget = factory('label:file', name='MYFILE', \
+    ...                   props={'label': 'MY FILE',
+    ...                          'label.position': 'inner'})
+    >>> widget()
+    u'<label for="input-MYFILE">MY FILE<input id="input-MYFILE" name="MYFILE" 
+    type="file" value="" /></label>'
+    
 
 Field Widget
 ============
@@ -169,8 +172,8 @@ Chained file inside field with label
     >>> widget = factory('field:label:file', name='MYFILE', \
     ...                   props={'label': 'MY FILE'})
     >>> widget()
-    u'<div id="field-MYFILE"><label for="input-MYFILE" 
-    id="label-MYFILE">MY FILE</label><input id="input-MYFILE" name="MYFILE" 
+    u'<div class="field" id="field-MYFILE"><label 
+    for="input-MYFILE">MY FILE</label><input id="input-MYFILE" name="MYFILE" 
     type="file" value="" /></div>'
 
 Error Widget
@@ -184,11 +187,11 @@ Chained password inside error inside field
     ...                         'required': 'No password given!'})
     
     >>> widget({'password': ''})
-    u'<div id="field-password"><div class="error"><div class="errormessage">No 
-    password given!</div><input class="error required" id="input-password" 
-    name="password" type="password" value="" /></div></div>'
+    u'<div class="field" id="field-password"><div class="error"><div 
+    class="errormessage">No password given!</div><input class="error required" 
+    id="input-password" name="password" type="password" value="" /></div></div>'
     
     >>> widget({'password': 'secret'})
-    u'<div id="field-password"><input class="required" id="input-password" 
-    name="password" type="password" value="secret" /></div>'
+    u'<div class="field" id="field-password"><input class="required" 
+    id="input-password" name="password" type="password" value="secret" /></div>'
     

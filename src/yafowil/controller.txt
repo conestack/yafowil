@@ -77,7 +77,7 @@ Dummy request
     ...     context = context
     >>> request = Request()
 
-Render form
+Render form with empty request
 ::
 
     >>> form(request)
@@ -85,8 +85,8 @@ Render form
     id="form-testform" method="post"><input id="input-testform-field1" 
     name="testform.field1" type="text" value="hello world" /><input 
     class="required" id="input-testform-field2" name="testform.field2" 
-    type="text" value="" /><input class="" id="input-testform-save" 
-    name="action.testform.save" type="submit" value="Save" /></form>'
+    type="text" value="" /><input id="input-testform-save" 
+    name="action.testform.save" type="submit" value="Save" /></form>'    
 
 Create controller for form.
 ::
@@ -137,12 +137,10 @@ Trigger action with valid input
     
 Render the form
 ::
-    
     >>> controller.rendered
     u'<form action="http://fubar.com" enctype="multipart/form-data" 
     id="form-testform" method="post"><input id="input-testform-field1" 
     name="testform.field1" type="text" value="hello world" /><input 
     class="required" id="input-testform-field2" name="testform.field2" 
-    type="text" value="1" /><input class="" id="input-testform-save" 
+    type="text" value="1" /><input id="input-testform-save" 
     name="action.testform.save" type="submit" value="Save" /></form>'
-    
