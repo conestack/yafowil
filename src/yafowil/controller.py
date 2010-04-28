@@ -25,7 +25,7 @@ class Controller(object):
     
     @property
     def rendered(self):
-        return self.form(data=self.data)
+        return self.widget(data=self.data)
     
     @property
     def actions(self):

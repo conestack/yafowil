@@ -88,8 +88,11 @@ class ExtractionError(Exception):
             stops extraction.
         
         """
-        super(ExtractionError, self).__init__(msg)
+        Exception.__init__(self, msg)
         self.abort = abort
+        
+    def __repr__(self):
+        return u"ExtractionError('%s',)" % str(self)
         
 class WidgetAttributes(NodeAttributes):
     

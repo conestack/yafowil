@@ -134,3 +134,15 @@ Trigger action with valid input
     
     >>> controller.error
     False
+    
+Render the form
+::
+    
+    >>> controller.rendered
+    u'<form action="http://fubar.com" enctype="multipart/form-data" 
+    id="form-testform" method="post"><input id="input-testform-field1" 
+    name="testform.field1" type="text" value="hello world" /><input 
+    class="required" id="input-testform-field2" name="testform.field2" 
+    type="text" value="1" /><input class="" id="input-testform-save" 
+    name="action.testform.save" type="submit" value="Save" /></form>'
+    
