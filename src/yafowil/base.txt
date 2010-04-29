@@ -14,61 +14,87 @@ Test UNSET
 
 Test Runtime Data
 =================
+
+Initial RuntimeData is empty
 ::    
+
 
     >>> from yafowil.base import RuntimeData
     >>> data = RuntimeData()
-    >>> sorted(data.keys())
-    ['errors', 'extracted', 'rendered']
-    
-    >>> data['custom'] = 'customdata'
-    >>> data
-    {'custom': 'customdata', 'errors': [], 'extracted': [], 'rendered': []}
-    
-    >>> data.last_extracted
+    >>> data.request
     <UNSET>
     
-    >>> data.has_extracted
-    False
+    >>> data.value
+    <UNSET>
 
-    >>> data['extracted'].append(dict())
-    >>> data.has_extracted
-    False
-
-    >>> data['extracted'].append(dict(key='value'))
-    >>> data.has_extracted
-    True
-
-    >>> data['extracted'].append(dict(key='value', key2=RuntimeData()))
-    >>> data.has_extracted
-    Traceback (most recent call last):
-    ...
-    ValueError
-
-    >>> data['extracted'].append(dict(key=RuntimeData()))
-    >>> data.has_extracted
-    False
-
-    >>> subdata = RuntimeData()
-    >>> subdata['extracted'].append('subvalue')
-    >>> data['extracted'].append(dict(key=subdata))
-    >>> data.has_extracted
-    True
-        
-    >>> data.last_rendered
-    u''
+    >>> data.extracted
+    <UNSET>
     
-    >>> data['extracted'].append('first')    
-    >>> data['extracted'].append('second')    
-    >>> data['extracted'].append('last')    
-    >>> data.last_extracted
-    'last'    
+    >>> data.rendered
+    <UNSET>
 
-    >>> data['rendered'].append('first')    
-    >>> data['rendered'].append('second')    
-    >>> data['rendered'].append('last')    
-    >>> data.last_rendered
-    'last'
+    >>> data.errors
+    []
+    
+    >>> data.keys()
+    []
+    
+    >>> repr(data.__name__)
+    'None'
+    
+Initial RuntimeData can get its name passed in.
+::
+
+    >>> data = RuntimeData('root')
+    >>> data.__name__
+    'root'    
+
+RuntimeData can have children.
+::   
+    
+    >>> data['surname'] = RuntimeData()
+    >>> data['fieldset'] = RuntimeData()
+    >>> data.keys()
+    ['surname', 'fieldset']
+    
+    >>> data['surname'].__name__
+    'surname'
+    
+And each child can have children again.
+::
+    
+    >>> data['fieldset']['age'] = RuntimeData()
+    >>> data['fieldset']['age'].value = 36
+    
+You can fetch other data also by its dotted absolute path.
+::
+    
+    >>> fetched = data.fetch('root.fieldset.age')
+    >>> fetched.value 
+    36
+
+Or by the absolute path as an list of strings.
+::    
+
+    >>> fetched = data.fetch(['root', 'fieldset', 'age'])
+    >>> fetched.value 
+    36
+    
+It works on children. 
+::
+
+    >>> fetched = data['fieldset']['age'].fetch('root.surname')
+    >>> fetched.__name__
+    'surname'
+
+Same with path as a list.
+::
+
+    >>> fetched = data['fieldset']['age'].fetch(['root', 'surname'])
+    >>> fetched.__name__
+    'surname'
+    
+
         
 Test Base Widget
 ================
@@ -86,28 +112,29 @@ Create some test dummies::
     ...     return 'e2'
 
     >>> def test_extractor3(widget, data):
+    ...     number = data.request[widget.__name__]
     ...     try:
-    ...         return int(data['value'])
+    ...         return int(number)
     ...     except:
-    ...         raise ExtractionError('e3: Integer expected, got %s' % \
-    ...                               data['value'])
+    ...         raise ExtractionError('e3: Integer expected, got %s' % number)
     ...     return value
     
     >>> def test_renderer(widget, data):
+    ...     #interact(locals())
     ...     return 'r1', widget.__name__, str(data), str(widget.attributes)
 
     >>> def test_renderer2(widget, data):
     ...     return 'r2', widget.__name__, str(data), str(widget.attributes)
     
     >>> def test_preprocessor(widget, data):
-    ...     data['test_preprocessor'] = 'called'
+    ...     data.value += ' test_preprocessor called'
     ...     return data
     
     >>> def test_getter(widget, data):
     ...     return 'Test Value'
 
     >>> def test_getter2(widget, data):
-    ...     return 123
+    ...     return 999
 
 Test the base widget class::    
     
@@ -119,18 +146,17 @@ Test the base widget class::
     ...                     dict(test1='Test1', test2='Test2'))
         
     >>> testwidget() 
-    ('r1', 'MYUID', "{'errors': [], 'extracted': [], 'rendered': [], 'request': 
-    {}, 'test_preprocessor': 'called', 'value': 'Test Value'}", "{'test1': 
-    'Test1', 'test2': 'Test2'}")
-
+    ('r1', 'MYUID', "<RuntimeData MYUID, value='Test Value test_preprocessor 
+    called', extracted=<UNSET>, 0 errors>", "{'test1': 'Test1', 'test2': 
+    'Test2'}")
+    
     >>> testwidget(request=test_request) 
-    ('r1', 'MYUID', "{'errors': [], 'extracted': ['e1'], 'rendered': [], 'request': 
-    {'MYUID': 'New Test Value'}, 'test_preprocessor': 'called', 'value': 
-    'Test Value'}", "{'test1': 'Test1', 'test2': 'Test2'}")
+    ('r1', 'MYUID', "<RuntimeData None, value='Test Value test_preprocessor 
+    called', extracted='e1', 0 errors>", "{'test1': 'Test1', 'test2': 'Test2'}")
     
     >>> testwidget.extract(test_request)
-    {'errors': [], 'extracted': ['e1'], 'rendered': [], 'request': {'MYUID': 
-    'New Test Value'}, 'test_preprocessor': 'called', 'value': 'Test Value'}
+    <RuntimeData None, value='Test Value test_preprocessor called', 
+    extracted='e1', 0 errors>
     
     >>> testwidget = Widget([('1', test_extractor)], 
     ...                     [('1', test_renderer)], 
@@ -138,31 +164,17 @@ Test the base widget class::
     ...                     'MYUID', test_getter,
     ...                     dict(test1='Test1', test2='Test2'))    
     >>> testwidget()
-    ('r1', 'MYUID', "{'errors': [], 'extracted': [], 
-    'rendered': [], 'request': {}, 'value': 'Test Value'}", "{'test1': 'Test1', 
-    'test2': 'Test2'}")
-    
+    ('r1', 'MYUID', "<RuntimeData MYUID, value='Test Value', extracted=<UNSET>, 
+    0 errors>", "{'test1': 'Test1', 'test2': 'Test2'}")
+        
     >>> testwidget = Widget([('1', test_extractor), ('2', test_extractor2)], 
     ...                     [('1', test_renderer), ('2', test_renderer2)], 
     ...                     [],
     ...                     'MYUID2', test_getter,
     ...                     dict(test1='Test1', test2='Test2'))
     >>> testwidget()
-    ('r2', 'MYUID2', '{\'errors\': [], \'extracted\': [], \'rendered\': 
-    [(\'r1\', \'MYUID2\', "{\'errors\': [], \'extracted\': [], \'rendered\': [], 
-    \'request\': {}, \'value\': \'Test Value\'}", "{\'test1\': \'Test1\', \'test2\': 
-    \'Test2\'}")], \'request\': {}, \'value\': \'Test Value\'}', "{'test1': 'Test1', 
-    'test2': 'Test2'}")
-
-    >>> testwidget = Widget([('1', test_extractor3)], 
-    ...                     [('1', test_renderer)], 
-    ...                     [],
-    ...                     'MYUID2', test_getter,
-    ...                     dict(test1='Test1', test2='Test2'))
-
-    >>> testwidget.extract({})
-    {'errors': [ExtractionError('e3: Integer expected, got Test Value',)], 
-    'extracted': [], 'rendered': [], 'request': {}, 'value': 'Test Value'}
+    ('r2', 'MYUID2', "<RuntimeData MYUID2, value='Test Value', extracted=<UNSET>, 
+    0 errors>", "{'test1': 'Test1', 'test2': 'Test2'}")
     
     >>> testwidget = Widget([('1', test_extractor3)], 
     ...                     [('1', test_renderer)], 
@@ -170,8 +182,17 @@ Test the base widget class::
     ...                     'MYUID2', test_getter2,
     ...                     dict(test1='Test1', test2='Test2'))
 
-    >>> testwidget.extract({})
-    {'errors': [], 'extracted': [123], 'rendered': [], 'request': {}, 'value': 123}
+    >>> testwidget.extract({'MYUID2': 'ABC'})
+    <RuntimeData None, value=999, extracted=<UNSET>, 1 errors>
+    
+    >>> testwidget = Widget([('1', test_extractor3)], 
+    ...                     [('1', test_renderer)], 
+    ...                     [],
+    ...                     'MYUID2', test_getter2,
+    ...                     dict(test1='Test1', test2='Test2'))
+
+    >>> testwidget.extract({'MYUID2': '123'})
+    <RuntimeData None, value=999, extracted=123, 0 errors>
     
         
 Test the factory
@@ -189,8 +210,8 @@ Test the factory
     >>> testwidget = factory('widget_test', name='MYFAC', value=test_getter, 
     ...                      props=dict(foo='bar'))
     >>> testwidget()
-    ('r1', 'MYFAC', "{'errors': [], 'extracted': [], 'rendered': [], 'request': 
-    {}, 'value': 'Test Value'}", "{'foo': 'bar'}")
+    ('r1', 'MYFAC', "<RuntimeData MYFAC, value='Test Value', extracted=<UNSET>, 
+    0 errors>", "{'foo': 'bar'}")
     
 We can create sets of static subwidgets, i.e. to have a validating password
 field with two input fields in. Here a simpler example:: 
@@ -225,16 +246,16 @@ with wrappers)!
     ...     return ['extracted inner']
 
     >>> def outer_renderer(widget, data):
-    ...     return u'<OUTER>%s</OUTER>' % data.last_rendered
+    ...     return u'<OUTER>%s</OUTER>' % data.rendered
     
     >>> def outer_extractor(widget, data):
-    ...     return data.last_extracted + ['extracted outer']
+    ...     return data.extracted + ['extracted outer']
         
     >>> factory.register('inner', [inner_extractor], [inner_renderer])
     >>> factory.register('outer', [outer_extractor], [outer_renderer])
     >>> widget = factory('outer:inner')
     >>> data = widget.extract({})
-    >>> data.last_extracted
+    >>> data.extracted
     ['extracted inner', 'extracted outer']
     
     >>> widget(data)
@@ -248,17 +269,17 @@ You may need an behavior just one time and just for one special widget. Here
 you can inject your custom special render or extractor into the chain::
     
     >>> def special_renderer(widget, data):
-    ...     return u'<SPECIAL>%s</SPECIAL>' % data.last_rendered
+    ...     return u'<SPECIAL>%s</SPECIAL>' % data.rendered
 
     >>> def special_extractor(widget, data):
-    ...     return data.last_extracted + ['extracted special']
+    ...     return data.extracted + ['extracted special']
         
     >>> widget = factory('outer:*special:inner', 
     ...                  custom={'special': ([special_extractor], 
     ...                                      [special_renderer], 
     ...                                      [], [])})
     >>> data = widget.extract({})
-    >>> data.last_extracted
+    >>> data.extracted
     ['extracted inner', 'extracted special', 'extracted outer']
 
     >>> widget(data)
