@@ -1,5 +1,8 @@
 from threading import RLock
-from zodict import AttributedNode
+from zodict import (
+    Node, 
+    AttributedNode
+)
 from zodict.node import NodeAttributes
 
 class Unset(object): 
@@ -17,61 +20,35 @@ UNSET = Unset()
 
 callable = lambda o: hasattr(o, '__call__')
 
-class RuntimeData(dict):
+class RuntimeData(Node):
     """Holds Runtime data of widget."""
     
-    def __init__(self, *args, **kw):
-        super(RuntimeData, self).__init__(*args, **kw)
-        self['extracted'] = list()
-        self['rendered'] = list()
-        self['errors'] = list()
+    def __init__(self, name=None):
+        super(RuntimeData, self).__init__(name=name)
+        self.request = UNSET
+        self.value = UNSET
+        self.extracted = UNSET
+        self.rendered = UNSET
+        self.errors= list()
         
-    def _last(self, key, default):
-        if not len(self[key]):
-            return default
-        return self.get(key)[-1]    
-        
-    @property
-    def last_extracted(self):
-        return self._last('extracted', UNSET)
-
-    @property
-    def last_rendered(self):
-        return self._last('rendered', u'')
-    
-    @property
-    def has_extracted(self):
-        """looks if some value was extracted.
-        
-        It always looks at last_extracted and goes then recursively into the 
-        tree of runtimedata. It considers a tree when a) last_extracted is a 
-        dict instance and all contained values are RuntimeData instances or b)
-        if last_extracted is a list and all contained values are RuntimeData 
-        instances. Mixing RuntimeData instances at this level with non 
-        RuntimeData is not allowed and will this method make fail.
-        """
-        last = self.last_extracted
-        if not isinstance(last, dict):
-            if isinstance(last, list) and \
-               [_ for _ in last if isinstance(_, self.__class__)]:
-                return bool([_ for _ in last if _.has_extracted])
-            return bool(last)
-        values = last.values()
-        lvalues = len(values)
-        ldata = len([_ for _ in values if isinstance(_, self.__class__)])
-        if not ldata:
-            return bool(values)
-        if ldata!=lvalues:
-            raise ValueError
-        for value in values:
-            if value.has_extracted:             
-                return True
-        return False        
-                    
+    def fetch(self, path):
+        if isinstance(path, basestring):
+            path = path.split('.')
+        data = self.root
+        if path[0] != data.__name__:
+            raise KeyError, 'Invalid name of root element'
+        for key in path[1:]:
+            data = data[key]
+        return data
+                            
     def __repr__(self):
-        va = ', '.join(["'%s': %s" % (_, repr(self[_])) \
-                        for _ in sorted(self.keys()) ])
-        return '{%s}' % va
+        return "<RuntimeData %s, value=%s, extracted=%s, %d errors>" % \
+                ('.'.join([str(_) for _ in self.path]), 
+                 repr(self.value), 
+                 repr(self.extracted),  
+                 len(self.errors))
+    
+    __str__ = __repr__
 
 class ExtractionError(Exception):
     """Indicates problems on extraction time, such as conversion, validation
@@ -196,7 +173,7 @@ class Widget(AttributedNode):
             None (default) to create an empty.
         """
         if data is None and not request:
-            data = RuntimeData()
+            data = RuntimeData(self.__name__)
             data = self._runpreprocessors(request, data)
         elif data is None and request:
             data = self.extract(request)
@@ -204,16 +181,16 @@ class Widget(AttributedNode):
         for ren_name, renderer in self.renderers:
             self.current_prefix = ren_name
             try:
-                value = renderer(self, data)
+                rendered = renderer(self, data)
             except Exception, e:
                 self.current_prefix = None
                 self.unlock()
                 e.args = [a for a in e.args] + [str(renderer)] + self.path
                 raise e
-            data['rendered'].append(value)
+            data.rendered = rendered
         self.current_prefix = None
         self.unlock()                   
-        return data.last_rendered
+        return data.rendered
     
     def extract(self, request):
         """extract the data from the request by calling the given extractors. 
@@ -227,9 +204,9 @@ class Widget(AttributedNode):
         for ex_name, extractor in self.extractors:     
             self.current_prefix = ex_name
             try:
-                value = extractor(self, data)
+                extracted = extractor(self, data)
             except ExtractionError, e:
-                data['errors'].append(e)
+                data.errors.append(e)
                 if e.abort:
                     break
             except Exception, e:
@@ -238,19 +215,19 @@ class Widget(AttributedNode):
                 e.args = [a for a in e.args] + [str(extractor)] + self.path
                 raise e
             else:
-                data['extracted'].append(value)
+                data.extracted = extracted
         self.current_prefix = None
         self.unlock()                   
         return data
 
     def _runpreprocessors(self, request, data):                
-        if 'value' in data and 'request' in data:
+        if data.request is not UNSET:
             return data
-        data['request'] = request
+        data.request = request
         if callable(self.getter):
-            data['value'] = self.getter(self, data)
+            data.value = self.getter(self, data)
         else:
-            data['value'] = self.getter        
+            data.value = self.getter        
         for ppname, pp in self.preprocessors:
             data.current_prefix = ppname
             try:
