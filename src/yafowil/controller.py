@@ -1,3 +1,5 @@
+from base import UNSET
+
 class Controller(object):
     """Form controller.
     """
@@ -21,6 +23,10 @@ class Controller(object):
         for action in self.actions:
             if not self.triggered(action):
                 continue
+            if action.attrs.get('skip'):
+                if action.attrs.get('next'):
+                    self.next = action.attrs.next(self.request)
+                return
             self.performed = True
             if self.error:
                 return

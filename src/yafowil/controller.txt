@@ -54,12 +54,27 @@ referring properties.
     ...     'handler': handler,
     ...     'next': next,
     ...     'label': 'Save',
+    ...     'skip': False,
     ... }
 
 Add save action.
 ::
 
     >>> form['save'] = factory('submit', props=props)
+
+Add cancel action. In this case we want the form processing to be skipped and
+just the next action to be performed.
+::
+
+    >>> props = {
+    ...     'action': 'cancel',
+    ...     'expression': True,
+    ...     'handler': None,
+    ...     'next': next,
+    ...     'label': 'Cancel',
+    ...     'skip': True,
+    ... }
+    >>> form['cancel'] = factory('submit', props=props)
 
 Check widget tree
 ::
@@ -69,6 +84,7 @@ Check widget tree
       <class 'yafowil.base.Widget'>: field1
       <class 'yafowil.base.Widget'>: field2
       <class 'yafowil.base.Widget'>: save
+      <class 'yafowil.base.Widget'>: cancel
 
 Dummy request
 ::
@@ -87,7 +103,9 @@ Render form with empty request
     name="testform.field1" type="text" value="hello world" /><input 
     class="required" id="input-testform-field2" name="testform.field2" 
     type="text" value="" /><input id="input-testform-save" 
-    name="action.testform.save" type="submit" value="Save" /></form>'    
+    name="action.testform.save" type="submit" value="Save" /><input 
+    id="input-testform-cancel" name="action.testform.cancel" 
+    type="submit" value="Cancel" /></form>'
     
 Create controller for form.
 ::
@@ -130,8 +148,11 @@ Trigger save action without required field
     >>> controller = Controller(form, request)
     >>> controller.error
     True
+    
+    >>> controller.performed
+    True
 
-Trigger action with valid input
+Trigger save action with valid input
 ::
 
     >>> request['testform.field2'] = '1'
@@ -144,6 +165,22 @@ Trigger action with valid input
     >>> controller.error
     False
     
+    >>> controller.performed
+    True
+
+Trigger cancel action. performing is skipped.
+::
+
+    >>> del request['action.testform.save']
+    >>> request['action.testform.cancel'] = '1'
+    >>> controller = Controller(form, request)
+    
+    >>> controller.next
+    'next return value'
+    
+    >>> controller.performed
+    False
+    
 Render the form
 ::
     >>> controller.rendered
@@ -152,4 +189,6 @@ Render the form
     name="testform.field1" type="text" value="hello world" /><input 
     class="required" id="input-testform-field2" name="testform.field2" 
     type="text" value="1" /><input id="input-testform-save" 
-    name="action.testform.save" type="submit" value="Save" /></form>'
+    name="action.testform.save" type="submit" value="Save" /><input 
+    id="input-testform-cancel" name="action.testform.cancel" 
+    type="submit" value="Cancel" /></form>'

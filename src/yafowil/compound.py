@@ -1,5 +1,6 @@
 from yafowil.base import (
     factory,
+    UNSET,
 )
 from yafowil.utils import (
     cssid,
@@ -12,7 +13,7 @@ def compound_extractor(widget, data):
     """
     for childname in widget:
         data[childname] = widget[childname].extract(data.request)
-    return None
+    return
 
 def compound_renderer(widget, data):
     """Delegates rendering to children."""
