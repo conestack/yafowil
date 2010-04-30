@@ -361,5 +361,5 @@ modify defaults for widgets attributes via factory
     ...     widget()
     ... except KeyError, e:
     ...     print e
-    ['id', '<function prefix_renderer at ...>', None]
+    ('id', '<function prefix_renderer at ...>', None)
    
