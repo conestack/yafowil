@@ -1,6 +1,5 @@
 from threading import RLock
 from zodict import (
-    Node, 
     AttributedNode
 )
 from zodict.node import NodeAttributes
@@ -20,7 +19,7 @@ UNSET = Unset()
 
 callable = lambda o: hasattr(o, '__call__')
 
-class RuntimeData(Node):
+class RuntimeData(AttributedNode):
     """Holds Runtime data of widget."""
     
     def __init__(self, name=None):
@@ -42,11 +41,17 @@ class RuntimeData(Node):
         return data
                             
     def __repr__(self):
-        return "<RuntimeData %s, value=%s, extracted=%s, %d errors>" % \
-                ('.'.join([str(_) for _ in self.path]), 
+        rep = "<RuntimeData %s, value=%s, extracted=%s" % (
+                 '.'.join([str(_) for _ in self.path]), 
                  repr(self.value), 
-                 repr(self.extracted),  
-                 len(self.errors))
+                 repr(self.extracted)
+        )  
+        if self.errors:
+            rep += ', %d error(s)' % len(self.errors)
+        if self.attrs:
+            rep += ', attrs=%s' % repr(self.attrs)
+        rep += ' at %s>' % hex(id(self))[:-1]
+        return rep
     
     __str__ = __repr__
 
@@ -199,7 +204,7 @@ class Widget(AttributedNode):
             expects a dict-like object       
 
         """
-        data = self._runpreprocessors(request, RuntimeData())
+        data = self._runpreprocessors(request, RuntimeData(self.__name__))
         self.lock()         
         for ex_name, extractor in self.extractors:     
             self.current_prefix = ex_name
