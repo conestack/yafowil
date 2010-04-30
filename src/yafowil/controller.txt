@@ -188,7 +188,7 @@ Render the form
     id="form-testform" method="post"><input id="input-testform-field1" 
     name="testform.field1" type="text" value="hello world" /><input 
     class="required" id="input-testform-field2" name="testform.field2" 
-    type="text" value="1" /><input id="input-testform-save" 
+    type="text" value="" /><input id="input-testform-save" 
     name="action.testform.save" type="submit" value="Save" /><input 
     id="input-testform-cancel" name="action.testform.cancel" 
     type="submit" value="Cancel" /></form>'

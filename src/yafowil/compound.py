@@ -19,7 +19,11 @@ def compound_renderer(widget, data):
     """Delegates rendering to children."""
     result = u''
     for childname in widget:
-        result += widget[childname](data=data.get(childname, None))
+        subdata = data.get(childname, None)
+        if subdata is None:
+            result += widget[childname](request=data.request)
+        else:
+            result += widget[childname](data=subdata)
     return result
 
 factory.register('compound', 
