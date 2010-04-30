@@ -8,11 +8,11 @@ optionflags = doctest.NORMALIZE_WHITESPACE | \
               doctest.REPORT_ONLY_FIRST_FAILURE
 
 TESTFILES = [
+    'utils.txt',
     'base.txt',
     'common.txt',
     'compound.txt',
     'controller.txt',
-    #'array.txt',
 ]
 
 def test_suite():

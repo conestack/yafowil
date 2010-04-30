@@ -4,51 +4,70 @@ from yafowil.base import (
     ExtractionError,
 )
 from utils import (
-    cssid,
     cssclasses,
+    cssid,
     tag,
     vocabulary,)
 
-def generic_extractor(widget, data):    
-    return data['request'].get('.'.join(widget.path), 
-                               widget.attrs.get('default'))
-    
-factory.defaults['default'] = UNSET
-
-def generic_required_extractor(widget, data):
-    extracted = data.last_extracted
-    if widget.attrs.get('required') \
-       and (extracted is UNSET or not bool(extracted)):
-        if isinstance(widget.attrs['required'], basestring):
-            raise ExtractionError(widget.attrs['required'])
-        raise ExtractionError(widget.attrs['required_message'])
-    return extracted
-
+factory.defaults['default'] = None
+factory.defaults['class'] = None
+factory.defaults['error_class'] = None
+factory.defaults['error_class_default'] = 'error'
 factory.defaults['required'] = False
 factory.defaults['required_message'] = u'Mandatory field was empty'          
+factory.defaults['required_class'] = None
+factory.defaults['required_class_default'] = 'required'
+
+def _value(widget, data):
+    if data.extracted is not UNSET:
+        return data.extracted
+    if data.value is not UNSET:
+        return data.value 
+    return widget.attrs.default
+    
+def generic_extractor(widget, data):
+    if widget.dottedpath not in data.request:
+        return UNSET
+    return data.request[widget.dottedpath]
+
+def generic_required_extractor(widget, data):
+    """validate required. 
+    
+    if required is set and some value was extracted, 
+    so data.extracted is not UNSET, then we evaluate data.extracted to boolean.
+    raise ExtractionError if result is False
+    """
+    if not widget.attrs.get('required') \
+       or bool(data.extracted) \
+       or data.extracted is UNSET:
+        return data.extracted
+    if isinstance(widget.attrs['required'], basestring):
+        raise ExtractionError(widget.attrs['required'])
+    raise ExtractionError(widget.attrs['required_message'])
 
 def input_generic_renderer(widget, data):
     input_attrs = {
-        'type': data.get('input_field_type', 0) or \
-                widget.attrs.get('type', None),
-        'value':  data['extracted'] and data.last_extracted \
-                  or data['value'] or '',
-        'name_': '.'.join(widget.path),
+        'type': data.attrs.get('input_field_type', False) or widget.attrs.type,
+        'value':  _value(widget, data),
+        'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),    
         'class_': cssclasses(widget, data),    
     }
     return tag('input', **input_attrs)
-    
+
 class InputGenericPreprocessor(object):
     
     def __init__(self, inputtype):
         self.inputtype = inputtype
         
     def __call__(self, widget, data):
-        data['input_field_type'] = self.inputtype   
-        return data 
+        data.attrs['input_field_type'] = self.inputtype   
+        return data
     
-def register_generic_input(subtype):
+def register_generic_input(subtype, enable_required_class=True):
+    if enable_required_class:
+        factory.defaults['%s.required_class' % subtype] = 'required'
+    factory.defaults['%s.default' % subtype] = ''
     factory.register(subtype, 
                      [generic_extractor, generic_required_extractor], 
                      [input_generic_renderer],
@@ -56,17 +75,18 @@ def register_generic_input(subtype):
 
 register_generic_input('text')
 register_generic_input('password')
-register_generic_input('hidden')
+register_generic_input('hidden', False)
 register_generic_input('radio')
 register_generic_input('checkbox')
 
 def input_file_renderer(widget, data):
     input_attrs = {
+        'name_': widget.dottedpath,
+        'id': cssid(widget, 'input'),
+        'class_': cssclasses(widget, data),            
         'type': 'file',
         'value':  '',
-        'name_': '.'.join(widget.path),
         'accept': widget.attrs.get('accept', None),
-        'id': cssid(widget, 'input'),
     }
     return tag('input', **input_attrs)
     
@@ -76,11 +96,11 @@ factory.register('file',
 
 def select_renderer(widget, data):
     optiontags = [] 
-    attr = widget.attributes
-    value = data['extracted'] and data.last_extracted or data['value'] or []
-    if isinstance(value, basestring) and attr.get('multiple', False):
+    value = _value(widget, data)
+    if isinstance(value, basestring):
+        # TODO:  what if value is an integer? 
         value = [value]
-    for key, term in vocabulary(attr.get('vocabulary', [])):
+    for key, term in vocabulary(widget.attrs.get('vocabulary', [])):
         option_attrs = {
             'selected': (key in value) and 'selected' or None,
             'value': key,
@@ -88,30 +108,33 @@ def select_renderer(widget, data):
         }
         optiontags.append(tag('option', term, **option_attrs))
     select_attrs = {
-        'name_': '.'.join(widget.path),
-        'class_': cssclasses(widget, data),
+        'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),
-        'multiple': attr.get('multiple', None) and 'multiple',
+        'class_': cssclasses(widget, data),                        
+        'multiple': widget.attrs.multivalued and 'multiple' or None,
     }
     return tag('select', *optiontags, **select_attrs)
 
+factory.defaults['select.multivalued'] = None
+factory.defaults['select.default'] = []
 factory.register('select', 
                  [generic_extractor], 
                  [select_renderer])
 
 def textarea_renderer(widget, data):
     area_attrs = {
-        'name_': '.'.join(widget.path),
-        'class_': cssclasses(widget, data),        
+        'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),
+        'class_': cssclasses(widget, data),            
         'wrap': widget.attrs.wrap,
         'cols': widget.attrs.cols,
         'rows': widget.attrs.rows,
         'readonly': widget.attrs.readonly and 'readonly',
     }
-    value = data['extracted'] and data.last_extracted or data['value'] or ''
+    value = _value(widget, data)
     return tag('textarea', value, **area_attrs)
 
+factory.defaults['textarea.default'] = ''          
 factory.defaults['textarea.wrap'] = None          
 factory.defaults['textarea.cols'] = 80          
 factory.defaults['textarea.rows'] = 25          
@@ -122,44 +145,37 @@ factory.register('textarea',
 
 def submit_renderer(widget, data):
     input_attrs = {
+        'name': widget.attrs.action and 'action.%s' % widget.dottedpath,
         'id': cssid(widget, 'input'),
+        'class_': widget.attrs.get('class'),
         'type': 'submit',
-        'class_':widget.attrs.get('class'),
         'value': widget.attrs.get('label', widget.__name__),
     }
-    if widget.attrs.action:
-        input_attrs['name_'] = 'action.%s' % '.'.join(widget.path)
     return tag('input', **input_attrs)
 
-factory.defaults['submit.class'] = None
+factory.defaults['submit.action'] = None
 factory.register('submit', [], [submit_renderer])
 
 def label_renderer(widget, data):
     label_text = widget.attrs.get('label', widget.__name__)
     label_attrs = {
         'for_': cssid(widget, 'input'),
+        'class_': cssclasses(widget, data, widget.attrs['class'])
     }
-    if widget.attrs.get('class'):
-        label_attrs['class_'] = widget.attrs.get('class')
-    if widget.attrs.withrequired:
-        label_attrs['class_'] = label_attrs.get('class_', '') + ' ' + \
-                                widget.attrs.get('withrequired', 'required')
     help = u''
     if widget.attrs.help:
         help_attrs = {'class_': widget.attrs.helpclass}
         help = tag('div', widget.attrs.help, help_attrs)
     pos = widget.attrs.position
     if pos == 'inner':
-        return tag('label', label_text, help, data.last_rendered, **label_attrs)
+        return tag('label', label_text, help, data.rendered, **label_attrs)
     elif pos == 'after':
-        return data.last_rendered + tag('label', label_text, help, **label_attrs)
-    return tag('label', label_text, help, **label_attrs) + data.last_rendered
+        return data.rendered + tag('label', label_text, help, **label_attrs)
+    return tag('label', label_text, help, **label_attrs) + data.rendered
 
 factory.defaults['label.position'] = 'before'
-factory.defaults['label.class'] = None
-factory.defaults['label.withrequired'] = None
 factory.defaults['label.help'] = None
-factory.defaults['label.helpclass'] = 'help'
+factory.defaults['label.help_class'] = 'help'
 factory.register('label', [], [label_renderer])
 
 def field_renderer(widget, data):
@@ -169,22 +185,20 @@ def field_renderer(widget, data):
     }
     if widget.attrs.witherror and data['errors']:
         div_attrs['class_'] += u' %s' % widget.attrs.witherror
-    return tag('div', data.last_rendered, **div_attrs)
+    return tag('div', data.rendered, **div_attrs)
 
 factory.defaults['field.class'] = 'field'
 factory.defaults['field.witherror'] = None
 factory.register('field', [], [field_renderer])
 
 def error_renderer(widget, data):
-    content = list()
-    for error in data['errors']:
-        content.append(tag('div', str(error), class_=widget.attrs.messageclass))
-    if not content:
-        return data.last_rendered
-    content += [data.last_rendered]
-    divattrs = dict(class_=widget.attrs['class']) 
-    return tag('div', *content, **divattrs)
+    if not data.errors:
+        return data.rendered
+    msgs = u''
+    for error in data.errors:
+        msgs += tag('div', str(error), class_=widget.attrs.message_class)
+    return tag('div', msgs, data.rendered, class_=cssclasses(widget, data))
 
-factory.defaults['error.class'] = 'error'
-factory.defaults['error.messageclass'] = 'errormessage'
+factory.defaults['error.error_class'] = 'error'
+factory.defaults['error.message_class'] = 'errormessage'
 factory.register('error', [], [error_renderer])

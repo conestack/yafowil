@@ -35,48 +35,67 @@ Text Input Widget
     u'<input id="input-MYFILE" name="MYFILE" type="file" value="" />'
     
 Required Input Widget
-=====================    
-::
+=====================
+
+Render required widget::
 
     >>> inputwidget = factory('text', 'REQUIRED', '',
-    ...                       {'required': True})
+    ...                       {'required': True,
+    ...                        'error_class': True})
     >>> inputwidget()
     u'<input class="required" id="input-REQUIRED" name="REQUIRED" type="text" 
     value="" />'
 
-    >> interact(locals())
+Extract with empty request, key not in request therefore no error::
+    
     >>> data = inputwidget.extract({})
     >>> data
-    {'errors': [ExtractionError('Mandatory field was empty',)], 
-    'extracted': [<UNSET>], 'input_field_type': 'text', 'rendered': [], 
-    'request': {}, 'value': ''}
+    <RuntimeData REQUIRED, value='', extracted=<UNSET>, 
+    attrs={'input_field_type': 'text'} at ...>
+        
+Extract with empty input sent, required error expected::    
     
     >>> data = inputwidget.extract({'REQUIRED': ''})
     >>> data
-    {'errors': [ExtractionError('Mandatory field was empty',)], 
-    'extracted': [''], 'input_field_type': 'text', 'rendered': [], 
-    'request': {'REQUIRED': ''}, 'value': ''}
+    <RuntimeData REQUIRED, value='', extracted='', 1 error(s), 
+    attrs={'input_field_type': 'text'} at ...>
+
+    >>> data.errors
+    [ExtractionError('Mandatory field was empty',)]
+
+With getter value set, empty request, no error expected::    
     
     >>> inputwidget = factory('text', 'REQUIRED', 'Test Text',
-    ...                       {'required': True})
+    ...                       {'required': True,
+    ...                        'error_class': True})
+    >>> data = inputwidget.extract({})
+    >>> data
+    <RuntimeData REQUIRED, value='Test Text', extracted=<UNSET>,
+    attrs={'input_field_type': 'text'} at ...>
+
+    >>> inputwidget(data=data)
+    u'<input class="required" id="input-REQUIRED" name="REQUIRED" type="text" 
+    value="Test Text" />'
+
+With getter value set, request given, error expected::    
+
     >>> data = inputwidget.extract({'REQUIRED': ''})
     >>> data
-    {'errors': [ExtractionError('Mandatory field was empty',)], 
-    'extracted': [''], 'input_field_type': 'text', 'rendered': [], 
-    'request': {'REQUIRED': ''}, 'value': 'Test Text'}
+    <RuntimeData REQUIRED, value='Test Text', extracted='', 1 error(s), 
+    attrs={'input_field_type': 'text'} at ...>
     
     >>> inputwidget(data=data)
-    u'<input class="error required" id="input-REQUIRED" name="REQUIRED" type="text" 
-    value="Test Text" />'
+    u'<input class="error required" id="input-REQUIRED" name="REQUIRED" 
+    type="text" value="" />'
+
+Create a custom error message::    
 
     >>> inputwidget = factory('text', 'REQUIRED', '',
     ...                       {'required': 'You fool, fill in a value!'})
     >>> data = inputwidget.extract({})
-    >>> data
-    {'errors': [ExtractionError('You fool, fill in a value!',)], 
-    'extracted': [<UNSET>], 'input_field_type': 'text', 'rendered': [], 
-    'request': {}, 'value': ''}
-    
+    >>> data 
+    <RuntimeData REQUIRED, value='', extracted=<UNSET>, 
+    attrs={'input_field_type': 'text'} at ...>
     
     
 Textarea Widget
@@ -188,7 +207,7 @@ Chained password inside error inside field
     
     >>> widget({'password': ''})
     u'<div class="field" id="field-password"><div class="error"><div 
-    class="errormessage">No password given!</div><input class="error required" 
+    class="errormessage">No password given!</div><input class="required" 
     id="input-password" name="password" type="password" value="" /></div></div>'
     
     >>> widget({'password': 'secret'})

@@ -162,7 +162,7 @@ class Widget(AttributedNode):
         self._lock.acquire()
 
     def unlock(self):
-        self._lock.release()
+        self._lock.release()        
                 
     def __call__(self, request={}, data=None):
         """renders the widget.
@@ -224,6 +224,10 @@ class Widget(AttributedNode):
         self.current_prefix = None
         self.unlock()                   
         return data
+    
+    @property
+    def dottedpath(self):
+        return '.'.join(self.path)
 
     def _runpreprocessors(self, request, data):                
         if data.request is not UNSET:

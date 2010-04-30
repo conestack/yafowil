@@ -22,3 +22,74 @@ Test Tag renderer
     >>> tag('p', 'Lorem Ipsum. ', u'Hello World!', 
     ...     class_='fancy', id='2f5b8a234ff')
     u'<p class="fancy" id="2f5b8a234ff">Lorem Ipsum. Hello World!</p>' 
+    
+    >>> tag('dummy', name='foo')
+     u'<dummy name="foo" />'
+    
+Test CSS Classes
+================
+::
+    >>> from zodict import AttributedNode
+    >>> class DummyWidget(AttributedNode):
+    ...     def __init__(self):
+    ...         self.attrs['required'] = False
+    ...         self.attrs['required_class'] = None
+    ...         self.attrs['required_class_default'] = 'required'
+    ...         self.attrs['error_class'] = None
+    ...         self.attrs['error_class_default'] = 'error'
+    >>> widget = DummyWidget()
+    
+    >>> class DummyData(object):
+    ...     def __init__(self):
+    ...         self.errors = []
+    >>> data = DummyData()
+    
+    >>> from yafowil.utils import cssclasses
+    >>> print cssclasses(widget, data)
+    None
+
+    >>> print cssclasses(widget, data, 'foo', 'bar')
+    bar foo
+    
+    >>> widget.required = True
+    >>> print cssclasses(widget, data)
+    None
+    
+    >>> widget.required = False
+    >>> data.errors = True
+    >>> print cssclasses(widget, data)
+    None
+
+    >>> widget.attrs.error_class = True
+    >>> print cssclasses(widget, data)
+    error
+
+    >>> print cssclasses(widget, data, 'foo', 'bar')
+    bar error foo
+
+    >>> widget.attrs.error_class = 'othererror'
+    >>> print cssclasses(widget, data)
+    othererror
+
+
+    >>> data.errors = False
+    >>> print cssclasses(widget, data)
+    None
+    
+    >>> widget.attrs.required = True
+    >>> print cssclasses(widget, data)
+    None
+
+    >>> widget.attrs.required_class = 'required'
+    >>> print cssclasses(widget, data)
+    required
+
+    >>> widget.attrs.error_class = True
+    >>> data.errors = True
+    >>> widget.attrs.required_class = 'required'
+    >>> print cssclasses(widget, data)
+    error required
+
+    >>> print cssclasses(widget, data, 'foo', 'bar')
+    bar error foo required
+    
