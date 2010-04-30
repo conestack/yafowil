@@ -66,6 +66,13 @@ And each child can have children again.
     >>> data['fieldset']['age'] = RuntimeData()
     >>> data['fieldset']['age'].value = 36
     
+RuntimeData can have arbitrary attributes.
+::
+
+    >>> data['surname'].attrs['somekey'] = 'somevalue'
+    >>> data['surname'].attrs['somekey']
+    'somevalue'
+    
 You can fetch other data also by its dotted absolute path.
 ::
     
@@ -127,7 +134,7 @@ Create some test dummies::
     ...     return 'r2', widget.__name__, str(data), str(widget.attributes)
     
     >>> def test_preprocessor(widget, data):
-    ...     data.value += ' test_preprocessor called'
+    ...     data.attrs['test_preprocessor'] = 'called'
     ...     return data
     
     >>> def test_getter(widget, data):
@@ -146,17 +153,18 @@ Test the base widget class::
     ...                     dict(test1='Test1', test2='Test2'))
         
     >>> testwidget() 
-    ('r1', 'MYUID', "<RuntimeData MYUID, value='Test Value test_preprocessor 
-    called', extracted=<UNSET>, 0 errors>", "{'test1': 'Test1', 'test2': 
-    'Test2'}")
+    ('r1', 'MYUID', "<RuntimeData MYUID, value='Test Value', extracted=<UNSET>, 
+    attrs={'test_preprocessor': 'called'} at ...>", "{'test1': 'Test1', 
+    'test2': 'Test2'}")
     
     >>> testwidget(request=test_request) 
-    ('r1', 'MYUID', "<RuntimeData None, value='Test Value test_preprocessor 
-    called', extracted='e1', 0 errors>", "{'test1': 'Test1', 'test2': 'Test2'}")
+    ('r1', 'MYUID', "<RuntimeData MYUID, value='Test Value', extracted='e1', 
+    attrs={'test_preprocessor': 'called'} at ...>", "{'test1': 'Test1', 
+    'test2': 'Test2'}")
     
     >>> testwidget.extract(test_request)
-    <RuntimeData None, value='Test Value test_preprocessor called', 
-    extracted='e1', 0 errors>
+    <RuntimeData MYUID, value='Test Value', extracted='e1', 
+    attrs={'test_preprocessor': 'called'} at ...>
     
     >>> testwidget = Widget([('1', test_extractor)], 
     ...                     [('1', test_renderer)], 
@@ -164,8 +172,8 @@ Test the base widget class::
     ...                     'MYUID', test_getter,
     ...                     dict(test1='Test1', test2='Test2'))    
     >>> testwidget()
-    ('r1', 'MYUID', "<RuntimeData MYUID, value='Test Value', extracted=<UNSET>, 
-    0 errors>", "{'test1': 'Test1', 'test2': 'Test2'}")
+    ('r1', 'MYUID', "<RuntimeData MYUID, value='Test Value', extracted=<UNSET> 
+    at ...>", "{'test1': 'Test1', 'test2': 'Test2'}")
         
     >>> testwidget = Widget([('1', test_extractor), ('2', test_extractor2)], 
     ...                     [('1', test_renderer), ('2', test_renderer2)], 
@@ -173,8 +181,8 @@ Test the base widget class::
     ...                     'MYUID2', test_getter,
     ...                     dict(test1='Test1', test2='Test2'))
     >>> testwidget()
-    ('r2', 'MYUID2', "<RuntimeData MYUID2, value='Test Value', extracted=<UNSET>, 
-    0 errors>", "{'test1': 'Test1', 'test2': 'Test2'}")
+    ('r2', 'MYUID2', "<RuntimeData MYUID2, value='Test Value', 
+    extracted=<UNSET> at ...>", "{'test1': 'Test1', 'test2': 'Test2'}")
     
     >>> testwidget = Widget([('1', test_extractor3)], 
     ...                     [('1', test_renderer)], 
@@ -183,8 +191,7 @@ Test the base widget class::
     ...                     dict(test1='Test1', test2='Test2'))
 
     >>> testwidget.extract({'MYUID2': 'ABC'})
-    <RuntimeData None, value=999, extracted=<UNSET>, 1 errors>
-    
+    <RuntimeData MYUID2, value=999, extracted=<UNSET>, 1 error(s) at ...>    
     >>> testwidget = Widget([('1', test_extractor3)], 
     ...                     [('1', test_renderer)], 
     ...                     [],
@@ -192,7 +199,7 @@ Test the base widget class::
     ...                     dict(test1='Test1', test2='Test2'))
 
     >>> testwidget.extract({'MYUID2': '123'})
-    <RuntimeData None, value=999, extracted=123, 0 errors>
+    <RuntimeData MYUID2, value=999, extracted=123 at ...>
     
         
 Test the factory
@@ -210,8 +217,8 @@ Test the factory
     >>> testwidget = factory('widget_test', name='MYFAC', value=test_getter, 
     ...                      props=dict(foo='bar'))
     >>> testwidget()
-    ('r1', 'MYFAC', "<RuntimeData MYFAC, value='Test Value', extracted=<UNSET>, 
-    0 errors>", "{'foo': 'bar'}")
+    ('r1', 'MYFAC', "<RuntimeData MYFAC, value='Test Value', extracted=<UNSET> 
+    at ...>", "{'foo': 'bar'}")
     
 We can create sets of static subwidgets, i.e. to have a validating password
 field with two input fields in. Here a simpler example:: 
