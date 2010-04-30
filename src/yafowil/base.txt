@@ -360,6 +360,6 @@ modify defaults for widgets attributes via factory
     >>> try:
     ...     widget()
     ... except KeyError, e:
-    ...     print e
-    ('id', '<function prefix_renderer at ...>', None)
+    ...     print list(e)
+    ['id', '<function prefix_renderer at ...>', None]
    
