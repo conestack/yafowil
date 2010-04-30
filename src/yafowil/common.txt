@@ -205,12 +205,14 @@ Chained password inside error inside field
     ...                  props={'label': 'Password',
     ...                         'required': 'No password given!'})
     
-    >>> widget({'password': ''})
+    >>> data = widget.extract({'password': ''}) 
+    >>> widget(data=data)
     u'<div class="field" id="field-password"><div class="error"><div 
     class="errormessage">No password given!</div><input class="required" 
     id="input-password" name="password" type="password" value="" /></div></div>'
     
-    >>> widget({'password': 'secret'})
+    >>> data = widget.extract({'password': 'secret'})
+    >>> widget(data=data)
     u'<div class="field" id="field-password"><input class="required" 
     id="input-password" name="password" type="password" value="secret" /></div>'
     

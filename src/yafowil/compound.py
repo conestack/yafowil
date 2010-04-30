@@ -2,49 +2,51 @@ from yafowil.base import (
     factory,
 )
 from yafowil.utils import (
-    cssid, 
+    cssid,
+    cssclasses, 
     tag,
 )
 
 def compound_extractor(widget, data):
-    result = dict()    
+    """Delegates extraction to children.
+    """
     for childname in widget:
-        result[childname] = widget[childname].extract(data['request'])
-    return result
+        data[childname] = widget[childname].extract(data.request)
+    return None
 
 def compound_renderer(widget, data):
+    """Delegates rendering to children."""
     result = u''
     for childname in widget:
-        kw = dict() 
-        if data['extracted']: 
-            kw['data'] = data['extracted'][0][childname]
-        kw['request'] = data['request']
-        result += widget[childname](**kw)
+        result += widget[childname](data=data.get(childname, None))
     return result
 
-def compound_preprocessor(widget, data):
-    if widget.attributes.get('delegation', False):
-        for childname in widget:
-            widget[childname].getter = data['value'].get(childname, None)
-    return data
-        
 factory.register('compound', 
                  [compound_extractor], 
                  [compound_renderer],
-                 [compound_preprocessor])
+                 [])
+
+# special case, cover later
+#def compound_value_delegation_subwidgets(widget, data):
+#    for childname in widget:
+#        widget[childname].getter = data['value'].get(childname, None)
+#    return data
+#        
 
 def fieldset_renderer(widget, data):
-    fieldset_id = cssid(widget, 'fieldset')
-    rendered = data.last_rendered
+    fs_attrs = {
+        'id': cssid(widget, 'fieldset'),
+        'class_': cssclasses(widget, data)
+    }
+    rendered = data.rendered
     if widget.attrs.legend:
         rendered = tag('legend', widget.attrs.legend) + rendered
-    return tag('fieldset', rendered, id=fieldset_id)   
+    return tag('fieldset', rendered, **fs_attrs)   
 
 factory.defaults['fieldset.legend'] = False
 factory.register('fieldset', 
                  factory.extractors('compound'), 
-                 factory.renderers('compound') + [fieldset_renderer],
-                 factory.preprocessors('compound'))
+                 factory.renderers('compound') + [fieldset_renderer])
 
 def form_renderer(widget, data):
     form_attrs = {
@@ -54,12 +56,11 @@ def form_renderer(widget, data):
         'class_': widget.attrs.get('class'),
         'id': 'form-%s' % '-'.join(widget.path),
     }
-    return tag('form', data.last_rendered, **form_attrs)
+    return tag('form', data.rendered, **form_attrs)
 
 factory.defaults['form.method'] = 'post'
 factory.defaults['form.enctype'] = 'multipart/form-data'
 factory.defaults['form.class'] = None
 factory.register('form', 
                  factory.extractors('compound'), 
-                 factory.renderers('compound') + [form_renderer],
-                 factory.preprocessors('compound'))
+                 factory.renderers('compound') + [form_renderer])

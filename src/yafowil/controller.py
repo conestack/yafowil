@@ -16,22 +16,23 @@ class Controller(object):
         self.error = False
         self.next = None
         self.data = self.widget.extract(request)
-        self.request = self.data['request']
+        self.request = self.data.request        
         self._error(self.data)
         for action in self.actions:
-            if self.triggered(action):
-                self.performed = True
-                if self.error:
-                    return
-                if action.attrs.get('handler'):
-                    action.attrs.handler(self.widget, self.data)
-                if action.attrs.get('next'):
-                    self.next = action.attrs.next(self.request)
+            if not self.triggered(action):
+                continue
+            self.performed = True
+            if self.error:
+                return
+            if action.attrs.get('handler'):
+                action.attrs.handler(self.widget, self.data)
+            if action.attrs.get('next'):
+                self.next = action.attrs.next(self.request)
     
     @property
     def rendered(self):
         if not self.performed:
-            return self.widget()
+            return self.widget(request=self.request)
         return self.widget(data=self.data)
     
     @property
@@ -40,14 +41,11 @@ class Controller(object):
         return [w for w in self.widget.values() if w.attrs.get('action')]
     
     def triggered(self, action):
-        return self.request.get('action.%s' % '.'.join(action.path))
+        return self.request.get('action.%s' % action.dottedpath)
     
     def _error(self, data):
-        if data.get('errors'):
+        if data.errors:
             self.error = True
             return
-        for sub in data['extracted']:
-            if not isinstance(sub, dict):
-                continue
-            for key in sub.keys():
-                self._error(sub[key])
+        for subdata in data.values():
+            self._error(subdata)

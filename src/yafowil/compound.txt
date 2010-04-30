@@ -2,48 +2,46 @@ Preparation
 ::
 
     >>> import yafowil.common
-    >>> from yafowil.base import factory, RuntimeData
-    
-Test Rendering of Compound
-::
-
     >>> import yafowil.compound
-    >>> compound = factory('compound', name='COMPOUND', 
-    ...                    value={'inner': 'somevalue', 
-    ...                           'inner2': 'othervalue'})
-    >>> compound['inner'] = factory('text', value='value1')
-    >>> compound['inner2'] = factory('text', value='value2')
-    >>> compound()
-    u'<input id="input-COMPOUND-inner" name="COMPOUND.inner" type="text" 
-    value="value1" /><input id="input-COMPOUND-inner2" name="COMPOUND.inner2" 
-    type="text" value="value2" />'
+    >>> from yafowil.base import factory
     
-Same with delegation switched on:
+Render Compound.
 ::
 
-    >>> compound = factory('compound', 
-    ...                    'COMPOUND', 
-    ...                    {'inner': 'somevalue', 
-    ...                     'inner2': 'othervalue'},
-    ...                    {'delegation': True})
-    >>> compound['inner'] = factory('text', 'inner', 'value')
-    >>> compound['inner2'] = factory('text', 'inner2', 'value2')
+    >>> compound = factory('compound', name='COMPOUND')
+    >>> compound['inner']  = factory('text', value='value1')
+    >>> compound['inner2'] = factory('text', value='value2', 
+    ...                              props={'required': True})
     >>> compound()
     u'<input id="input-COMPOUND-inner" name="COMPOUND.inner" type="text" 
-    value="somevalue" /><input id="input-COMPOUND-inner2" name="COMPOUND.inner2" 
-    type="text" value="othervalue" />'
+    value="value1" /><input class="required" id="input-COMPOUND-inner2" 
+    name="COMPOUND.inner2" type="text" value="value2" />'
 
-Test Extraction of Widget
+Extract Compound empty.
+::    
+
+    >>> data = compound.extract({})
+    >>> data    
+    <RuntimeData COMPOUND, value=None, extracted=None at ...>
+
+    >>> data['inner']
+    <RuntimeData COMPOUND.inner, value='value1', extracted=<UNSET>, 
+    attrs={'input_field_type': 'text'} at ...>    
+
+Extract with a value in request
 ::
 
-    >>> compound.extract({'COMPOUND.inner': 'newvalue'})
-    {'errors': [], 'extracted': [{'inner2': {'errors': [], 
-    'extracted': [<UNSET>, <UNSET>], 'input_field_type': 'text', 'rendered': [], 
-    'request': {'COMPOUND.inner': 'newvalue'}, 'value': 'othervalue'}, 
-    'inner': {'errors': [], 'extracted': ['newvalue', 'newvalue'], 
-    'input_field_type': 'text', 'rendered': [], 'request': {'COMPOUND.inner': 'newvalue'}, 
-    'value': 'somevalue'}}], 'rendered': [], 'request': {'COMPOUND.inner': 'newvalue'}, 
-    'value': {'inner2': 'othervalue', 'inner': 'somevalue'}}
+    >>> data = compound.extract({'COMPOUND.inner': 'newvalue'})
+    >>> data['inner']
+    <RuntimeData COMPOUND.inner, value='value1', extracted='newvalue', 
+    attrs={'input_field_type': 'text'} at ...>    
+
+Extract with empty required, error should be there.
+
+    >>> data = compound.extract({'COMPOUND.inner2': ''})
+    >>> data['inner2']
+    <RuntimeData COMPOUND.inner2, value='value2', extracted='', 1 error(s), 
+    attrs={'input_field_type': 'text'} at ...>
 
 Test Fieldset
 ::
@@ -66,6 +64,28 @@ Test Form
     >>> form = factory('form',
     ...                name = 'FORM',
     ...                props={'action': 'http://fubar.com'})
-    >>> form({})
+    >>> form()
     u'<form action="http://fubar.com" enctype="multipart/form-data" 
     id="form-FORM" method="post"></form>'
+    
+
+
+XXX TODO
+=========    
+REIMPLEMENT LATER, SPECIAL CASE
+Same with delegation switched on:
+::
+
+    >> compound = factory('compound', 
+    ..                    'COMPOUND', 
+    ..                    {'inner': 'somevalue', 
+    ..                    'inner2': 'othervalue'},
+    ..                    {'delegation': True})
+    >> compound['inner'] = factory('text', 'inner', 'value')
+    >> compound['inner2'] = factory('text', 'inner2', 'value2')
+    >> compound()    
+    u'<input id="input-COMPOUND-inner" name="COMPOUND.inner" type="text" 
+    value="somevalue" /><input id="input-COMPOUND-inner2" name="COMPOUND.inner2" 
+    type="text" value="othervalue" />'
+/XXX TODO
+    

@@ -143,7 +143,7 @@ Create some test dummies::
     >>> def test_getter2(widget, data):
     ...     return 999
 
-Test the base widget class::    
+the widget class::    
     
     >>> test_request = {'MYUID': 'New Test Value'}
     >>> testwidget = Widget([('1', test_extractor)], 
@@ -157,14 +157,21 @@ Test the base widget class::
     attrs={'test_preprocessor': 'called'} at ...>", "{'test1': 'Test1', 
     'test2': 'Test2'}")
     
+a passed in request does not triger extraction::    
+    
     >>> testwidget(request=test_request) 
-    ('r1', 'MYUID', "<RuntimeData MYUID, value='Test Value', extracted='e1', 
+    ('r1', 'MYUID', "<RuntimeData MYUID, value='Test Value', extracted=<UNSET>, 
     attrs={'test_preprocessor': 'called'} at ...>", "{'test1': 'Test1', 
     'test2': 'Test2'}")
     
-    >>> testwidget.extract(test_request)
+extraction is an explicit task::    
+    
+    >>> data = testwidget.extract(test_request)
+    >>> data
     <RuntimeData MYUID, value='Test Value', extracted='e1', 
     attrs={'test_preprocessor': 'called'} at ...>
+    
+different cases    
     
     >>> testwidget = Widget([('1', test_extractor)], 
     ...                     [('1', test_renderer)], 

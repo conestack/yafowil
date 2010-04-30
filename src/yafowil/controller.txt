@@ -17,7 +17,7 @@ Dummy getter
 ::
 
     >>> def getter(widget, data):
-    ...     return data['request'].context.value
+    ...     return data.request.context.value
 
 Create Widget tree
 ::
@@ -80,14 +80,15 @@ Dummy request
 Render form with empty request
 ::
 
-    >>> form(request)
+    >>> data = form.extract(request)
+    >>> form(data)
     u'<form action="http://fubar.com" enctype="multipart/form-data" 
     id="form-testform" method="post"><input id="input-testform-field1" 
     name="testform.field1" type="text" value="hello world" /><input 
     class="required" id="input-testform-field2" name="testform.field2" 
     type="text" value="" /><input id="input-testform-save" 
     name="action.testform.save" type="submit" value="Save" /></form>'    
-
+    
 Create controller for form.
 ::
 
@@ -99,13 +100,21 @@ If action is not triggered, or ``action['next']`` is not set,
     
     >>> controller.next
     
-Since validation failed due to missing required field, ``error`` is True
+An empty request does not trigger validation failures.
 ::
 
     >>> controller.error
+    False
+
+Provide empty required field and it fails!
+::
+
+    >>> request['testform.field2'] = ''
+    >>> controller = Controller(form, request)
+    >>> controller.error
     True
 
-Provide required field
+Provide required field and all is fine.
 ::
 
     >>> request['testform.field2'] = '1'
@@ -116,7 +125,7 @@ Provide required field
 Trigger save action without required field
 ::
 
-    >>> del request['testform.field2']
+    >>> request['testform.field2'] = ''
     >>> request['action.testform.save'] = '1'
     >>> controller = Controller(form, request)
     >>> controller.error

@@ -1,7 +1,5 @@
 from threading import RLock
-from zodict import (
-    AttributedNode
-)
+from zodict import AttributedNode
 from zodict.node import NodeAttributes
 
 class Unset(object): 
@@ -26,6 +24,7 @@ class RuntimeData(AttributedNode):
         super(RuntimeData, self).__init__(name=name)
         self.request = UNSET
         self.value = UNSET
+        self.preprocessed = False
         self.extracted = UNSET
         self.rendered = UNSET
         self.errors= list()
@@ -52,6 +51,10 @@ class RuntimeData(AttributedNode):
             rep += ', attrs=%s' % repr(self.attrs)
         rep += ' at %s>' % hex(id(self))[:-1]
         return rep
+
+    @property
+    def noderepr(self):
+        return repr(self)     
     
     __str__ = __repr__
 
@@ -164,25 +167,31 @@ class Widget(AttributedNode):
     def unlock(self):
         self._lock.release()        
                 
-    def __call__(self, request={}, data=None):
+    def __call__(self, data=None, request=None):
         """renders the widget.
         
-        ``request`` 
-            expects a dict-like object; if non-empty given and data is not 
-            passed extraction takes place before rendering. Empty is default.      
+        If data is passed in request is ignored! Request can't be passed in 
+        together with data.
         
         ``data``
-            runtime data, information collected in one run of the widget. May be
-            passed in i.e if extract was called separate before it should not 
-            run twice. Expects either an initialized RuntimeData instance or 
-            None (default) to create an empty.
+            runtime data, information collected in one run of the widget. 
+            Passed in. Extract need to be called separate before. 
+            Expects either an initialized RuntimeData instance or None (default) 
+            to create an empty widget.
+            
+        ``request``
+            pass in request. if passed in it will be available at data. 
+            but extraction does not happen. call extract explicit before if
+            needed. 
         """
-        if data is None and not request:
+        if data is not None and request is not None:
+            raise ValueError, 'if data is passed in dont pass in request!' 
+        if data is None:
             data = RuntimeData(self.__name__)
-            data = self._runpreprocessors(request, data)
-        elif data is None and request:
-            data = self.extract(request)
-        self.lock()         
+            if request is not None:
+                data.request = request
+            data = self._runpreprocessors(data)
+        self.lock()
         for ren_name, renderer in self.renderers:
             self.current_prefix = ren_name
             try:
@@ -204,7 +213,9 @@ class Widget(AttributedNode):
             expects a dict-like object       
 
         """
-        data = self._runpreprocessors(request, RuntimeData(self.__name__))
+        data = RuntimeData(self.__name__)
+        data.request = request
+        data = self._runpreprocessors(data)
         self.lock()         
         for ex_name, extractor in self.extractors:     
             self.current_prefix = ex_name
@@ -229,10 +240,9 @@ class Widget(AttributedNode):
     def dottedpath(self):
         return '.'.join(self.path)
 
-    def _runpreprocessors(self, request, data):                
-        if data.request is not UNSET:
+    def _runpreprocessors(self, data):                
+        if data.preprocessed:
             return data
-        data.request = request
         if callable(self.getter):
             data.value = self.getter(self, data)
         else:
@@ -245,7 +255,8 @@ class Widget(AttributedNode):
                 data.current_prefix = None 
                 e.args = [a for a in e.args] + [str(pp)] + self.path
                 raise e
-        data.current_prefix = None 
+        data.current_prefix = None
+        data.preprocessed = True 
         return data
         
 class Factory(object):
