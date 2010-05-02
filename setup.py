@@ -38,6 +38,6 @@ setup(name='yafowil',
       tests_require=tests_require,
       test_suite="yafowil.tests.test_suite",
       extras_require = dict(
-          tests=tests_require,
+          test=tests_require,
       ),
 )
