@@ -1,5 +1,3 @@
-from base import UNSET
-
 class Controller(object):
     """Form controller.
     """
