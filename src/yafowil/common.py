@@ -79,6 +79,24 @@ register_generic_input('hidden', False)
 register_generic_input('radio')
 register_generic_input('checkbox')
 
+def input_proxy_renderer(widget, data):
+    value = data.value
+    if data.request is not UNSET:
+        if data.request.get(widget.__name__):
+            value = data.request.get(widget.__name__)
+    input_attrs = {
+        'type': 'hidden',
+        'value':  value,
+        'name_': widget.__name__,
+        'id': cssid(widget, 'input'),    
+        'class_': cssclasses(widget, data),    
+    }
+    return tag('input', **input_attrs)
+
+factory.register('proxy', 
+                 [generic_extractor], 
+                 [input_proxy_renderer])
+
 def input_file_renderer(widget, data):
     input_attrs = {
         'name_': widget.dottedpath,

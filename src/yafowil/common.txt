@@ -148,7 +148,18 @@ Submit Widget (action)
     >>> widget = factory('submit', name='save', props=props)
     >>> widget()
     u'<input id="input-save" name="action.save" type="submit" value="Action name" />'
-    
+
+
+Proxy Widget
+============
+
+Used to pass hidden arguments out of form namespace.
+::
+
+    >>> widget = factory('proxy', name='proxy', value='1')
+    >>> widget()
+    u'<input id="input-proxy" name="proxy" type="hidden" value="1" />'
+
 Label Widget
 ============
 
