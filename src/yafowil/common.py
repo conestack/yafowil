@@ -151,6 +151,8 @@ def textarea_renderer(widget, data):
         'readonly': widget.attrs.readonly and 'readonly',
     }
     value = _value(widget, data)
+    if not value:
+        value = ''
     return tag('textarea', value, **area_attrs)
 
 factory.defaults['textarea.default'] = ''          
