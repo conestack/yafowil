@@ -7,7 +7,8 @@ from utils import (
     cssclasses,
     cssid,
     tag,
-    vocabulary,)
+    vocabulary,
+)
 
 factory.defaults['default'] = None
 factory.defaults['class'] = None
