@@ -116,6 +116,8 @@ factory.register('file',
 def select_renderer(widget, data):
     optiontags = [] 
     value = _value(widget, data)
+    if value is None:
+        value = []
     if isinstance(value, basestring):
         # TODO:  what if value is an integer? 
         value = [value]
