@@ -114,6 +114,8 @@ factory.register('file',
 
 def select_renderer(widget, data):
     value = _value(widget, data)
+    if value is None:
+        value = []
     if isinstance(value, basestring) or not hasattr(value, '__iter__'):
         value = [value]
     if widget.attrs.format == 'block':
