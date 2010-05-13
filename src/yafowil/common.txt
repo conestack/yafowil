@@ -22,10 +22,6 @@ Text Input Widget
     >>> inputwidget()
     u'<input id="input-MYHIDDEN" name="MYHIDDEN" type="hidden" value="Test Hidden" />'
     
-    >>> inputwidget = factory('radio', 'MYRADIO', 'Test Radio')    
-    >>> inputwidget()
-    u'<input id="input-MYRADIO" name="MYRADIO" type="radio" value="Test Radio" />'
-
     >>> inputwidget = factory('checkbox', 'MYCHECKBOX', 'Test Checkbox')    
     >>> inputwidget()
     u'<input id="input-MYCHECKBOX" name="MYCHECKBOX" type="checkbox" value="Test Checkbox" />'
@@ -119,11 +115,13 @@ Selection Widget
     ...                                       ('two', 'Two'), 
     ...                                       ('three', 'Three'),
     ...                                       ('four', 'Four')],
-    ...                       'label': 'Test Selection Widget',
-    ...                       'css': {'selection': 'selectioncss', 
-    ...                               'label': 'labelcss'}})
+    ...                       })
     >>> selectwidget()
-    u'<select id="input-MYSELECT" name="MYSELECT"><option id="input-MYSELECT-one" selected="selected" value="one">One</option><option id="input-MYSELECT-two" value="two">Two</option><option id="input-MYSELECT-three" selected="selected" value="three">Three</option><option id="input-MYSELECT-four" value="four">Four</option></select>'
+    u'<select id="input-MYSELECT" name="MYSELECT"><option id="input-MYSELECT-one" 
+    selected="selected" value="one">One</option><option id="input-MYSELECT-two" 
+    value="two">Two</option><option id="input-MYSELECT-three" selected="selected" 
+    value="three">Three</option><option id="input-MYSELECT-four" 
+    value="four">Four</option></select>'
 
     >>> data = selectwidget.extract({'MYSELECT': 'two'})
     >>> selectwidget(data=data)
@@ -132,6 +130,16 @@ Selection Widget
     value="two">Two</option><option id="input-MYSELECT-three" 
     value="three">Three</option><option id="input-MYSELECT-four" 
     value="four">Four</option></select>'
+    
+    >>> selectwidget = factory('select', 'MYSELECT', ['one', 'three'],
+    ...                       {'vocabulary': [('one','One'), 
+    ...                                       ('two', 'Two'), 
+    ...                                       ('three', 'Three'),
+    ...                                       ('four', 'Four')],
+    ...                        'format': 'single',
+    ...                       })
+    >>> selectwidget()
+
     
 File Widget
 ===========
