@@ -77,7 +77,6 @@ def register_generic_input(subtype, enable_required_class=True):
 register_generic_input('text')
 register_generic_input('password')
 register_generic_input('hidden', False)
-register_generic_input('checkbox')
 
 def input_proxy_renderer(widget, data):
     value = data.value
@@ -97,6 +96,36 @@ factory.register('proxy',
                  [generic_extractor], 
                  [input_proxy_renderer])
 
+def input_checkbox_extractor(widget, data):
+    if '%s-exists' % widget.dottedpath not in data.request:
+        return UNSET
+    return widget.dottedpath in data.request
+
+def input_checkbox_renderer(widget, data):
+    input_attrs = {
+        'type': 'checkbox',
+        'checked':  _value(widget, data) and 'checked' or None,
+        'value': '',
+        'name_': widget.dottedpath,
+        'id': cssid(widget, 'input'),    
+        'class_': cssclasses(widget, data),    
+    }
+    checkbox = tag('input', **input_attrs)
+    input_attrs = {
+        'type': 'hidden',
+        'value':  'checkboxexists',
+        'name_': "%s-exists" % widget.dottedpath,
+        'id': cssid(widget, 'checkboxexists'),    
+    }
+    hidden = tag('input', **input_attrs)
+    return checkbox + hidden 
+
+factory.defaults['checkbox.default'] = False
+factory.defaults['checkbox.required_class'] = 'required'
+factory.register('checkbox', 
+                 [input_checkbox_extractor, generic_required_extractor], 
+                 [input_checkbox_renderer])
+    
 def input_file_renderer(widget, data):
     input_attrs = {
         'name_': widget.dottedpath,
