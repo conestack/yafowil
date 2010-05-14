@@ -125,8 +125,8 @@ def input_checkbox_renderer(widget, data):
         'name_': "%s-exists" % widget.dottedpath,
         'id': cssid(widget, 'checkboxexists'),    
     }
-    hidden = tag('input', **input_attrs)
-    return checkbox + hidden 
+    exists_marker = tag('input', **input_attrs)
+    return checkbox + exists_marker 
 
 factory.defaults['checkbox.default'] = False
 factory.defaults['checkbox.format'] = 'bool'
@@ -149,6 +149,17 @@ def input_file_renderer(widget, data):
 factory.register('file', 
                  [generic_extractor, generic_required_extractor], 
                  [input_file_renderer])
+
+def select_extractor(widget, data):
+    extracted = generic_extractor(widget, data)
+    if extracted is UNSET \
+       and widget.attrs.format != 'block' \
+       and '%s-exists' % widget.dottedpath in data.request:
+        if widget.attrs.multivalued:
+            extracted = []
+        else:
+            extracted = ''
+    return extracted 
 
 def select_renderer(widget, data):
     value = _value(widget, data)
@@ -191,13 +202,20 @@ def select_renderer(widget, data):
             text = tag('span', term)
             tags.append(tag('div', input, text, 
                             **{'id': cssid(widget, 'radio', key)}))
-        return ''.join(tags)            
+        attrs = {
+            'type': 'hidden',
+            'value':  'exists',
+            'name_': "%s-exists" % widget.dottedpath,
+            'id': cssid(widget, 'exists'),    
+        }
+        exists_marker = tag('input', **attrs)            
+        return exists_marker + u''.join(tags)            
             
 factory.defaults['select.multivalued'] = None
 factory.defaults['select.default'] = []
 factory.defaults['select.format'] = 'block'
 factory.register('select', 
-                 [generic_extractor], 
+                 [select_extractor], 
                  [select_renderer])
 
 def textarea_renderer(widget, data):
