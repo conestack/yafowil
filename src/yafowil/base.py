@@ -206,15 +206,20 @@ class Widget(AttributedNode):
         self.unlock()                   
         return data.rendered
     
-    def extract(self, request):
+    def extract(self, request, parent=None):
         """extract the data from the request by calling the given extractors. 
         
         ``request`` 
-            expects a dict-like object       
+            expects a dict-like object
+            
+        ``parent``
+            parent data       
 
         """
         data = RuntimeData(self.__name__)
         data.request = request
+        if parent is not None:
+            parent[self.__name__] = data
         data = self._runpreprocessors(data)
         self.lock()         
         for ex_name, extractor in self.extractors:     

@@ -12,7 +12,7 @@ def compound_extractor(widget, data):
     """Delegates extraction to children.
     """
     for childname in widget:
-        data[childname] = widget[childname].extract(data.request)
+        childdata = widget[childname].extract(data.request, parent=data)
     return
 
 def compound_renderer(widget, data):
