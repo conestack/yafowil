@@ -221,7 +221,10 @@ Different cases.
     >>> testwidget.extract({'MYUID2': '123'})
     <RuntimeData MYUID2, value=999, extracted=123 at ...>
     
-A failing widget    
+A failing widget.    
+::
+
+    >>> import sys, traceback
     >>> testwidget = Widget([('1', fail_extractor)], 
     ...                     [('1', fail_renderer)], 
     ...                     [],
@@ -231,15 +234,31 @@ A failing widget
     >>> try:
     ...    testwidget.extract({})
     ... except Exception, e:
-    ...    print e
-    extractor has to fail
+    ...    traceback.print_exc(file=sys.stdout)
+    Traceback (most recent call last):
+      File "<doctest base.txt[...]>", line 2, in <module>
+        testwidget.extract({})
+      File ".../yafowil/base.py", line ..., in extract
+        data.extracted = extractor(self, data)
+       - Warning: Occured on extract in widget "MYFAIL" with name "1"
+      File "<doctest base.txt[...]>", line 2, in fail_extractor
+        raise ValueError, 'extractor has to fail'
+    ValueError: extractor has to fail   
 
     >>> try:
     ...    testwidget()
     ... except Exception, e:
-    ...    print e
-    renderer has to fail
-        
+    ...    traceback.print_exc(file=sys.stdout)
+    Traceback (most recent call last):
+      File "<doctest base.txt[...]>", line 2, in <module>
+        testwidget()
+      File ".../yafowil/base.py", line ..., in __call__
+        data.rendered = renderer(self, data)
+       - Warning: Occured on render in widget "MYFAIL" with name "1"
+      File "<doctest base.txt[...]>", line 2, in fail_renderer
+        raise ValueError, 'renderer has to fail'
+    ValueError: renderer has to fail        
+
 factory
 -------
 ::
