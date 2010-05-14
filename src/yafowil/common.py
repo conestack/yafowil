@@ -173,6 +173,7 @@ def select_renderer(widget, data):
             attrs = {
                 'type': tagtype,
                 'value':  key,
+                'checked': (key in value) and 'checked' or None,
                 'name_': widget.dottedpath,
                 'id': cssid(widget, 'input', key),    
                 'class_': cssclasses(widget, data),    

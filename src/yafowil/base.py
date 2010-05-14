@@ -267,11 +267,13 @@ class Factory(object):
         self.defaults = dict()
         
     def register(self, name, extractors, renderers, 
-                 preprocessors=[], subwidgets=[]):
+                 preprocessors=[], builders=[]):
         if name.startswith('*'):
-            raise ValueError, 'Asterisk * as first sign not allowed as name.'
+            raise ValueError, 'Asterisk * as first char not allowed as name.'
+        if ':' in name:
+            raise ValueError, 'Colon : as char not allowed in name.'
         self._factories[name] = (extractors, renderers, 
-                                 preprocessors, subwidgets)
+                                 preprocessors, builders)
         
     def register_global_preprocessors(self, preprocessors):
         self._global_preprocessors += preprocessors
@@ -309,23 +311,23 @@ class Factory(object):
         ``custom`` 
             dict, where keys are matching to asterisk prefixed custom chains.
             each chains part is tuple with 4 lists of callables: extractors, 
-            renderers, preprocessors, subwidgets.    
+            renderers, preprocessors, builder.    
         """
         extractors = list()
         renderers = list()
         preprocessors = list()
-        subwidgets = list()
+        builders = list()
         for reg_name in reg_names.split(':'):
             if reg_name.startswith('*'):
                 part_name = reg_name[1:]
-                ex, ren, pre, sub = custom[part_name]
+                ex, ren, pre, bui = custom[part_name]
             else:                   
                 part_name = reg_name
-                ex, ren, pre, sub = self._factories[part_name]
+                ex, ren, pre, bui = self._factories[part_name]
             extractors    = [(part_name, _) for _ in ex]  + extractors
             renderers     = [(part_name, _) for _ in ren] + renderers
             preprocessors = preprocessors + [(part_name, _) for _ in pre]
-            subwidgets    = subwidgets    + [(part_name, _) for _ in sub]
+            builders      = builders + [(part_name, _) for _ in bui]
         global_pre  = [('__GLOBAL__', _) for _ in self._global_preprocessors]
         widget = Widget(extractors, 
                         renderers, 
@@ -334,9 +336,9 @@ class Factory(object):
                         value_or_getter=value, 
                         properties=props,
                         defaults=self.defaults)
-        for part_name, subwidget_func in subwidgets:
+        for part_name, builder_func in builders:
             widget.current_prefix = part_name
-            subwidget_func(widget, self)
+            builder_func(widget, self)
             widget.current_prefix = None
         return widget
     
@@ -349,7 +351,7 @@ class Factory(object):
     def preprocessors(self, name):
         return self._global_preprocessors + self._factories[name][2]
 
-    def subwidgets(self, name):
+    def builders(self, name):
         return self._factories[name][3]
     
 factory = Factory()
