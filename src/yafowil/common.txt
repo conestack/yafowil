@@ -121,7 +121,7 @@ A checkbox widget with an value or an empty string.
     ...                       props={'format': 'string'})    
     >>> inputwidget()
     u'<input checked="checked" id="input-MYCHECKBOX" name="MYCHECKBOX" 
-    type="checkbox" value="" /><input id="checkboxexists-MYCHECKBOX" 
+    type="checkbox" value="Test Checkbox" /><input id="checkboxexists-MYCHECKBOX" 
     name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />'
     
 Textarea Widget

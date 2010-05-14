@@ -116,6 +116,8 @@ def input_checkbox_renderer(widget, data):
         'id': cssid(widget, 'input'),    
         'class_': cssclasses(widget, data),    
     }
+    if widget.attrs.format == 'bool':
+        input_attrs['value'] = ''
     checkbox = tag('input', **input_attrs)
     input_attrs = {
         'type': 'hidden',
