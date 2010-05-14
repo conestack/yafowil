@@ -99,13 +99,19 @@ factory.register('proxy',
 def input_checkbox_extractor(widget, data):
     if '%s-exists' % widget.dottedpath not in data.request:
         return UNSET
-    return widget.dottedpath in data.request
+    format = widget.attrs.format
+    if format == 'bool':
+        return widget.dottedpath in data.request
+    elif format == 'string':
+        return data.request.get(widget.dottedpath, '')
+    raise ValueError, 'Checkbox widget has invalid format % s set' % format
 
 def input_checkbox_renderer(widget, data):
+    value = _value(widget, data)
     input_attrs = {
         'type': 'checkbox',
-        'checked':  _value(widget, data) and 'checked' or None,
-        'value': '',
+        'checked':  value and 'checked' or None,
+        'value': value,
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),    
         'class_': cssclasses(widget, data),    
@@ -121,6 +127,7 @@ def input_checkbox_renderer(widget, data):
     return checkbox + hidden 
 
 factory.defaults['checkbox.default'] = False
+factory.defaults['checkbox.format'] = 'bool'
 factory.defaults['checkbox.required_class'] = 'required'
 factory.register('checkbox', 
                  [input_checkbox_extractor, generic_required_extractor], 
