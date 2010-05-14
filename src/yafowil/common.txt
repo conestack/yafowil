@@ -169,7 +169,8 @@ Selection Widget
     ...                        'format': 'single',
     ...                       })
     >>> selectwidget()
-    u'<div id="radio-MYSELECT-one"><input checked="checked" 
+    u'<input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
+    value="exists" /><div id="radio-MYSELECT-one"><input checked="checked" 
     id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one" 
     /><span>One</span></div><div id="radio-MYSELECT-two"><input 
     id="input-MYSELECT-two" name="MYSELECT" type="radio" value="two" 
