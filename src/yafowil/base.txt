@@ -128,6 +128,9 @@ Create some test dummies.
     ...     except:
     ...         raise ExtractionError('e3: Integer expected, got %s' % number)
     ...     return value
+
+    >>> def fail_extractor(widget, data):
+    ...     raise ValueError, 'extractor has to fail'
     
     >>> def test_renderer(widget, data):
     ...     #interact(locals())
@@ -135,6 +138,9 @@ Create some test dummies.
 
     >>> def test_renderer2(widget, data):
     ...     return 'r2', widget.__name__, str(data), str(widget.attributes)
+
+    >>> def fail_renderer(widget, data):
+    ...     raise ValueError, 'renderer has to fail'
     
     >>> def test_preprocessor(widget, data):
     ...     data.attrs['test_preprocessor'] = 'called'
@@ -215,6 +221,24 @@ Different cases.
     >>> testwidget.extract({'MYUID2': '123'})
     <RuntimeData MYUID2, value=999, extracted=123 at ...>
     
+A failing widget    
+    >>> testwidget = Widget([('1', fail_extractor)], 
+    ...                     [('1', fail_renderer)], 
+    ...                     [],
+    ...                     'MYFAIL', '',
+    ...                     dict())
+
+    >>> try:
+    ...    testwidget.extract({})
+    ... except Exception, e:
+    ...    print e
+    extractor has to fail
+
+    >>> try:
+    ...    testwidget()
+    ... except Exception, e:
+    ...    print e
+    renderer has to fail
         
 factory
 -------
@@ -373,5 +397,5 @@ modify defaults for widgets attributes via factory
     >>> try:
     ...     widget()
     ... except KeyError, e:
-    ...     print list(e)
-    ['id', '<function prefix_renderer at ...>', None]
+    ...     print e
+    'id'

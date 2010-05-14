@@ -78,6 +78,13 @@ class ExtractionError(Exception):
         
     def __repr__(self):
         return u"ExtractionError('%s',)" % str(self)
+    
+class TBSupplement(object):
+
+    def __init__(self, widget, func, task, name):
+        self.manageable_object = func
+        self.warnings = ['Occured on %s in widget "%s" with name "%s"' % \
+                         (task, widget.dottedpath, name)]
         
 class WidgetAttributes(NodeAttributes):
     
@@ -192,18 +199,15 @@ class Widget(AttributedNode):
                 data.request = request
             data = self._runpreprocessors(data)
         self.lock()
-        for ren_name, renderer in self.renderers:
-            self.current_prefix = ren_name
-            try:
-                rendered = renderer(self, data)
-            except Exception, e:
-                self.current_prefix = None
-                self.unlock()
-                e.args = [a for a in e.args] + [str(renderer)] + self.path
-                raise e
-            data.rendered = rendered
-        self.current_prefix = None
-        self.unlock()                   
+        try:
+            for ren_name, renderer in self.renderers:
+                self.current_prefix = ren_name
+                __traceback_supplement__ = (TBSupplement, self, renderer, 
+                                            'render', ren_name)
+                data.rendered = renderer(self, data)
+        finally:
+            self.current_prefix = None
+            self.unlock()
         return data.rendered
     
     def extract(self, request, parent=None):
@@ -221,24 +225,21 @@ class Widget(AttributedNode):
         if parent is not None:
             parent[self.__name__] = data
         data = self._runpreprocessors(data)
-        self.lock()         
-        for ex_name, extractor in self.extractors:     
-            self.current_prefix = ex_name
-            try:
-                extracted = extractor(self, data)
-            except ExtractionError, e:
-                data.errors.append(e)
-                if e.abort:
-                    break
-            except Exception, e:
-                self.current_prefix = None
-                self.unlock()                   
-                e.args = [a for a in e.args] + [str(extractor)] + self.path
-                raise e
-            else:
-                data.extracted = extracted
-        self.current_prefix = None
-        self.unlock()                   
+        self.lock()     
+        try:    
+            for ex_name, extractor in self.extractors:     
+                self.current_prefix = ex_name
+                __traceback_supplement__ = (TBSupplement, self, extractor, 
+                                            'extract', ex_name)
+                try:
+                    data.extracted = extractor(self, data)
+                except ExtractionError, e:
+                    data.errors.append(e)
+                    if e.abort:
+                        break
+        finally:
+            self.current_prefix = None
+            self.unlock()                                   
         return data
     
     @property
