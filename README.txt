@@ -11,29 +11,6 @@ browser per widget.
 Yafowil widgets are just configuration. Yafowil provides a factory where you can 
 fetch your widgets instances from. Or you register your own.
 
-Minimal example
----------------
-
-A simple hello world form works like so::
-
-    >>> import yafowil loader
-    >>> from yafowil.base import factory
-    
-Create a form::
-    
-    >>> form = factory('form', name='myform', 
-    ...                props={'action': 'http://www.domain.tld/someform'})
-    >>> form['some input'] = factory('field:label:text', props={'label': 'Your Text'})
-    >>> form['submit'] = factory('field:submit')
-
-Render an empty form    
-
-    >>> form()
-    <form></form>
-    
-
-     
-
 Dependencies
 ------------ 
  
@@ -44,57 +21,115 @@ not know about data-storage, but offers you a hook to add your handler.
 Tired of inventing widgets again and again after switching the python framework 
 Yafowil is intentionally written framework-independent. By just feeding it with 
 configuration it can be used and extended in most of existing python web 
-frameworks. Zope, Bfg and Django are hot candidates.
+frameworks. Zope, Bfg and Django are hot candidates. 
 
-Whats in this package?
-----------------------   
+
+Hello World
+===========
+
+For the impatient, code says more than 1000 words: A simple hello world form 
+works like so::
+
+    >>> import yafowil.loader
+    >>> from yafowil.base import factory
+    >>> from yafowil.controller import Controller
+    
+Create a form::
+    
+    >>> form = factory('form', name='myform', 
+    ...     props={'action': 'http://www.domain.tld/someform'})
+    >>> form['someinput'] = factory('label:text', 
+    ...     props={'label': 'Your Text'})
+    
+    >>> def formaction(widget, data):
+    ...     data.printtree()
+
+    >>> def formnext(request):
+    ...     return 'http://www.domain.tld/result'
+    
+    >>> form['submit'] = factory('submit', 
+    ...     props={'handler': formaction, 'next': formnext, 'action': True})
+    
+
+Render an empty form    
+
+    >>> form()
+    u'<form action="http://www.domain.tld/someform" 
+    enctype="multipart/form-data" id="form-myform" method="post"><label 
+    for="input-myform-someinput">Your Text</label><input 
+    id="input-myform-someinput" name="myform.someinput" type="text" 
+    /><input id="input-myform-submit" name="action.myform.submit" 
+    type="submit" value="submit" /></form>'
+
+    
+Get form data out of request (request is expected dict-like)::
+
+    >>> request = {'myform.someinput': 'Hello World', 
+    ...            'action.myform.submit': 'submit'}
+    >>> controller = Controller(form, request)
+    <RuntimeData myform, value=None, extracted=None at ...>
+      <RuntimeData myform.someinput, value=None, extracted='Hello World', 
+      attrs={'input_field_type': 'text'} at ...>
+      <RuntimeData myform.submit, value=None, extracted=<UNSET> at ...>
+     
+Basic functions
+===============
 
 It provides widgets for all HTML standard inputs, Such as: text, textarea, 
-dropdown, checkbox, radiobutton, file, hidden, submit. 
+checkbox, radio, selects (single, multiplefile), file, hidden, submit. 
 
-There are different possibilities to group or wrap widgets and their behaviour.
+Usally you request a widget instance from the factory. I.e. by calling:: 
 
-First you can register chains of renderers and/or extractors under an own name.
+    widget = factory('field:label:text')
+    
+A form is build dict-like. Same with fieldsets::
 
-Sesond you can request such chains from the factory. I.e. by calling 
-``widget = factory('field:label:text')``. 
+    form =  factory('form', 'UNIQUENAME', props={'action': 'someurl'})
+    form['somefield'] = factory('field:label:text')
+    form['somefieldset'] = factory('fieldset', props={'legend': 'A Fieldset'})
+    form['somefieldset']['innerfield'] = factory('field:label:text')
+    ...
+        
+You can inject custom behaviour by marking a part of the widget with 
+the asterisk ``*`` character. Behaviours are one or a combination of a
 
-Additional it provides the possibility to build compounds (aka subforms). 
-The main form is also just a compound. Fieldset is a kind of compound. Compounds
-are built using the dict-like and location aware ``Node`` mentioned above.
+extractor
+    extracts, validates and/or converts form-data from the request
 
-If one needs an compound several times, it can be build at factory time by 
-registering one or more subwidget functions. A good example for such a static 
-compound is a validating password widgets (those annoying ones where you need to 
-enter your password twice. Its an compound of two simple password widgets plus an 
-validation (extractor) on the surrounding compund.
+renderer
+    build the markup 
+    
+preprocessor
+    Generic hook to prepare runtime-data. Runs once per runtime-data instance
+    before extractors or renderers are running. 
+    
+builder
+    Generic hook called once at factory time of the widget. Here i.e. subwidgets
+    can be created.    
 
-With an ``array`` repeating any widget several times is possible. An array is an 
-special dynamic compound.
+:: 
 
-Other widgets are provided in separate packages. The idea is to use the same 
-namespace: ``yafowil.*``. 
+    def myvalidator(widget, data):
+       # validate the data, raise ExtractionError if somethings wrong
+       return data.extracted
+         
+    widget = factory('field:label:*myvalidation:text', 
+                     custom: {'myvalidation': ([myvalidator],[],[],[]})
+
+If you need behaviour you need is more general  so you need it more than once -
+you can register it in the factory for easy later access::
+
+    factory.register('mybehaviour', [myvalidator], [])    
+                      
+    widget = factory('field:label:mybehaviour:text')
+
 
 Architecture
 ============
 
 The basic widget get all functionality injected as callables. It is reduced to 
-the execution-logic. Other logic is injected on initialization time:
-
-value 
-    callable as value-getter or just the value, 
-
-preprocessors 
-    list of callables preparing runtime data
-    
-renderers 
-    list of callables creating markup.
-    
-extractors
-    list of callables getting form data out of request, providing it dict-like.
-
-subwidgets
-    list of callables constructing contained widgets at factory time.
+the execution-logic. Other logic is injected on initialization time. The value
+can be passed in as a callable as value-getter or just the value, 
 
 Also passed is some static configuration:
 
@@ -102,15 +137,18 @@ Also passed is some static configuration:
 - arbitary properties as general keyword arguments (for read-only use).
  
 Different widget flavors - combinations of preprocessors, extractors, renderers
-and subwidgets - are registered in a registry. This registry is also a factory
-spitting out configured widgets by name.  
+and builders - are registered in a registry. This registry is also a factory
+spitting out configured widgets by name.
 
 Behaviour
 =========
+
+Widget instances
+----------------
  
 To get an instance of the widget call the factory and pass the registered name, 
 a unique name for this widget instance, the value (or an getter) and arbitrary 
-properties.
+properties and eventually a mapping to custom behaviour.
 
 Widget instances are providing two functionalities:
 
@@ -135,7 +173,15 @@ In both cases the preprocessors are called, but only once for each runtime-data.
 There are two type of preprocessors: global and by widget registered. Global
 ones are called first. Hint: In the preprocessors it is also possible to wrap the 
 request or value, i.e. in order to use a request provided by some framework as 
-input.   
+input.
+
+Controller
+----------   
+
+The controller handles forms and its several actions. Its convinient to use and 
+dispatches the actions to handlers and deals with rendering and re-rendering of
+the form. Here you can hook in a callable saving the data to the storage of 
+your choice.
 
 Example
 =======

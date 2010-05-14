@@ -235,7 +235,7 @@ factory
     ('r1', 'MYFAC', "<RuntimeData MYFAC, value='Test Value', extracted=<UNSET> 
     at ...>", "{'foo': 'bar'}")
     
-We can create sets of static subwidgets, i.e. to have a validating password
+We can create sets of static builders, i.e. to have a validating password
 field with two input fields in. Here a simpler example.
 :: 
 
@@ -244,7 +244,7 @@ field with two input fields in. Here a simpler example.
     ...     widget['two'] = factory('widget_test', widget.attrs)
         
     >>> factory.register('static_compound', [], [], 
-    ...                  subwidgets=[create_static_compound])
+    ...                  builders=[create_static_compound])
     
     >>> widget = factory('static_compound', props={})
     >>> widget.keys()
@@ -259,7 +259,7 @@ This might be a label, some error output or div around. We dont want to register
 an amount of X possible widgets with an amount of Y possible wrappers. Therefore
 we can factor a widget in a chain defined colon-separated, i.e 'outer:inner' or 
 'field:error:text'. Chaining works for all parts: renderers, extractors, 
-preprocessors and subwidgets. Most inner and first executed is right (we prefix 
+preprocessors and builders. Most inner and first executed is right (we prefix 
 with wrappers)!
 ::
 

@@ -22,10 +22,6 @@ Text Input Widget
     >>> inputwidget()
     u'<input id="input-MYHIDDEN" name="MYHIDDEN" type="hidden" value="Test Hidden" />'
     
-    >>> inputwidget = factory('checkbox', 'MYCHECKBOX', 'Test Checkbox')    
-    >>> inputwidget()
-    u'<input id="input-MYCHECKBOX" name="MYCHECKBOX" type="checkbox" value="Test Checkbox" />'
-
     >>> inputwidget = factory('file', 'MYFILE', 'Test File')    
     >>> inputwidget()
     u'<input id="input-MYFILE" name="MYFILE" type="file" value="" />'
@@ -93,6 +89,40 @@ Create a custom error message::
     <RuntimeData REQUIRED, value='', extracted=<UNSET>, 
     attrs={'input_field_type': 'text'} at ...>
     
+
+Checkbox Widget
+===============
+
+A boolean checkbox widget (default)
+::
+    
+    >>> inputwidget = factory('checkbox', 'MYCHECKBOX')    
+    >>> inputwidget()
+    u'<input id="input-MYCHECKBOX" name="MYCHECKBOX" 
+    type="checkbox" value="" /><input id="checkboxexists-MYCHECKBOX" 
+    name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />'
+
+    >>> inputwidget = factory('checkbox', 'MYCHECKBOX', value='True')    
+    >>> inputwidget()
+    u'<input checked="checked" id="input-MYCHECKBOX" name="MYCHECKBOX" 
+    type="checkbox" value="" /><input id="checkboxexists-MYCHECKBOX" 
+    name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />'
+
+A checkbox widget with an value or an empty string.
+
+    >>> inputwidget = factory('checkbox', 'MYCHECKBOX', '',
+    ...                       props={'format': 'string'})    
+    >>> inputwidget()
+    u'<input id="input-MYCHECKBOX" name="MYCHECKBOX" 
+    type="checkbox" value="" /><input id="checkboxexists-MYCHECKBOX" 
+    name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />'
+
+    >>> inputwidget = factory('checkbox', 'MYCHECKBOX', 'Test Checkbox',
+    ...                       props={'format': 'string'})    
+    >>> inputwidget()
+    u'<input checked="checked" id="input-MYCHECKBOX" name="MYCHECKBOX" 
+    type="checkbox" value="" /><input id="checkboxexists-MYCHECKBOX" 
+    name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />'
     
 Textarea Widget
 ===============
@@ -139,6 +169,15 @@ Selection Widget
     ...                        'format': 'single',
     ...                       })
     >>> selectwidget()
+    u'<div id="radio-MYSELECT-one"><input checked="checked" 
+    id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one" 
+    /><span>One</span></div><div id="radio-MYSELECT-two"><input 
+    id="input-MYSELECT-two" name="MYSELECT" type="radio" value="two" 
+    /><span>Two</span></div><div id="radio-MYSELECT-three"><input 
+    checked="checked" id="input-MYSELECT-three" name="MYSELECT" type="radio" 
+    value="three" /><span>Three</span></div><div id="radio-MYSELECT-four"><input 
+    id="input-MYSELECT-four" name="MYSELECT" type="radio" value="four" 
+    /><span>Four</span></div>'
 
     
 File Widget

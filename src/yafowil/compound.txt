@@ -85,14 +85,13 @@ Create a form::
     ...     props={'label': 'Your Text'})
     
     >>> def formaction(widget, data):
-    ...     interact(locals())
-    ...     print 'You entered: ' + data['someinput'].value
+    ...     data.printtree()
 
     >>> def formnext(request):
     ...     return 'http://www.domain.tld/result'
     
     >>> form['submit'] = factory('submit', 
-    ...     props={'handler': formaction, 'next': formnext})
+    ...     props={'handler': formaction, 'next': formnext, 'action': True})
     
 
 Render an empty form    
@@ -111,7 +110,10 @@ Get form data out of request (request is expected dict-like)::
     >>> request = {'myform.someinput': 'Hello World', 
     ...            'action.myform.submit': 'submit'}
     >>> controller = Controller(form, request)
-    'You entered: Hello World'
+    <RuntimeData myform, value=None, extracted=None at ...>
+      <RuntimeData myform.someinput, value=None, extracted='Hello World', 
+      attrs={'input_field_type': 'text'} at ...>
+      <RuntimeData myform.submit, value=None, extracted=<UNSET> at ...>
 
 XXX TODO
 =========    
