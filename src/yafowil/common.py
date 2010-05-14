@@ -7,7 +7,8 @@ from utils import (
     cssclasses,
     cssid,
     tag,
-    vocabulary,)
+    vocabulary,
+)
 
 factory.defaults['default'] = None
 factory.defaults['class'] = None
@@ -76,9 +77,55 @@ def register_generic_input(subtype, enable_required_class=True):
 register_generic_input('text')
 register_generic_input('password')
 register_generic_input('hidden', False)
-register_generic_input('radio')
-register_generic_input('checkbox')
 
+def input_proxy_renderer(widget, data):
+    value = data.value
+    if data.request is not UNSET:
+        if data.request.get(widget.__name__):
+            value = data.request.get(widget.__name__)
+    input_attrs = {
+        'type': 'hidden',
+        'value':  value,
+        'name_': widget.__name__,
+        'id': cssid(widget, 'input'),    
+        'class_': cssclasses(widget, data),    
+    }
+    return tag('input', **input_attrs)
+
+factory.register('proxy', 
+                 [generic_extractor], 
+                 [input_proxy_renderer])
+
+def input_checkbox_extractor(widget, data):
+    if '%s-exists' % widget.dottedpath not in data.request:
+        return UNSET
+    return widget.dottedpath in data.request
+
+def input_checkbox_renderer(widget, data):
+    input_attrs = {
+        'type': 'checkbox',
+        'checked':  _value(widget, data) and 'checked' or None,
+        'value': '',
+        'name_': widget.dottedpath,
+        'id': cssid(widget, 'input'),    
+        'class_': cssclasses(widget, data),    
+    }
+    checkbox = tag('input', **input_attrs)
+    input_attrs = {
+        'type': 'hidden',
+        'value':  'checkboxexists',
+        'name_': "%s-exists" % widget.dottedpath,
+        'id': cssid(widget, 'checkboxexists'),    
+    }
+    hidden = tag('input', **input_attrs)
+    return checkbox + hidden 
+
+factory.defaults['checkbox.default'] = False
+factory.defaults['checkbox.required_class'] = 'required'
+factory.register('checkbox', 
+                 [input_checkbox_extractor, generic_required_extractor], 
+                 [input_checkbox_renderer])
+    
 def input_file_renderer(widget, data):
     input_attrs = {
         'name_': widget.dottedpath,
@@ -95,28 +142,50 @@ factory.register('file',
                  [input_file_renderer])
 
 def select_renderer(widget, data):
-    optiontags = [] 
     value = _value(widget, data)
-    if isinstance(value, basestring):
-        # TODO:  what if value is an integer? 
+    if value is None:
+        value = []
+    if isinstance(value, basestring) or not hasattr(value, '__iter__'):
         value = [value]
-    for key, term in vocabulary(widget.attrs.get('vocabulary', [])):
-        option_attrs = {
-            'selected': (key in value) and 'selected' or None,
-            'value': key,
-            'id': cssid(widget, 'input', key),
+    if widget.attrs.format == 'block':
+        optiontags = []
+        for key, term in vocabulary(widget.attrs.get('vocabulary', [])):
+            attrs = {
+                'selected': (key in value) and 'selected' or None,
+                'value': key,
+                'id': cssid(widget, 'input', key),
+            }
+            optiontags.append(tag('option', term, **attrs))
+        select_attrs = {
+            'name_': widget.dottedpath,
+            'id': cssid(widget, 'input'),
+            'class_': cssclasses(widget, data),                        
+            'multiple': widget.attrs.multivalued and 'multiple' or None,
         }
-        optiontags.append(tag('option', term, **option_attrs))
-    select_attrs = {
-        'name_': widget.dottedpath,
-        'id': cssid(widget, 'input'),
-        'class_': cssclasses(widget, data),                        
-        'multiple': widget.attrs.multivalued and 'multiple' or None,
-    }
-    return tag('select', *optiontags, **select_attrs)
-
+        return tag('select', *optiontags, **select_attrs)
+    else:
+        tags = []
+        for key, term in vocabulary(widget.attrs.get('vocabulary', [])):
+            if widget.attrs.multivalued:
+                tagtype = 'checkbox'
+            else:
+                tagtype = 'radio'
+            attrs = {
+                'type': tagtype,
+                'value':  key,
+                'name_': widget.dottedpath,
+                'id': cssid(widget, 'input', key),    
+                'class_': cssclasses(widget, data),    
+            }
+            input = tag('input', **attrs)
+            text = tag('span', term)
+            tags.append(tag('div', input, text, 
+                            **{'id': cssid(widget, 'radio', key)}))
+        return ''.join(tags)            
+            
 factory.defaults['select.multivalued'] = None
 factory.defaults['select.default'] = []
+factory.defaults['select.format'] = 'block'
 factory.register('select', 
                  [generic_extractor], 
                  [select_renderer])
@@ -132,6 +201,8 @@ def textarea_renderer(widget, data):
         'readonly': widget.attrs.readonly and 'readonly',
     }
     value = _value(widget, data)
+    if not value:
+        value = ''
     return tag('textarea', value, **area_attrs)
 
 factory.defaults['textarea.default'] = ''          
@@ -181,9 +252,9 @@ factory.register('label', [], [label_renderer])
 def field_renderer(widget, data):
     div_attrs = {
         'id': cssid(widget, 'field'),
-        'class_': widget.attrs['class'],
+        'class_': cssclasses(widget, data, widget.attrs['class'])
     }
-    if widget.attrs.witherror and data['errors']:
+    if widget.attrs.witherror and data.errors:
         div_attrs['class_'] += u' %s' % widget.attrs.witherror
     return tag('div', data.rendered, **div_attrs)
 

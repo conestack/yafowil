@@ -1,5 +1,8 @@
-Test UNSET
-==========
+Yafowil Base Components
+=======================
+
+UNSET
+-----
 ::
 
     >>> from yafowil.base import UNSET
@@ -12,12 +15,12 @@ Test UNSET
     >>> bool(UNSET)
     False
 
-Test Runtime Data
-=================
+
+Runtime Data
+------------
 
 Initial RuntimeData is empty
 ::    
-
 
     >>> from yafowil.base import RuntimeData
     >>> data = RuntimeData()
@@ -100,17 +103,17 @@ Same with path as a list.
     >>> fetched = data['fieldset']['age'].fetch(['root', 'surname'])
     >>> fetched.__name__
     'surname'
-    
 
-        
-Test Base Widget
-================
+
+Base Widget
+-----------
 ::
 
     >>> from yafowil.base import Widget
     >>> from yafowil.base import ExtractionError 
     
-Create some test dummies::
+Create some test dummies.
+::
 
     >>> def test_extractor(widget, data):
     ...     return 'e1'
@@ -143,7 +146,8 @@ Create some test dummies::
     >>> def test_getter2(widget, data):
     ...     return 999
 
-the widget class::    
+The widget class.
+::    
     
     >>> test_request = {'MYUID': 'New Test Value'}
     >>> testwidget = Widget([('1', test_extractor)], 
@@ -157,21 +161,24 @@ the widget class::
     attrs={'test_preprocessor': 'called'} at ...>", "{'test1': 'Test1', 
     'test2': 'Test2'}")
     
-a passed in request does not triger extraction::    
+A passed in request does not triger extraction.
+::    
     
     >>> testwidget(request=test_request) 
     ('r1', 'MYUID', "<RuntimeData MYUID, value='Test Value', extracted=<UNSET>, 
     attrs={'test_preprocessor': 'called'} at ...>", "{'test1': 'Test1', 
     'test2': 'Test2'}")
     
-extraction is an explicit task::    
+Extraction is an explicit task.
+::    
     
     >>> data = testwidget.extract(test_request)
     >>> data
     <RuntimeData MYUID, value='Test Value', extracted='e1', 
     attrs={'test_preprocessor': 'called'} at ...>
     
-different cases    
+Different cases.
+::    
     
     >>> testwidget = Widget([('1', test_extractor)], 
     ...                     [('1', test_renderer)], 
@@ -209,9 +216,10 @@ different cases
     <RuntimeData MYUID2, value=999, extracted=123 at ...>
     
         
-Test the factory
-================
+factory
+-------
 ::
+
     >>> from yafowil.base import Factory
     >>> factory = Factory()
     >>> factory.register('widget_test', [test_extractor], [test_renderer])
@@ -228,7 +236,8 @@ Test the factory
     at ...>", "{'foo': 'bar'}")
     
 We can create sets of static subwidgets, i.e. to have a validating password
-field with two input fields in. Here a simpler example:: 
+field with two input fields in. Here a simpler example.
+:: 
 
     >>> def create_static_compound(widget, factory):
     ...     widget['one'] = factory('widget_test', widget.attrs)
@@ -240,8 +249,9 @@ field with two input fields in. Here a simpler example::
     >>> widget = factory('static_compound', props={})
     >>> widget.keys()
     ['one', 'two']
-        
-request chains via factory
+
+
+Request chains via factory
 --------------------------
 
 Sometimes we want to wrap inputs by UI candy, primary for usability reasons. 
@@ -276,11 +286,12 @@ with wrappers)!
     u'<OUTER><INNER /></OUTER>'
     
 
-inject custom specials parts in the chain.
-------------------------------------------
+Inject custom specials parts in the chain
+-----------------------------------------
 
 You may need an behavior just one time and just for one special widget. Here
-you can inject your custom special render or extractor into the chain::
+you can inject your custom special render or extractor into the chain.
+::
     
     >>> def special_renderer(widget, data):
     ...     return u'<SPECIAL>%s</SPECIAL>' % data.rendered
@@ -300,11 +311,12 @@ you can inject your custom special render or extractor into the chain::
     u'<OUTER><SPECIAL><INNER /></SPECIAL></OUTER>'
 
 
-prefixes with widgets and factories
+Prefixes with widgets and factories
 -----------------------------------
  
 Factory called widget attributes should now about its factory name with a 
-prefix. 
+prefix.
+:: 
 
     >>> def prefix_renderer(widget, data):
     ...     return u'<ID>%s</ID>' % widget.attrs['id']
@@ -322,7 +334,7 @@ prefix.
 modify defaults for widgets attributes via factory
 --------------------------------------------------
 
-1st look for prefixed in attributes
+1st look for prefixed in attributes.
 ::
 
     >>> factory.defaults['id'] = 'Test3'
@@ -330,7 +342,7 @@ modify defaults for widgets attributes via factory
     >>> widget()
     u'<ID>Test3</ID>'
 
-2nd look for unprefixed in attributes
+2nd look for unprefixed in attributes.
 ::
 
     >>> factory.defaults['prefix.id'] = 'Test4'
@@ -338,21 +350,22 @@ modify defaults for widgets attributes via factory
     >>> widget()
     u'<ID>Test4</ID>'
 
-3rd look for prefixed in defaults
+3rd look for prefixed in defaults.
 ::
 
     >>> widget = factory('prefix', props={'prefix.id': 'Test'})
     >>> widget()
     u'<ID>Test</ID>'
 
-4th look for unprefixed in defaults
+4th look for unprefixed in defaults.
 ::
 
     >>> widget = factory('prefix', props={'id': 'Test2'})
     >>> widget()
     u'<ID>Test2</ID>'
 
-5th raise keyerror
+5th raise keyerror.
+::
 
     >>> del factory.defaults['id']
     >>> del factory.defaults['prefix.id']
@@ -362,4 +375,3 @@ modify defaults for widgets attributes via factory
     ... except KeyError, e:
     ...     print list(e)
     ['id', '<function prefix_renderer at ...>', None]
-   
