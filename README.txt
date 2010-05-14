@@ -2,14 +2,40 @@ Introduction
 ============
 
 This is **Yet Another Form WIdget Library** (XHTML). There are plenty of 'em out 
-in python space. But I did not find anything puristic, thin, userinterface 
+in Python space. But I did not find anything puristic, thin, userinterface 
 centric, with a set of base input widgets which one can adapt to its needs. 
 
 It's all just about rendering widgets and extracting the data returned from the 
-browser per widget.
+browser per widget. 
 
-Widgets are just configuration. Yafowil does not provide classes for widgets, 
-but a factory where you can fetch your widgets from - and register your own. 
+Yafowil widgets are just configuration. Yafowil provides a factory where you can 
+fetch your widgets instances from. Or you register your own.
+
+Minimal example
+---------------
+
+A simple hello world form works like so::
+
+    >>> import yafowil loader
+    >>> from yafowil.base import factory
+    
+Create a form::
+    
+    >>> form = factory('form', name='myform', 
+    ...                props={'action': 'http://www.domain.tld/someform'})
+    >>> form['some input'] = factory('field:label:text', props={'label': 'Your Text'})
+    >>> form['submit'] = factory('field:submit')
+
+Render an empty form    
+
+    >>> form()
+    <form></form>
+    
+
+     
+
+Dependencies
+------------ 
  
 Yafowil aims to have no dependencies to any framework. It utilizes ``Node`` from 
 ``zodict``. And so it has flimsy dependecies to ``zope.location``. It also does 
@@ -18,7 +44,10 @@ not know about data-storage, but offers you a hook to add your handler.
 Tired of inventing widgets again and again after switching the python framework 
 Yafowil is intentionally written framework-independent. By just feeding it with 
 configuration it can be used and extended in most of existing python web 
-frameworks. Zope, Bfg and Django are hot candidates.   
+frameworks. Zope, Bfg and Django are hot candidates.
+
+Whats in this package?
+----------------------   
 
 It provides widgets for all HTML standard inputs, Such as: text, textarea, 
 dropdown, checkbox, radiobutton, file, hidden, submit. 

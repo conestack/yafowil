@@ -215,4 +215,3 @@ Chained password inside error inside field
     >>> widget(data=data)
     u'<div class="field" id="field-password"><input class="required" 
     id="input-password" name="password" type="password" value="secret" /></div>'
-    

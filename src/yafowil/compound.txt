@@ -68,7 +68,50 @@ Test Form
     u'<form action="http://fubar.com" enctype="multipart/form-data" 
     id="form-FORM" method="post"></form>'
     
+Hello World
+-----------
 
+A simple hello world form works like so::
+
+    >>> import yafowil.loader
+    >>> from yafowil.base import factory
+    >>> from yafowil.controller import Controller
+    
+Create a form::
+    
+    >>> form = factory('form', name='myform', 
+    ...     props={'action': 'http://www.domain.tld/someform'})
+    >>> form['someinput'] = factory('label:text', 
+    ...     props={'label': 'Your Text'})
+    
+    >>> def formaction(widget, data):
+    ...     interact(locals())
+    ...     print 'You entered: ' + data['someinput'].value
+
+    >>> def formnext(request):
+    ...     return 'http://www.domain.tld/result'
+    
+    >>> form['submit'] = factory('submit', 
+    ...     props={'handler': formaction, 'next': formnext})
+    
+
+Render an empty form    
+
+    >>> form()
+    u'<form action="http://www.domain.tld/someform" 
+    enctype="multipart/form-data" id="form-myform" method="post"><label 
+    for="input-myform-someinput">Your Text</label><input 
+    id="input-myform-someinput" name="myform.someinput" type="text" 
+    /><input id="input-myform-submit" name="action.myform.submit" 
+    type="submit" value="submit" /></form>'
+
+    
+Get form data out of request (request is expected dict-like)::
+
+    >>> request = {'myform.someinput': 'Hello World', 
+    ...            'action.myform.submit': 'submit'}
+    >>> controller = Controller(form, request)
+    'You entered: Hello World'
 
 XXX TODO
 =========    
