@@ -47,12 +47,15 @@ def generic_required_extractor(widget, data):
     raise ExtractionError(widget.attrs['required_message'])
 
 def input_generic_renderer(widget, data):
+    css = widget.attrs.get('css', list())
+    if isinstance(css, basestring):
+        css = [css]
     input_attrs = {
         'type': data.attrs.get('input_field_type', False) or widget.attrs.type,
         'value':  _value(widget, data),
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),    
-        'class_': cssclasses(widget, data),    
+        'class_': cssclasses(widget, data, *css),    
     }
     return tag('input', **input_attrs)
 
