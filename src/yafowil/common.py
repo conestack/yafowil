@@ -170,6 +170,9 @@ def select_renderer(widget, data):
         value = []
     if isinstance(value, basestring) or not hasattr(value, '__iter__'):
         value = [value]
+    css = widget.attrs.get('css', list())
+    if isinstance(css, basestring):
+        css = [css]
     if widget.attrs.format == 'block':
         optiontags = []
         for key, term in vocabulary(widget.attrs.get('vocabulary', [])):
@@ -182,7 +185,7 @@ def select_renderer(widget, data):
         select_attrs = {
             'name_': widget.dottedpath,
             'id': cssid(widget, 'input'),
-            'class_': cssclasses(widget, data),                        
+            'class_': cssclasses(widget, data, *css),                        
             'multiple': widget.attrs.multivalued and 'multiple' or None,
         }
         return tag('select', *optiontags, **select_attrs)
@@ -199,7 +202,7 @@ def select_renderer(widget, data):
                 'checked': (key in value) and 'checked' or None,
                 'name_': widget.dottedpath,
                 'id': cssid(widget, 'input', key),    
-                'class_': cssclasses(widget, data),    
+                'class_': cssclasses(widget, data, *css),    
             }
             input = tag('input', **attrs)
             text = tag('span', term)
