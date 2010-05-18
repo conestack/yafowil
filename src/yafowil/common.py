@@ -162,7 +162,7 @@ def input_file_renderer(widget, data):
     return tag('input', **input_attrs)
 
 def file_options_renderer(widget, data):
-    if data.value not in [None, UNSET]:
+    if data.value not in [None, UNSET, '']:
         return data.rendered + select_renderer(widget, data)
     return data.rendered
     
