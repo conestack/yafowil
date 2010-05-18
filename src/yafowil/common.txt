@@ -1,12 +1,14 @@
-Preparation
-===========
+Yafowil common widgets
+======================
 
-Trigger registry by importing
+Trigger registry by importing.
+::
 
     >>> import yafowil.common
-        
+
+
 Text Input Widget
-=================
+-----------------
 ::
 
     >>> from yafowil.base import factory
@@ -21,15 +23,13 @@ Text Input Widget
     >>> inputwidget = factory('hidden', 'MYHIDDEN', 'Test Hidden')
     >>> inputwidget()
     u'<input id="input-MYHIDDEN" name="MYHIDDEN" type="hidden" value="Test Hidden" />'
-    
-    >>> inputwidget = factory('file', 'MYFILE', 'Test File')    
-    >>> inputwidget()
-    u'<input id="input-MYFILE" name="MYFILE" type="file" value="" />'
-    
-Required Input Widget
-=====================
 
-Render required widget::
+
+Required Input Widget
+---------------------
+
+Render required widget.
+::
 
     >>> inputwidget = factory('text', 'REQUIRED', '',
     ...                       {'required': True,
@@ -38,14 +38,16 @@ Render required widget::
     u'<input class="required" id="input-REQUIRED" name="REQUIRED" type="text" 
     value="" />'
 
-Extract with empty request, key not in request therefore no error::
+Extract with empty request, key not in request therefore no error.
+::
     
     >>> data = inputwidget.extract({})
     >>> data
     <RuntimeData REQUIRED, value='', extracted=<UNSET>, 
     attrs={'input_field_type': 'text'} at ...>
         
-Extract with empty input sent, required error expected::    
+Extract with empty input sent, required error expected.
+::    
     
     >>> data = inputwidget.extract({'REQUIRED': ''})
     >>> data
@@ -55,7 +57,8 @@ Extract with empty input sent, required error expected::
     >>> data.errors
     [ExtractionError('Mandatory field was empty',)]
 
-With getter value set, empty request, no error expected::    
+With getter value set, empty request, no error expected.
+::    
     
     >>> inputwidget = factory('text', 'REQUIRED', 'Test Text',
     ...                       {'required': True,
@@ -69,7 +72,8 @@ With getter value set, empty request, no error expected::
     u'<input class="required" id="input-REQUIRED" name="REQUIRED" type="text" 
     value="Test Text" />'
 
-With getter value set, request given, error expected::    
+With getter value set, request given, error expected.
+::    
 
     >>> data = inputwidget.extract({'REQUIRED': ''})
     >>> data
@@ -80,7 +84,8 @@ With getter value set, request given, error expected::
     u'<input class="error required" id="input-REQUIRED" name="REQUIRED" 
     type="text" value="" />'
 
-Create a custom error message::    
+Create a custom error message.
+::    
 
     >>> inputwidget = factory('text', 'REQUIRED', '',
     ...                       {'required': 'You fool, fill in a value!'})
@@ -91,9 +96,9 @@ Create a custom error message::
     
 
 Checkbox Widget
-===============
+---------------
 
-A boolean checkbox widget (default)
+A boolean checkbox widget (default).
 ::
     
     >>> inputwidget = factory('checkbox', 'MYCHECKBOX')    
@@ -109,6 +114,7 @@ A boolean checkbox widget (default)
     name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />'
 
 A checkbox widget with an value or an empty string.
+::
 
     >>> inputwidget = factory('checkbox', 'MYCHECKBOX', '',
     ...                       props={'format': 'string'})    
@@ -123,9 +129,10 @@ A checkbox widget with an value or an empty string.
     u'<input checked="checked" id="input-MYCHECKBOX" name="MYCHECKBOX" 
     type="checkbox" value="Test Checkbox" /><input id="checkboxexists-MYCHECKBOX" 
     name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />'
-    
+
+
 Textarea Widget
-===============
+---------------
 ::
 
     >>> inputwidget = factory('textarea', 'MYTEXTAREA', 'Test Textarea',
@@ -136,8 +143,9 @@ Textarea Widget
     >>> inputwidget()
     u'<textarea cols="80" id="input-MYTEXTAREA" name="MYTEXTAREA" rows="25">Test Textarea</textarea>'
 
+
 Selection Widget
-================
+----------------
 ::
 
     >>> selectwidget = factory('select', 'MYSELECT', ['one', 'three'],
@@ -182,11 +190,47 @@ Selection Widget
 
     
 File Widget
-===========
+-----------
+
+    >>> widget = factory('file', 'MYFILE')
+    >>> widget()
+    u'<input id="input-MYFILE" name="MYFILE-file" type="file" value="" />'
     
+    >>> widget = factory('file', 'MYFILE', value='x')
+    >>> widget()
+    u'<input id="input-MYFILE" name="MYFILE-file" type="file" 
+    value="" /><input id="exists-MYFILE" name="MYFILE-exists" 
+    type="hidden" value="exists" /><div id="radio-MYFILE-keep"><input 
+    id="input-MYFILE-keep" name="MYFILE" type="radio" value="keep" /><span>Keep 
+    Existing file</span></div><div id="radio-MYFILE-replace"><input 
+    id="input-MYFILE-replace" name="MYFILE" type="radio" value="replace" 
+    /><span>Replace existing file</span></div><div 
+    id="radio-MYFILE-delete"><input id="input-MYFILE-delete" 
+    name="MYFILE" type="radio" value="delete" /><span>Delete existing 
+    file</span></div>'
     
+    >>> request = {
+    ...     'MYFILE-file': 'y',
+    ...     'MYFILE-exists': 'exists',
+    ...     'MYFILE': 'keep'
+    ... }
+    >>> data = widget.extract(request)
+    >>> data.extracted
+    'x'
+    
+    >>> request['MYFILE'] = 'replace'
+    >>> data = widget.extract(request)
+    >>> data.extracted
+    'y'
+    
+    >>> request['MYFILE'] = 'delete'
+    >>> data = widget.extract(request)
+    >>> data.extracted
+    <UNSET>
+
+
 Submit Widget (action)
-======================
+----------------------
 ::
 
     >>> props = {
@@ -199,7 +243,7 @@ Submit Widget (action)
 
 
 Proxy Widget
-============
+------------
 
 Used to pass hidden arguments out of form namespace.
 ::
@@ -208,56 +252,58 @@ Used to pass hidden arguments out of form namespace.
     >>> widget()
     u'<input id="input-proxy" name="proxy" type="hidden" value="1" />'
 
-Label Widget
-============
 
-Default
+Label Widget
+------------
+
+Default.
 ::
 
     >>> widget = factory('label:file', name='MYFILE', \
     ...                   props={'label': 'MY FILE'})
     >>> widget()
     u'<label for="input-MYFILE">MY FILE</label><input id="input-MYFILE" 
-    name="MYFILE" type="file" value="" />'
+    name="MYFILE-file" type="file" value="" />'
     
-Label after widget
+Label after widget.
 ::
 
     >>> widget = factory('label:file', name='MYFILE', \
     ...                   props={'label': 'MY FILE',
     ...                          'label.position': 'after'})
     >>> widget()
-    u'<input id="input-MYFILE" name="MYFILE" type="file" value="" /><label 
+    u'<input id="input-MYFILE" name="MYFILE-file" type="file" value="" /><label 
     for="input-MYFILE">MY FILE</label>'
     
-Same with inner label
+Same with inner label.
 ::
 
     >>> widget = factory('label:file', name='MYFILE', \
     ...                   props={'label': 'MY FILE',
     ...                          'label.position': 'inner'})
     >>> widget()
-    u'<label for="input-MYFILE">MY FILE<input id="input-MYFILE" name="MYFILE" 
-    type="file" value="" /></label>'
+    u'<label for="input-MYFILE">MY FILE<input id="input-MYFILE" 
+    name="MYFILE-file" type="file" value="" /></label>'
     
 
 Field Widget
-============
+------------
     
-Chained file inside field with label
+Chained file inside field with label.
 ::
 
     >>> widget = factory('field:label:file', name='MYFILE', \
     ...                   props={'label': 'MY FILE'})
     >>> widget()
     u'<div class="field" id="field-MYFILE"><label 
-    for="input-MYFILE">MY FILE</label><input id="input-MYFILE" name="MYFILE" 
-    type="file" value="" /></div>'
+    for="input-MYFILE">MY FILE</label><input id="input-MYFILE" 
+    name="MYFILE-file" type="file" value="" /></div>'
+
 
 Error Widget
-============
+------------
 
-Chained password inside error inside field
+Chained password inside error inside field.
 ::
 
     >>> widget = factory('field:error:password', name='password',

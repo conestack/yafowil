@@ -138,9 +138,21 @@ factory.register('checkbox',
                  [input_checkbox_extractor, generic_required_extractor], 
                  [input_checkbox_renderer])
     
+def file_extracor(widget, data):
+    name = '%s-%s' % (widget.dottedpath, 'file')
+    if name not in data.request:
+        return UNSET
+    if widget.dottedpath in data.request:
+        option = data.request.get(widget.dottedpath, 'keep')
+        if option == 'keep':
+            return data.value
+        elif option == 'delete':
+            return UNSET
+    return data.request[name]
+
 def input_file_renderer(widget, data):
     input_attrs = {
-        'name_': widget.dottedpath,
+        'name_': '%s-%s' % (widget.dottedpath, 'file'),
         'id': cssid(widget, 'input'),
         'class_': cssclasses(widget, data),            
         'type': 'file',
@@ -148,10 +160,23 @@ def input_file_renderer(widget, data):
         'accept': widget.attrs.get('accept', None),
     }
     return tag('input', **input_attrs)
+
+def file_options_renderer(widget, data):
+    if data.value not in [None, UNSET]:
+        return data.rendered + select_renderer(widget, data)
+    return data.rendered
     
-factory.register('file', 
-                 [generic_extractor, generic_required_extractor], 
-                 [input_file_renderer])
+factory.defaults['file.multivalued'] = False
+factory.defaults['file.default'] = 'keep'
+factory.defaults['file.format'] = 'radio'
+factory.defaults['file.vocabulary'] = [
+    ('keep', 'Keep Existing file'),
+    ('replace', 'Replace existing file'),
+    ('delete', 'Delete existing file'),
+]
+factory.register('file',
+                 [file_extracor, generic_required_extractor],
+                 [input_file_renderer, file_options_renderer])
 
 def select_extractor(widget, data):
     extracted = generic_extractor(widget, data)
