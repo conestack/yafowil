@@ -194,36 +194,34 @@ File Widget
 
     >>> widget = factory('file', 'MYFILE')
     >>> widget()
-    u'<input id="input-MYFILE" name="MYFILE-file" type="file" value="" />'
+    u'<input id="input-MYFILE" name="MYFILE" type="file" value="" />'
     
     >>> widget = factory('file', 'MYFILE', value='x')
     >>> widget()
-    u'<input id="input-MYFILE" name="MYFILE-file" type="file" 
-    value="" /><input id="exists-MYFILE" name="MYFILE-exists" 
-    type="hidden" value="exists" /><div id="radio-MYFILE-keep"><input 
-    id="input-MYFILE-keep" name="MYFILE" type="radio" value="keep" /><span>Keep 
-    Existing file</span></div><div id="radio-MYFILE-replace"><input 
-    id="input-MYFILE-replace" name="MYFILE" type="radio" value="replace" 
-    /><span>Replace existing file</span></div><div 
+    u'<input id="input-MYFILE" name="MYFILE" type="file" value="" /><div 
+    id="radio-MYFILE-keep"><input checked="checked" id="input-MYFILE-keep" 
+    name="MYFILE-action" type="radio" value="keep" /><span>Keep Existing 
+    file</span></div><div id="radio-MYFILE-replace"><input 
+    id="input-MYFILE-replace" name="MYFILE-action" type="radio" 
+    value="replace" /><span>Replace existing file</span></div><div 
     id="radio-MYFILE-delete"><input id="input-MYFILE-delete" 
-    name="MYFILE" type="radio" value="delete" /><span>Delete existing 
-    file</span></div>'
+    name="MYFILE-action" type="radio" value="delete" /><span>Delete 
+    existing file</span></div>'    
     
     >>> request = {
-    ...     'MYFILE-file': 'y',
-    ...     'MYFILE-exists': 'exists',
-    ...     'MYFILE': 'keep'
+    ...     'MYFILE': 'y',
+    ...     'MYFILE-action': 'keep'
     ... }
     >>> data = widget.extract(request)
     >>> data.extracted
     'x'
     
-    >>> request['MYFILE'] = 'replace'
+    >>> request['MYFILE-action'] = 'replace'
     >>> data = widget.extract(request)
     >>> data.extracted
     'y'
     
-    >>> request['MYFILE'] = 'delete'
+    >>> request['MYFILE-action'] = 'delete'
     >>> data = widget.extract(request)
     >>> data.extracted
     <UNSET>
@@ -263,7 +261,7 @@ Default.
     ...                   props={'label': 'MY FILE'})
     >>> widget()
     u'<label for="input-MYFILE">MY FILE</label><input id="input-MYFILE" 
-    name="MYFILE-file" type="file" value="" />'
+    name="MYFILE" type="file" value="" />'
     
 Label after widget.
 ::
@@ -272,7 +270,7 @@ Label after widget.
     ...                   props={'label': 'MY FILE',
     ...                          'label.position': 'after'})
     >>> widget()
-    u'<input id="input-MYFILE" name="MYFILE-file" type="file" value="" /><label 
+    u'<input id="input-MYFILE" name="MYFILE" type="file" value="" /><label 
     for="input-MYFILE">MY FILE</label>'
     
 Same with inner label.
@@ -283,7 +281,7 @@ Same with inner label.
     ...                          'label.position': 'inner'})
     >>> widget()
     u'<label for="input-MYFILE">MY FILE<input id="input-MYFILE" 
-    name="MYFILE-file" type="file" value="" /></label>'
+    name="MYFILE" type="file" value="" /></label>'
     
 
 Field Widget
@@ -297,7 +295,7 @@ Chained file inside field with label.
     >>> widget()
     u'<div class="field" id="field-MYFILE"><label 
     for="input-MYFILE">MY FILE</label><input id="input-MYFILE" 
-    name="MYFILE-file" type="file" value="" /></div>'
+    name="MYFILE" type="file" value="" /></div>'
 
 
 Error Widget

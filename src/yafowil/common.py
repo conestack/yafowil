@@ -139,11 +139,11 @@ factory.register('checkbox',
                  [input_checkbox_renderer])
     
 def file_extracor(widget, data):
-    name = '%s-%s' % (widget.dottedpath, 'file')
+    name = widget.dottedpath
     if name not in data.request:
         return UNSET
-    if widget.dottedpath in data.request:
-        option = data.request.get(widget.dottedpath, 'keep')
+    if '%s-action' % name in data.request:
+        option = data.request.get('%s-action' % name, 'keep')
         if option == 'keep':
             return data.value
         elif option == 'delete':
@@ -152,7 +152,7 @@ def file_extracor(widget, data):
 
 def input_file_renderer(widget, data):
     input_attrs = {
-        'name_': '%s-%s' % (widget.dottedpath, 'file'),
+        'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),
         'class_': cssclasses(widget, data),            
         'type': 'file',
@@ -162,13 +162,30 @@ def input_file_renderer(widget, data):
     return tag('input', **input_attrs)
 
 def file_options_renderer(widget, data):
-    if data.value not in [None, UNSET, '']:
-        return data.rendered + select_renderer(widget, data)
-    return data.rendered
+    if data.value in [None, UNSET, '']:
+        return data.rendered
+    if data.request:
+        value = [data.request.get('%s-action' % widget.dottedpath, 'keep')]
+    else:
+        value = ['keep']
+    tags = []
+    for key, term in vocabulary(widget.attrs.get('vocabulary', [])):
+        attrs = {
+            'type': 'radio',
+            'value':  key,
+            'checked': (key in value) and 'checked' or None,
+            'name_': '%s-action' % widget.dottedpath,
+            'id': cssid(widget, 'input', key),    
+            'class_': cssclasses(widget, data),    
+        }
+        input = tag('input', **attrs)
+        text = tag('span', term)
+        tags.append(tag('div', input, text, 
+                        **{'id': cssid(widget, 'radio', key)}))
+    exists_marker = tag('input', **attrs)
+    return data.rendered + u''.join(tags)
     
 factory.defaults['file.multivalued'] = False
-factory.defaults['file.default'] = 'keep'
-factory.defaults['file.format'] = 'radio'
 factory.defaults['file.vocabulary'] = [
     ('keep', 'Keep Existing file'),
     ('replace', 'Replace existing file'),
@@ -240,7 +257,7 @@ def select_renderer(widget, data):
             'id': cssid(widget, 'exists'),    
         }
         exists_marker = tag('input', **attrs)            
-        return exists_marker + u''.join(tags)            
+        return exists_marker + u''.join(tags)
             
 factory.defaults['select.multivalued'] = None
 factory.defaults['select.default'] = []
