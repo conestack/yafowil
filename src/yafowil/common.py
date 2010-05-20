@@ -349,3 +349,27 @@ def error_renderer(widget, data):
 factory.defaults['error.error_class'] = 'error'
 factory.defaults['error.message_class'] = 'errormessage'
 factory.register('error', [], [error_renderer])
+
+def view_renderer(widget, data):
+    mode = widget.attrs.mode
+    if not isinstance(mode, basestring):
+        mode = mode(widget, data)
+    if mode == 'edit':
+        return data.rendered
+    if mode == 'hidden':
+        return u''
+    if widget.attrs.alternative:
+        return widget.attrs.alternative(widget, data)
+    value = data.value
+    if isinstance(value, basestring):
+        return tag('div', value)
+    if isinstance(value, bool):
+        if value:
+            return tag('div', 'True')
+        return tag('div', 'False')
+    items = [tag('li', item) for item in value]
+    return tag('ul', *items)
+
+factory.defaults['view.mode'] = 'edit'
+factory.defaults['view.alternative'] = None
+factory.register('view', [], [view_renderer])
