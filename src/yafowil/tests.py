@@ -13,6 +13,7 @@ TESTFILES = [
     'common.txt',
     'compound.txt',
     'controller.txt',
+    'mode.txt',
 ]
 
 def test_suite():
