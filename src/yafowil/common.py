@@ -111,13 +111,16 @@ def input_checkbox_extractor(widget, data):
 
 def input_checkbox_renderer(widget, data):
     value = _value(widget, data)
+    css = widget.attrs.get('css', list())
+    if isinstance(css, basestring):
+        css = [css]
     input_attrs = {
         'type': 'checkbox',
         'checked':  value and 'checked' or None,
         'value': value,
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),    
-        'class_': cssclasses(widget, data),    
+        'class_': cssclasses(widget, data, *css),    
     }
     if widget.attrs.format == 'bool':
         input_attrs['value'] = ''
@@ -151,10 +154,13 @@ def file_extracor(widget, data):
     return data.request[name]
 
 def input_file_renderer(widget, data):
+    css = widget.attrs.get('css', list())
+    if isinstance(css, basestring):
+        css = [css]
     input_attrs = {
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),
-        'class_': cssclasses(widget, data),            
+        'class_': cssclasses(widget, data, *css),            
         'type': 'file',
         'value':  '',
         'accept': widget.attrs.get('accept', None),
@@ -267,10 +273,13 @@ factory.register('select',
                  [select_renderer])
 
 def textarea_renderer(widget, data):
+    css = widget.attrs.get('css', list())
+    if isinstance(css, basestring):
+        css = [css]
     area_attrs = {
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),
-        'class_': cssclasses(widget, data),            
+        'class_': cssclasses(widget, data, *css),            
         'wrap': widget.attrs.wrap,
         'cols': widget.attrs.cols,
         'rows': widget.attrs.rows,

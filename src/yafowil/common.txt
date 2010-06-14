@@ -137,8 +137,6 @@ Textarea Widget
 
     >>> inputwidget = factory('textarea', 'MYTEXTAREA', 'Test Textarea',
     ...                       dict(label='Test Textarea Widget',
-    ...                            css={'input': 'inputcss', 
-    ...                                 'label': 'labelcss'},
     ...                            id={'label': 'TestLabelId'}))
     >>> inputwidget()
     u'<textarea cols="80" id="input-MYTEXTAREA" name="MYTEXTAREA" rows="25">Test Textarea</textarea>'
