@@ -19,7 +19,7 @@ def hidden_renderer(widget, data):
     return tag('input', **hidden_attrs)
 
 def mode_renderer(widget, data):
-    mode = widget.attrs.mode
+    mode = widget.attrs['mode']
     if not isinstance(mode, basestring):
         mode = mode(widget, data)
     ren = widget.attrs.get(mode)

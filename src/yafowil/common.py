@@ -122,7 +122,7 @@ def input_checkbox_renderer(widget, data):
         'id': cssid(widget, 'input'),    
         'class_': cssclasses(widget, data, *css),    
     }
-    if widget.attrs.format == 'bool':
+    if widget.attrs['format'] == 'bool':
         input_attrs['value'] = ''
     checkbox = tag('input', **input_attrs)
     input_attrs = {
@@ -163,7 +163,7 @@ def input_file_renderer(widget, data):
         'class_': cssclasses(widget, data, *css),            
         'type': 'file',
         'value':  '',
-        'accept': widget.attrs.get('accept', None),
+        'accept': widget.attrs.get('accept'),
     }
     return tag('input', **input_attrs)
 
@@ -204,9 +204,9 @@ factory.register('file',
 def select_extractor(widget, data):
     extracted = generic_extractor(widget, data)
     if extracted is UNSET \
-       and widget.attrs.format != 'block' \
+       and widget.attrs['format'] != 'block' \
        and '%s-exists' % widget.dottedpath in data.request:
-        if widget.attrs.multivalued:
+        if widget.attrs['multivalued']:
             extracted = []
         else:
             extracted = ''
@@ -221,7 +221,7 @@ def select_renderer(widget, data):
     css = widget.attrs.get('css', list())
     if isinstance(css, basestring):
         css = [css]
-    if widget.attrs.format == 'block':
+    if widget.attrs['format'] == 'block':
         optiontags = []
         for key, term in vocabulary(widget.attrs.get('vocabulary', [])):
             attrs = {
@@ -234,13 +234,13 @@ def select_renderer(widget, data):
             'name_': widget.dottedpath,
             'id': cssid(widget, 'input'),
             'class_': cssclasses(widget, data, *css),                        
-            'multiple': widget.attrs.multivalued and 'multiple' or None,
+            'multiple': widget.attrs['multivalued'] and 'multiple' or None,
         }
         return tag('select', *optiontags, **select_attrs)
     else:
         tags = []
         for key, term in vocabulary(widget.attrs.get('vocabulary', [])):
-            if widget.attrs.multivalued:
+            if widget.attrs['multivalued']:
                 tagtype = 'checkbox'
             else:
                 tagtype = 'radio'
@@ -280,10 +280,10 @@ def textarea_renderer(widget, data):
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),
         'class_': cssclasses(widget, data, *css),            
-        'wrap': widget.attrs.wrap,
-        'cols': widget.attrs.cols,
-        'rows': widget.attrs.rows,
-        'readonly': widget.attrs.readonly and 'readonly',
+        'wrap': widget.attrs['wrap'],
+        'cols': widget.attrs['cols'],
+        'rows': widget.attrs['rows'],
+        'readonly': widget.attrs['readonly'] and 'readonly',
     }
     value = _value(widget, data)
     if not value:

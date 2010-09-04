@@ -44,8 +44,8 @@ def fieldset_renderer(widget, data):
         'class_': cssclasses(widget, data)
     }
     rendered = data.rendered
-    if widget.attrs.legend:
-        rendered = tag('legend', widget.attrs.legend) + rendered
+    if widget.attrs['legend']:
+        rendered = tag('legend', widget.attrs['legend']) + rendered
     return tag('fieldset', rendered, **fs_attrs)   
 
 factory.defaults['fieldset.legend'] = False
@@ -55,9 +55,10 @@ factory.register('fieldset',
 
 def form_renderer(widget, data):
     form_attrs = {
-        'action': widget.attrs.action,
-        'method': widget.attrs.method,
-        'enctype': widget.attrs.method=='post' and widget.attrs.enctype or None,
+        'action': widget.attrs['action'],
+        'method': widget.attrs['method'],
+        'enctype': widget.attrs['method']=='post' and \
+                   widget.attrs['enctype'] or None,
         'class_': widget.attrs.get('class'),
         'id': 'form-%s' % '-'.join(widget.path),
     }

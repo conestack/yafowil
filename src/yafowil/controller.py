@@ -23,15 +23,15 @@ class Controller(object):
                 continue
             if action.attrs.get('skip'):
                 if action.attrs.get('next'):
-                    self.next = action.attrs.next(self.request)
+                    self.next = action.attrs['next'](self.request)
                 return
             self.performed = True
             if self.error:
                 return
             if action.attrs.get('handler'):
-                action.attrs.handler(self.widget, self.data)
+                action.attrs['handler'](self.widget, self.data)
             if action.attrs.get('next'):
-                self.next = action.attrs.next(self.request)
+                self.next = action.attrs['next'](self.request)
     
     @property
     def rendered(self):
