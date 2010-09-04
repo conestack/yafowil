@@ -82,15 +82,15 @@ def cssid(widget, prefix, postfix=None):
     
 def cssclasses(widget, data, *args):
     _classes = list()
-    if widget.attrs.error_class and data.errors:
-        if isinstance(widget.attrs.error_class, basestring):
-            _classes.append(widget.attrs.error_class)
+    if widget.attrs['error_class'] and data.errors:
+        if isinstance(widget.attrs['error_class'], basestring):
+            _classes.append(widget.attrs['error_class'])
         else:
-            _classes.append(widget.attrs.error_class_default)
-    if widget.attrs.required_class and widget.attrs.required:
-        if isinstance(widget.attrs.required_class, basestring):
-            _classes.append(widget.attrs.required_class)
+            _classes.append(widget.attrs['error_class_default'])
+    if widget.attrs['required_class'] and widget.attrs['required']:
+        if isinstance(widget.attrs['required_class'], basestring):
+            _classes.append(widget.attrs['required_class'])
         else:
-            _classes.append(widget.attrs.required_class_default)
+            _classes.append(widget.attrs['required_class_default'])
     _classes += [_ for _ in args if _]
     return _classes and ' '.join(sorted(_classes)) or None

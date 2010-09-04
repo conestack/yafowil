@@ -301,7 +301,7 @@ factory.register('textarea',
 
 def submit_renderer(widget, data):
     input_attrs = {
-        'name': widget.attrs.action and 'action.%s' % widget.dottedpath,
+        'name': widget.attrs['action'] and 'action.%s' % widget.dottedpath,
         'id': cssid(widget, 'input'),
         'class_': widget.attrs.get('class'),
         'type': 'submit',
@@ -319,10 +319,10 @@ def label_renderer(widget, data):
         'class_': cssclasses(widget, data, widget.attrs['class'])
     }
     help = u''
-    if widget.attrs.help:
-        help_attrs = {'class_': widget.attrs.helpclass}
-        help = tag('div', widget.attrs.help, help_attrs)
-    pos = widget.attrs.position
+    if widget.attrs['help']:
+        help_attrs = {'class_': widget.attrs['helpclass']}
+        help = tag('div', widget.attrs['help'], help_attrs)
+    pos = widget.attrs['position']
     if pos == 'inner':
         return tag('label', label_text, help, data.rendered, **label_attrs)
     elif pos == 'after':
@@ -339,8 +339,8 @@ def field_renderer(widget, data):
         'id': cssid(widget, 'field'),
         'class_': cssclasses(widget, data, widget.attrs['class'])
     }
-    if widget.attrs.witherror and data.errors:
-        div_attrs['class_'] += u' %s' % widget.attrs.witherror
+    if widget.attrs['witherror'] and data.errors:
+        div_attrs['class_'] += u' %s' % widget.attrs['witherror']
     return tag('div', data.rendered, **div_attrs)
 
 factory.defaults['field.class'] = 'field'
@@ -352,7 +352,7 @@ def error_renderer(widget, data):
         return data.rendered
     msgs = u''
     for error in data.errors:
-        msgs += tag('div', str(error), class_=widget.attrs.message_class)
+        msgs += tag('div', str(error), class_=widget.attrs['message_class'])
     return tag('div', msgs, data.rendered, class_=cssclasses(widget, data))
 
 factory.defaults['error.error_class'] = 'error'
