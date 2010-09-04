@@ -17,11 +17,22 @@ UNSET = Unset()
 
 callable = lambda o: hasattr(o, '__call__')
 
+class DictReprAttributes(NodeAttributes):
+    
+    def __repr__(self, ):  
+        return '{%s}' % ', '.join(['%s: %s' % (repr(k), repr(v)) 
+                                   for k,v in self.items()])
+
+    __str__ = __repr__
+        
 class RuntimeData(AttributedNode):
     """Holds Runtime data of widget."""
+
+    attributes_factory = DictReprAttributes  
     
     def __init__(self, name=None):
         super(RuntimeData, self).__init__(name=name)
+        self.attribute_access_for_attrs = False                
         self.request = UNSET
         self.value = UNSET
         self.preprocessed = False
@@ -85,8 +96,8 @@ class TBSupplement(object):
         self.manageable_object = func
         self.warnings = ['Occured on %s in widget "%s" with name "%s"' % \
                          (task, widget.dottedpath, name)]
-        
-class WidgetAttributes(NodeAttributes):
+                
+class WidgetAttributes(DictReprAttributes):
     
     def __getitem__(self, name):
         prefixed = '%s.%s' % (self._node.current_prefix or '', name)
@@ -96,18 +107,17 @@ class WidgetAttributes(NodeAttributes):
         value = super(WidgetAttributes, self).get(name, UNSET)
         if value is not UNSET:
             return value
-        node = object.__getattribute__(self, '_node')
-        value = node.defaults.get(prefixed, UNSET)          
+        value = self.__parent__.defaults.get(prefixed, UNSET)          
         if value is not UNSET:
             return value
-        return node.defaults[name]
+        return self.__parent__.defaults[name]
     
     def get(self, key, default=None):
         try:
             return self[key]
         except KeyError:
             return default
-        
+            
 class Widget(AttributedNode):
     """Base Widget Class
     """
@@ -157,6 +167,7 @@ class Widget(AttributedNode):
             a dict with defaults value for the widgets attributes.
         """
         super(Widget, self).__init__(uniquename)
+        self.attribute_access_for_attrs = False        
         self.getter = value_or_getter
         self.extractors = extractors
         self.renderers = renderers
@@ -166,7 +177,7 @@ class Widget(AttributedNode):
         self._lock = RLock()
         self.current_prefix = None
         for key in properties:
-            self.attributes[key] = properties[key]
+            self.attrs[key] = properties[key]
             
     def lock(self):
         self._lock.acquire()
