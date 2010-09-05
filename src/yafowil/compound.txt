@@ -49,13 +49,14 @@ Test Fieldset
     >>> compound = factory('fieldset', 
     ...                    'COMPOUND',
     ...                    {'inner': 'somevalue', 
-    ...                     'inner2': 'othervalue'})
+    ...                     'inner2': 'othervalue'},
+    ...                    props={'legend': 'Some Test'})
     >>> compound['inner'] = factory('text', 'inner', 'value')
     >>> compound['inner2'] = factory('text', 'inner2', 'value2')
     >>> compound()
-    u'<fieldset id="fieldset-COMPOUND"><input id="input-COMPOUND-inner" 
-    name="COMPOUND.inner" type="text" value="value" /><input 
-    id="input-COMPOUND-inner2" name="COMPOUND.inner2" type="text" 
+    u'<fieldset id="fieldset-COMPOUND"><legend>Some Test</legend><input 
+    id="input-COMPOUND-inner" name="COMPOUND.inner" type="text" value="value" 
+    /><input id="input-COMPOUND-inner2" name="COMPOUND.inner2" type="text" 
     value="value2" /></fieldset>'
 
 Test Form
