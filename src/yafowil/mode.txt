@@ -65,7 +65,7 @@ Dummy mode decider function.
     >>> def modedecider(widget, data):
     ...     return data.request.get('mode', 'edit')
 
-Test view widget with singlevalue.
+Test view widget with single string value.
 ::
 
     >>> widget = factory(
@@ -91,6 +91,21 @@ Test view widget with singlevalue.
     >>> widget(request={'mode': 'none'})
     u''
 
+Test view widget with boolean value.
+::
+
+    >>> widget = factory(
+    ...     'mode:field:label:text',
+    ...     'foo',
+    ...     value = True,
+    ...     props = {
+    ...         'label': 'Foo',
+    ...         'mode': modedecider,
+    ...     })
+    
+    >>> widget(request={'mode': 'view'}) 
+    u'<div>True</div>'
+    
 Test view widget with iterable value.
 ::
 

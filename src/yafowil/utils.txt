@@ -11,8 +11,17 @@ Test the Vocabulary
     >>> vocabulary(['value', 'value2'])
     [('value', 'value'), ('value2', 'value2')]
 
-    >>> vocabulary([('key', 'value'), ('key2', 'value2')])
-    [('key', 'value'), ('key2', 'value2')]
+    >>> vocabulary([('key', 'value'), ('key2', 'value2', 'v2.3'), ('key3',)])
+    [('key', 'value'), ('key2', 'value2'), ('key3', 'key3')]
+    
+    >>> def callme():
+    ...     return 'bar'
+    
+    >>> vocabulary(callme)
+    [('bar', 'bar')]
+    
+    >>> vocabulary(None) is None
+    True
         
 Test Tag renderer
 =================
@@ -52,7 +61,7 @@ Test CSS Classes
     >>> print cssclasses(widget, data, 'foo', 'bar')
     bar foo
     
-    >>> widget.required = True
+    >>> widget.attrs['required'] = True
     >>> print cssclasses(widget, data)
     None
     
@@ -61,14 +70,14 @@ Test CSS Classes
     >>> print cssclasses(widget, data)
     None
 
-    >>> widget.attrs.error_class = True
+    >>> widget.attrs['error_class'] = True
     >>> print cssclasses(widget, data)
     error
 
     >>> print cssclasses(widget, data, 'foo', 'bar')
     bar error foo
 
-    >>> widget.attrs.error_class = 'othererror'
+    >>> widget.attrs['error_class'] = 'othererror'
     >>> print cssclasses(widget, data)
     othererror
 
@@ -77,13 +86,17 @@ Test CSS Classes
     >>> print cssclasses(widget, data)
     None
     
-    >>> widget.attrs.required = True
+    >>> widget.attrs['required'] = True
     >>> print cssclasses(widget, data)
     None
 
-    >>> widget.attrs.required_class = 'required'
+    >>> widget.attrs['required_class'] = True
     >>> print cssclasses(widget, data)
     required
+
+    >>> widget.attrs['required_class'] = 'otherrequired'
+    >>> print cssclasses(widget, data)
+    otherrequired
 
     >>> widget.attrs.error_class = True
     >>> data.errors = True

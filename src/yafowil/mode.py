@@ -26,12 +26,10 @@ def mode_renderer(widget, data):
     if ren:
         return ren(widget, data)
     value = data.value
+    if isinstance(value, bool):
+        value = widget.attrs['showbool'][value and 1 or 0]
     if isinstance(value, basestring):
         return tag('div', value)
-    if isinstance(value, bool):
-        if value:
-            return tag('div', 'True')
-        return tag('div', 'False')
     items = [tag('li', item) for item in value]
     return tag('ul', *items)
 
@@ -40,4 +38,5 @@ factory.defaults['mode.edit'] = edit_renderer
 factory.defaults['mode.none'] = none_renderer
 factory.defaults['mode.hidden'] = hidden_renderer
 factory.defaults['mode.display'] = None
+factory.defaults['mode.showbool'] = ('False', 'True')
 factory.register('mode', [], [mode_renderer])

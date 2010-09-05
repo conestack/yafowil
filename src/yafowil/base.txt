@@ -103,6 +103,14 @@ Same with path as a list.
     >>> fetched = data['fieldset']['age'].fetch(['root', 'surname'])
     >>> fetched.__name__
     'surname'
+    
+It fails if if root element name is wrong.
+::
+
+    >>> fetched = data['fieldset']['age'].fetch(['foobar', 'surname']) 
+    Traceback (most recent call last):
+    ...
+    KeyError: 'Invalid name of root element'
 
 
 Base Widget
@@ -167,7 +175,7 @@ The widget class.
     attrs={'test_preprocessor': 'called'} at ...>", "{'test1': 'Test1', 
     'test2': 'Test2'}")
     
-A passed in request does not triger extraction.
+A passed in request does not trigger extraction.
 ::    
     
     >>> testwidget(request=test_request) 
@@ -258,6 +266,14 @@ A failing widget.
       File "<doctest base.txt[...]>", line 2, in fail_renderer
         raise ValueError, 'renderer has to fail'
     ValueError: renderer has to fail        
+    
+Plausability::
+
+    >>> testwidget(data=data, request={})
+    Traceback (most recent call last):
+    ...
+    ValueError: if data is passed in dont pass in request!
+    
 
 factory
 -------
@@ -277,6 +293,20 @@ factory
     >>> testwidget()
     ('r1', 'MYFAC', "<RuntimeData MYFAC, value='Test Value', extracted=<UNSET> 
     at ...>", "{'foo': 'bar'}")
+
+    >>> factory.register('widget_test', [test_extractor], [test_renderer], 
+    ...                  preprocessors=[test_preprocessor])
+    
+    >>> factory.preprocessors('widget_test')
+    [<function test_preprocessor at 0x...>]
+    
+    >>> def test_global_preprocessor(widget, data):
+    ...     return data
+    
+    >>> factory.register_global_preprocessors([test_global_preprocessor])
+    >>> factory.preprocessors('widget_test')
+    [<function test_global_preprocessor at 0x...>, 
+    <function test_preprocessor at 0x...>]
     
 We can create sets of static builders, i.e. to have a validating password
 field with two input fields in. Here a simpler example.
@@ -292,6 +322,22 @@ field with two input fields in. Here a simpler example.
     >>> widget = factory('static_compound', props={})
     >>> widget.keys()
     ['one', 'two']
+    
+    >>> factory.builders('static_compound')
+    [<function create_static_compound at 0x...>]
+    
+Some basic name chacke are done.
+::
+    
+    >>> factory.register('*notallowed', [], [])
+    Traceback (most recent call last):
+    ...
+    ValueError: Asterisk * as first char not allowed as name.
+
+    >>> factory.register('not:allowed', [], [])
+    Traceback (most recent call last):
+    ...
+    ValueError: Colon : as char not allowed in name.
 
 
 Request chains via factory

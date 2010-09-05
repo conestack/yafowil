@@ -193,7 +193,7 @@ class Widget(AttributedNode):
         
         ``data``
             runtime data, information collected in one run of the widget. 
-            Passed in. Extract need to be called separate before. 
+            If passed in, extract need to be called separate before. 
             Expects either an initialized RuntimeData instance or None (default) 
             to create an empty widget.
             
