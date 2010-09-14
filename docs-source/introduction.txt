@@ -2,12 +2,10 @@
 Introduction
 ============
 
----------------
-Getting started
----------------
+---------------------------
+Minimal Hello World Example
+---------------------------
 
-Using zc.buildout
------------------
 
 This buildout uses ``WebOb`` and ``Paster`` to create a minimal WSGI 
 application. 
@@ -89,3 +87,13 @@ And add a minimal web-application ``src/helloworld/run.py``::
         server = make_server(address, port, application)
         server.serve_forever()        
 
+Now bootstrap buildout, run buildout and run the application. You need to have 
+git installed (for now).
+::
+
+    python2.6 bootstrap.py
+    ./bin/buildout
+    ./bin/helloworld
+    
+Point your browser to ``http://localhost:8080/`` and use it.
+ 
