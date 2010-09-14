@@ -7,7 +7,7 @@ Minimal Hello World Example
 ---------------------------
 
 
-This buildout uses ``WebOb`` and ``Paster`` to create a minimal WSGI 
+This buildout uses ``WebOb``  to create a minimal WSGI 
 application. 
 
 First we need to create a minimal structure::
