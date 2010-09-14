@@ -26,5 +26,5 @@ def test_suite():
         ) for file in TESTFILES
     ])
 
-if __name__ == '__main__':
-    unittest.main(defaultTest='test_suite') 
+if __name__ == '__main__':                                   #pragma NO COVERAGE
+    unittest.main(defaultTest='test_suite')                  #pragma NO COVERAGE
