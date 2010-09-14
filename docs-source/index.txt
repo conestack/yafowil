@@ -3,11 +3,12 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to YAFOWIL's documentation!
-===================================
+YAFOWIL documentation
+=====================
 
-YAFOWIL offers am extensible and reusable set of form widgets, independent from 
-any web-framework, but easy to use in any web-framework.
+YAFOWIL offers html-form creation and modification at runtime. Its light-weight  
+and provides an extensible, reusable set of form widgets, independent from any 
+web-framework, but easy to use in your web-framework.
 
 Contents:
 
