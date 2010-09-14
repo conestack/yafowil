@@ -274,6 +274,29 @@ Plausability::
     ...
     ValueError: if data is passed in dont pass in request!
     
+The dottedpath.
+
+Fails with no name in root::
+ 
+    >>> testwidget = Widget([], [], [])    
+    >>> testwidget.dottedpath
+    Traceback (most recent call last):
+    ...
+    ValueError: Root widget has no name! Pass it to factory.
+    
+At this test level the factory is not used, so we pass it directly to Widget::    
+
+    >>> testwidget = Widget([], [], [], uniquename='root')    
+    >>> testwidget.dottedpath
+    'root'
+    
+   >>> testwidget['child'] = Widget([], [], [])
+   >>> testwidget['child'].dottedpath
+   'root.child'
+
+   >>> testwidget['child']['level3'] = Widget([], [], [])
+   >>> testwidget['child']['level3'].dottedpath
+   'root.child.level3'
 
 factory
 -------
@@ -338,7 +361,6 @@ Some basic name chacke are done.
     Traceback (most recent call last):
     ...
     ValueError: Colon : as char not allowed in name.
-
 
 Request chains via factory
 --------------------------
@@ -427,7 +449,7 @@ modify defaults for widgets attributes via factory
 ::
 
     >>> factory.defaults['id'] = 'Test3'
-    >>> widget = factory('prefix')
+    >>> widget = factory('prefix', name='test')
     >>> widget()
     u'<ID>Test3</ID>'
 
@@ -435,21 +457,21 @@ modify defaults for widgets attributes via factory
 ::
 
     >>> factory.defaults['prefix.id'] = 'Test4'
-    >>> widget = factory('prefix')
+    >>> widget = factory('prefix', name='test')
     >>> widget()
     u'<ID>Test4</ID>'
 
 3rd look for prefixed in defaults.
 ::
 
-    >>> widget = factory('prefix', props={'prefix.id': 'Test'})
+    >>> widget = factory('prefix', name='test', props={'prefix.id': 'Test'})
     >>> widget()
     u'<ID>Test</ID>'
 
 4th look for unprefixed in defaults.
 ::
 
-    >>> widget = factory('prefix', props={'id': 'Test2'})
+    >>> widget = factory('prefix', name='test', props={'id': 'Test2'})
     >>> widget()
     u'<ID>Test2</ID>'
 
@@ -458,9 +480,9 @@ modify defaults for widgets attributes via factory
 
     >>> del factory.defaults['id']
     >>> del factory.defaults['prefix.id']
-    >>> widget = factory('prefix')
+    >>> widget = factory('prefix', name='test')
     >>> try:
     ...     widget()
     ... except KeyError, e:
     ...     print e
-    'id'
+    'Property with key "id" is not given on widget "test" (no default).'

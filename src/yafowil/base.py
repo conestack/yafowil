@@ -110,7 +110,11 @@ class WidgetAttributes(DictReprAttributes):
         value = self.__parent__.defaults.get(prefixed, UNSET)          
         if value is not UNSET:
             return value
-        return self.__parent__.defaults[name]
+        if name in self.__parent__.defaults:
+            return self.__parent__.defaults[name]
+        raise KeyError, \
+            'Property with key "%s" is not given on widget "%s" (no default).' \
+            % (name, self.__parent__.dottedpath)
     
     def get(self, key, default=None):
         try:
@@ -255,6 +259,9 @@ class Widget(AttributedNode):
     
     @property
     def dottedpath(self):
+        if self.path[0] is None:
+            raise ValueError, \
+                  'Root widget has no name! Pass it to factory.'
         return '.'.join(self.path)
 
     def _runpreprocessors(self, data):                
