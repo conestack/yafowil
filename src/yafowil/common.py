@@ -5,7 +5,9 @@ from yafowil.base import (
 )
 from utils import (
     cssclasses,
+    css_managed_props,
     cssid,
+    managedprops,
     tag,
     vocabulary,
 )
@@ -27,10 +29,12 @@ def _value(widget, data):
     return widget.attrs.default
     
 def generic_extractor(widget, data):
+    __managed_props = []     
     if widget.dottedpath not in data.request:
         return UNSET
     return data.request[widget.dottedpath]
 
+@managedprops('required', 'required_message')
 def generic_required_extractor(widget, data):
     """validate required. 
     
@@ -46,12 +50,14 @@ def generic_required_extractor(widget, data):
         raise ExtractionError(widget.attrs['required'])
     raise ExtractionError(widget.attrs['required_message'])
 
+@managedprops('type', *css_managed_props)
 def input_generic_renderer(widget, data):
     css = widget.attrs.get('css', list())
     if isinstance(css, basestring):
         css = [css]
     input_attrs = {
-        'type': data.attrs.get('input_field_type', False) or widget.attrs.type,
+        'type': data.attrs.get('input_field_type', False) \
+                or widget.attrs['type'],
         'value':  _value(widget, data),
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),    
@@ -81,6 +87,7 @@ register_generic_input('text')
 register_generic_input('password')
 register_generic_input('hidden', False)
 
+@managedprops(*css_managed_props)
 def input_proxy_renderer(widget, data):
     value = data.value
     if data.request is not UNSET:
@@ -99,16 +106,20 @@ factory.register('proxy',
                  [generic_extractor], 
                  [input_proxy_renderer])
 
+@managedprops('format')
 def input_checkbox_extractor(widget, data):
+    """Extracts data from a single input with type checkbox.
+    """
     if '%s-exists' % widget.dottedpath not in data.request:
         return UNSET
-    format = widget.attrs.format
+    format = widget.attrs['format']
     if format == 'bool':
         return widget.dottedpath in data.request
     elif format == 'string':
         return data.request.get(widget.dottedpath, '')
     raise ValueError, 'Checkbox widget has invalid format % s set' % format
 
+@managedprops('format', 'css', *css_managed_props)
 def input_checkbox_renderer(widget, data):
     value = _value(widget, data)
     css = widget.attrs.get('css', list())
@@ -153,6 +164,7 @@ def file_extracor(widget, data):
             return UNSET
     return data.request[name]
 
+@managedprops('css', 'accept',*css_managed_props)
 def input_file_renderer(widget, data):
     css = widget.attrs.get('css', list())
     if isinstance(css, basestring):
@@ -163,10 +175,11 @@ def input_file_renderer(widget, data):
         'class_': cssclasses(widget, data, *css),            
         'type': 'file',
         'value':  '',
-        'accept': widget.attrs.get('accept'),
+        'accept': widget.attrs['accept'],
     }
     return tag('input', **input_attrs)
 
+@managedprops('css', 'vocabulary', *css_managed_props)
 def file_options_renderer(widget, data):
     if data.value in [None, UNSET, '']:
         return data.rendered
@@ -188,7 +201,6 @@ def file_options_renderer(widget, data):
         text = tag('span', term)
         tags.append(tag('div', input, text, 
                         **{'id': cssid(widget, 'radio', key)}))
-    exists_marker = tag('input', **attrs)
     return data.rendered + u''.join(tags)
     
 factory.defaults['file.multivalued'] = False

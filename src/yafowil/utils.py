@@ -74,12 +74,22 @@ def tag(tag_name, *inners, **attributes):
         'value': u''.join(i for i in cl),
     }
 
+class managedprops(object):
+    
+    def __init__(self, *names):
+        self._managed_props = names    
+
+    def __call__(self, func):
+        return func
+    
 def cssid(widget, prefix, postfix=None):
     id = "%s-%s" % (prefix, '-'.join(widget.path))
     if postfix is not None:
         id = '%s-%s' % (id, postfix) 
     return id
     
+css_managed_props = ['error_class', 'error_class_default',
+                     'required_class', 'required_class_default']
 def cssclasses(widget, data, *args):
     _classes = list()
     if widget.attrs['error_class'] and data.errors:

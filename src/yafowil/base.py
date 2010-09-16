@@ -23,7 +23,7 @@ class DictReprAttributes(NodeAttributes):
         return '{%s}' % ', '.join(['%s: %s' % (repr(k), repr(v)) 
                                    for k,v in self.items()])
 
-    __str__ = __repr__
+    __str__ = __repr__    
         
 class RuntimeData(AttributedNode):
     """Holds Runtime data of widget."""
