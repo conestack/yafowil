@@ -101,10 +101,17 @@ class WidgetAttributes(DictReprAttributes):
     
     def __getitem__(self, name):
         prefixed = '%s.%s' % (self._node.current_prefix or '', name)
-        value = super(WidgetAttributes, self).get(prefixed, UNSET)
+        try:
+            value = super(WidgetAttributes, self).__getitem__(prefixed)
+        except KeyError:
+            value = UNSET
         if value is not UNSET:
             return value
-        value = super(WidgetAttributes, self).get(name, UNSET)
+        
+        try:
+            value = super(WidgetAttributes, self).__getitem__(name)
+        except KeyError:
+            value = UNSET
         if value is not UNSET:
             return value
         value = self.__parent__.defaults.get(prefixed, UNSET)          

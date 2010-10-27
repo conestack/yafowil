@@ -175,8 +175,9 @@ def input_file_renderer(widget, data):
         'class_': cssclasses(widget, data, *css),            
         'type': 'file',
         'value':  '',
-        'accept': widget.attrs['accept'],
     }
+    if widget.attrs.get('accept'):
+        input_attrs['accept'] = widget.attrs['accept']
     return tag('input', **input_attrs)
 
 @managedprops('css', 'vocabulary', *css_managed_props)
