@@ -317,14 +317,15 @@ class Factory(object):
         """creates a widget.
         
         ``reg_names``
-            a string defining which widget to build. it contains a colon 
-            separated list of names in the registry. To create a simple 
-            text widget from common its ``text``. To wrap a text widget with
-            a label it is ``label:text``. Latter concatenates the chains of 
-            both. registrations. Custom chains not registered in the registry 
-            can be added by using the asterisk syntax. I.e. injecting an 
-            validating extractor works with ``label:*myextractor:text``. Latter
-            implies to use the ``custom`` keyword argument (see below)   
+            a string or list defining which widget(s) to build. If reg_names is
+            a string it contains a colon separated list of names in the
+            registry. To create a simple text widget from common its ``text``.
+            To wrap a text widget with a label it is ``label:text``. Latter
+            concatenates the chains of both. registrations. Custom chains not
+            registered in the registry can be added by using the asterisk 
+            syntax. I.e. injecting an validating extractor works with 
+            ``label:*myextractor:text``. Latter implies to use the ``custom`` 
+            keyword argument (see below)   
             
         ``name``
             a name for the widget. optional. if not set it has to be set later
@@ -348,7 +349,9 @@ class Factory(object):
         renderers = list()
         preprocessors = list()
         builders = list()
-        for reg_name in reg_names.split(':'):
+        if isinstance(reg_names, basestring):
+            reg_names = reg_names.split(':')
+        for reg_name in reg_names:
             if reg_name.startswith('*'):
                 part_name = reg_name[1:]
                 ex, ren, pre, bui = custom[part_name]

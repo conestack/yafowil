@@ -371,7 +371,8 @@ an amount of X possible widgets with an amount of Y possible wrappers. Therefore
 we can factor a widget in a chain defined colon-separated, i.e 'outer:inner' or 
 'field:error:text'. Chaining works for all parts: renderers, extractors, 
 preprocessors and builders. Most inner and first executed is right (we prefix 
-with wrappers)!
+with wrappers)!. The chain can be defined as list instead of a colon seperated
+string as well.
 ::
 
     >>> def inner_renderer(widget, data):
@@ -388,7 +389,22 @@ with wrappers)!
         
     >>> factory.register('inner', [inner_extractor], [inner_renderer])
     >>> factory.register('outer', [outer_extractor], [outer_renderer])
+    
+Colon seperated chain definition
+::
+    
     >>> widget = factory('outer:inner')
+    >>> data = widget.extract({})
+    >>> data.extracted
+    ['extracted inner', 'extracted outer']
+    
+    >>> widget(data)
+    u'<OUTER><INNER /></OUTER>'
+
+Chain definition as list
+::
+    
+    >>> widget = factory(['outer', 'inner'])
     >>> data = widget.extract({})
     >>> data.extracted
     ['extracted inner', 'extracted outer']
