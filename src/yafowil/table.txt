@@ -1,0 +1,51 @@
+Table rendering
+---------------
+
+Table elements are available as widgets as well, often you want to organize
+your form elements inside a table to provide pretty looking forms.
+::
+
+    >>> from yafowil.base import factory
+    >>> factory('table', name='foo')()
+    u'<table></table>'
+    
+    >>> factory('table', name='foo', props={'id': 'id', 'class': 'css'})()
+    u'<table class="css" id="id"></table>'
+    
+    >>> factory('thead', name='foo')()
+    u'<thead></thead>'
+    
+    >>> factory('tbody', name='foo')()
+    u'<tbody></tbody>'
+    
+    >>> factory('tr', name='foo')()
+    u'<tr></tr>'
+    
+    >>> factory('tr', name='foo', props={'id': 'id', 'class': 'css'})()
+    u'<tr class="css" id="id"></tr>'
+    
+    >>> factory('th', name='foo')()
+    u'<th></th>'
+    
+    >>> factory('th',
+    ...         name='foo',
+    ...         props={
+    ...             'id': 'id',
+    ...             'class': 'css',
+    ...             'colspan': 2,
+    ...             'rowspan': 2,
+    ...         })()
+    u'<th class="css" colspan="2" id="id" rowspan="2"></th>'
+    
+    >>> factory('td', name='foo')()
+    u'<td></td>'
+    
+    >>> factory('td',
+    ...         name='foo',
+    ...         props={
+    ...             'id': 'id',
+    ...             'class': 'css',
+    ...             'colspan': 2,
+    ...             'rowspan': 2,
+    ...         })()
+    u'<td class="css" colspan="2" id="id" rowspan="2"></td>'

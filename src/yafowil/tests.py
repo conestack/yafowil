@@ -14,6 +14,7 @@ TESTFILES = [
     'compound.txt',
     'controller.txt',
     'mode.txt',
+    'table.txt',
 ]
 
 def test_suite():
