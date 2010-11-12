@@ -8,17 +8,23 @@ def table_renderer(widget, data):
     }
     return tag('table', data.rendered, **attrs)
 
-factory.register('table', [], [table_renderer])
+factory.register('table',
+                 factory.extractors('compound'),
+                 factory.renderers('compound') + [table_renderer])
 
 def thead_renderer(widget, data):
     return tag('thead', data.rendered)
 
-factory.register('thead', [], [thead_renderer])
+factory.register('thead',
+                 factory.extractors('compound'),
+                 factory.renderers('compound') + [thead_renderer])
 
 def tbody_renderer(widget, data):
     return tag('tbody', data.rendered)
 
-factory.register('tbody', [], [tbody_renderer])
+factory.register('tbody',
+                 factory.extractors('compound'),
+                 factory.renderers('compound') + [tbody_renderer])
 
 def tr_renderer(widget, data):
     attrs = {
@@ -27,7 +33,9 @@ def tr_renderer(widget, data):
     }
     return tag('tr', data.rendered, **attrs)
 
-factory.register('tr', [], [tr_renderer])
+factory.register('tr',
+                 factory.extractors('compound'),
+                 factory.renderers('compound') + [tr_renderer])
 
 def th_renderer(widget, data):
     attrs = {
@@ -38,7 +46,9 @@ def th_renderer(widget, data):
     }
     return tag('th', data.rendered, **attrs)
 
-factory.register('th', [], [th_renderer])
+factory.register('th',
+                 factory.extractors('compound'),
+                 factory.renderers('compound') + [th_renderer])
 
 def td_renderer(widget, data):
     attrs = {
@@ -49,4 +59,6 @@ def td_renderer(widget, data):
     }
     return tag('td', data.rendered, **attrs)
 
-factory.register('td', [], [td_renderer])
+factory.register('td',
+                 factory.extractors('compound'),
+                 [td_renderer])

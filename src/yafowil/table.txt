@@ -5,6 +5,7 @@ Table elements are available as widgets as well, often you want to organize
 your form elements inside a table to provide pretty looking forms.
 ::
 
+    >>> import yafowil.loader
     >>> from yafowil.base import factory
     >>> factory('table', name='foo')()
     u'<table></table>'
@@ -49,3 +50,16 @@ your form elements inside a table to provide pretty looking forms.
     ...             'rowspan': 2,
     ...         })()
     u'<td class="css" colspan="2" id="id" rowspan="2"></td>'
+    
+    >>> form = factory('form',
+    ...                name='myform',
+    ...                props={
+    ...                    'action': 'myaction',
+    ...                })
+    >>> form['table'] = factory('table')
+    >>> form['table']['row1'] = factory('tr')
+    >>> form['table']['row1']['field1'] = factory('td:text', name='field1')
+    >>> form()
+    u'<form action="myaction" enctype="multipart/form-data" id="form-myform" 
+    method="post"><table><tr><td><input id="input-myform-table-row1-field1" 
+    name="myform.table.row1.field1" type="text" /></td></tr></table></form>'
