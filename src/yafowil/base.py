@@ -187,6 +187,8 @@ class Widget(AttributedNode):
         self.__name__ = uniquename
         self._lock = RLock()
         self.current_prefix = None
+        # keep properties for use in dottedpath to avoid recursion errors
+        self._properties = properties
         for key in properties:
             self.attrs[key] = properties[key]
             
@@ -269,7 +271,14 @@ class Widget(AttributedNode):
         if self.path[0] is None:
             raise ValueError, \
                   'Root widget has no name! Pass it to factory.'
-        return '.'.join(self.path)
+        path = list()
+        node = self
+        while node is not None:
+            if not node._properties.get('structural'):
+                path.append(node.__name__)
+            node = node.__parent__
+        path.reverse()
+        return '.'.join(path)
 
     def _runpreprocessors(self, data):                
         if data.preprocessed:

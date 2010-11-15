@@ -63,3 +63,19 @@ your form elements inside a table to provide pretty looking forms.
     u'<form action="myaction" enctype="multipart/form-data" id="form-myform" 
     method="post"><table><tr><td><input id="input-myform-table-row1-field1" 
     name="myform.table.row1.field1" type="text" /></td></tr></table></form>'
+
+Build same table again but set some nodes structural. This is considered in
+``Widget.dottedpath``.
+
+    >>> form = factory('form',
+    ...                name='myform',
+    ...                props={
+    ...                    'action': 'myaction',
+    ...                })
+    >>> form['table'] = factory('table', props={'structural': True})
+    >>> form['table']['row1'] = factory('tr', props={'structural': True})
+    >>> form['table']['row1']['field1'] = factory('td:text', name='field1')
+    >>> form()
+    u'<form action="myaction" enctype="multipart/form-data" id="form-myform" 
+    method="post"><table><tr><td><input id="input-myform-field1" 
+    name="myform.field1" type="text" /></td></tr></table></form>'

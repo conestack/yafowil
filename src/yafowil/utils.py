@@ -83,7 +83,8 @@ class managedprops(object):
         return func
     
 def cssid(widget, prefix, postfix=None):
-    id = "%s-%s" % (prefix, '-'.join(widget.path))
+    path = widget.dottedpath.replace('.', '-')
+    id = "%s-%s" % (prefix, path)
     if postfix is not None:
         id = '%s-%s' % (id, postfix) 
     return id
