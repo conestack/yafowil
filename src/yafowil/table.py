@@ -44,11 +44,14 @@ def th_renderer(widget, data):
         'colspan': widget.attrs.get('colspan'),
         'rowspan': widget.attrs.get('rowspan'),
     }
-    return tag('th', data.rendered, **attrs)
+    contents = widget.attrs.get('label')
+    if not contents:
+        contents = data.rendered
+    return tag('th', contents, **attrs)
 
 factory.register('th',
                  factory.extractors('compound'),
-                 factory.renderers('compound') + [th_renderer])
+                 [th_renderer])
 
 def td_renderer(widget, data):
     attrs = {
