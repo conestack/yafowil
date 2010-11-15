@@ -13,7 +13,6 @@ def compound_extractor(widget, data):
     """
     for childname in widget:
         child = widget[childname]
-        
         if child.attrs.get('structural'):
             for structuralchildname in child:
                 compound_extractor(child[structuralchildname], data)
