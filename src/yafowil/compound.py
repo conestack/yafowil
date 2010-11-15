@@ -12,7 +12,13 @@ def compound_extractor(widget, data):
     """Delegates extraction to children.
     """
     for childname in widget:
-        childdata = widget[childname].extract(data.request, parent=data)
+        child = widget[childname]
+        
+        if child.attrs.get('structural'):
+            for structuralchildname in child:
+                compound_extractor(child[structuralchildname], data)
+        else:
+            childdata = child.extract(data.request, parent=data)
     return
 
 def compound_renderer(widget, data):

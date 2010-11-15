@@ -63,5 +63,5 @@ def td_renderer(widget, data):
     return tag('td', data.rendered, **attrs)
 
 factory.register('td',
-                 factory.extractors('compound'),
+                 [],
                  [td_renderer])
