@@ -115,23 +115,3 @@ Get form data out of request (request is expected dict-like)::
       <RuntimeData myform.someinput, value=None, extracted='Hello World', 
       attrs={'input_field_type': 'text'} at ...>
       <RuntimeData myform.submit, value=None, extracted=<UNSET> at ...>
-
-XXX TODO
-=========    
-REIMPLEMENT LATER, SPECIAL CASE
-Same with delegation switched on:
-::
-
-    >> compound = factory('compound', 
-    ..                    'COMPOUND', 
-    ..                    {'inner': 'somevalue', 
-    ..                    'inner2': 'othervalue'},
-    ..                    {'delegation': True})
-    >> compound['inner'] = factory('text', 'inner', 'value')
-    >> compound['inner2'] = factory('text', 'inner2', 'value2')
-    >> compound()    
-    u'<input id="input-COMPOUND-inner" name="COMPOUND.inner" type="text" 
-    value="somevalue" /><input id="input-COMPOUND-inner2" name="COMPOUND.inner2" 
-    type="text" value="othervalue" />'
-/XXX TODO
-    

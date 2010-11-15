@@ -36,13 +36,6 @@ factory.register('compound',
                  [compound_renderer],
                  [])
 
-# special case, cover later
-#def compound_value_delegation_subwidgets(widget, data):
-#    for childname in widget:
-#        widget[childname].getter = data['value'].get(childname, None)
-#    return data
-#        
-
 def fieldset_renderer(widget, data):
     fs_attrs = {
         'id': cssid(widget, 'fieldset'),
