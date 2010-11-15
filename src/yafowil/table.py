@@ -50,7 +50,7 @@ def th_renderer(widget, data):
     return tag('th', contents, **attrs)
 
 factory.register('th',
-                 factory.extractors('compound'),
+                 [],
                  [th_renderer])
 
 def td_renderer(widget, data):
