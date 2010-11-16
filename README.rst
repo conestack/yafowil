@@ -241,13 +241,11 @@ Changes
 
 - Initial: Make it work (jensens)
 
-Credits
-======= 
+Contributors
+============
 
-- Written and concepted by Jens W. Klein <jens@bluedynamics.com>
+- Jens W. Klein <jens@bluedynamics.com>
 
-- API review and major contributions by
-  Robert Niederrreiter <rnix@squarewave.at>
+- Robert Niederrreiter <rnix@squarewave.at>
 
-- Credits to Christian Scholz aka MrTopf for the good discussion about formlibs
-  simplified. 
+- Christian Scholz aka MrTopf
