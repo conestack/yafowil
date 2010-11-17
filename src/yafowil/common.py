@@ -61,7 +61,8 @@ def input_generic_renderer(widget, data):
         'value':  _value(widget, data),
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),    
-        'class_': cssclasses(widget, data, *css),    
+        'class_': cssclasses(widget, data, *css),
+        'disabled': widget.attrs.get('disabled'),
     }
     return tag('input', **input_attrs)
 
