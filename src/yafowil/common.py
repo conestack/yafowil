@@ -26,7 +26,7 @@ def _value(widget, data):
         return data.extracted
     if data.value is not UNSET:
         return data.value 
-    return widget.attrs.default
+    return widget.attrs['default']
     
 def generic_extractor(widget, data):
     __managed_props = []     
