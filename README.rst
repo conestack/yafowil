@@ -21,7 +21,7 @@ not know about data-storage, but offers you a hook to add your handler.
 Tired of inventing widgets again and again after switching the python framework 
 Yafowil is intentionally written framework-independent. By just feeding it with 
 configuration it can be used and extended in most of existing python web 
-frameworks. Zope, Bfg and Django are hot candidates. 
+frameworks. Zope, Pyramid and Django are hot candidates. 
 
 
 Hello World

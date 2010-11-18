@@ -19,20 +19,20 @@ YAFOWIL is based on a set of core ideas:
 Callables Everywhere
 --------------------
 
-If you work with YAFOWIL first time it probably feel a bit different compared to
+If you work with YAFOWIL first time it probably feels a bit different compared to
 other multiple class inheritating, schema based forms. Instead YAFOWIL uses 
 simple callables at several places. You never need to inherit any class from
-yafowil.* (and if you think you need to you didn't understand the architecture).
+yafowil.* (and if you think you need to you didn't understand its architecture).
 
-Callables are used for every extensible aspect of YAFOWIL. Then they are bundled
+Callables are used for every extensible aspect of YAFOWIL. They are bundled
 and passed - as blueprints - to a factory. 
 
 State at Runtime
 ----------------
 
-While one cycle (request to response) runs, the state of the widget is kept in
+While one cycle runs (request to response), the state of the widget is kept in
 a runtime data object. It collects all information like value, request, errors 
-happend, and the rendered widget.
+happened, and the rendered widget.
 
 The widget
 ----------
@@ -47,32 +47,32 @@ The widget class is generic.
 Only at creation time of Widgets you need to use its dict-like api. This is the
 case if you create compounds of widgets, i.e. a form or a fieldset.   
 
-The Factory has the Plan
-------------------------
+The Factory contains blueprints
+-------------------------------
 
-The factory has blueprints of widgets registered by name. Its the generic plan 
-for a widget. 
+The factory contains blueprints, the generic plan, of widgets registered by 
+name.  
 
 parts of blueprint
 ------------------
 
 The plan consists of four chains of callables. Each chain has different 
-responsibilities.
+responsibilities. Chains are executed left-to-right.
 
-extractors
+callable: extractor
     An extractor is responsible to get, convert and validate the data of the 
     current widget in context from the request. It is a callable expecting the 
     widget instance and the runtime data (with request, errors and values) 
     as parameters. 
 
-chain #1: 
+chain #1: extractors 
     Extractors are chained. Example: An Integer Field consists of the
     pure extractor which results in a string. Next extractor in the chain is 
     responsible to convert it to an integer. If it fails an error is marked, 
     otherwise the value on data is of type ``int``. If only positive 
-    integers are allowed we can add a validating extractor to the chain.
+    integers are allowed we can add a validating extractor to the chain.    
     
-renderer
+callable: renderer
     The renderer is responsible to create output (text, unicode) ready to 
     be passed to the response. It is a callable expecting the widget instance  
     and runtime data (after extraction run) as parameters. It can utilize any 
@@ -85,22 +85,23 @@ chain #2: renderers
     rendered output of the first and so on. Thus a pure html ``<input ..>`` 
     widget can be wrapped with a label etc.
     
-preprocessors
+callable: preprocessor
      A preprocessor can be used in many different ways. It is executed in one
      run (request to response) once direct after runtime data is created. It 
      gets widget and runtime data as parameters.  
      
-global preprocessors 
+callable: global preprocessor
     A factory global preprocessor executed for every widget produced by the 
     factory. It will be executed before all other preprocessors are 
     running. It can be used to do framework specific conversions i.e. for the 
     request.
     
-chain #3: preprocessors
+chain #3: preprocessors/ global preprocessors
     Preprocessors are chained. The chain of preprocessors is executed once 
-    per runtime data object. 
+    after creation of a new runtime data object, i.o.w. once in a run at the 
+    very beginning of the run. 
     
-builder
+callable: builder
     A builder is a callable responsible to automatically populate a widget
     with child widgets. It expects the widget and the factory itself as 
     parameters. Its a kind of automatic compound and is executed at
@@ -110,21 +111,36 @@ builder
     a password validation widget consisting of two password input fields.
     
 chain #4: builders 
-    subwidgets are chained. The chain is executed one after one at factoring 
+    Builders are chained. The chain is executed one after one at factoring 
     time once per widget instance.
     
 combining blueprints
 --------------------
 
 Usually we have some common widgets, i.e a pure textarea, and then we need 
-some label, description, errors happened, maybe a table cell or a div around and 
-so on. And it can be very different dependent on the framework used or the design
-we need to implement. But the core functionality is always the same. In other 
-words: The input field and its behavior is stable, the eye-candy around is not.
+some label, description, display errors happened, maybe a table cell or a div 
+around and so on. And it can be very different dependent on the framework used 
+or the design we need to implement. But the core functionality is always the 
+same. In other words: The input field and its behavior is stable, the eye-candy 
+around is not.
 
 Its what the user of YAFOWIL can change with ease. At factory time, when the
 widget is requested from the factory, additional configurations can be added by
 passing a colon separated list of names, i.e ``label:textarea`` or 
-``myproject.field:label:textarea`` and so on. Thus we can add every type of 
-chain: extractors (conversion, validation), renderers (wrap eye candy), 
-preprocessors and even builders. 
+``myproject.field:label:textarea`` and so on. Thus we can chain blueprints!
+
+Extractors in this chained blueprints are executed from right to left while all 
+others are executes left to right.  
+
+custom blueprint
+----------------
+
+If theres one special rare use-case not worth to write a generic widget for, its 
+possible to create a custom blueprint. Its a 4-tuple with chains of extractors, 
+renderers, preprocessors and builders. Each chain contains callables as 
+explained above. To tell the factory about usage of a custom blueprint, use the
+asterisk-prefix like: ``field:label:*mycustom:textarea``. Next the factory takes 
+an keyword-argument custom expecting a dict with key ``mycustom`` and a 4-tuple
+of chains.   
+
+Custom blueprints are great for easily injecting validating extractors. 
