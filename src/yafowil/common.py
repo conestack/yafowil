@@ -26,7 +26,7 @@ def _value(widget, data):
         return data.extracted
     if data.value is not UNSET:
         return data.value 
-    return widget.attrs.default
+    return widget.attrs['default']
     
 def generic_extractor(widget, data):
     __managed_props = []     
@@ -61,7 +61,8 @@ def input_generic_renderer(widget, data):
         'value':  _value(widget, data),
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),    
-        'class_': cssclasses(widget, data, *css),    
+        'class_': cssclasses(widget, data, *css),
+        'disabled': widget.attrs.get('disabled'),
     }
     return tag('input', **input_attrs)
 
