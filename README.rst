@@ -23,10 +23,10 @@ Yafowil is intentionally written framework-independent. By just feeding it with
 configuration it can be used and extended in most of existing python web 
 frameworks. Zope, Pyramid and Django are hot candidates. 
 
-Hello World
-===========
+Example
+=======
 
-For the impatient, code says more than 1000 words: A simple hello world form 
+For the impatient, code says more than 1000 words: A very simple example form 
 works like so.
 ::
 
@@ -95,21 +95,14 @@ Basic functions
 
 Yafowil provides widgets for all HTML standard inputs, Such as:
 
--text
-
--textarea
-
--checkbox
-
--radio
-
--selects (single, multiple)
-
--file
-
--hidden
-
--submit
+- text
+- textarea
+- checkbox
+- radio
+- selects (single, multiple)
+- file
+- hidden
+- submit
 
 Usally you request a widget instance from the factory. I.e. by calling
 :: 
@@ -118,11 +111,10 @@ Usally you request a widget instance from the factory. I.e. by calling
 
 where ``text`` is the widget registration name.
 
-A Form or subform is organized as a tree of widgets. Thus, a widget is either 
-a compound (form, fieldset, etc) containing child widgets or leafs, i.e. all 
-HTML standard input widgets.
+A form or part of a form is organized as a tree of widgets. Thus, a widget is 
+either a compound (form, fieldset, etc) containing child widgets or leafs. 
 
-Leaf widgets could be chained. Let's say we want a HTML field containing a label
+Widgets can be chained. Let's say we want a HTML field containing a label
 and an input, this looks like
 ::
 
@@ -209,64 +201,11 @@ for easy later access
     ...     },
     ... )
 
-Architecture
-============
+Detailed Documentation
+======================
 
-The basic widget get all functionality injected as callables. It is reduced to 
-the execution-logic. Other logic is injected on initialization time. The value
-can be passed in as a callable as value-getter or just the value, 
+Theres a detailed documentation available at (TODO INSERT LINK).
 
-Also passed is some static configuration:
-
--``name`` as string,
--arbitary ``properties`` as general keyword arguments (for read-only use).
-
-Different widget flavors - combinations of preprocessors, extractors, renderers
-and builders - are registered in a registry. This registry is also a factory
-spitting out configured widgets by name.
-
-Behaviour
-=========
-
-Widget instances
-----------------
- 
-To get an instance of the widget call the factory and pass the registered name, 
-a unique name for this widget instance, the value (or an getter) and arbitrary 
-properties and eventually a mapping to custom behaviour.
-
-Widget instances are providing two functionalities:
-
-extract
-    to get values from request as runtime-data. Extraction means also
-    type-conversion or validation. This is all coupled and doing it all in one 
-    pipeline makes life easier. In the chain or pipeline of extractors each 
-    extractor get the values of all previous extractions with the runtime-data.
-    If an extractor fails it raises an exception. If ``abort`` (default is on) 
-    is set on the exception by a failing extractor, processing is stopped. 
-    For each failing extractor the exception is added to the error-list on 
-    runtime-data. 
-
-render on ``__call__``
-    to get the markup of the widget created either pass already extracted 
-    runtime data or - if not passed - it will be called internally.
-    In the chain or pipeline of renderers each renderer get the values of all 
-    previous rendered with the runtime-data. It has also access to extractions
-    and errors.
-
-In both cases the preprocessors are called, but only once for each runtime-data.
-There are two type of preprocessors: global and by widget registered. Global
-ones are called first. Hint: In the preprocessors it is also possible to wrap the 
-request or value, i.e. in order to use a request provided by some framework as 
-input.
-
-Controller
-----------   
-
-The controller handles forms and its several actions. Its convinient to use and 
-dispatches the actions to handlers and deals with rendering and re-rendering of
-the form. Here you can hook in a callable saving the data to the storage of 
-your choice.
 
 Changes
 =======
@@ -283,4 +222,4 @@ Contributors
 
 - Robert Niederrreiter <rnix@squarewave.at>
 
-- Christian Scholz aka MrTopf
+- Christian Scholz aka MrTopf (initial discussion)
