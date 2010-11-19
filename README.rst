@@ -272,9 +272,9 @@ Changes
 =======
 
 1.0 
-----------------------
+---
 
-- Initial: Make it work (jensens)
+- Make it work (jensens, rnix)
 
 Contributors
 ============
