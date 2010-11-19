@@ -95,14 +95,14 @@ Basic functions
 
 Yafowil provides widgets for all HTML standard inputs, Such as:
 
--``text``
--``textarea``
--``checkbox``
--``radio``
--``selects`` (single, multiple)
--``file``
--``hidden``
--``submit``
+-text
+-textarea
+-checkbox
+-radio
+-selects (single, multiple)
+-file
+-hidden
+-submit
 
 Usally you request a widget instance from the factory. I.e. by calling
 :: 
