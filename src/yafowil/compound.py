@@ -60,6 +60,8 @@ def form_renderer(widget, data):
         'class_': widget.attrs.get('class'),
         'id': 'form-%s' % '-'.join(widget.path),
     }
+    if callable(widget.attrs['action']):
+        form_attrs['action'] =  form_attrs['action'](widget, data)
     return tag('form', data.rendered, **form_attrs)
 
 factory.defaults['form.method'] = 'post'
