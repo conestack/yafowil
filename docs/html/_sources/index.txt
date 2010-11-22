@@ -15,12 +15,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
    
-   introduction
-   examples
+   helloworld 
    architecture
-   extend
-   Widget Library <widgets/widgets>
-   api
 
 Indices and tables
 ==================

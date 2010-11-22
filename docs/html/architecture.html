@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -12,16 +14,16 @@
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
         VERSION:     '1.0',
-        COLLAPSE_MODINDEX: false,
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="YAFOWIL - Yet Another Form Widget Library" href="index.html" />
-    <link rel="next" title="Extend YAFOWIL - DYI Widgets" href="extend.html" />
-    <link rel="prev" title="Usage" href="examples.html" /> 
+    <link rel="prev" title="Minimal Hello World Example" href="helloworld.html" /> 
   </head>
   <body>
     <div class="related">
@@ -31,54 +33,49 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="extend.html" title="Extend YAFOWIL - DYI Widgets"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="examples.html" title="Usage"
+          <a href="helloworld.html" title="Minimal Hello World Example"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">YAFOWIL</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-            <h3><a href="index.html">Table Of Contents</a></h3>
-            <ul>
-<li><a class="reference external" href="#">Elements Explained</a><ul>
-<li><a class="reference external" href="#base-principles">Base Principles</a></li>
-<li><a class="reference external" href="#callables-everywhere">Callables Everywhere</a></li>
-<li><a class="reference external" href="#state-at-runtime">State at Runtime</a></li>
-<li><a class="reference external" href="#the-widget">The widget</a></li>
-<li><a class="reference external" href="#the-factory-has-the-plan">The Factory has the Plan</a></li>
-<li><a class="reference external" href="#parts-of-blueprint">parts of blueprint</a></li>
-<li><a class="reference external" href="#combining-blueprints">combining blueprints</a></li>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Elements Explained</a><ul>
+<li><a class="reference internal" href="#base-principles">Base Principles</a></li>
+<li><a class="reference internal" href="#callables-everywhere">Callables Everywhere</a></li>
+<li><a class="reference internal" href="#state-at-runtime">State at Runtime</a></li>
+<li><a class="reference internal" href="#the-widget">The widget</a></li>
+<li><a class="reference internal" href="#the-factory-contains-blueprints">The Factory contains blueprints</a></li>
+<li><a class="reference internal" href="#parts-of-blueprint">parts of blueprint</a></li>
+<li><a class="reference internal" href="#combining-blueprints">combining blueprints</a></li>
+<li><a class="reference internal" href="#custom-blueprint">custom blueprint</a></li>
 </ul>
 </li>
 </ul>
 
-            <h4>Previous topic</h4>
-            <p class="topless"><a href="examples.html"
-                                  title="previous chapter">Usage</a></p>
-            <h4>Next topic</h4>
-            <p class="topless"><a href="extend.html"
-                                  title="next chapter">Extend YAFOWIL - DYI Widgets</a></p>
-            <h3>This Page</h3>
-            <ul class="this-page-menu">
-              <li><a href="_sources/architecture.txt"
-                     rel="nofollow">Show Source</a></li>
-            </ul>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="helloworld.html"
+                        title="previous chapter">Minimal Hello World Example</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/architecture.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
 
@@ -102,18 +99,18 @@
 </div>
 <div class="section" id="callables-everywhere">
 <h2>Callables Everywhere<a class="headerlink" href="#callables-everywhere" title="Permalink to this headline">¶</a></h2>
-<p>If you work with YAFOWIL first time it probably feel a bit different compared to
+<p>If you work with YAFOWIL first time it probably feels a bit different compared to
 other multiple class inheritating, schema based forms. Instead YAFOWIL uses
 simple callables at several places. You never need to inherit any class from
-yafowil.* (and if you think you need to you didn&#8217;t understand the architecture).</p>
-<p>Callables are used for every extensible aspect of YAFOWIL. Then they are bundled
+yafowil.* (and if you think you need to you didn&#8217;t understand its architecture).</p>
+<p>Callables are used for every extensible aspect of YAFOWIL. They are bundled
 and passed - as blueprints - to a factory.</p>
 </div>
 <div class="section" id="state-at-runtime">
 <h2>State at Runtime<a class="headerlink" href="#state-at-runtime" title="Permalink to this headline">¶</a></h2>
-<p>While one cycle (request to response) runs, the state of the widget is kept in
+<p>While one cycle runs (request to response), the state of the widget is kept in
 a runtime data object. It collects all information like value, request, errors
-happend, and the rendered widget.</p>
+happened, and the rendered widget.</p>
 </div>
 <div class="section" id="the-widget">
 <h2>The widget<a class="headerlink" href="#the-widget" title="Permalink to this headline">¶</a></h2>
@@ -127,28 +124,28 @@ does the handling.</li>
 <p>Only at creation time of Widgets you need to use its dict-like api. This is the
 case if you create compounds of widgets, i.e. a form or a fieldset.</p>
 </div>
-<div class="section" id="the-factory-has-the-plan">
-<h2>The Factory has the Plan<a class="headerlink" href="#the-factory-has-the-plan" title="Permalink to this headline">¶</a></h2>
-<p>The factory has blueprints of widgets registered by name. Its the generic plan
-for a widget.</p>
+<div class="section" id="the-factory-contains-blueprints">
+<h2>The Factory contains blueprints<a class="headerlink" href="#the-factory-contains-blueprints" title="Permalink to this headline">¶</a></h2>
+<p>The factory contains blueprints, the generic plan, of widgets registered by
+name.</p>
 </div>
 <div class="section" id="parts-of-blueprint">
 <h2>parts of blueprint<a class="headerlink" href="#parts-of-blueprint" title="Permalink to this headline">¶</a></h2>
 <p>The plan consists of four chains of callables. Each chain has different
-responsibilities.</p>
+responsibilities. Chains are executed left-to-right.</p>
 <dl class="docutils">
-<dt>extractors</dt>
+<dt>callable: extractor</dt>
 <dd>An extractor is responsible to get, convert and validate the data of the
 current widget in context from the request. It is a callable expecting the
 widget instance and the runtime data (with request, errors and values)
 as parameters.</dd>
-<dt>chain #1:</dt>
+<dt>chain #1: extractors</dt>
 <dd>Extractors are chained. Example: An Integer Field consists of the
 pure extractor which results in a string. Next extractor in the chain is
 responsible to convert it to an integer. If it fails an error is marked,
 otherwise the value on data is of type <tt class="docutils literal"><span class="pre">int</span></tt>. If only positive
 integers are allowed we can add a validating extractor to the chain.</dd>
-<dt>renderer</dt>
+<dt>callable: renderer</dt>
 <dd>The renderer is responsible to create output (text, unicode) ready to
 be passed to the response. It is a callable expecting the widget instance
 and runtime data (after extraction run) as parameters. It can utilize any
@@ -159,19 +156,20 @@ pure python.</dd>
 <dd>Renderers are chained. The second renderer in the chain can access the
 rendered output of the first and so on. Thus a pure html <tt class="docutils literal"><span class="pre">&lt;input</span> <span class="pre">..&gt;</span></tt>
 widget can be wrapped with a label etc.</dd>
-<dt>preprocessors</dt>
+<dt>callable: preprocessor</dt>
 <dd>A preprocessor can be used in many different ways. It is executed in one
 run (request to response) once direct after runtime data is created. It
 gets widget and runtime data as parameters.</dd>
-<dt>global preprocessors</dt>
+<dt>callable: global preprocessor</dt>
 <dd>A factory global preprocessor executed for every widget produced by the
 factory. It will be executed before all other preprocessors are
 running. It can be used to do framework specific conversions i.e. for the
 request.</dd>
-<dt>chain #3: preprocessors</dt>
+<dt>chain #3: preprocessors/ global preprocessors</dt>
 <dd>Preprocessors are chained. The chain of preprocessors is executed once
-per runtime data object.</dd>
-<dt>builder</dt>
+after creation of a new runtime data object, i.o.w. once in a run at the
+very beginning of the run.</dd>
+<dt>callable: builder</dt>
 <dd>A builder is a callable responsible to automatically populate a widget
 with child widgets. It expects the widget and the factory itself as
 parameters. Its a kind of automatic compound and is executed at
@@ -180,23 +178,35 @@ after the parent widget is created and configured. Its intended use is to
 make it easy to provide groups of widgets which are always the same. I.e.
 a password validation widget consisting of two password input fields.</dd>
 <dt>chain #4: builders</dt>
-<dd>subwidgets are chained. The chain is executed one after one at factoring
+<dd>Builders are chained. The chain is executed one after one at factoring
 time once per widget instance.</dd>
 </dl>
 </div>
 <div class="section" id="combining-blueprints">
 <h2>combining blueprints<a class="headerlink" href="#combining-blueprints" title="Permalink to this headline">¶</a></h2>
 <p>Usually we have some common widgets, i.e a pure textarea, and then we need
-some label, description, errors happened, maybe a table cell or a div around and
-so on. And it can be very different dependent on the framework used or the design
-we need to implement. But the core functionality is always the same. In other
-words: The input field and its behavior is stable, the eye-candy around is not.</p>
+some label, description, display errors happened, maybe a table cell or a div
+around and so on. And it can be very different dependent on the framework used
+or the design we need to implement. But the core functionality is always the
+same. In other words: The input field and its behavior is stable, the eye-candy
+around is not.</p>
 <p>Its what the user of YAFOWIL can change with ease. At factory time, when the
 widget is requested from the factory, additional configurations can be added by
 passing a colon separated list of names, i.e <tt class="docutils literal"><span class="pre">label:textarea</span></tt> or
-<tt class="docutils literal"><span class="pre">myproject.field:label:textarea</span></tt> and so on. Thus we can add every type of
-chain: extractors (conversion, validation), renderers (wrap eye candy),
-preprocessors and even builders.</p>
+<tt class="docutils literal"><span class="pre">myproject.field:label:textarea</span></tt> and so on. Thus we can chain blueprints!</p>
+<p>Extractors in this chained blueprints are executed from right to left while all
+others are executes left to right.</p>
+</div>
+<div class="section" id="custom-blueprint">
+<h2>custom blueprint<a class="headerlink" href="#custom-blueprint" title="Permalink to this headline">¶</a></h2>
+<p>If theres one special rare use-case not worth to write a generic widget for, its
+possible to create a custom blueprint. Its a 4-tuple with chains of extractors,
+renderers, preprocessors and builders. Each chain contains callables as
+explained above. To tell the factory about usage of a custom blueprint, use the
+asterisk-prefix like: <tt class="docutils literal"><span class="pre">field:label:*mycustom:textarea</span></tt>. Next the factory takes
+an keyword-argument custom expecting a dict with key <tt class="docutils literal"><span class="pre">mycustom</span></tt> and a 4-tuple
+of chains.</p>
+<p>Custom blueprints are great for easily injecting validating extractors.</p>
 </div>
 </div>
 
@@ -213,17 +223,14 @@ preprocessors and even builders.</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="extend.html" title="Extend YAFOWIL - DYI Widgets"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="examples.html" title="Usage"
+          <a href="helloworld.html" title="Minimal Hello World Example"
              >previous</a> |</li>
         <li><a href="index.html">YAFOWIL</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2010, Jens W. Klein, BlueDynamics Alliance, Austria.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.7.
+        &copy; Copyright 2010, Jens W. Klein, BlueDynamics Alliance, Austria.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
     </div>
   </body>
 </html>
