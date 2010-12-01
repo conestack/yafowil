@@ -305,6 +305,7 @@ class Factory(object):
         self._factories = dict()
         self._global_preprocessors = list()
         self.defaults = dict()
+        self.document = dict()
         
     def register(self, name, extractors, renderers, 
                  preprocessors=[], builders=[]):
