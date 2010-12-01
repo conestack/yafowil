@@ -25,6 +25,7 @@ Then add there a ``buildout.cfg`` containing::
     auto-checkout = *
     
     [sources]
+    node          = git git://github.com/bluedynamics/node.git
     yafowil       = git git://github.com/bluedynamics/yafowil.git
     yafowil.webob = git git://github.com/bluedynamics/yafowil.webob.git
     zodict        = git git://github.com/bluedynamics/zodict.git
@@ -39,7 +40,7 @@ Then add a ``setup.py``::
     setup(name='helloworld',
           packages=find_packages('src'),
           package_dir = {'': 'src'},
-          install_requires=['setuptools', 'yafowil.webob',]
+          install_requires=['setuptools', 'yafowil.webob'],
           entry_points = """\
           [console_scripts]      
           helloworld = helloworld.run:run    
