@@ -222,4 +222,6 @@ Contributors
 
 - Robert Niederrreiter <rnix@squarewave.at>
 
+- Attila Oláh
+
 - Christian Scholz aka MrTopf (initial discussion)
