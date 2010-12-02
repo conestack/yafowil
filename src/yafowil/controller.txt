@@ -206,4 +206,26 @@ Render form not performed
     id="input-testform-cancel" name="action.testform.cancel" 
     type="submit" value="Cancel" /></form>'
 
+
+Try recursive lookup of actions
+::
+
+    >>> form = factory(u'form',
+    ...                name='testform',
+    ...                props={'action': 'http://fubar.com'})
+    >>> form['level1'] = factory('submit', 
+    ...                          props={'action': 'l1action'})
+    >>> form['fieldset'] = factory('fieldset')
+    >>> form['fieldset']['level2'] = factory('submit', 
+    ...                                          props={'action': 'l2action'})
+    >>> form['fieldset']['subset'] = factory('fieldset')
+    >>> form['fieldset']['subset']['level3'] = factory('submit', 
+    ...                                            props={'action': 'l3action'})
+    >>> controller = Controller(form, {})
+    >>> controller.actions
+    [<Widget object 'level1' at ...>, 
+    <Widget object 'level2' at ...>, 
+    <Widget object 'level3' at ...>]
+    
+    
     
