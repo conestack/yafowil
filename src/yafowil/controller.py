@@ -41,8 +41,14 @@ class Controller(object):
     
     @property
     def actions(self):
-        # XXX TODO: collect actions recursive.
-        return [w for w in self.widget.values() if w.attrs.get('action')]
+        result = []
+        def collect_actions(level):
+            for widget in level.values():
+                if widget.attrs.get('action'):
+                    result.append(widget)    
+                collect_actions(widget)
+        collect_actions(self.widget) 
+        return result
     
     def triggered(self, action):
         return self.request.get('action.%s' % action.dottedpath)
