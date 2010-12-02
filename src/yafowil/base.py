@@ -10,6 +10,9 @@ class Unset(object):
     def __str__(self):
         return ''
     
+    def __len__(self):
+        return 0
+    
     def __repr__(self):
         return '<UNSET>'
 
