@@ -8,6 +8,9 @@ version = '1.1'
 shortdesc = \
 'YAFOWIL - Yet Another Form Widget Lib: Lightweight, Extensible, Pluggable, Pure.'
 longdesc = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
+longdesc += open(os.path.join(os.path.dirname(__file__), 'HISTORY.rst')).read()
+longdesc += open(os.path.join(os.path.dirname(__file__), 'LICENSE.rst')).read()
+
 tests_require = ['interlude']
 
 setup(name='yafowil',
@@ -24,8 +27,8 @@ setup(name='yafowil',
       keywords='html input widgets form compound array',
       author='BlueDynamics Alliance',
       author_email='dev@bluedynamics.com',
-      url=u'',
-      license='Python Software Foundation License',
+      url=u'https://github.com/bluedynamics/yafowil',
+      license='BSD simplified',
       packages=find_packages('src'),
       package_dir = {'': 'src'},
       namespace_packages=['yafowil'],
