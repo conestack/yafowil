@@ -1,3 +1,5 @@
+import logging
+
 def vocabulary(definition):
     """Convert different kinds of input into a list of bi-tuples, both strings.
     """
@@ -28,52 +30,68 @@ def vocabulary(definition):
         return new_vocab
     return definition
 
-def tag(tag_name, *inners, **attributes):
-    """Generates some xml/html tag.
-        
-    ``tagname``
-        name of a valid tag
-        
-    ``inners``
-        inner content of the tag. If empty a closed tag is generated
-    
-    ``attributes``
-        attributes of the tag, leading or trailing ``_`` underscores are 
-        omitted from keywords.
+class Tag(object):
 
-    Example::
-
-        >>> tag('p', 'Lorem Ipsum.', u'Hello World!', 
-        ...     class_='fancy', id='2f5b8a234ff')
-        <p class="fancy" id="2f5b8a234ff">Lorem Ipsum. Hello World.</p>
+    def __init__(self, translate):
+        self.translate = translate
+        self.encoding = 'utf-8'
+                
+    def __call__(self, tag_name, *inners, **attributes):
+        """Generates some xml/html tag.
+            
+        ``tagname``
+            name of a valid tag
+            
+        ``inners``
+            inner content of the tag. If empty a closed tag is generated
+        
+        ``attributes``
+            attributes of the tag, leading or trailing ``_`` underscores are 
+            omitted from keywords.
     
-    """
-    cl = list()
-    for key, value in attributes.items():
-        if value is None:
-            continue
-        if not isinstance(value, unicode):
-            value = str(value).decode('utf-8')
-        cl.append((key.strip('_'), value))
-    attributes = u''
-    if cl:
-        attributes = u' %s' % u' '.join(sorted([u'%s="%s"' % _ for _ in cl]))     
-    cl = list()
-    for inner in inners:
-        if not isinstance(inner, unicode):
-            inner = str(inner).decode('utf-8')
-        cl.append(inner)
-    if not cl:
-        return u'<%(name)s%(attrs)s />' % {
+        Example::
+    
+            >>> tag('p', 'Lorem Ipsum.', u'Hello World!', 
+            ...     class_='fancy', id='2f5b8a234ff')
+            <p class="fancy" id="2f5b8a234ff">Lorem Ipsum. Hello World.</p>
+        
+        """
+        cl = list()
+        for key, value in attributes.items():
+            if value is None:
+                continue
+            value = self.translate(value)
+            if not isinstance(value, unicode):
+                value = str(value).decode(self.encoding)
+            cl.append((key.strip('_'), value))
+        attributes = u''
+        if cl:
+            attributes = u' %s' % u' '.join(sorted([u'%s="%s"' % _ for _ in cl]))     
+        cl = list()
+        for inner in inners:
+            inner = self.translate(inner)
+            if not isinstance(inner, unicode):
+                inner = str(inner).decode(self.encoding)
+            cl.append(inner)
+        if not cl:
+            return u'<%(name)s%(attrs)s />' % {
+                'name': tag_name,
+                'attrs': attributes,
+            }
+        return u'<%(name)s%(attrs)s>%(value)s</%(name)s>' % {
             'name': tag_name,
             'attrs': attributes,
+            'value': u''.join(i for i in cl),
         }
-    return u'<%(name)s%(attrs)s>%(value)s</%(name)s>' % {
-        'name': tag_name,
-        'attrs': attributes,
-        'value': u''.join(i for i in cl),
-    }
+        
+## Deprecation message
+def _deprecated_null_localization(msg):
+    logging.warn("Deprecated usage of 'yafowil.utils.tag', please use the "+\
+                 "tag factory on RuntimeData instead.")
+    return msg
 
+tag = Tag(_deprecated_null_localization)        
+        
 class managedprops(object):
     
     def __init__(self, *names):

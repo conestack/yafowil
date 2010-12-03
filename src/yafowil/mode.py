@@ -1,5 +1,5 @@
 from yafowil.base import factory
-from yafowil.utils import tag, cssid, cssclasses
+from yafowil.utils import cssid, cssclasses
 from yafowil.common import _value
 
 def edit_renderer(widget, data):
@@ -16,9 +16,10 @@ def hidden_renderer(widget, data):
         'id': cssid(widget, 'input'),    
         'class_': cssclasses(widget, data),    
     }
-    return tag('input', **hidden_attrs)
+    return data.tag('input', **hidden_attrs)
 
 def mode_renderer(widget, data):
+    tag = data.tag
     mode = widget.attrs['mode']
     if not isinstance(mode, basestring):
         mode = mode(widget, data)

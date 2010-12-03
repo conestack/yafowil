@@ -1,6 +1,7 @@
 from threading import RLock
 from zodict import AttributedNode
 from zodict.node import NodeAttributes
+from yafowil.utils import Tag
 
 class Unset(object): 
     
@@ -42,6 +43,7 @@ class RuntimeData(AttributedNode):
         self.extracted = UNSET
         self.rendered = UNSET
         self.errors= list()
+        self.translate_callable = lambda msg: msg        
         
     def fetch(self, path):
         if isinstance(path, basestring):
@@ -52,6 +54,10 @@ class RuntimeData(AttributedNode):
         for key in path[1:]:
             data = data[key]
         return data
+    
+    @property
+    def tag(self):
+        return Tag(self.translate_callable)
                             
     def __repr__(self):
         rep = "<RuntimeData %s, value=%s, extracted=%s" % (
@@ -308,7 +314,7 @@ class Factory(object):
         self._factories = dict()
         self._global_preprocessors = list()
         self.defaults = dict()
-        self.document = dict()
+        self.document = dict()       
         
     def register(self, name, extractors, renderers, 
                  preprocessors=[], builders=[]):
@@ -400,5 +406,5 @@ class Factory(object):
 
     def builders(self, name):
         return self._factories[name][3]
-    
+        
 factory = Factory()

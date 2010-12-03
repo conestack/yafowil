@@ -5,7 +5,6 @@ from yafowil.base import (
 from yafowil.utils import (
     cssid,
     cssclasses, 
-    tag,
 )
 
 def compound_extractor(widget, data):
@@ -43,8 +42,8 @@ def fieldset_renderer(widget, data):
     }
     rendered = data.rendered
     if widget.attrs['legend']:
-        rendered = tag('legend', widget.attrs['legend']) + rendered
-    return tag('fieldset', rendered, **fs_attrs)   
+        rendered = data.tag('legend', widget.attrs['legend']) + rendered
+    return data.tag('fieldset', rendered, **fs_attrs)   
 
 factory.defaults['fieldset.legend'] = False
 factory.register('fieldset', 
@@ -62,7 +61,7 @@ def form_renderer(widget, data):
     }
     if callable(form_attrs['action']):
         form_attrs['action'] =  form_attrs['action'](widget, data)
-    return tag('form', data.rendered, **form_attrs)
+    return data.tag('form', data.rendered, **form_attrs)
 
 factory.defaults['form.method'] = 'post'
 factory.defaults['form.enctype'] = 'multipart/form-data'

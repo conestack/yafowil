@@ -4,7 +4,8 @@ Preparation
     >>> import yafowil.common
     >>> import yafowil.compound
     >>> from yafowil.base import factory
-    >>> from yafowil.utils import tag   
+    >>> from yafowil.utils import Tag
+    >>> tag = Tag(lambda msg: msg)           
         
 Render Compound.
 ::
