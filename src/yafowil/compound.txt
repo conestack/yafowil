@@ -4,7 +4,8 @@ Preparation
     >>> import yafowil.common
     >>> import yafowil.compound
     >>> from yafowil.base import factory
-    
+    >>> from yafowil.utils import tag   
+        
 Render Compound.
 ::
 
@@ -12,10 +13,12 @@ Render Compound.
     >>> compound['inner']  = factory('text', value='value1')
     >>> compound['inner2'] = factory('text', value='value2', 
     ...                              props={'required': True})
-    >>> compound()
-    u'<input id="input-COMPOUND-inner" name="COMPOUND.inner" type="text" 
-    value="value1" /><input class="required" id="input-COMPOUND-inner2" 
-    name="COMPOUND.inner2" type="text" value="value2" />'
+    >>> pxml(tag('div', compound()))
+    <div>
+      <input class="text" id="input-COMPOUND-inner" name="COMPOUND.inner" type="text" value="value1"/>
+      <input class="required text" id="input-COMPOUND-inner2" name="COMPOUND.inner2" type="text" value="value2"/>
+    </div>
+    <BLANKLINE>
 
 Extract Compound empty.
 ::    
@@ -53,11 +56,13 @@ Test Fieldset
     ...                    props={'legend': 'Some Test'})
     >>> compound['inner'] = factory('text', 'inner', 'value')
     >>> compound['inner2'] = factory('text', 'inner2', 'value2')
-    >>> compound()
-    u'<fieldset id="fieldset-COMPOUND"><legend>Some Test</legend><input 
-    id="input-COMPOUND-inner" name="COMPOUND.inner" type="text" value="value" 
-    /><input id="input-COMPOUND-inner2" name="COMPOUND.inner2" type="text" 
-    value="value2" /></fieldset>'
+    >>> pxml(compound())
+    <fieldset id="fieldset-COMPOUND">
+      <legend>Some Test</legend>
+      <input class="text" id="input-COMPOUND-inner" name="COMPOUND.inner" type="text" value="value"/>
+      <input class="text" id="input-COMPOUND-inner2" name="COMPOUND.inner2" type="text" value="value2"/>
+    </fieldset>
+    <BLANKLINE>
 
 Test Form
 ::
@@ -66,8 +71,7 @@ Test Form
     ...                name = 'FORM',
     ...                props={'action': 'http://fubar.com'})
     >>> form()
-    u'<form action="http://fubar.com" enctype="multipart/form-data" 
-    id="form-FORM" method="post"></form>'
+    u'<form action="http://fubar.com" enctype="multipart/form-data" id="form-FORM" method="post"></form>'
     
 Hello World
 -----------
@@ -97,13 +101,13 @@ Create a form::
 
 Render an empty form    
 
-    >>> form()
-    u'<form action="http://www.domain.tld/someform" 
-    enctype="multipart/form-data" id="form-myform" method="post"><label 
-    for="input-myform-someinput">Your Text</label><input 
-    id="input-myform-someinput" name="myform.someinput" type="text" 
-    /><input id="input-myform-submit" name="action.myform.submit" 
-    type="submit" value="submit" /></form>'
+    >>> pxml(form())
+    <form action="http://www.domain.tld/someform" enctype="multipart/form-data" id="form-myform" method="post">
+      <label for="input-myform-someinput">Your Text</label>
+      <input class="text" id="input-myform-someinput" name="myform.someinput" type="text"/>
+      <input id="input-myform-submit" name="action.myform.submit" type="submit" value="submit"/>
+    </form>
+    <BLANKLINE>
 
     
 Get form data out of request (request is expected dict-like)::

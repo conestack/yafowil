@@ -2,6 +2,7 @@ import unittest
 import doctest 
 from pprint import pprint
 from interlude import interact
+import lxml.etree as etree
 
 optionflags = doctest.NORMALIZE_WHITESPACE | \
               doctest.ELLIPSIS | \
@@ -16,6 +17,9 @@ TESTFILES = [
     'mode.txt',
     'table.txt',
 ]
+def pxml(xml):
+    et = etree.fromstring(xml)
+    print etree.tostring(et, pretty_print=True)
 
 def test_suite():
     return unittest.TestSuite([
@@ -23,7 +27,8 @@ def test_suite():
             file, 
             optionflags=optionflags,
             globs={'interact': interact,
-                   'pprint': pprint},
+                   'pprint': pprint,
+                   'pxml': pxml},
         ) for file in TESTFILES
     ])
 
