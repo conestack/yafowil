@@ -6,6 +6,9 @@ Trigger registry by importing.
 
     >>> import yafowil.common
 
+Helper::
+    >>> from yafowil.utils import tag           
+
 
 Text Input Widget
 -----------------
@@ -14,15 +17,15 @@ Text Input Widget
     >>> from yafowil.base import factory
     >>> inputwidget = factory('text', name='MYTEXT', value='Test Text')    
     >>> inputwidget()
-    u'<input id="input-MYTEXT" name="MYTEXT" type="text" value="Test Text" />'
+    u'<input class="text" id="input-MYTEXT" name="MYTEXT" type="text" value="Test Text" />'
 
     >>> inputwidget = factory('password', 'MYPASSWORD', '')
     >>> inputwidget()
-    u'<input id="input-MYPASSWORD" name="MYPASSWORD" type="password" value="" />'
+    u'<input class="password"  id="input-MYPASSWORD" name="MYPASSWORD" type="password" value="" />'
 
     >>> inputwidget = factory('hidden', 'MYHIDDEN', 'Test Hidden')
     >>> inputwidget()
-    u'<input id="input-MYHIDDEN" name="MYHIDDEN" type="hidden" value="Test Hidden" />'
+    u'<input class="hidden" id="input-MYHIDDEN" name="MYHIDDEN" type="hidden" value="Test Hidden" />'
 
 
 Required Input Widget
@@ -35,8 +38,8 @@ Render required widget.
     ...                       {'required': True,
     ...                        'error_class': True})
     >>> inputwidget()
-    u'<input class="required" id="input-REQUIRED" name="REQUIRED" type="text" 
-    value="" />'
+    u'<input class="required text" id="input-REQUIRED" name="REQUIRED" 
+    type="text" value="" />'
 
 Extract with empty request, key not in request therefore no error.
 ::
@@ -69,7 +72,7 @@ With getter value set, empty request, no error expected.
     attrs={'input_field_type': 'text'} at ...>
 
     >>> inputwidget(data=data)
-    u'<input class="required" id="input-REQUIRED" name="REQUIRED" type="text" 
+    u'<input class="required text" id="input-REQUIRED" name="REQUIRED" type="text" 
     value="Test Text" />'
 
 With getter value set, request given, error expected.
@@ -81,7 +84,7 @@ With getter value set, request given, error expected.
     attrs={'input_field_type': 'text'} at ...>
     
     >>> inputwidget(data=data)
-    u'<input class="error required" id="input-REQUIRED" name="REQUIRED" 
+    u'<input class="error required text" id="input-REQUIRED" name="REQUIRED" 
     type="text" value="" />'
 
 Create a custom error message.
@@ -257,9 +260,12 @@ Default.
 
     >>> widget = factory('label:file', name='MYFILE', \
     ...                   props={'label': 'MY FILE'})
-    >>> widget()
-    u'<label for="input-MYFILE">MY FILE</label><input id="input-MYFILE" 
-    name="MYFILE" type="file" value="" />'
+    >>> pxml(tag('div', widget()))
+    <div>
+      <label for="input-MYFILE">MY FILE</label>
+      <input id="input-MYFILE" name="MYFILE" type="file" value=""/>
+    </div>
+    <BLANKLINE>
     
 Label after widget.
 ::
@@ -267,9 +273,12 @@ Label after widget.
     >>> widget = factory('label:file', name='MYFILE', \
     ...                   props={'label': 'MY FILE',
     ...                          'label.position': 'after'})
-    >>> widget()
-    u'<input id="input-MYFILE" name="MYFILE" type="file" value="" /><label 
-    for="input-MYFILE">MY FILE</label>'
+    >>> pxml(tag('div', widget()))
+    <div>
+      <input id="input-MYFILE" name="MYFILE" type="file" value=""/>
+      <label for="input-MYFILE">MY FILE</label>
+    </div>
+    <BLANKLINE>
     
 Same with inner label.
 ::
@@ -277,10 +286,11 @@ Same with inner label.
     >>> widget = factory('label:file', name='MYFILE', \
     ...                   props={'label': 'MY FILE',
     ...                          'label.position': 'inner'})
-    >>> widget()
-    u'<label for="input-MYFILE">MY FILE<input id="input-MYFILE" 
-    name="MYFILE" type="file" value="" /></label>'
-    
+    >>> pxml(tag('div', widget()))
+    <div>
+      <label for="input-MYFILE">MY FILE<input id="input-MYFILE" name="MYFILE" type="file" value=""/></label>
+    </div>
+    <BLANKLINE>    
 
 Field Widget
 ------------
@@ -290,11 +300,12 @@ Chained file inside field with label.
 
     >>> widget = factory('field:label:file', name='MYFILE', \
     ...                   props={'label': 'MY FILE'})
-    >>> widget()
-    u'<div class="field" id="field-MYFILE"><label 
-    for="input-MYFILE">MY FILE</label><input id="input-MYFILE" 
-    name="MYFILE" type="file" value="" /></div>'
-
+    >>> pxml(widget())
+    <div class="field" id="field-MYFILE">
+      <label for="input-MYFILE">MY FILE</label>
+      <input id="input-MYFILE" name="MYFILE" type="file" value=""/>
+    </div>
+    <BLANKLINE>
 
 Error Widget
 ------------
@@ -307,12 +318,18 @@ Chained password inside error inside field.
     ...                         'required': 'No password given!'})
     
     >>> data = widget.extract({'password': ''}) 
-    >>> widget(data=data)
-    u'<div class="field" id="field-password"><div class="error"><div 
-    class="errormessage">No password given!</div><input class="required" 
-    id="input-password" name="password" type="password" value="" /></div></div>'
+    >>> pxml(widget(data=data))
+    <div class="field" id="field-password">
+      <div class="error">
+        <div class="errormessage">No password given!</div>
+        <input class="password required" id="input-password" name="password" type="password" value=""/>
+      </div>
+    </div>
+    <BLANKLINE>
     
     >>> data = widget.extract({'password': 'secret'})
-    >>> widget(data=data)
-    u'<div class="field" id="field-password"><input class="required" 
-    id="input-password" name="password" type="password" value="secret" /></div>'
+    >>> pxml(widget(data=data))
+    <div class="field" id="field-password">
+      <input class="password required" id="input-password" name="password" type="password" value="secret"/>
+    </div>
+    <BLANKLINE>
