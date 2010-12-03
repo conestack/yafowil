@@ -13,13 +13,27 @@ from utils import (
 )
 
 factory.defaults['default'] = None
+factory.document['default'] = "Default value." 
 factory.defaults['class'] = None
+factory.document['class'] = "Common CSS-class to put on."
 factory.defaults['error_class'] = None
+factory.document['error_class'] = "CSS-class to put on in case of error."
 factory.defaults['error_class_default'] = 'error'
+factory.document['error_class_default'] = """\
+    Fallback CSS-class to put on in case of error if no specific class was 
+    given."""
 factory.defaults['required'] = False
+factory.document['required'] = "Wether this value is required or not." 
 factory.defaults['required_message'] = u'Mandatory field was empty'          
+factory.document['required_message'] = """\
+    Message to be shown if required condition was not met."""           
 factory.defaults['required_class'] = None
+factory.document['required_class'] = """\
+    CSS-class to put on in case if required condition was not met."""
 factory.defaults['required_class_default'] = 'required'
+factory.document['required_class_default'] = """\
+    CSS-class to put on in case if required condition was not met if no specific 
+    class was given."""
 
 def _value(widget, data):
     if data.extracted is not UNSET:
@@ -52,7 +66,7 @@ def generic_required_extractor(widget, data):
 
 @managedprops('type', *css_managed_props)
 def input_generic_renderer(widget, data):
-    css = widget.attrs.get('css', list())
+    css = widget.attrs.get('class', list())
     if isinstance(css, basestring):
         css = [css]
     input_attrs = {
@@ -79,6 +93,7 @@ def register_generic_input(subtype, enable_required_class=True):
     if enable_required_class:
         factory.defaults['%s.required_class' % subtype] = 'required'
     factory.defaults['%s.default' % subtype] = ''
+    factory.defaults['%s.class' % subtype] = subtype
     factory.register(subtype, 
                      [generic_extractor, generic_required_extractor], 
                      [input_generic_renderer],
@@ -334,7 +349,7 @@ def label_renderer(widget, data):
     }
     help = u''
     if widget.attrs['help']:
-        help_attrs = {'class_': widget.attrs['helpclass']}
+        help_attrs = {'class_': widget.attrs['help_class']}
         help = tag('div', widget.attrs['help'], help_attrs)
     pos = widget.attrs['position']
     if pos == 'inner':

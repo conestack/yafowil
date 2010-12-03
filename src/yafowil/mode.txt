@@ -36,10 +36,12 @@ Hook custom to chain on widget generation.
 Check results.
 ::
 
-    >>> widget(request={})
-    u'<div class="field" id="field-foo"><label 
-    for="input-foo">Foo</label><input id="input-foo" name="foo" type="text" 
-    value="foo" /></div>'
+    >>> pxml(widget(request={}))
+    <div class="field" id="field-foo">
+      <label for="input-foo">Foo</label>
+      <input class="text" id="input-foo" name="foo" type="text" value="foo"/>
+    </div>
+    <BLANKLINE>
     
     >>> widget(request={'display': True})
     '<div>foo</div>'
@@ -77,10 +79,12 @@ Test view widget with single string value.
     ...         'mode': modedecider,
     ...     })
     
-    >>> widget(request={})
-    u'<div class="field" id="field-foo"><label 
-    for="input-foo">Foo</label><input id="input-foo" name="foo" type="text" 
-    value="foo" /></div>'
+    >>> pxml(widget(request={}))
+    <div class="field" id="field-foo">
+      <label for="input-foo">Foo</label>
+      <input class="text" id="input-foo" name="foo" type="text" value="foo"/>
+    </div>
+    <BLANKLINE>
     
     >>> widget(request={'mode': 'display'})
     u'<div>foo</div>'
@@ -118,8 +122,12 @@ Test view widget with iterable value.
     ...         'mode': modedecider,
     ...     })
     
-    >>> widget(request={'mode': 'view'})
-    u'<ul><li>foo</li><li>bar</li></ul>'
+    >>> pxml(widget(request={'mode': 'view'}))
+    <ul>
+      <li>foo</li>
+      <li>bar</li>
+    </ul>
+    <BLANKLINE>
 
 Finally you might want to use your own renderers for mode. You can define this
 with the related mode name in props. Just define a callback function doing the 
@@ -139,10 +147,12 @@ rendering job.
     ...         'mode.display': alternative_renderer,
     ...     })
     
-    >>> widget(request={'mode': 'edit'})
-    u'<div class="field" id="field-foo"><label 
-    for="input-foo">Foo</label><input id="input-foo" name="foo" type="text" 
-    value="foo" /></div>'
+    >>> pxml(widget(request={'mode': 'edit'}))
+    <div class="field" id="field-foo">
+      <label for="input-foo">Foo</label>
+      <input class="text" id="input-foo" name="foo" type="text" value="foo"/>
+    </div>
+    <BLANKLINE>
     
     >>> widget(request={'mode': 'display'})
     u'<p>alternative</p>'

@@ -47,7 +47,7 @@ class Controller(object):
                 if widget.attrs.get('action'):
                     result.append(widget)    
                 collect_actions(widget)
-        collect_actions(self.widget) 
+        collect_actions(self.widget)
         return result
     
     def triggered(self, action):
