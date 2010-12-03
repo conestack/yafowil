@@ -79,7 +79,6 @@ def register_generic_input(subtype, enable_required_class=True):
     if enable_required_class:
         factory.defaults['%s.required_class' % subtype] = 'required'
     factory.defaults['%s.default' % subtype] = ''
-    factory.defaults['%s.class' % subtype] = subtype
     factory.register(subtype, 
                      [generic_extractor, generic_required_extractor], 
                      [input_generic_renderer],
