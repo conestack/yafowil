@@ -8,7 +8,6 @@ from utils import (
     css_managed_props,
     cssid,
     managedprops,
-    tag,
     vocabulary,
 )
 
@@ -66,6 +65,7 @@ def generic_required_extractor(widget, data):
 
 @managedprops('type', *css_managed_props)
 def input_generic_renderer(widget, data):
+    tag = data.tag
     css = widget.attrs.get('class', list())
     if isinstance(css, basestring):
         css = [css]
@@ -105,6 +105,7 @@ register_generic_input('hidden', False)
 
 @managedprops(*css_managed_props)
 def input_proxy_renderer(widget, data):
+    tag = data.tag
     value = data.value
     if data.request is not UNSET:
         if data.request.get(widget.__name__):
@@ -137,6 +138,7 @@ def input_checkbox_extractor(widget, data):
 
 @managedprops('format', 'css', *css_managed_props)
 def input_checkbox_renderer(widget, data):
+    tag = data.tag
     value = _value(widget, data)
     css = widget.attrs.get('css', list())
     if isinstance(css, basestring):
@@ -182,6 +184,7 @@ def file_extracor(widget, data):
 
 @managedprops('css', 'accept',*css_managed_props)
 def input_file_renderer(widget, data):
+    tag = data.tag
     css = widget.attrs.get('css', list())
     if isinstance(css, basestring):
         css = [css]
@@ -200,6 +203,7 @@ def input_file_renderer(widget, data):
 def file_options_renderer(widget, data):
     if data.value in [None, UNSET, '']:
         return data.rendered
+    tag = data.tag
     if data.request:
         value = [data.request.get('%s-action' % widget.dottedpath, 'keep')]
     else:
@@ -242,6 +246,7 @@ def select_extractor(widget, data):
     return extracted 
 
 def select_renderer(widget, data):
+    tag = data.tag
     value = _value(widget, data)
     if value is None:
         value = []
@@ -302,6 +307,7 @@ factory.register('select',
                  [select_renderer])
 
 def textarea_renderer(widget, data):
+    tag = data.tag
     css = widget.attrs.get('css', list())
     if isinstance(css, basestring):
         css = [css]
@@ -329,6 +335,7 @@ factory.register('textarea',
                  [textarea_renderer])
 
 def submit_renderer(widget, data):
+    tag = data.tag
     input_attrs = {
         'name': widget.attrs['action'] and 'action.%s' % widget.dottedpath,
         'id': cssid(widget, 'input'),
@@ -342,6 +349,7 @@ factory.defaults['submit.action'] = None
 factory.register('submit', [], [submit_renderer])
 
 def label_renderer(widget, data):
+    tag = data.tag
     label_text = widget.attrs.get('label', widget.__name__)
     label_attrs = {
         'for_': cssid(widget, 'input'),
@@ -364,6 +372,7 @@ factory.defaults['label.help_class'] = 'help'
 factory.register('label', [], [label_renderer])
 
 def field_renderer(widget, data):
+    tag = data.tag
     div_attrs = {
         'id': cssid(widget, 'field'),
         'class_': cssclasses(widget, data, widget.attrs['class'])
@@ -379,6 +388,7 @@ factory.register('field', [], [field_renderer])
 def error_renderer(widget, data):
     if not data.errors:
         return data.rendered
+    tag = data.tag
     msgs = u''
     for error in data.errors:
         msgs += tag('div', str(error), class_=widget.attrs['message_class'])

@@ -7,7 +7,8 @@ Trigger registry by importing.
     >>> import yafowil.common
 
 Helper::
-    >>> from yafowil.utils import tag           
+    >>> from yafowil.utils import Tag
+    >>> tag = Tag(lambda msg: msg)           
 
 
 Text Input Widget
