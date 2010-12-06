@@ -8,6 +8,7 @@ version = '1.1'
 shortdesc = \
 'YAFOWIL - Yet Another Form Widget Lib: Lightweight, Extensible, Pluggable, Pure.'
 longdesc = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
+longdesc += open(os.path.join(os.path.dirname(__file__), 'LICENSE.rst')).read()
 tests_require = ['interlude', 'lxml']
 
 setup(name='yafowil',
