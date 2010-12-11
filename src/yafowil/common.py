@@ -1,3 +1,4 @@
+import re
 from yafowil.base import (
     factory,
     UNSET,
@@ -100,8 +101,41 @@ def register_generic_input(subtype, enable_required_class=True):
                      [InputGenericPreprocessor(subtype)])
 
 register_generic_input('text')
-register_generic_input('password')
 register_generic_input('hidden', False)
+
+def minlength_extractor(widget, data):
+    val = data.extracted
+    minlength = widget.attrs.get('minlength', -1)
+    if minlength != -1:
+        if len(val) < minlength:
+            message = u'Input must have at least %i characters.' % minlength
+            raise ExtractionError(message)
+    return val
+
+def ascii_extractor(widget, data):
+    val = data.extracted
+    if not widget.attrs.get('ascii', False):
+        return val
+    try:
+        str(val)
+    except UnicodeEncodeError:
+        raise ExtractionError(u'Input contains illegal characters.')
+    return val
+
+factory.defaults['password.required_class'] = 'required'
+factory.defaults['password.default'] = ''
+factory.defaults['password.class'] = 'password'
+factory.defaults['password.minlength'] = -1
+factory.defaults['password.ascii'] = False
+factory.register('password', 
+                 [
+                     generic_extractor,
+                     generic_required_extractor,
+                     minlength_extractor,
+                     ascii_extractor
+                 ],
+                 [input_generic_renderer],
+                 [InputGenericPreprocessor('password')])
 
 @managedprops(*css_managed_props)
 def input_proxy_renderer(widget, data):
@@ -298,7 +332,7 @@ def select_renderer(widget, data):
         }
         exists_marker = tag('input', **attrs)            
         return exists_marker + u''.join(tags)
-            
+        
 factory.defaults['select.multivalued'] = None
 factory.defaults['select.default'] = []
 factory.defaults['select.format'] = 'block'
@@ -397,3 +431,23 @@ def error_renderer(widget, data):
 factory.defaults['error.error_class'] = 'error'
 factory.defaults['error.message_class'] = 'errormessage'
 factory.register('error', [], [error_renderer])
+
+EMAIL_RE = u'^[a-zA-Z0-9\._\-]+@[a-zA-Z0-9\._\-]+.[a-zA-Z0-9]{2,6}$'
+
+def email_extractor(widget, data):
+    val = data.extracted
+    if not re.match(EMAIL_RE, val):
+        raise ExtractionError(u'Input not a valid email address.')
+    return val
+
+factory.defaults['email.required_class'] = 'required'
+factory.defaults['email.default'] = ''
+factory.defaults['email.class'] = 'email'
+factory.register('email', 
+                 [
+                     generic_extractor,
+                     generic_required_extractor,
+                     email_extractor
+                 ],
+                 [input_generic_renderer],
+                 [InputGenericPreprocessor('text')])

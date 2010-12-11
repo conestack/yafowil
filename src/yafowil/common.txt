@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 Yafowil common widgets
 ======================
 
@@ -334,3 +336,66 @@ Chained password inside error inside field.
       <input class="password required" id="input-password" name="password" type="password" value="secret"/>
     </div>
     <BLANKLINE>
+
+Password Widget
+---------------
+
+Password widget has 2 additional properties, ``minlength`` and ``ascii``.
+
+    >>> widget = factory(
+    ...     'password',
+    ...     name='password',
+    ...     props={
+    ...     })
+    >>> data = widget.extract({'password': 'xx'})
+    >>> data.errors
+    []
+    
+    >>> widget = factory(
+    ...     'password',
+    ...     name='password',
+    ...     props={
+    ...         'minlength': 3,
+    ...     })
+    >>> data = widget.extract({'password': 'xx'})
+    >>> data.errors
+    [ExtractionError('Input must have at least 3 characters.',)]
+    
+    >>> data = widget.extract({'password': 'xxx'})
+    >>> data.errors
+    []
+    
+    >>> widget = factory(
+    ...     'password',
+    ...     name='password',
+    ...     props={
+    ...         'ascii': True,
+    ...     })
+    >>> data = widget.extract({'password': u'xx'})
+    >>> data.errors
+    []
+    
+    >>> data = widget.extract({'password': u'äää'})
+    >>> data.errors
+    [ExtractionError('Input contains illegal characters.',)]
+
+Email Widget
+------------
+
+    >>> widget = factory(
+    ...     'email',
+    ...     name='email')
+    >>> pxml(widget())
+    <input class="email" id="input-email" name="email" type="text"/>
+    
+    >>> data = widget.extract({'email': 'foo@bar.com'})
+    >>> data.errors
+    []
+    
+    >>> data = widget.extract({'email': 'foo@bar'})
+    >>> data.errors
+    [ExtractionError('Input not a valid email address.',)]
+    
+    >>> data = widget.extract({'email': '@bar.com'})
+    >>> data.errors
+    [ExtractionError('Input not a valid email address.',)]
