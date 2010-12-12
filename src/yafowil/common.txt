@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 
-Yafowil common widgets
-======================
+Common widgets
+==============
 
 Trigger registry by importing.
 ::
 
     >>> import yafowil.common
 
-Helper::
+Helper
+::
+
     >>> from yafowil.utils import Tag
     >>> tag = Tag(lambda msg: msg)           
 
@@ -18,36 +20,32 @@ Text Input Widget
 ::
 
     >>> from yafowil.base import factory
-    >>> inputwidget = factory('text', name='MYTEXT', value='Test Text')    
-    >>> inputwidget()
-    u'<input class="text" id="input-MYTEXT" name="MYTEXT" type="text" value="Test Text" />'
+    >>> widget = factory('text', name='MYTEXT', value='Test Text')    
+    >>> widget()
+    u'<input class="text" id="input-MYTEXT" name="MYTEXT" type="text" 
+    value="Test Text" />'
 
-    >>> inputwidget = factory('password', 'MYPASSWORD', '')
-    >>> inputwidget()
-    u'<input class="password"  id="input-MYPASSWORD" name="MYPASSWORD" type="password" value="" />'
-
-    >>> inputwidget = factory('hidden', 'MYHIDDEN', 'Test Hidden')
-    >>> inputwidget()
-    u'<input class="hidden" id="input-MYHIDDEN" name="MYHIDDEN" type="hidden" value="Test Hidden" />'
+    >>> widget = factory('hidden', 'MYHIDDEN', 'Test Hidden')
+    >>> widget()
+    u'<input class="hidden" id="input-MYHIDDEN" name="MYHIDDEN" type="hidden" 
+    value="Test Hidden" />'
 
 
 Required Input Widget
 ---------------------
-
-Render required widget.
 ::
 
-    >>> inputwidget = factory('text', 'REQUIRED', '',
+    >>> widget = factory('text', 'REQUIRED', '',
     ...                       {'required': True,
     ...                        'error_class': True})
-    >>> inputwidget()
+    >>> widget()
     u'<input class="required text" id="input-REQUIRED" name="REQUIRED" 
     type="text" value="" />'
 
 Extract with empty request, key not in request therefore no error.
 ::
     
-    >>> data = inputwidget.extract({})
+    >>> data = widget.extract({})
     >>> data
     <RuntimeData REQUIRED, value='', extracted=<UNSET>, 
     attrs={'input_field_type': 'text'} at ...>
@@ -55,7 +53,7 @@ Extract with empty request, key not in request therefore no error.
 Extract with empty input sent, required error expected.
 ::    
     
-    >>> data = inputwidget.extract({'REQUIRED': ''})
+    >>> data = widget.extract({'REQUIRED': ''})
     >>> data
     <RuntimeData REQUIRED, value='', extracted='', 1 error(s), 
     attrs={'input_field_type': 'text'} at ...>
@@ -66,36 +64,42 @@ Extract with empty input sent, required error expected.
 With getter value set, empty request, no error expected.
 ::    
     
-    >>> inputwidget = factory('text', 'REQUIRED', 'Test Text',
-    ...                       {'required': True,
-    ...                        'error_class': True})
-    >>> data = inputwidget.extract({})
+    >>> widget = factory(
+    ...     'text',
+    ...     'REQUIRED',
+    ...     'Test Text',
+    ...     {'required': True,
+    ...      'error_class': True})
+    >>> data = widget.extract({})
     >>> data
     <RuntimeData REQUIRED, value='Test Text', extracted=<UNSET>,
     attrs={'input_field_type': 'text'} at ...>
 
-    >>> inputwidget(data=data)
-    u'<input class="required text" id="input-REQUIRED" name="REQUIRED" type="text" 
-    value="Test Text" />'
+    >>> widget(data=data)
+    u'<input class="required text" id="input-REQUIRED" name="REQUIRED" 
+    type="text" value="Test Text" />'
 
 With getter value set, request given, error expected.
 ::    
 
-    >>> data = inputwidget.extract({'REQUIRED': ''})
+    >>> data = widget.extract({'REQUIRED': ''})
     >>> data
     <RuntimeData REQUIRED, value='Test Text', extracted='', 1 error(s), 
     attrs={'input_field_type': 'text'} at ...>
     
-    >>> inputwidget(data=data)
+    >>> widget(data=data)
     u'<input class="error required text" id="input-REQUIRED" name="REQUIRED" 
     type="text" value="" />'
 
 Create a custom error message.
 ::    
 
-    >>> inputwidget = factory('text', 'REQUIRED', '',
-    ...                       {'required': 'You fool, fill in a value!'})
-    >>> data = inputwidget.extract({})
+    >>> widget = factory(
+    ...     'text',
+    ...     'REQUIRED',
+    ...     value='',
+    ...     props={'required': 'You fool, fill in a value!'})
+    >>> data = widget.extract({})
     >>> data 
     <RuntimeData REQUIRED, value='', extracted=<UNSET>, 
     attrs={'input_field_type': 'text'} at ...>
@@ -107,14 +111,14 @@ Checkbox Widget
 A boolean checkbox widget (default).
 ::
     
-    >>> inputwidget = factory('checkbox', 'MYCHECKBOX')    
-    >>> inputwidget()
+    >>> widget = factory('checkbox', 'MYCHECKBOX')    
+    >>> widget()
     u'<input id="input-MYCHECKBOX" name="MYCHECKBOX" 
     type="checkbox" value="" /><input id="checkboxexists-MYCHECKBOX" 
     name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />'
 
-    >>> inputwidget = factory('checkbox', 'MYCHECKBOX', value='True')    
-    >>> inputwidget()
+    >>> widget = factory('checkbox', 'MYCHECKBOX', value='True')    
+    >>> widget()
     u'<input checked="checked" id="input-MYCHECKBOX" name="MYCHECKBOX" 
     type="checkbox" value="" /><input id="checkboxexists-MYCHECKBOX" 
     name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />'
@@ -122,65 +126,88 @@ A boolean checkbox widget (default).
 A checkbox widget with an value or an empty string.
 ::
 
-    >>> inputwidget = factory('checkbox', 'MYCHECKBOX', '',
-    ...                       props={'format': 'string'})    
-    >>> inputwidget()
+    >>> widget = factory(
+    ...     'checkbox',
+    ...     'MYCHECKBOX',
+    ...     value='',
+    ...     props={'format': 'string'})    
+    >>> widget()
     u'<input id="input-MYCHECKBOX" name="MYCHECKBOX" 
     type="checkbox" value="" /><input id="checkboxexists-MYCHECKBOX" 
     name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />'
 
-    >>> inputwidget = factory('checkbox', 'MYCHECKBOX', 'Test Checkbox',
-    ...                       props={'format': 'string'})    
-    >>> inputwidget()
+    >>> widget = factory(
+    ...     'checkbox',
+    ...     'MYCHECKBOX',
+    ...     value='Test Checkbox',
+    ...     props={'format': 'string'})    
+    >>> widget()
     u'<input checked="checked" id="input-MYCHECKBOX" name="MYCHECKBOX" 
-    type="checkbox" value="Test Checkbox" /><input id="checkboxexists-MYCHECKBOX" 
-    name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />'
+    type="checkbox" value="Test Checkbox" /><input 
+    id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
+    type="hidden" value="checkboxexists" />'
 
 
 Textarea Widget
 ---------------
 ::
 
-    >>> inputwidget = factory('textarea', 'MYTEXTAREA', 'Test Textarea',
-    ...                       dict(label='Test Textarea Widget',
-    ...                            id={'label': 'TestLabelId'}))
-    >>> inputwidget()
-    u'<textarea cols="80" id="input-MYTEXTAREA" name="MYTEXTAREA" rows="25">Test Textarea</textarea>'
+    >>> widget = factory(
+    ...     'textarea',
+    ...     'MYTEXTAREA',
+    ...     value='Test Textarea',
+    ...     props={
+    ...         'label': 'Test Textarea Widget',
+    ...         'id': {
+    ...             'label': 'TestLabelId'
+    ...         },
+    ...     })
+    >>> widget()
+    u'<textarea cols="80" id="input-MYTEXTAREA" name="MYTEXTAREA" 
+    rows="25">Test Textarea</textarea>'
 
 
 Selection Widget
 ----------------
 ::
 
-    >>> selectwidget = factory('select', 'MYSELECT', ['one', 'three'],
-    ...                       {'vocabulary': [('one','One'), 
-    ...                                       ('two', 'Two'), 
-    ...                                       ('three', 'Three'),
-    ...                                       ('four', 'Four')],
-    ...                       })
-    >>> selectwidget()
+    >>> widget = factory(
+    ...     'select',
+    ...     'MYSELECT',
+    ...     value=['one', 'three'],
+    ...     props={
+    ...         'vocabulary': [
+    ...             ('one','One'), 
+    ...             ('two', 'Two'), 
+    ...             ('three', 'Three'),
+    ...             ('four', 'Four')]})
+    >>> widget()
     u'<select id="input-MYSELECT" name="MYSELECT"><option id="input-MYSELECT-one" 
     selected="selected" value="one">One</option><option id="input-MYSELECT-two" 
     value="two">Two</option><option id="input-MYSELECT-three" selected="selected" 
     value="three">Three</option><option id="input-MYSELECT-four" 
     value="four">Four</option></select>'
 
-    >>> data = selectwidget.extract({'MYSELECT': 'two'})
-    >>> selectwidget(data=data)
+    >>> data = widget.extract({'MYSELECT': 'two'})
+    >>> widget(data=data)
     u'<select id="input-MYSELECT" name="MYSELECT"><option id="input-MYSELECT-one" 
     value="one">One</option><option id="input-MYSELECT-two" selected="selected" 
     value="two">Two</option><option id="input-MYSELECT-three" 
     value="three">Three</option><option id="input-MYSELECT-four" 
     value="four">Four</option></select>'
     
-    >>> selectwidget = factory('select', 'MYSELECT', ['one', 'three'],
-    ...                       {'vocabulary': [('one','One'), 
-    ...                                       ('two', 'Two'), 
-    ...                                       ('three', 'Three'),
-    ...                                       ('four', 'Four')],
-    ...                        'format': 'single',
-    ...                       })
-    >>> selectwidget()
+    >>> widget = factory(
+    ...     'select',
+    ...     'MYSELECT',
+    ...     value=['one', 'three'],
+    ...     props={
+    ...         'vocabulary': [
+    ...             ('one','One'), 
+    ...             ('two', 'Two'), 
+    ...             ('three', 'Three'),
+    ...             ('four', 'Four')],
+    ...         'format': 'single'})
+    >>> widget()
     u'<input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
     value="exists" /><div id="radio-MYSELECT-one"><input checked="checked" 
     id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one" 
@@ -310,6 +337,154 @@ Chained file inside field with label.
     </div>
     <BLANKLINE>
 
+Password Widget
+---------------
+
+Password widget has some additional properties, ``strength``, ``minlength``
+and ``ascii``.
+
+Use in add forms, no password set yet.
+::
+    
+    >>> widget = factory(
+    ...     'password',
+    ...     name='pwd',
+    ...     props={
+    ...     })
+    >>> widget()
+    u'<input class="password" id="input-pwd" name="pwd" type="password" value="" />'
+    
+    >>> data = widget.extract({})
+    >>> data.extracted
+    <UNSET>
+    
+    >>> data = widget.extract({'pwd': 'xx'})
+    >>> data.extracted
+    'xx'
+
+Use in edit forms. note that password is never shown up in markup, but a
+placeholder is used when a password is already set. Thus, if a extracted
+password value is UNSET, this means that password was not changed.
+
+    >>> widget = factory(
+    ...     'password',
+    ...     name='password',
+    ...     value='secret',
+    ...     props={
+    ...     })
+    >>> widget()
+    u'<input class="password" id="input-password" name="password" type="password" value="_NOCHANGE_" />'
+    
+    >>> data = widget.extract({'password': '_NOCHANGE_'})
+    >>> data.extracted
+    <UNSET>
+    
+    >>> data = widget.extract({'password': 'foo'})
+    >>> data.extracted
+    'foo'
+    
+    >>> widget(data=data)
+    u'<input class="password" id="input-password" name="password" type="password" value="foo" />'
+
+Password validation.
+::
+
+    >>> widget = factory(
+    ...     'password',
+    ...     name='pwd',
+    ...     props={
+    ...         'strength': 4, # max 4
+    ...     })
+    >>> data = widget.extract({'pwd': ''})
+    >>> data.errors
+    [ExtractionError('Password too weak',)]
+    
+    >>> data = widget.extract({'pwd': 'A0*'})
+    >>> data.errors
+    [ExtractionError('Password too weak',)]
+    
+    >>> data = widget.extract({'pwd': 'a0*'})
+    >>> data.errors
+    [ExtractionError('Password too weak',)]
+    
+    >>> data = widget.extract({'pwd': 'aA*'})
+    >>> data.errors
+    [ExtractionError('Password too weak',)]
+    
+    >>> data = widget.extract({'pwd': 'aA0'})
+    >>> data.errors
+    [ExtractionError('Password too weak',)]
+    
+    >>> data = widget.extract({'pwd': 'aA0*'})
+    >>> data.errors
+    []
+
+Minlength validation.
+::
+
+    >>> widget = factory(
+    ...     'password',
+    ...     name='pwd',
+    ...     props={
+    ...         'minlength': 3,
+    ...     })
+    >>> data = widget.extract({'pwd': 'xx'})
+    >>> data.errors
+    [ExtractionError('Input must have at least 3 characters.',)]
+    
+    >>> data = widget.extract({'pwd': 'xxx'})
+    >>> data.errors
+    []
+
+Ascii validation.
+::
+
+    >>> widget = factory(
+    ...     'password',
+    ...     name='pwd',
+    ...     props={
+    ...         'ascii': True,
+    ...     })
+    >>> data = widget.extract({'pwd': u'äää'})
+    >>> data.errors
+    [ExtractionError('Input contains illegal characters.',)]
+    
+    >>> data = widget.extract({'pwd': u'xx'})
+    >>> data.errors
+    []
+
+Combine all validations.
+::
+
+    >>> widget = factory(
+    ...     'password',
+    ...     name='pwd',
+    ...     props={
+    ...         'required': 'No Password given',
+    ...         'minlength': 6,
+    ...         'ascii': True,
+    ...         'strength': 4,
+    ...     })
+    >>> data = widget.extract({'pwd': u''})
+    >>> data.errors
+    [ExtractionError('No Password given',)]
+    
+    >>> data = widget.extract({'pwd': u'xxxxx'})
+    >>> data.errors
+    [ExtractionError('Input must have at least 6 characters.',)]
+    
+    >>> data = widget.extract({'pwd': u'xxxxxä'})
+    >>> data.errors
+    [ExtractionError('Input contains illegal characters.',)]
+    
+    >>> data = widget.extract({'pwd': u'xxxxxx'})
+    >>> data.errors
+    [ExtractionError('Password too weak',)]
+    
+    >>> data = widget.extract({'pwd': u'xX1*00'})
+    >>> data.errors
+    []
+
 Error Widget
 ------------
 
@@ -337,48 +512,6 @@ Chained password inside error inside field.
     </div>
     <BLANKLINE>
 
-Password Widget
----------------
-
-Password widget has 2 additional properties, ``minlength`` and ``ascii``.
-
-    >>> widget = factory(
-    ...     'password',
-    ...     name='password',
-    ...     props={
-    ...     })
-    >>> data = widget.extract({'password': 'xx'})
-    >>> data.errors
-    []
-    
-    >>> widget = factory(
-    ...     'password',
-    ...     name='password',
-    ...     props={
-    ...         'minlength': 3,
-    ...     })
-    >>> data = widget.extract({'password': 'xx'})
-    >>> data.errors
-    [ExtractionError('Input must have at least 3 characters.',)]
-    
-    >>> data = widget.extract({'password': 'xxx'})
-    >>> data.errors
-    []
-    
-    >>> widget = factory(
-    ...     'password',
-    ...     name='password',
-    ...     props={
-    ...         'ascii': True,
-    ...     })
-    >>> data = widget.extract({'password': u'xx'})
-    >>> data.errors
-    []
-    
-    >>> data = widget.extract({'password': u'äää'})
-    >>> data.errors
-    [ExtractionError('Input contains illegal characters.',)]
-
 Email Widget
 ------------
 
@@ -388,10 +521,6 @@ Email Widget
     >>> pxml(widget())
     <input class="email" id="input-email" name="email" type="text"/>
     
-    >>> data = widget.extract({'email': 'foo@bar.com'})
-    >>> data.errors
-    []
-    
     >>> data = widget.extract({'email': 'foo@bar'})
     >>> data.errors
     [ExtractionError('Input not a valid email address.',)]
@@ -399,3 +528,7 @@ Email Widget
     >>> data = widget.extract({'email': '@bar.com'})
     >>> data.errors
     [ExtractionError('Input not a valid email address.',)]
+    
+    >>> data = widget.extract({'email': 'foo@bar.com'})
+    >>> data.errors
+    []
