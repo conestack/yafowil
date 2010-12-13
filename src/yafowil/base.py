@@ -298,12 +298,9 @@ class Widget(AttributedNode):
             data.value = self.getter        
         for ppname, pp in self.preprocessors:
             data.current_prefix = ppname
-            try:
-                data = pp(self, data)
-            except Exception, e:
-                data.current_prefix = None 
-                e.args = [a for a in e.args] + [str(pp)] + self.path
-                raise e
+            __traceback_supplement__ = (TBSupplement, self, pp, 
+                                        'preprocessor', ppname)
+            data = pp(self, data)
         data.current_prefix = None
         data.preprocessed = True 
         return data

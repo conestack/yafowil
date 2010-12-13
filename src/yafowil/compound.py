@@ -36,9 +36,12 @@ factory.register('compound',
                  [])
 
 def fieldset_renderer(widget, data):
+    css = widget.attrs.get('class', list())
+    if isinstance(css, basestring):
+        css = [css]    
     fs_attrs = {
         'id': cssid(widget, 'fieldset'),
-        'class_': cssclasses(widget, data)
+        'class_': cssclasses(widget, data, *css)
     }
     rendered = data.rendered
     if widget.attrs['legend']:
@@ -46,6 +49,7 @@ def fieldset_renderer(widget, data):
     return data.tag('fieldset', rendered, **fs_attrs)   
 
 factory.defaults['fieldset.legend'] = False
+factory.defaults['fieldset.class'] = []
 factory.register('fieldset', 
                  factory.extractors('compound'), 
                  factory.renderers('compound') + [fieldset_renderer])
