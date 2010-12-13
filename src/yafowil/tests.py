@@ -17,9 +17,13 @@ TESTFILES = [
     'mode.txt',
     'table.txt',
 ]
-def pxml(xml):
+
+def fxml(xml):
     et = etree.fromstring(xml)
-    print etree.tostring(et, pretty_print=True)
+    return etree.tostring(et, pretty_print=True)
+
+def pxml(xml):
+    print fxml(xml)
 
 def test_suite():
     return unittest.TestSuite([
