@@ -84,6 +84,7 @@ def input_generic_renderer(widget, data):
         'id': cssid(widget, 'input'),    
         'class_': cssclasses(widget, data, *css),
         'disabled': widget.attrs.get('disabled'),
+        'placeholder': widget.attrs.get('placeholder'),
     }
     return tag('input', **input_attrs)
 
@@ -154,6 +155,7 @@ def textarea_renderer(widget, data):
         'cols': widget.attrs['cols'],
         'rows': widget.attrs['rows'],
         'readonly': widget.attrs['readonly'] and 'readonly',
+        'placeholder': widget.attrs.get('placeholder'),
     }
     value = _value(widget, data)
     if not value:
@@ -246,6 +248,7 @@ def password_renderer(widget, data):
         'id': cssid(widget, 'input'),    
         'class_': cssclasses(widget, data, *css),
         'disabled': widget.attrs.get('disabled'),
+        'placeholder': widget.attrs.get('placeholder'),
     }
     return tag('input', **input_attrs)
 
