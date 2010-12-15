@@ -78,6 +78,7 @@ def input_generic_renderer(widget, data):
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),    
         'class_': cssclasses(widget, data),
+        'size': widget.attrs.get('size'),
         'disabled': widget.attrs.get('disabled'),
     }
     return tag('input', **input_attrs)
@@ -100,6 +101,7 @@ def register_generic_input(subtype, enable_required_class=True):
         factory.defaults['%s.required_class' % subtype] = 'required'
     factory.defaults['%s.default' % subtype] = ''
     factory.defaults['%s.class' % subtype] = subtype
+    factory.defaults['%s.size' % subtype] = None
     factory.register(subtype, 
                      [generic_extractor, generic_required_extractor], 
                      [input_generic_renderer],
