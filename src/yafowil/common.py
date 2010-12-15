@@ -1,8 +1,10 @@
 import re
+import logging
 from yafowil.base import (
     factory,
     UNSET,
     ExtractionError,
+    fetch_value
 )
 from utils import (
     cssclasses,
@@ -40,13 +42,9 @@ factory.document['required_class_default'] = """\
 ###############################################################################
 
 def _value(widget, data):
-    """XXX: move to utils.
-    """
-    if data.extracted is not UNSET:
-        return data.extracted
-    if data.value is not UNSET:
-        return data.value 
-    return widget.attrs['default']
+    logging.warn("Deprecated usage of 'yafowil.common._value', please use "+\
+                 "'yafowil.common.fetch_value' instead.") 
+    return fetch_value(widget, data)   
     
 def generic_extractor(widget, data):
     __managed_props = []     
@@ -73,16 +71,13 @@ def generic_required_extractor(widget, data):
 @managedprops('type', *css_managed_props)
 def input_generic_renderer(widget, data):
     tag = data.tag
-    css = widget.attrs.get('class', list())
-    if isinstance(css, basestring):
-        css = [css]
     input_attrs = {
         'type': data.attrs.get('input_field_type', False) \
                 or widget.attrs['type'],
-        'value':  _value(widget, data),
+        'value':  fetch_value(widget, data),
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),    
-        'class_': cssclasses(widget, data, *css),
+        'class_': cssclasses(widget, data),
         'disabled': widget.attrs.get('disabled'),
     }
     return tag('input', **input_attrs)
@@ -143,19 +138,16 @@ factory.register('proxy',
 
 def textarea_renderer(widget, data):
     tag = data.tag
-    css = widget.attrs.get('css', list())
-    if isinstance(css, basestring):
-        css = [css]
     area_attrs = {
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),
-        'class_': cssclasses(widget, data, *css),            
+        'class_': cssclasses(widget, data),            
         'wrap': widget.attrs['wrap'],
         'cols': widget.attrs['cols'],
         'rows': widget.attrs['rows'],
         'readonly': widget.attrs['readonly'] and 'readonly',
     }
-    value = _value(widget, data)
+    value = fetch_value(widget, data)
     if not value:
         value = ''
     return tag('textarea', value, **area_attrs)
@@ -228,9 +220,6 @@ def password_extractor(widget, data):
 
 def password_renderer(widget, data):
     tag = data.tag
-    css = widget.attrs.get('class', list())
-    if isinstance(css, basestring):
-        css = [css]
     def pwd_value(widget, data):
         if data.extracted is not UNSET:
             return data.extracted
@@ -244,7 +233,7 @@ def password_renderer(widget, data):
         'value':  value,
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),    
-        'class_': cssclasses(widget, data, *css),
+        'class_': cssclasses(widget, data),
         'disabled': widget.attrs.get('disabled'),
     }
     return tag('input', **input_attrs)
@@ -277,20 +266,17 @@ def input_checkbox_extractor(widget, data):
         return data.request.get(widget.dottedpath, '')
     raise ValueError, 'Checkbox widget has invalid format % s set' % format
 
-@managedprops('format', 'css', *css_managed_props)
+@managedprops('format', *css_managed_props)
 def input_checkbox_renderer(widget, data):
     tag = data.tag
-    value = _value(widget, data)
-    css = widget.attrs.get('css', list())
-    if isinstance(css, basestring):
-        css = [css]
+    value = fetch_value(widget, data)
     input_attrs = {
         'type': 'checkbox',
         'checked':  value and 'checked' or None,
         'value': value,
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),    
-        'class_': cssclasses(widget, data, *css),    
+        'class_': cssclasses(widget, data),    
     }
     if widget.attrs['format'] == 'bool':
         input_attrs['value'] = ''
@@ -328,14 +314,11 @@ def select_extractor(widget, data):
 
 def select_renderer(widget, data):
     tag = data.tag
-    value = _value(widget, data)
+    value = fetch_value(widget, data)
     if value is None:
         value = []
     if isinstance(value, basestring) or not hasattr(value, '__iter__'):
         value = [value]
-    css = widget.attrs.get('css', list())
-    if isinstance(css, basestring):
-        css = [css]
     if widget.attrs['format'] == 'block':
         optiontags = []
         for key, term in vocabulary(widget.attrs.get('vocabulary', [])):
@@ -348,7 +331,7 @@ def select_renderer(widget, data):
         select_attrs = {
             'name_': widget.dottedpath,
             'id': cssid(widget, 'input'),
-            'class_': cssclasses(widget, data, *css),                        
+            'class_': cssclasses(widget, data),                        
             'multiple': widget.attrs['multivalued'] and 'multiple' or None,
         }
         return tag('select', *optiontags, **select_attrs)
@@ -365,7 +348,7 @@ def select_renderer(widget, data):
                 'checked': (key in value) and 'checked' or None,
                 'name_': widget.dottedpath,
                 'id': cssid(widget, 'input', key),    
-                'class_': cssclasses(widget, data, *css),    
+                'class_': cssclasses(widget, data),    
             }
             input = tag('input', **attrs)
             text = tag('span', term)
@@ -406,13 +389,10 @@ def file_extracor(widget, data):
 @managedprops('css', 'accept',*css_managed_props)
 def input_file_renderer(widget, data):
     tag = data.tag
-    css = widget.attrs.get('css', list())
-    if isinstance(css, basestring):
-        css = [css]
     input_attrs = {
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),
-        'class_': cssclasses(widget, data, *css),            
+        'class_': cssclasses(widget, data),            
         'type': 'file',
         'value':  '',
     }
@@ -503,7 +483,7 @@ def label_renderer(widget, data):
     label_text = widget.attrs.get('label', widget.__name__)
     label_attrs = {
         'for_': cssid(widget, 'input'),
-        'class_': cssclasses(widget, data, widget.attrs['class'])
+        'class_': cssclasses(widget, data)
     }
     help = u''
     if widget.attrs['help']:
@@ -529,7 +509,7 @@ def field_renderer(widget, data):
     tag = data.tag
     div_attrs = {
         'id': cssid(widget, 'field'),
-        'class_': cssclasses(widget, data, widget.attrs['class'])
+        'class_': cssclasses(widget, data)
     }
     if widget.attrs['witherror'] and data.errors:
         div_attrs['class_'] += u' %s' % widget.attrs['witherror']

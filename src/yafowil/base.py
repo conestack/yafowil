@@ -405,3 +405,12 @@ class Factory(object):
         return self._factories[name][3]
         
 factory = Factory()
+
+def fetch_value(widget, data):
+    """fetch extracted, given value or default 
+    """
+    if data.extracted is not UNSET:
+        return data.extracted
+    if data.value is not UNSET:
+        return data.value 
+    return widget.attrs['default']
