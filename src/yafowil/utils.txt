@@ -121,3 +121,7 @@ Test CSS Classes
     >>> print cssclasses(widget, data)
     bar error foo required
     
+    >>> print cssclasses(widget, data, additional=['zika', 'akiz'])
+    akiz bar error foo required zika
+    
+    
