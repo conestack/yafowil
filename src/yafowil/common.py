@@ -14,44 +14,48 @@ from utils import (
     vocabulary,
 )
 
+###############################################################################
+# common defaults
+###############################################################################
+
 factory.defaults['default'] = None
-factory.document['default'] = \
+factory.doc['props']['default'] = \
 """Default value.
 """
 
 factory.defaults['class'] = None
-factory.document['class'] = \
+factory.doc['props']['class'] = \
 """Common CSS-class to put on.
 """
 
 factory.defaults['error_class'] = None
-factory.document['error_class'] = \
+factory.doc['props']['error_class'] = \
 """CSS-class to put on in case of error.
 """
 
 factory.defaults['error_class_default'] = 'error'
-factory.document['error_class_default'] = \
+factory.doc['props']['error_class_default'] = \
 """Fallback CSS-class to put on in case of error if no specific class was 
 given.
 """
 
 factory.defaults['required'] = False
-factory.document['required'] = \
+factory.doc['props']['required'] = \
 """Wether this value is required or not.
 """
 
 factory.defaults['required_message'] = u'Mandatory field was empty'          
-factory.document['required_message'] = \
+factory.doc['props']['required_message'] = \
 """Message to be shown if required condition was not met.
-"""   
+""" 
             
 factory.defaults['required_class'] = None
-factory.document['required_class'] = \
+factory.doc['props']['required_class'] = \
 """CSS-class to put on in case if required condition was not met.
 """
-    
+
 factory.defaults['required_class_default'] = 'required'
-factory.document['required_class_default'] = \
+factory.doc['props']['required_class_default'] = \
 """CSS-class to put on in case if required condition was not met if no specific 
 class was given.
 """
@@ -135,26 +139,53 @@ def input_generic_renderer(widget, data):
 # text
 ###############################################################################
 
-factory.defaults['text.type'] = 'text'
-factory.defaults['text.required_class'] = 'required'
-factory.defaults['text.default'] = ''
-factory.defaults['text.class'] = 'text'
-factory.defaults['text.size'] = None
-factory.defaults['text.disabled'] = False
 factory.register('text', 
                  [generic_extractor, generic_required_extractor], 
                  [input_generic_renderer])
+factory.doc['widget']['text'] = \
+"""Text input widget.
+"""
+
+factory.defaults['text.type'] = 'text'
+factory.doc['props']['text.type'] = \
+"""Type of input tag.
+"""
+
+factory.defaults['text.required_class'] = 'required'
+
+factory.defaults['text.default'] = ''
+
+factory.defaults['text.class'] = 'text'
+
+factory.defaults['text.size'] = None
+factory.doc['props']['text.size'] = \
+"""Allowed input size.
+"""
+
+factory.defaults['text.disabled'] = False
+factory.doc['props']['text.disabled'] = \
+"""Flag wether input field is disabled.
+"""
 
 ###############################################################################
 # hidden
 ###############################################################################
 
-factory.defaults['hidden.type'] = 'hidden'
-factory.defaults['hidden.default'] = ''
-factory.defaults['hidden.class'] = 'hidden'
 factory.register('hidden', 
                  [generic_extractor], 
                  [input_generic_renderer])
+factory.doc['widget']['hidden'] = \
+"""Hidden input widget.
+"""
+
+factory.defaults['hidden.type'] = 'hidden'
+factory.doc['props']['hidden.type'] = \
+"""Type of input tag.
+"""
+
+factory.defaults['hidden.default'] = ''
+
+factory.defaults['hidden.class'] = 'hidden'
 
 ###############################################################################
 # proxy 
