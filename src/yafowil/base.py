@@ -30,7 +30,8 @@ class DictReprAttributes(NodeAttributes):
     __str__ = __repr__    
         
 class RuntimeData(AttributedNode):
-    """Holds Runtime data of widget."""
+    """Holds Runtime data of widget.
+    """
 
     attributes_factory = DictReprAttributes  
     
@@ -80,7 +81,8 @@ class RuntimeData(AttributedNode):
 
 class ExtractionError(Exception):
     """Indicates problems on extraction time, such as conversion, validation
-    or similar problems.""" 
+    or similar problems.
+    """ 
     
     def __init__(self, msg, abort=True):       
         """Initialize Exception
@@ -91,7 +93,6 @@ class ExtractionError(Exception):
         ``abort``
             if True the extraction chain continues. Default to False, which 
             stops extraction.
-        
         """
         Exception.__init__(self, msg)
         self.abort = abort
@@ -139,7 +140,7 @@ class WidgetAttributes(DictReprAttributes):
             return default
             
 class Widget(AttributedNode):
-    """Base Widget Class
+    """Base Widget Class.
     """
     
     attributes_factory = WidgetAttributes
@@ -208,7 +209,7 @@ class Widget(AttributedNode):
         self._lock.release()        
                 
     def __call__(self, data=None, request=None):
-        """renders the widget.
+        """Renders the widget.
         
         If data is passed in request is ignored! Request can't be passed in 
         together with data.
@@ -244,14 +245,13 @@ class Widget(AttributedNode):
         return data.rendered
     
     def extract(self, request, parent=None):
-        """extract the data from the request by calling the given extractors. 
+        """Extract the data from the request by calling the given extractors. 
         
         ``request`` 
             expects a dict-like object
             
         ``parent``
             parent data       
-
         """
         data = RuntimeData(self.__name__)
         data.request = request
@@ -330,7 +330,7 @@ class Factory(object):
                  value=None, 
                  props=dict(),
                  custom=dict()):
-        """creates a widget.
+        """Creates a widget.
         
         ``reg_names``
             a string or list defining which widget(s) to build. If reg_names is
@@ -407,7 +407,7 @@ class Factory(object):
 factory = Factory()
 
 def fetch_value(widget, data):
-    """fetch extracted, given value or default 
+    """Fetch extracted, given value or default .
     """
     if data.extracted is not UNSET:
         return data.extracted
