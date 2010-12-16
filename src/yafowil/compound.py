@@ -36,12 +36,9 @@ factory.register('compound',
                  [])
 
 def fieldset_renderer(widget, data):
-    css = widget.attrs.get('class', list())
-    if isinstance(css, basestring):
-        css = [css]    
     fs_attrs = {
         'id': cssid(widget, 'fieldset'),
-        'class_': cssclasses(widget, data, *css)
+        'class_': cssclasses(widget, data)
     }
     rendered = data.rendered
     if widget.attrs['legend']:
@@ -60,7 +57,7 @@ def form_renderer(widget, data):
         'method': widget.attrs['method'],
         'enctype': widget.attrs['method']=='post' and \
                    widget.attrs['enctype'] or None,
-        'class_': widget.attrs.get('class'),
+        'class_': cssclasses(widget, data),
         'id': 'form-%s' % '-'.join(widget.path),
     }
     if callable(form_attrs['action']):

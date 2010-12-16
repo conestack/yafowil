@@ -1,6 +1,5 @@
-from yafowil.base import factory
+from yafowil.base import factory, fetch_value
 from yafowil.utils import cssid, cssclasses
-from yafowil.common import _value
 
 def edit_renderer(widget, data):
     return data.rendered
@@ -11,7 +10,7 @@ def none_renderer(widget, data):
 def hidden_renderer(widget, data):
     hidden_attrs = {
         'type': 'hidden',
-        'value':  _value(widget, data),
+        'value':  fetch_value(widget, data),
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),    
         'class_': cssclasses(widget, data),    

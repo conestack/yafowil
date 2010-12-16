@@ -55,6 +55,7 @@ Test CSS Classes
     ...         self.attrs['required_class_default'] = 'required'
     ...         self.attrs['error_class'] = None
     ...         self.attrs['error_class_default'] = 'error'
+    ...         self.attrs['class'] = None
     >>> widget = DummyWidget()
     
     >>> class DummyData(object):
@@ -66,9 +67,11 @@ Test CSS Classes
     >>> print cssclasses(widget, data)
     None
 
-    >>> print cssclasses(widget, data, 'foo', 'bar')
+    >>> widget.attrs['class'] = 'foo bar'
+    >>> print cssclasses(widget, data)
     bar foo
     
+    >>> widget.attrs['class'] = None
     >>> widget.attrs['required'] = True
     >>> print cssclasses(widget, data)
     None
@@ -82,9 +85,11 @@ Test CSS Classes
     >>> print cssclasses(widget, data)
     error
 
-    >>> print cssclasses(widget, data, 'foo', 'bar')
+    >>> widget.attrs['class'] = 'foo bar'
+    >>> print cssclasses(widget, data)
     bar error foo
 
+    >>> widget.attrs['class'] = None
     >>> widget.attrs['error_class'] = 'othererror'
     >>> print cssclasses(widget, data)
     othererror
@@ -112,6 +117,11 @@ Test CSS Classes
     >>> print cssclasses(widget, data)
     error required
 
-    >>> print cssclasses(widget, data, 'foo', 'bar')
+    >>> widget.attrs['class'] = 'foo bar'
+    >>> print cssclasses(widget, data)
     bar error foo required
+    
+    >>> print cssclasses(widget, data, additional=['zika', 'akiz'])
+    akiz bar error foo required zika
+    
     

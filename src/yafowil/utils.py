@@ -109,7 +109,7 @@ def cssid(widget, prefix, postfix=None):
     
 css_managed_props = ['error_class', 'error_class_default',
                      'required_class', 'required_class_default']
-def cssclasses(widget, data, *args):
+def cssclasses(widget, data, classattr='class', additional=[]):
     _classes = list()
     if widget.attrs['error_class'] and data.errors:
         if isinstance(widget.attrs['error_class'], basestring):
@@ -121,5 +121,7 @@ def cssclasses(widget, data, *args):
             _classes.append(widget.attrs['required_class'])
         else:
             _classes.append(widget.attrs['required_class_default'])
-    _classes += [_ for _ in args if _]
+    if widget.attrs[classattr]:
+        _classes+= widget.attrs[classattr].split()
+    _classes += additional
     return _classes and ' '.join(sorted(_classes)) or None

@@ -1,9 +1,10 @@
 from yafowil.base import factory
+from yafowil.utils import cssclasses
 
 def table_renderer(widget, data):
     attrs = {
         'id': widget.attrs.get('id'),
-        'class_': widget.attrs.get('class'),
+        'class_': cssclasses(widget, data),
     }
     return data.tag('table', data.rendered, **attrs)
 
@@ -28,7 +29,7 @@ factory.register('tbody',
 def tr_renderer(widget, data):
     attrs = {
         'id': widget.attrs.get('id'),
-        'class_': widget.attrs.get('class'),
+        'class_': cssclasses(widget, data),
     }
     return data.tag('tr', data.rendered, **attrs)
 
@@ -39,7 +40,7 @@ factory.register('tr',
 def th_renderer(widget, data):
     attrs = {
         'id': widget.attrs.get('id'),
-        'class_': widget.attrs.get('class'),
+        'class_': cssclasses(widget, data),
         'colspan': widget.attrs.get('colspan'),
         'rowspan': widget.attrs.get('rowspan'),
     }
@@ -55,7 +56,7 @@ factory.register('th',
 def td_renderer(widget, data):
     attrs = {
         'id': widget.attrs.get('id'),
-        'class_': widget.attrs.get('class'),
+        'class_': cssclasses(widget, data),
         'colspan': widget.attrs.get('colspan'),
         'rowspan': widget.attrs.get('rowspan'),
     }
