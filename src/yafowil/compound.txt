@@ -29,23 +29,21 @@ Extract Compound empty.
     <RuntimeData COMPOUND, value=None, extracted=None at ...>
 
     >>> data['inner']
-    <RuntimeData COMPOUND.inner, value='value1', extracted=<UNSET>, 
-    attrs={'input_field_type': 'text'} at ...>    
+    <RuntimeData COMPOUND.inner, value='value1', extracted=<UNSET> at ...>    
 
 Extract with a value in request
 ::
 
     >>> data = compound.extract({'COMPOUND.inner': 'newvalue'})
     >>> data['inner']
-    <RuntimeData COMPOUND.inner, value='value1', extracted='newvalue', 
-    attrs={'input_field_type': 'text'} at ...>    
+    <RuntimeData COMPOUND.inner, value='value1', extracted='newvalue' at ...>    
 
 Extract with empty required, error should be there.
 
     >>> data = compound.extract({'COMPOUND.inner2': ''})
     >>> data['inner2']
-    <RuntimeData COMPOUND.inner2, value='value2', extracted='', 1 error(s), 
-    attrs={'input_field_type': 'text'} at ...>
+    <RuntimeData COMPOUND.inner2, value='value2', extracted='', 
+    1 error(s) at ...>
 
 Test Fieldset
 ::
@@ -117,6 +115,5 @@ Get form data out of request (request is expected dict-like)::
     ...            'action.myform.submit': 'submit'}
     >>> controller = Controller(form, request)
     <RuntimeData myform, value=None, extracted=None at ...>
-      <RuntimeData myform.someinput, value=None, extracted='Hello World', 
-      attrs={'input_field_type': 'text'} at ...>
+      <RuntimeData myform.someinput, value=None, extracted='Hello World' at ...>
       <RuntimeData myform.submit, value=None, extracted=<UNSET> at ...>
