@@ -38,8 +38,6 @@ class RuntimeDataAttributed(Attributed):
 @behavior(RuntimeDataAttributed)        
 class RuntimeData(OrderedNode):
     """Holds Runtime data of widget."""
-
-    attributes_factory = NodeAttributes  
         
     def __init__(self, name=None):
         OrderedNode.__init__(self, name=name)
