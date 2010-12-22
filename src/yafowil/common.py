@@ -250,10 +250,7 @@ def textarea_renderer(widget, data):
         'rows': widget.attrs['rows'],
         'readonly': widget.attrs['readonly'] and 'readonly',
     }
-    value = fetch_value(widget, data)
-    if value is UNSET:
-        value = ''
-    return tag('textarea', value, **area_attrs)
+    return tag('textarea', fetch_value(widget, data), **area_attrs)
 
 factory.register('textarea', 
                  [generic_extractor, generic_required_extractor], 
