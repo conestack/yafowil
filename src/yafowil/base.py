@@ -124,7 +124,7 @@ class WidgetAttributes(NodeAttributes):
         if value is not UNSET:
             return value        
         try:
-            value = NodeAttributes.__getitem__(self, prefixed)
+            value = NodeAttributes.__getitem__(self, name)
         except KeyError:
             value = UNSET
         if value is not UNSET:
