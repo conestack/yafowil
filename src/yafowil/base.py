@@ -28,7 +28,14 @@ def _dict__repr__(self):
     return '{%s}' % ', '.join(['%s: %s' % (repr(k), repr(v)) 
                                for k,v in self.items()])
 
-@behavior(Attributed)        
+class RuntimeDataAttributes(NodeAttributes):
+    __str__ = __repr__ = _dict__repr__
+
+class RuntimeDataAttributed(Attributed):
+
+    attributes_factory = RuntimeDataAttributes
+
+@behavior(RuntimeDataAttributed)        
 class RuntimeData(OrderedNode):
     """Holds Runtime data of widget."""
 
@@ -36,7 +43,6 @@ class RuntimeData(OrderedNode):
         
     def __init__(self, name=None):
         OrderedNode.__init__(self, name=name)
-        self.attribute_access_for_attrs = False                
         self.request = UNSET
         self.value = UNSET
         self.preprocessed = False
@@ -107,6 +113,8 @@ class TBSupplement(object):
 @behavior(Attributed)       
 class WidgetAttributes(NodeAttributes):
     
+    __str__ = __repr__ = _dict__repr__
+        
     def __getitem__(self, name):
         prefixed = '%s.%s' % (self.__parent__.current_prefix or '', name)
         try:
@@ -135,6 +143,8 @@ class WidgetAttributes(NodeAttributes):
             return self[key]
         except KeyError:
             return default
+        
+    
         
 class WidgetAttributed(Attributed):
 
@@ -188,7 +198,6 @@ class Widget(OrderedNode):
             a dict with defaults value for the widgets attributes.
         """
         OrderedNode.__init__(self, uniquename)
-        self.attribute_access_for_attrs = False        
         self.getter = value_or_getter
         self.extractors = extractors
         self.renderers = renderers

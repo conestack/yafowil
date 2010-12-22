@@ -453,7 +453,7 @@ prefix.
     >>> widget()
     u'<ID>Test</ID>'
 
-    >>> widget = factory('prefix', props={'id': 'Test2'})
+    >>> widget = factory('prefix', name='test', props={'id': 'Test2'})
     >>> widget()
     u'<ID>Test2</ID>'
     
