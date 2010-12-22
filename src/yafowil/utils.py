@@ -122,6 +122,8 @@ def cssclasses(widget, data, classattr='class', additional=[]):
         else:
             _classes.append(widget.attrs['required_class_default'])
     if widget.attrs[classattr]:
-        _classes+= widget.attrs[classattr].split()
+        if widget.__name__ == 'foo_table':
+            import pdb;pdb.set_trace()
+        _classes += widget.attrs[classattr].split()
     _classes += additional
     return _classes and ' '.join(sorted(_classes)) or None
