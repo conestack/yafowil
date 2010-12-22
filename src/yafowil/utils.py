@@ -111,17 +111,18 @@ css_managed_props = ['error_class', 'error_class_default',
                      'required_class', 'required_class_default']
 def cssclasses(widget, data, classattr='class', additional=[]):
     _classes = list()
-    if widget.attrs['error_class'] and data.errors:
-        if isinstance(widget.attrs['error_class'], basestring):
-            _classes.append(widget.attrs['error_class'])
+    attrs = widget.attrs
+    if attrs['error_class'] and data.errors:
+        if isinstance(attrs['error_class'], basestring):
+            _classes.append(attrs['error_class'])
         else:
-            _classes.append(widget.attrs['error_class_default'])
-    if widget.attrs['required_class'] and widget.attrs['required']:
-        if isinstance(widget.attrs['required_class'], basestring):
-            _classes.append(widget.attrs['required_class'])
+            _classes.append(attrs['error_class_default'])
+    if attrs['required_class'] and attrs['required']:
+        if isinstance(attrs['required_class'], basestring):
+            _classes.append(attrs['required_class'])
         else:
-            _classes.append(widget.attrs['required_class_default'])
-    if widget.attrs[classattr]:
-        _classes+= widget.attrs[classattr].split()
+            _classes.append(attrs['required_class_default'])
+    if attrs[classattr]:
+        _classes += attrs[classattr].split()
     _classes += additional
     return _classes and ' '.join(sorted(_classes)) or None

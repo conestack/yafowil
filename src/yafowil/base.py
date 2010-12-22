@@ -1,6 +1,11 @@
 from threading import RLock
-from zodict import AttributedNode
-from zodict.node import NodeAttributes
+from node.base import OrderedNode
+from node.behavior import (
+    behavior,
+    Attributed,
+) 
+from node.behavior.attributed import NodeAttributes
+
 from yafowil.utils import Tag
 
 class Unset(object): 
@@ -19,25 +24,23 @@ class Unset(object):
 
 UNSET = Unset()
 
-callable = lambda o: hasattr(o, '__call__')
+def _dict__repr__(self):  
+    return '{%s}' % ', '.join(['%s: %s' % (repr(k), repr(v)) 
+                               for k,v in self.items()])
 
-class DictReprAttributes(NodeAttributes):
-    
-    def __repr__(self, ):  
-        return '{%s}' % ', '.join(['%s: %s' % (repr(k), repr(v)) 
-                                   for k,v in self.items()])
+class RuntimeDataAttributes(NodeAttributes):
+    __str__ = __repr__ = _dict__repr__
 
-    __str__ = __repr__    
+class RuntimeDataAttributed(Attributed):
+
+    attributes_factory = RuntimeDataAttributes
+
+@behavior(RuntimeDataAttributed)        
+class RuntimeData(OrderedNode):
+    """Holds Runtime data of widget."""
         
-class RuntimeData(AttributedNode):
-    """Holds Runtime data of widget.
-    """
-
-    attributes_factory = DictReprAttributes  
-    
     def __init__(self, name=None):
-        super(RuntimeData, self).__init__(name=name)
-        self.attribute_access_for_attrs = False                
+        OrderedNode.__init__(self, name=name)
         self.request = UNSET
         self.value = UNSET
         self.preprocessed = False
@@ -73,12 +76,12 @@ class RuntimeData(AttributedNode):
         rep += ' at %s>' % hex(id(self))[:-1]
         return rep
 
-    @property
-    def noderepr(self):
-        return repr(self)     
-    
     __str__ = __repr__
 
+    @property
+    def noderepr(self):
+        return repr(self)
+    
 class ExtractionError(Exception):
     """Indicates problems on extraction time, such as conversion, validation
     or similar problems.
@@ -105,21 +108,23 @@ class TBSupplement(object):
     def __init__(self, widget, func, task, name):
         self.manageable_object = func
         self.warnings = ['Occured on %s in widget "%s" with name "%s"' % \
-                         (task, widget.dottedpath, name)]
-                
-class WidgetAttributes(DictReprAttributes):
+                         (task, widget.dottedpath, name)]     
+
+@behavior(Attributed)       
+class WidgetAttributes(NodeAttributes):
     
+    __str__ = __repr__ = _dict__repr__
+        
     def __getitem__(self, name):
-        prefixed = '%s.%s' % (self._node.current_prefix or '', name)
+        prefixed = '%s.%s' % (self.__parent__.current_prefix or '', name)
         try:
-            value = super(WidgetAttributes, self).__getitem__(prefixed)
+            value = NodeAttributes.__getitem__(self, prefixed)
         except KeyError:
             value = UNSET
         if value is not UNSET:
-            return value
-        
+            return value        
         try:
-            value = super(WidgetAttributes, self).__getitem__(name)
+            value = NodeAttributes.__getitem__(self, name)
         except KeyError:
             value = UNSET
         if value is not UNSET:
@@ -138,12 +143,17 @@ class WidgetAttributes(DictReprAttributes):
             return self[key]
         except KeyError:
             return default
-            
-class Widget(AttributedNode):
-    """Base Widget Class.
-    """
+        
     
+        
+class WidgetAttributed(Attributed):
+
     attributes_factory = WidgetAttributes
+            
+@behavior(WidgetAttributed)                
+class Widget(OrderedNode):
+    """Base Widget Class
+    """
     
     def __init__(self, extractors, renderers, preprocessors, 
                  uniquename=None, value_or_getter=None, properties=dict(),
@@ -187,8 +197,7 @@ class Widget(AttributedNode):
         ``defaults``
             a dict with defaults value for the widgets attributes.
         """
-        super(Widget, self).__init__(uniquename)
-        self.attribute_access_for_attrs = False        
+        OrderedNode.__init__(self, uniquename)
         self.getter = value_or_getter
         self.extractors = extractors
         self.renderers = renderers

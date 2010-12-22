@@ -46,17 +46,18 @@ deprecated test::
 Test CSS Classes
 ================
 ::
-    >>> from zodict import AttributedNode
-    >>> class DummyWidget(AttributedNode):
-    ...     def __init__(self):
-    ...         super(DummyWidget, self).__init__(self)
-    ...         self.attrs['required'] = False
-    ...         self.attrs['required_class'] = None
-    ...         self.attrs['required_class_default'] = 'required'
-    ...         self.attrs['error_class'] = None
-    ...         self.attrs['error_class_default'] = 'error'
-    ...         self.attrs['class'] = None
-    >>> widget = DummyWidget()
+    >>> from node.base import OrderedNode
+    >>> from node.behavior import behavior, Attributed 
+    >>> @behavior(Attributed)
+    ... class CSSTestNode(OrderedNode):
+    ...     pass
+    >>> widget = CSSTestNode()
+    >>> widget.attrs['required'] = False
+    >>> widget.attrs['required_class'] = None
+    >>> widget.attrs['required_class_default'] = 'required'
+    >>> widget.attrs['error_class'] = None
+    >>> widget.attrs['error_class_default'] = 'error'
+    >>> widget.attrs['class'] = None
     
     >>> class DummyData(object):
     ...     def __init__(self):
@@ -111,9 +112,9 @@ Test CSS Classes
     >>> print cssclasses(widget, data)
     otherrequired
 
-    >>> widget.attrs.error_class = True
+    >>> widget.attrs['error_class'] = True
     >>> data.errors = True
-    >>> widget.attrs.required_class = 'required'
+    >>> widget.attrs['required_class'] = 'required'
     >>> print cssclasses(widget, data)
     error required
 

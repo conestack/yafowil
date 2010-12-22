@@ -10,7 +10,7 @@ your form elements inside a table to provide pretty looking forms.
     >>> factory('table', name='foo')()
     u'<table></table>'
     
-    >>> factory('table', name='foo', props={'id': 'id', 'class': 'css'})()
+    >>> factory('table', name='foo_table', props={'id': 'id', 'class': 'css'})()
     u'<table class="css" id="id"></table>'
     
     >>> factory('thead', name='foo')()
