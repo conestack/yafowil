@@ -156,7 +156,7 @@ class Widget(OrderedNode):
     """
     
     def __init__(self, extractors, renderers, preprocessors, 
-                 uniquename=None, value_or_getter=None, properties=dict(),
+                 uniquename=None, value_or_getter=UNSET, properties=dict(),
                  defaults=dict()
                  ):
         """Initialize the widget. 

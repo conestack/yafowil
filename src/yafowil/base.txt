@@ -15,6 +15,8 @@ UNSET
     >>> bool(UNSET)
     False
 
+    >>> len(UNSET)
+    0
 
 Runtime Data
 ------------
@@ -190,6 +192,17 @@ Extraction is an explicit task.
     >>> data
     <RuntimeData MYUID, value='Test Value', extracted='e1', 
     attrs={'test_preprocessor': 'called'} at ...>
+    
+    >>> data.attrs['test_preprocessor']
+    'called'
+    
+Preprocessor is only called once!
+::    
+    
+    >>> data.attrs['test_preprocessor'] = 'reset'
+    >>> data = testwidget._runpreprocessors(data)
+    >>> data.attrs['test_preprocessor']
+    'reset'    
     
 Different cases.
 ::    
@@ -502,3 +515,58 @@ modify defaults for widgets attributes via factory
     ... except KeyError, e:
     ...     print e
     'Property with key "id" is not given on widget "test" (no default).'
+    
+    
+fetch value
+===========
+
+    >>> from yafowil.base import fetch_value
+    >>> dmarker = list()
+    >>> defaults = dict(default=dmarker)
+    >>> widget_no_return = Widget([],[],[], 'empty', defaults=defaults)
+    >>> widget_with_value = Widget([],[],[], 'value', 
+    ...                            value_or_getter='withvalue', 
+    ...                            defaults=defaults)
+    >>> widget_with_default = Widget([],[],[], 'default',
+    ...                              properties=dict(default='defaultvalue'),
+    ...                              defaults=defaults)
+    >>> widget_with_both = Widget([],[],[], 'both', 
+    ...                           value_or_getter='valueboth',  
+    ...                           properties=dict(default='defaultboth'),
+    ...                           defaults=defaults)
+    >>> data_empty = RuntimeData()
+    >>> data_filled = RuntimeData()
+    >>> data_filled.extracted = 'extractedvalue'    
+    
+    >>> data_empty.value = widget_no_return.getter
+    >>> fetch_value(widget_no_return, data_empty) is dmarker
+    True
+
+    >>> data_filled.value = widget_no_return.getter
+    >>> fetch_value(widget_no_return, data_filled)
+    'extractedvalue'
+
+    >>> data_empty.value = widget_with_value.getter
+    >>> fetch_value(widget_with_value, data_empty)
+    'withvalue'
+
+    >>> data_filled.value = widget_with_value.getter
+    >>> fetch_value(widget_with_value, data_filled)
+    'extractedvalue'    
+
+    >>> data_empty.value = widget_with_default.getter
+    >>> fetch_value(widget_with_default, data_empty)
+    'defaultvalue'
+
+    >>> data_filled.value = widget_with_default.getter
+    >>> fetch_value(widget_with_default, data_filled)
+    'extractedvalue'        
+
+    >>> data_empty.value = widget_with_both.getter
+    >>> fetch_value(widget_with_both, data_empty)
+    'valueboth'
+
+    >>> data_filled.value = widget_with_both.getter
+    >>> fetch_value(widget_with_default, data_filled)
+    'extractedvalue'        
+    
