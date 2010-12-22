@@ -3,7 +3,7 @@
 Common widgets
 ==============
 
-Trigger registry by importing.
+Trigger registry by importing module.
 ::
 
     >>> import yafowil.common
@@ -20,12 +20,18 @@ Text Input Widget
 ::
 
     >>> from yafowil.base import factory
-    >>> widget = factory('text', name='MYTEXT', value='Test Text')    
+    >>> widget = factory(
+    ...     'text',
+    ...     name='MYTEXT',
+    ...     value='Test Text')   
     >>> widget()
     u'<input class="text" id="input-MYTEXT" name="MYTEXT" type="text" 
     value="Test Text" />'
 
-    >>> widget = factory('hidden', 'MYHIDDEN', 'Test Hidden')
+    >>> widget = factory(
+    ...     'hidden',
+    ...     name='MYHIDDEN',
+    ...     value='Test Hidden')
     >>> widget()
     u'<input class="hidden" id="input-MYHIDDEN" name="MYHIDDEN" type="hidden" 
     value="Test Hidden" />'
@@ -35,9 +41,13 @@ Required Input Widget
 ---------------------
 ::
 
-    >>> widget = factory('text', 'REQUIRED', '',
-    ...                       {'required': True,
-    ...                        'error_class': True})
+    >>> widget = factory(
+    ...     'text',
+    ...     name='REQUIRED',
+    ...     value='',
+    ...     props={
+    ...         'required': True,
+    ...         'error_class': True})
     >>> widget()
     u'<input class="required text" id="input-REQUIRED" name="REQUIRED" 
     type="text" value="" />'
@@ -47,16 +57,14 @@ Extract with empty request, key not in request therefore no error.
     
     >>> data = widget.extract({})
     >>> data
-    <RuntimeData REQUIRED, value='', extracted=<UNSET>, 
-    attrs={'input_field_type': 'text'} at ...>
+    <RuntimeData REQUIRED, value='', extracted=<UNSET> at ...>
         
 Extract with empty input sent, required error expected.
 ::    
     
     >>> data = widget.extract({'REQUIRED': ''})
     >>> data
-    <RuntimeData REQUIRED, value='', extracted='', 1 error(s), 
-    attrs={'input_field_type': 'text'} at ...>
+    <RuntimeData REQUIRED, value='', extracted='', 1 error(s) at ...>
 
     >>> data.errors
     [ExtractionError('Mandatory field was empty',)]
@@ -66,14 +74,14 @@ With getter value set, empty request, no error expected.
     
     >>> widget = factory(
     ...     'text',
-    ...     'REQUIRED',
-    ...     'Test Text',
-    ...     {'required': True,
-    ...      'error_class': True})
+    ...     name='REQUIRED',
+    ...     value='Test Text',
+    ...     props={
+    ...         'required': True,
+    ...         'error_class': True})
     >>> data = widget.extract({})
     >>> data
-    <RuntimeData REQUIRED, value='Test Text', extracted=<UNSET>,
-    attrs={'input_field_type': 'text'} at ...>
+    <RuntimeData REQUIRED, value='Test Text', extracted=<UNSET> at ...>
 
     >>> widget(data=data)
     u'<input class="required text" id="input-REQUIRED" name="REQUIRED" 
@@ -84,8 +92,7 @@ With getter value set, request given, error expected.
 
     >>> data = widget.extract({'REQUIRED': ''})
     >>> data
-    <RuntimeData REQUIRED, value='Test Text', extracted='', 1 error(s), 
-    attrs={'input_field_type': 'text'} at ...>
+    <RuntimeData REQUIRED, value='Test Text', extracted='', 1 error(s) at ...>
     
     >>> widget(data=data)
     u'<input class="error required text" id="input-REQUIRED" name="REQUIRED" 
@@ -96,14 +103,32 @@ Create a custom error message.
 
     >>> widget = factory(
     ...     'text',
-    ...     'REQUIRED',
+    ...     name='REQUIRED',
     ...     value='',
-    ...     props={'required': 'You fool, fill in a value!'})
-    >>> data = widget.extract({})
-    >>> data 
-    <RuntimeData REQUIRED, value='', extracted=<UNSET>, 
-    attrs={'input_field_type': 'text'} at ...>
+    ...     props={
+    ...         'required': 'You fool, fill in a value!'})
+    >>> data = widget.extract({'REQUIRED': ''})
+    >>> data
+    <RuntimeData REQUIRED, value='', extracted='', 1 error(s) at ...>
     
+    >>> data.errors
+    [ExtractionError('You fool, fill in a value!',)]
+
+``required`` property could be a callable as well.
+::
+
+    >>> def required_callback(widget, data):
+    ...     return u"Foooo"
+    >>> widget = factory(
+    ...     'text',
+    ...     name='REQUIRED',
+    ...     value='',
+    ...     props={
+    ...         'required': required_callback})
+    >>> data = widget.extract({'REQUIRED': ''})
+    >>> data.errors
+    [ExtractionError('Foooo',)]
+
 
 Checkbox Widget
 ---------------

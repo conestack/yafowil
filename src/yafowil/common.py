@@ -14,39 +14,66 @@ from utils import (
     vocabulary,
 )
 
+###############################################################################
+# common defaults
+###############################################################################
+
 factory.defaults['default'] = None
-factory.document['default'] = "Default value." 
+factory.doc['props']['default'] = \
+"""Default value.
+"""
+
 factory.defaults['class'] = None
-factory.document['class'] = "Common CSS-class to put on."
+factory.doc['props']['class'] = \
+"""Common CSS-class to put on.
+"""
+
 factory.defaults['error_class'] = None
-factory.document['error_class'] = "CSS-class to put on in case of error."
+factory.doc['props']['error_class'] = \
+"""CSS-class to put on in case of error.
+"""
+
 factory.defaults['error_class_default'] = 'error'
-factory.document['error_class_default'] = """\
-    Fallback CSS-class to put on in case of error if no specific class was 
-    given."""
+factory.doc['props']['error_class_default'] = \
+"""Fallback CSS-class to put on in case of error if no specific class was 
+given.
+"""
+
 factory.defaults['required'] = False
-factory.document['required'] = "Wether this value is required or not." 
+factory.doc['props']['required'] = \
+"""Wether this value is required or not.
+"""
+
 factory.defaults['required_message'] = u'Mandatory field was empty'          
-factory.document['required_message'] = """\
-    Message to be shown if required condition was not met."""           
+factory.doc['props']['required_message'] = \
+"""Message to be shown if required condition was not met.
+""" 
+            
 factory.defaults['required_class'] = None
-factory.document['required_class'] = """\
-    CSS-class to put on in case if required condition was not met."""
+factory.doc['props']['required_class'] = \
+"""CSS-class to put on in case if required condition was not met.
+"""
+
 factory.defaults['required_class_default'] = 'required'
-factory.document['required_class_default'] = """\
-    CSS-class to put on in case if required condition was not met if no specific 
-    class was given."""
+factory.doc['props']['required_class_default'] = \
+"""CSS-class to put on in case if required condition was not met if no specific 
+class was given.
+"""
 
 ###############################################################################
 # generic
 ###############################################################################
 
 def _value(widget, data):
+    """BBB
+    """
     logging.warn("Deprecated usage of 'yafowil.common._value', please use "+\
                  "'yafowil.common.fetch_value' instead.") 
     return fetch_value(widget, data)   
     
 def generic_extractor(widget, data):
+    """Extract raw data from request by ``widget.dottedpath``.
+    """
     __managed_props = []     
     if widget.dottedpath not in data.request:
         return UNSET
@@ -54,61 +81,111 @@ def generic_extractor(widget, data):
 
 @managedprops('required', 'required_message')
 def generic_required_extractor(widget, data):
-    """validate required. 
+    """Validate required. 
     
-    if required is set and some value was extracted, 
-    so data.extracted is not UNSET, then we evaluate data.extracted to boolean.
-    raise ExtractionError if result is False
+    If required is set and some value was extracted, 
+    so ``data.extracted`` is not ``UNSET``, then we evaluate ``data.extracted``
+    to boolean. Raise ``ExtractionError`` if result is ``False``.
+    
+    Properties:
+    
+    ``required``
+        Define wether value is required ot not. Either basestring instance or
+        callable returning basestring is expected.
+    
+    ``required_message``
+        Default required message as basestring instance.
     """
-    if not widget.attrs.get('required') \
+    required = widget.attrs.get('required')
+    if callable(required):
+        required = required(widget, data)
+    if not required \
        or bool(data.extracted) \
        or data.extracted is UNSET:
         return data.extracted
-    if isinstance(widget.attrs['required'], basestring):
-        raise ExtractionError(widget.attrs['required'])
+    if isinstance(required, basestring):
+        raise ExtractionError(required)
     raise ExtractionError(widget.attrs['required_message'])
 
 @managedprops('type', *css_managed_props)
 def input_generic_renderer(widget, data):
+    """Generic HTML ``input`` tag render.
+    
+    Properties:
+    
+    ``type``
+        Type of this input tag.
+    
+    ``size``
+        Size of input tag.
+    
+    ``disabled``
+        Bool evaluating value, if evaluates to True, set disabled="disabled" on
+        input tag.
+    """
     tag = data.tag
     input_attrs = {
-        'type': data.attrs.get('input_field_type', False) \
-                or widget.attrs['type'],
-        'value':  fetch_value(widget, data),
+        'type': widget.attrs['type'],
+        'value': fetch_value(widget, data),
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),    
         'class_': cssclasses(widget, data),
         'size': widget.attrs.get('size'),
-        'disabled': widget.attrs.get('disabled'),
+        'disabled': bool(widget.attrs.get('disabled')) and 'disabled' or None,
     }
     return tag('input', **input_attrs)
 
-class InputGenericPreprocessor(object):
-    
-    def __init__(self, inputtype):
-        self.inputtype = inputtype
-        
-    def __call__(self, widget, data):
-        data.attrs['input_field_type'] = self.inputtype   
-        return data
-
 ###############################################################################
-# text and hidden
+# text
 ###############################################################################
 
-def register_generic_input(subtype, enable_required_class=True):
-    if enable_required_class:
-        factory.defaults['%s.required_class' % subtype] = 'required'
-    factory.defaults['%s.default' % subtype] = ''
-    factory.defaults['%s.class' % subtype] = subtype
-    factory.defaults['%s.size' % subtype] = None
-    factory.register(subtype, 
-                     [generic_extractor, generic_required_extractor], 
-                     [input_generic_renderer],
-                     [InputGenericPreprocessor(subtype)])
+factory.register('text', 
+                 [generic_extractor, generic_required_extractor], 
+                 [input_generic_renderer])
+factory.doc['widget']['text'] = \
+"""Text input widget.
+"""
 
-register_generic_input('text')
-register_generic_input('hidden', False)
+factory.defaults['text.type'] = 'text'
+factory.doc['props']['text.type'] = \
+"""Type of input tag.
+"""
+
+factory.defaults['text.required_class'] = 'required'
+
+factory.defaults['text.default'] = ''
+
+factory.defaults['text.class'] = 'text'
+
+factory.defaults['text.size'] = None
+factory.doc['props']['text.size'] = \
+"""Allowed input size.
+"""
+
+factory.defaults['text.disabled'] = False
+factory.doc['props']['text.disabled'] = \
+"""Flag wether input field is disabled.
+"""
+
+###############################################################################
+# hidden
+###############################################################################
+
+factory.register('hidden', 
+                 [generic_extractor], 
+                 [input_generic_renderer])
+factory.doc['widget']['hidden'] = \
+"""Hidden input widget.
+"""
+
+factory.defaults['hidden.type'] = 'hidden'
+factory.doc['props']['hidden.type'] = \
+"""Type of input tag.
+"""
+
+factory.defaults['hidden.default'] = ''
+
+factory.defaults['hidden.class'] = 'hidden'
 
 ###############################################################################
 # proxy 
@@ -116,6 +193,9 @@ register_generic_input('hidden', False)
 
 @managedprops(*css_managed_props)
 def input_proxy_renderer(widget, data):
+    """Render hidden input ignoring ``widget.dottedpath``, just using widget
+    name.
+    """
     tag = data.tag
     value = data.value
     if data.request is not UNSET:
@@ -133,12 +213,33 @@ def input_proxy_renderer(widget, data):
 factory.register('proxy', 
                  [generic_extractor], 
                  [input_proxy_renderer])
+factory.doc['widget']['proxy'] = \
+"""Used to pass hidden arguments out of form namespace.
+"""
+
+factory.defaults['proxy.class'] = None
 
 ###############################################################################
 # textarea
 ###############################################################################
 
 def textarea_renderer(widget, data):
+    """Render text area.
+    
+    Properties:
+    
+    ``wrap``
+        Wrap property of textarea element.
+    
+    ``cols``
+        Number of characters.
+    
+    ``rows``
+        Number of lines.
+    
+    ``readonly``
+        Flag wether textarea is readonly.
+    """
     tag = data.tag
     area_attrs = {
         'name_': widget.dottedpath,
@@ -154,20 +255,48 @@ def textarea_renderer(widget, data):
         value = ''
     return tag('textarea', value, **area_attrs)
 
-factory.defaults['textarea.default'] = ''          
-factory.defaults['textarea.wrap'] = None          
-factory.defaults['textarea.cols'] = 80          
-factory.defaults['textarea.rows'] = 25          
-factory.defaults['textarea.readonly'] = None          
 factory.register('textarea', 
                  [generic_extractor, generic_required_extractor], 
                  [textarea_renderer])
+factory.doc['widget']['textarea'] = \
+"""HTML textarea widget.
+"""
+
+factory.defaults['textarea.default'] = ''
+factory.defaults['textarea.wrap'] = None
+factory.doc['props']['textarea.wrap'] = \
+"""Either ``soft``, ``hard``, ``virtual``, ``physical`` or  ``off``.
+"""
+
+factory.defaults['textarea.cols'] = 80
+factory.doc['props']['textarea.cols'] = \
+"""Number of characters.
+"""
+
+factory.defaults['textarea.rows'] = 25
+factory.doc['props']['textarea.rows'] = \
+"""Number of lines.
+"""
+
+factory.defaults['textarea.readonly'] = None
+factory.doc['props']['textarea.readonly'] = \
+"""Flag wether textarea is readonly.
+"""
 
 ###############################################################################
 # password
 ###############################################################################
 
 def minlength_extractor(widget, data):
+    """Validate minlength of a string input.
+    
+    Only perform if ``minlength`` property is set.
+    
+    Properties:
+    
+    ``minlength``
+        Minimum length of string as int. 
+    """
     val = data.extracted
     if val is UNSET:
         return val
@@ -179,6 +308,15 @@ def minlength_extractor(widget, data):
     return val
 
 def ascii_extractor(widget, data):
+    """Validate if a string is ASCII encoding.
+    
+    Only perform if ``ascii`` property evaludates to True.
+    
+    Properties:
+    
+    ``ascii``
+        Flag wether ascii check should perform.
+    """
     val = data.extracted
     if val is UNSET:
         return val
@@ -202,6 +340,24 @@ RE_PASSWORD_ALL = [
 PASSWORD_NOCHANGE_VALUE = '_NOCHANGE_'
 
 def password_extractor(widget, data):
+    """Extract and validate password input.
+    
+    If extracted password is unchanged, return ``UNSET``. Consider this when
+    reading from password widgets!
+    
+    This extractor provides a strength check. It only performs if ``strenght``
+    property is set. Strength check is done by four rules:
+        - input contains lowercase character
+        - input contains uppercase character
+        - input contains digit
+        - input contains special character.
+    
+    Properties:
+    
+    ``strength``
+        Integer value <= 4. Define how many rules must apply to consider a 
+        password valid.
+    """
     val = data.extracted
     if val == PASSWORD_NOCHANGE_VALUE:
         return UNSET
@@ -221,6 +377,22 @@ def password_extractor(widget, data):
     return val
 
 def password_renderer(widget, data):
+    """Render password widget.
+    
+    The password is never rendered to markup, instead
+    ``yafowil.common.PASSWORD_NOCHANGE_VALUE`` is set as ``value`` property on
+    dom element. See ``yafowil.common.password_extractor`` for details on
+    password extraction.
+    
+    Properties:
+    
+    ``size``
+        Maximum size of password.
+    
+    ``disabled``
+        Bool evaluating value, if evaluates to True, set disabled="disabled" on
+        password input tag.
+    """
     tag = data.tag
     def pwd_value(widget, data):
         if data.extracted is not UNSET:
@@ -236,20 +408,42 @@ def password_renderer(widget, data):
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),    
         'class_': cssclasses(widget, data),
+        'size': widget.attrs.get('size'),
         'disabled': widget.attrs.get('disabled'),
     }
     return tag('input', **input_attrs)
 
-factory.defaults['password.required_class'] = 'required'
-factory.defaults['password.default'] = ''
-factory.defaults['password.class'] = 'password'
-factory.defaults['password.minlength'] = -1
-factory.defaults['password.ascii'] = False
 factory.register('password', 
                  [generic_extractor, generic_required_extractor,
                   minlength_extractor, ascii_extractor, password_extractor],
                  [password_renderer],
                  [])
+factory.doc['widget']['password'] = \
+"""Password widget.
+"""
+
+factory.defaults['password.required_class'] = 'required'
+
+factory.defaults['password.default'] = ''
+
+factory.defaults['password.class'] = 'password'
+
+factory.defaults['password.minlength'] = -1
+factory.doc['props']['password.minlength'] = \
+"""Minlength of password.
+"""
+
+factory.defaults['password.ascii'] = False
+factory.doc['props']['password.ascii'] = \
+"""Flag wether ascii check should performed.
+"""
+
+factory.defaults['password.strength'] = 'strength'
+factory.defaults['password.strength'] = -1
+factory.doc['props']['password.strength'] = \
+"""Integer value <= 4. Define how many rules must apply to consider a password
+valid.
+"""
 
 ###############################################################################
 # checkbox
@@ -467,14 +661,16 @@ def email_extractor(widget, data):
         raise ExtractionError(u'Input not a valid email address.')
     return val
 
+factory.defaults['email.type'] = 'text'
 factory.defaults['email.required_class'] = 'required'
 factory.defaults['email.default'] = ''
 factory.defaults['email.class'] = 'email'
+factory.defaults['email.size'] = None
+factory.defaults['email.disabled'] = False
 factory.register('email', 
                  [generic_extractor, generic_required_extractor,
                   email_extractor],
-                 [input_generic_renderer],
-                 [InputGenericPreprocessor('text')])
+                 [input_generic_renderer])
 
 ###############################################################################
 # label
