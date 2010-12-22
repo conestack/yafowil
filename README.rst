@@ -14,14 +14,18 @@ fetch your widgets instances from. Or you register your own.
 Dependencies
 ------------ 
 
-Yafowil aims to have no dependencies to any framework. It utilizes ``Node`` from 
-``zodict``. And so it has flimsy dependecies to ``zope.location``. It also does 
-not know about data-storage, but offers you a hook to add your handler. 
+Yafowil aims to have no dependencies to any framework. It utilizes the ``node``  
+package. It also does not know about data-storage, but offers you a hook to add 
+your handler. 
 
 Tired of inventing widgets again and again after switching the python framework 
 Yafowil is intentionally written framework-independent. By just feeding it with 
 configuration it can be used and extended in most of existing python web 
 frameworks. Zope, Pyramid and Django are hot candidates. 
+
+Integration packages such as ``yafowil.zope2`` or ``yafowil.webob`` are providing 
+neccessary hooks to specific frameworks.
+
 
 Example
 =======
