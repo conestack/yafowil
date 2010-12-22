@@ -18,7 +18,7 @@ from utils import (
 # common defaults
 ###############################################################################
 
-factory.defaults['default'] = None
+factory.defaults['default'] = UNSET
 factory.doc['props']['default'] = \
 """Default value.
 """
@@ -251,7 +251,7 @@ def textarea_renderer(widget, data):
         'readonly': widget.attrs['readonly'] and 'readonly',
     }
     value = fetch_value(widget, data)
-    if not value:
+    if value is UNSET:
         value = ''
     return tag('textarea', value, **area_attrs)
 
@@ -511,7 +511,7 @@ def select_extractor(widget, data):
 def select_renderer(widget, data):
     tag = data.tag
     value = fetch_value(widget, data)
-    if value is None:
+    if value is UNSET:
         value = []
     if isinstance(value, basestring) or not hasattr(value, '__iter__'):
         value = [value]

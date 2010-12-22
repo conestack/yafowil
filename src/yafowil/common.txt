@@ -180,6 +180,18 @@ Textarea Widget
     >>> widget = factory(
     ...     'textarea',
     ...     'MYTEXTAREA',
+    ...     props={
+    ...         'label': 'Test Textarea Widget',
+    ...         'id': {
+    ...             'label': 'TestLabelId'
+    ...         },
+    ...     })
+    >>> widget()
+    u'<textarea cols="80" id="input-MYTEXTAREA" name="MYTEXTAREA" rows="25">None</textarea>'
+    
+    >>> widget = factory(
+    ...     'textarea',
+    ...     'MYTEXTAREA',
     ...     value='Test Textarea',
     ...     props={
     ...         'label': 'Test Textarea Widget',
