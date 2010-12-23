@@ -250,6 +250,7 @@ def textarea_renderer(widget, data):
         'rows': widget.attrs['rows'],
         'readonly': widget.attrs['readonly'] and 'readonly',
     }
+    import pdb;pdb.set_trace()
     return tag('textarea', fetch_value(widget, data), **area_attrs)
 
 factory.register('textarea', 

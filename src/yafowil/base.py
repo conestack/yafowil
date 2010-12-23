@@ -235,7 +235,7 @@ class Widget(OrderedNode):
             needed. 
         """
         if data is not None and request is not None:
-            raise ValueError, 'if data is passed in dont pass in request!' 
+            raise ValueError, "if data is passed in, don't pass in request!" 
         if data is None:
             data = RuntimeData(self.__name__)
             if request is not None:

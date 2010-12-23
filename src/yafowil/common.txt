@@ -186,6 +186,7 @@ Textarea Widget
     ...             'label': 'TestLabelId'
     ...         },
     ...     })
+    >> interact(locals())
     >>> widget()
     u'<textarea cols="80" id="input-MYTEXTAREA" name="MYTEXTAREA" rows="25"></textarea>'
     
