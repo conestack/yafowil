@@ -2,11 +2,11 @@ import re
 import logging
 from yafowil.base import (
     factory,
-    UNSET,
     ExtractionError,
     fetch_value
 )
 from utils import (
+    UNSET,
     cssclasses,
     css_managed_props,
     cssid,
@@ -120,8 +120,8 @@ def input_generic_renderer(widget, data):
         Size of input tag.
     
     ``disabled``
-        Bool evaluating value, if evaluates to True, set disabled="disabled" on
-        input tag.
+        Bool evaluating value, if evaluates to True, sets disabled="disabled" 
+        on input tag.
     """
     tag = data.tag
     input_attrs = {
@@ -250,7 +250,6 @@ def textarea_renderer(widget, data):
         'rows': widget.attrs['rows'],
         'readonly': widget.attrs['readonly'] and 'readonly',
     }
-    import pdb;pdb.set_trace()
     return tag('textarea', fetch_value(widget, data), **area_attrs)
 
 factory.register('textarea', 
@@ -423,7 +422,6 @@ factory.doc['widget']['password'] = \
 factory.defaults['password.required_class'] = 'required'
 
 factory.defaults['password.default'] = ''
-
 factory.defaults['password.class'] = 'password'
 
 factory.defaults['password.minlength'] = -1
@@ -660,8 +658,8 @@ def email_extractor(widget, data):
     return val
 
 factory.defaults['email.type'] = 'text'
-factory.defaults['email.required_class'] = 'required'
 factory.defaults['email.default'] = ''
+factory.defaults['email.required_class'] = 'required'
 factory.defaults['email.class'] = 'email'
 factory.defaults['email.size'] = None
 factory.defaults['email.disabled'] = False

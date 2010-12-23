@@ -1,5 +1,21 @@
 import logging
 
+class Unset(object): 
+    
+    def __nonzero__(self):
+        return False
+    
+    def __str__(self):
+        return ''
+    
+    def __len__(self):
+        return 0
+    
+    def __repr__(self):
+        return '<UNSET>'
+
+UNSET = Unset()
+
 def vocabulary(definition):
     """Convert different kinds of input into a list of bi-tuples, both strings.
     """
@@ -58,7 +74,7 @@ class Tag(object):
         """
         cl = list()
         for key, value in attributes.items():
-            if value is None:
+            if value is None or value is UNSET:
                 continue
             value = self.translate(value)
             if not isinstance(value, unicode):

@@ -1,8 +1,6 @@
-from yafowil.base import (
-    factory,
-    UNSET,
-)
+from yafowil.base import factory
 from yafowil.utils import (
+    UNSET,
     cssid,
     cssclasses, 
 )

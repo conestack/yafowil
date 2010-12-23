@@ -64,7 +64,7 @@ your form elements inside a table to provide pretty looking forms.
       <table>
         <tr>
           <td>
-            <input class="text" id="input-myform-table-row1-field1" name="myform.table.row1.field1" type="text"/>
+            <input class="text" id="input-myform-table-row1-field1" name="myform.table.row1.field1" type="text" value=""/>
           </td>
         </tr>
       </table>
@@ -87,7 +87,7 @@ Build same table again but set some nodes structural. This is considered in
       <table>
         <tr>
           <td>
-            <input class="text" id="input-myform-field1" name="myform.field1" type="text"/>
+            <input class="text" id="input-myform-field1" name="myform.field1" type="text" value=""/>
           </td>
         </tr>
       </table>

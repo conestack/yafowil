@@ -186,6 +186,7 @@ Textarea Widget
     ...             'label': 'TestLabelId'
     ...         },
     ...     })
+
     >> interact(locals())
     >>> widget()
     u'<textarea cols="80" id="input-MYTEXTAREA" name="MYTEXTAREA" rows="25"></textarea>'
@@ -557,7 +558,7 @@ Email Widget
     ...     'email',
     ...     name='email')
     >>> pxml(widget())
-    <input class="email" id="input-email" name="email" type="text"/>
+    <input class="email" id="input-email" name="email" type="text" value=""/>
     
     >>> data = widget.extract({'email': 'foo@bar'})
     >>> data.errors

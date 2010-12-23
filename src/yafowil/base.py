@@ -6,23 +6,10 @@ from node.behavior import (
 ) 
 from node.behavior.attributed import NodeAttributes
 
-from yafowil.utils import Tag
-
-class Unset(object): 
-    
-    def __nonzero__(self):
-        return False
-    
-    def __str__(self):
-        return ''
-    
-    def __len__(self):
-        return 0
-    
-    def __repr__(self):
-        return '<UNSET>'
-
-UNSET = Unset()
+from yafowil.utils import (
+    Tag,
+    UNSET,
+)
 
 def _dict__repr__(self):  
     return '{%s}' % ', '.join(['%s: %s' % (repr(k), repr(v)) 
@@ -48,7 +35,7 @@ class RuntimeData(OrderedNode):
         self.rendered = UNSET
         self.errors= list()
         self.translate_callable = lambda msg: msg        
-        
+                
     def fetch(self, path):
         if isinstance(path, basestring):
             path = path.split('.')
@@ -103,12 +90,16 @@ class ExtractionError(Exception):
     def __repr__(self):
         return u"ExtractionError('%s',)" % str(self)
     
-class TBSupplement(object):
+class TBSupplementWidget(object):
 
-    def __init__(self, widget, func, task, name):
+    def __init__(self, widget, func, task, descr):
         self.manageable_object = func
-        self.warnings = ['Occured on %s in widget "%s" with name "%s"' % \
-                         (task, widget.dottedpath, name)]     
+        try:
+            name = widget.dottedpath
+        except ValueError:
+            name = '(name not set)'
+        self.warnings = ['Occurred on %s in widget "%s" %s' % \
+                         (task, name, descr)]     
 
 @behavior(Attributed)       
 class WidgetAttributes(NodeAttributes):
@@ -245,8 +236,9 @@ class Widget(OrderedNode):
         try:
             for ren_name, renderer in self.renderers:
                 self.current_prefix = ren_name
-                __traceback_supplement__ = (TBSupplement, self, renderer, 
-                                            'render', ren_name)
+                __traceback_supplement__ = (TBSupplementWidget, self, renderer, 
+                                            'render', 
+                                            'with name "%s"' % ren_name)
                 data.rendered = renderer(self, data)
         finally:
             self.current_prefix = None
@@ -271,8 +263,9 @@ class Widget(OrderedNode):
         try:    
             for ex_name, extractor in self.extractors:     
                 self.current_prefix = ex_name
-                __traceback_supplement__ = (TBSupplement, self, extractor, 
-                                            'extract', ex_name)
+                __traceback_supplement__ = (TBSupplementWidget, self, extractor, 
+                                            'extract', 
+                                            'with name "%s"' % ex_name)
                 try:
                     data.extracted = extractor(self, data)
                 except ExtractionError, e:
@@ -299,6 +292,9 @@ class Widget(OrderedNode):
         return '.'.join(path)
 
     def _runpreprocessors(self, data):                
+        __traceback_supplement__ = (TBSupplementWidget, self,
+                                    self._runpreprocessors, 
+                                    'run preprocessors', 'execute')
         if data.preprocessed:
             return data
         if callable(self.getter):
@@ -307,8 +303,9 @@ class Widget(OrderedNode):
             data.value = self.getter        
         for ppname, pp in self.preprocessors:
             data.current_prefix = ppname
-            __traceback_supplement__ = (TBSupplement, self, pp, 
-                                        'preprocessor', ppname)
+            __traceback_supplement__ = (TBSupplementWidget, self, pp, 
+                                        'preprocessor', 
+                                        'with name "%s"' % ppname)
             data = pp(self, data)
         data.current_prefix = None
         data.preprocessed = True 
@@ -339,7 +336,7 @@ class Factory(object):
         
     def __call__(self, reg_names, 
                  name=None, 
-                 value=None, 
+                 value=UNSET, 
                  props=dict(),
                  custom=dict()):
         """Creates a widget.

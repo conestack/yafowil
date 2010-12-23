@@ -26,7 +26,7 @@ Extract Compound empty.
 
     >>> data = compound.extract({})
     >>> data    
-    <RuntimeData COMPOUND, value=None, extracted=None at ...>
+    <RuntimeData COMPOUND, value=<UNSET>, extracted=None at ...>
 
     >>> data['inner']
     <RuntimeData COMPOUND.inner, value='value1', extracted=<UNSET> at ...>    
@@ -103,7 +103,7 @@ Render an empty form
     >>> pxml(form())
     <form action="http://www.domain.tld/someform" enctype="multipart/form-data" id="form-myform" method="post">
       <label for="input-myform-someinput">Your Text</label>
-      <input class="text" id="input-myform-someinput" name="myform.someinput" type="text"/>
+      <input class="text" id="input-myform-someinput" name="myform.someinput" type="text" value=""/>
       <input id="input-myform-submit" name="action.myform.submit" type="submit" value="submit"/>
     </form>
     <BLANKLINE>
@@ -114,6 +114,6 @@ Get form data out of request (request is expected dict-like)::
     >>> request = {'myform.someinput': 'Hello World', 
     ...            'action.myform.submit': 'submit'}
     >>> controller = Controller(form, request)
-    <RuntimeData myform, value=None, extracted=None at ...>
-      <RuntimeData myform.someinput, value=None, extracted='Hello World' at ...>
-      <RuntimeData myform.submit, value=None, extracted=<UNSET> at ...>
+    <RuntimeData myform, value=<UNSET>, extracted=None at ...>
+      <RuntimeData myform.someinput, value=<UNSET>, extracted='Hello World' at ...>
+      <RuntimeData myform.submit, value=<UNSET>, extracted=<UNSET> at ...>

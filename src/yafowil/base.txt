@@ -1,23 +1,6 @@
 Yafowil Base Components
 =======================
 
-UNSET
------
-::
-
-    >>> from yafowil.base import UNSET
-    >>> UNSET
-    <UNSET>
-    
-    >>> str(UNSET)
-    ''
-
-    >>> bool(UNSET)
-    False
-
-    >>> len(UNSET)
-    0
-
 Runtime Data
 ------------
 
@@ -261,7 +244,7 @@ A failing widget.
         testwidget.extract({})
       File ".../yafowil/base.py", line ..., in extract
         data.extracted = extractor(self, data)
-       - Warning: Occured on extract in widget "MYFAIL" with name "1"
+       - Warning: Occurred on extract in widget "MYFAIL" with name "1"
       File "<doctest base.txt[...]>", line 2, in fail_extractor
         raise ValueError, 'extractor has to fail'
     ValueError: extractor has to fail   
@@ -275,7 +258,7 @@ A failing widget.
         testwidget()
       File ".../yafowil/base.py", line ..., in __call__
         data.rendered = renderer(self, data)
-       - Warning: Occured on render in widget "MYFAIL" with name "1"
+       - Warning: Occurred on render in widget "MYFAIL" with name "1"
       File "<doctest base.txt[...]>", line 2, in fail_renderer
         raise ValueError, 'renderer has to fail'
     ValueError: renderer has to fail        
@@ -285,7 +268,7 @@ Plausability::
     >>> testwidget(data=data, request={})
     Traceback (most recent call last):
     ...
-    ValueError: if data is passed in dont pass in request!
+    ValueError: if data is passed in, don't pass in request!
     
 The dottedpath.
 

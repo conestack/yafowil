@@ -1,3 +1,20 @@
+Test UNSET
+==========
+::
+
+    >>> from yafowil.utils import UNSET
+    >>> UNSET
+    <UNSET>
+    
+    >>> str(UNSET)
+    ''
+
+    >>> bool(UNSET)
+    False
+
+    >>> len(UNSET)
+    0
+
 Test the Vocabulary
 ===================
 
@@ -35,6 +52,12 @@ Test Tag renderer
     
     >>> tag('dummy', name='foo')
      u'<dummy name="foo" />'
+     
+    >>> tag('dummy', name=None)
+    u'<dummy />'
+    
+    >>> tag('dummy', name=UNSET)
+    u'<dummy />'
      
 deprecated test::
 
