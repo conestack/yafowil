@@ -208,8 +208,14 @@ for easy later access
 Detailed Documentation
 ======================
 
-Theres a detailed documentation available at (TODO INSERT LINK).
+Theres a `detailed documentation <http://packages.python.org/yafowil>`_ available (TODO).
 
+Source Code
+===========
+
+The sources are in a GIT DVCS with its main branches at `github <http://github.com/bluedynamics/yafowil>`_.
+
+We'd be happy to see many forks and pull-requests to make YAFOWIL even better.
 
 Changes
 =======
@@ -226,6 +232,6 @@ Contributors
 
 - Robert Niederrreiter <rnix@squarewave.at>
 
-- Attila Oláh
+- Attila Olah
 
 - Christian Scholz aka MrTopf (initial discussion)
