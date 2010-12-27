@@ -108,12 +108,14 @@ def _deprecated_null_localization(msg):
 
 tag = Tag(_deprecated_null_localization)        
         
+
 class managedprops(object):
     
-    def __init__(self, *names):
-        self._managed_props = names    
-
+    def __init__(self, *args):
+        self.__yafowil_managed_props__ = args
+        
     def __call__(self, func):
+        func.__yafowil_managed_props__ = self.__yafowil_managed_props__
         return func
     
 def cssid(widget, prefix, postfix=None):
@@ -123,7 +125,7 @@ def cssid(widget, prefix, postfix=None):
         id = '%s-%s' % (id, postfix) 
     return id
     
-css_managed_props = ['error_class', 'error_class_default',
+css_managed_props = ['class', 'error_class', 'error_class_default',
                      'required_class', 'required_class_default']
 def cssclasses(widget, data, classattr='class', additional=[]):
     _classes = list()

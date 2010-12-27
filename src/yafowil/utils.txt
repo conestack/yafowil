@@ -148,4 +148,18 @@ Test CSS Classes
     >>> print cssclasses(widget, data, additional=['zika', 'akiz'])
     akiz bar error foo required zika
     
+Test managedprops annotation
+============================
+
+::
+
+    >>> from yafowil.utils import managedprops
+    >>> @managedprops('foo', 'bar')
+    ... def somefunc(a, b, c):
+    ...     return a, b, c
+    >>> somefunc(1, 2, 3)
+    (1, 2, 3)
+    >>> somefunc.__yafowil_managed_props__
+    ('foo', 'bar')
+    
     
