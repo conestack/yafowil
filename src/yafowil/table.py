@@ -1,6 +1,11 @@
 from yafowil.base import factory
-from yafowil.utils import cssclasses
+from yafowil.utils import (
+    cssclasses,
+    css_managed_props,
+    managedprops,
+)
 
+@managedprops('id', *css_managed_props)
 def table_renderer(widget, data):
     attrs = {
         'id': widget.attrs.get('id'),
@@ -26,6 +31,7 @@ factory.register('tbody',
                  factory.extractors('compound'),
                  factory.renderers('compound') + [tbody_renderer])
 
+@managedprops('id', *css_managed_props)
 def tr_renderer(widget, data):
     attrs = {
         'id': widget.attrs.get('id'),
@@ -37,6 +43,7 @@ factory.register('tr',
                  factory.extractors('compound'),
                  factory.renderers('compound') + [tr_renderer])
 
+@managedprops('id', 'rowspan', 'colspan', 'label', *css_managed_props)
 def th_renderer(widget, data):
     attrs = {
         'id': widget.attrs.get('id'),
@@ -53,6 +60,7 @@ factory.register('th',
                  [],
                  [th_renderer])
 
+@managedprops('id', 'rowspan', 'colspan', *css_managed_props)
 def td_renderer(widget, data):
     attrs = {
         'id': widget.attrs.get('id'),

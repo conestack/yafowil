@@ -1,5 +1,13 @@
-from yafowil.base import factory, fetch_value
-from yafowil.utils import cssid, cssclasses
+from yafowil.base import (
+    factory, 
+    fetch_value
+)
+from yafowil.utils import (
+    cssid, 
+    cssclasses,
+    css_managed_props,
+    managedprops,
+)
 
 def edit_renderer(widget, data):
     return data.rendered
@@ -7,6 +15,7 @@ def edit_renderer(widget, data):
 def none_renderer(widget, data):
     return u''
 
+@managedprops(*css_managed_props)
 def hidden_renderer(widget, data):
     hidden_attrs = {
         'type': 'hidden',
@@ -17,6 +26,7 @@ def hidden_renderer(widget, data):
     }
     return data.tag('input', **hidden_attrs)
 
+@managedprops('mode', 'edit', 'none', 'hidden', 'display', 'showbool')
 def mode_renderer(widget, data):
     tag = data.tag
     mode = widget.attrs['mode']

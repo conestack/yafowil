@@ -107,7 +107,7 @@ def generic_required_extractor(widget, data):
         raise ExtractionError(required)
     raise ExtractionError(widget.attrs['required_message'])
 
-@managedprops('type', *css_managed_props)
+@managedprops('type', 'size', 'disabled', *css_managed_props)
 def input_generic_renderer(widget, data):
     """Generic HTML ``input`` tag render.
     
@@ -223,22 +223,9 @@ factory.defaults['proxy.class'] = None
 # textarea
 ###############################################################################
 
+@managedprops('wrap', 'cols', 'rows', 'readonly', *css_managed_props)
 def textarea_renderer(widget, data):
-    """Render text area.
-    
-    Properties:
-    
-    ``wrap``
-        Wrap property of textarea element.
-    
-    ``cols``
-        Number of characters.
-    
-    ``rows``
-        Number of lines.
-    
-    ``readonly``
-        Flag wether textarea is readonly.
+    """Renders text area.
     """
     tag = data.tag
     area_attrs = {
@@ -284,6 +271,7 @@ factory.doc['props']['textarea.readonly'] = \
 # password
 ###############################################################################
 
+@managedprops('minlength')
 def minlength_extractor(widget, data):
     """Validate minlength of a string input.
     
@@ -304,6 +292,7 @@ def minlength_extractor(widget, data):
             raise ExtractionError(message)
     return val
 
+@managedprops('ascii')
 def ascii_extractor(widget, data):
     """Validate if a string is ASCII encoding.
     
@@ -336,6 +325,7 @@ RE_PASSWORD_ALL = [
     SPECIAL_CHAR_RE]
 PASSWORD_NOCHANGE_VALUE = '_NOCHANGE_'
 
+@managedprops('strength', 'weak_password_message')
 def password_extractor(widget, data):
     """Extract and validate password input.
     
@@ -370,9 +360,10 @@ def password_extractor(widget, data):
         if re.match(reg_exp, val):
             strength += 1
     if strength < required_strength:
-        raise ExtractionError(u"Password too weak")
+        raise ExtractionError(widget.attrs.get('weak_password_message'))
     return val
 
+@managedprops('size', 'disabled', *css_managed_props)
 def password_renderer(widget, data):
     """Render password widget.
     
@@ -441,6 +432,11 @@ factory.doc['props']['password.strength'] = \
 valid.
 """
 
+factory.defaults['weak_password_message'] = u'Password too weak'
+factory.doc['props']['password.strength'] = \
+"""Message shown if password is not strong enough.
+"""
+
 ###############################################################################
 # checkbox
 ###############################################################################
@@ -493,6 +489,7 @@ factory.register('checkbox',
 # selection
 ###############################################################################
 
+@managedprops('format', 'multivalued')
 def select_extractor(widget, data):
     extracted = generic_extractor(widget, data)
     if extracted is UNSET \
@@ -504,6 +501,7 @@ def select_extractor(widget, data):
             extracted = ''
     return extracted 
 
+@managedprops('format', 'vocabulary', 'multivalued', *css_managed_props)
 def select_renderer(widget, data):
     tag = data.tag
     value = fetch_value(widget, data)
@@ -578,7 +576,7 @@ def file_extracor(widget, data):
             return UNSET
     return data.request[name]
 
-@managedprops('css', 'accept',*css_managed_props)
+@managedprops('accept',*css_managed_props)
 def input_file_renderer(widget, data):
     tag = data.tag
     input_attrs = {
@@ -592,7 +590,7 @@ def input_file_renderer(widget, data):
         input_attrs['accept'] = widget.attrs['accept']
     return tag('input', **input_attrs)
 
-@managedprops('css', 'vocabulary', *css_managed_props)
+@managedprops('vocabulary', *css_managed_props)
 def file_options_renderer(widget, data):
     if data.value in [None, UNSET, '']:
         return data.rendered
@@ -631,6 +629,7 @@ factory.register('file',
 # submit
 ###############################################################################
 
+@managedprops('label', 'class', 'action')
 def submit_renderer(widget, data):
     tag = data.tag
     input_attrs = {
@@ -672,6 +671,7 @@ factory.register('email',
 # label
 ###############################################################################
 
+@managedprops('position', 'label', 'help', 'help_class', *css_managed_props)
 def label_renderer(widget, data):
     tag = data.tag
     label_text = widget.attrs.get('label', widget.__name__)
@@ -699,6 +699,7 @@ factory.register('label', [], [label_renderer])
 # field
 ###############################################################################
 
+@managedprops('witherror', *css_managed_props)
 def field_renderer(widget, data):
     tag = data.tag
     div_attrs = {
@@ -717,6 +718,7 @@ factory.register('field', [], [field_renderer])
 # error
 ###############################################################################
 
+@managedprops('message_class', *css_managed_props)
 def error_renderer(widget, data):
     if not data.errors:
         return data.rendered

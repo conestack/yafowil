@@ -2,9 +2,12 @@ from yafowil.base import factory
 from yafowil.utils import (
     UNSET,
     cssid,
-    cssclasses, 
+    cssclasses,
+    css_managed_props,
+    managedprops,
 )
 
+@managedprops('structural')
 def compound_extractor(widget, data):
     """Delegates extraction to children.
     """
@@ -33,6 +36,7 @@ factory.register('compound',
                  [compound_renderer],
                  [])
 
+@managedprops('legend', *css_managed_props)
 def fieldset_renderer(widget, data):
     fs_attrs = {
         'id': cssid(widget, 'fieldset'),
@@ -44,11 +48,12 @@ def fieldset_renderer(widget, data):
     return data.tag('fieldset', rendered, **fs_attrs)   
 
 factory.defaults['fieldset.legend'] = False
-factory.defaults['fieldset.class'] = []
+factory.defaults['fieldset.class'] = None
 factory.register('fieldset', 
                  factory.extractors('compound'), 
                  factory.renderers('compound') + [fieldset_renderer])
 
+@managedprops('action', 'method', 'enctype', *css_managed_props)
 def form_renderer(widget, data):
     form_attrs = {
         'action': widget.attrs['action'],
