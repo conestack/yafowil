@@ -4,7 +4,7 @@
 from setuptools import setup, find_packages
 import sys, os
 
-version = '1.0'
+version = '1.0-beta'
 shortdesc = \
 'YAFOWIL - Yet Another Form Widget Lib: Lightweight, Extensible, Pluggable, Pure.'
 longdesc = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()

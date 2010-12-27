@@ -12,7 +12,7 @@ Yafowil widgets are just configuration. Yafowil provides a factory where you can
 fetch your widgets instances from. Or you register your own.
 
 Dependencies
------------- 
+============
 
 Yafowil aims to have no dependencies to any framework. It utilizes the ``node``  
 package. It also does not know about data-storage, but offers you a hook to add 
@@ -107,6 +107,7 @@ Yafowil provides widgets for all HTML standard inputs, Such as:
 - file
 - hidden
 - submit
+- and some more
 
 Usally you request a widget instance from the factory. I.e. by calling
 :: 
