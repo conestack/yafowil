@@ -1,6 +1,3 @@
-Introduction
-============
-
 This is **Yet Another Form WIdget Library** (XHTML). There are plenty of 'em out 
 in Python space.  
 
