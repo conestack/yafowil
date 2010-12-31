@@ -3,9 +3,8 @@ from node.base import OrderedNode
 from node.behavior import (
     behavior,
     Attributed,
+    NodeAttributes,
 ) 
-from node.behavior.attributed import NodeAttributes
-
 from yafowil.utils import (
     Tag,
     UNSET,
@@ -15,19 +14,18 @@ def _dict__repr__(self):
     return '{%s}' % ', '.join(['%s: %s' % (repr(k), repr(v)) 
                                for k,v in self.items()])
 
+
 class RuntimeDataAttributes(NodeAttributes):
     __str__ = __repr__ = _dict__repr__
 
-class RuntimeDataAttributed(Attributed):
 
-    attributes_factory = RuntimeDataAttributes
-
-@behavior(RuntimeDataAttributed)        
+@behavior(Attributed)
 class RuntimeData(OrderedNode):
     """Holds Runtime data of widget."""
         
     def __init__(self, name=None):
-        OrderedNode.__init__(self, name=name)
+        super(OrderedNode, self).__init__(name=name)
+        self.attributes_factory = RuntimeDataAttributes
         self.request = UNSET
         self.value = UNSET
         self.preprocessed = False
@@ -101,6 +99,7 @@ class TBSupplementWidget(object):
         self.warnings = ['Occurred on %s in widget "%s" %s' % \
                          (task, name, descr)]     
 
+
 @behavior(Attributed)       
 class WidgetAttributes(NodeAttributes):
     
@@ -134,14 +133,9 @@ class WidgetAttributes(NodeAttributes):
             return self[key]
         except KeyError:
             return default
-        
-    
-        
-class WidgetAttributed(Attributed):
 
-    attributes_factory = WidgetAttributes
-            
-@behavior(WidgetAttributed)                
+
+@behavior(Attributed)                
 class Widget(OrderedNode):
     """Base Widget Class
     """
@@ -188,7 +182,8 @@ class Widget(OrderedNode):
         ``defaults``
             a dict with defaults value for the widgets attributes.
         """
-        OrderedNode.__init__(self, uniquename)
+        super(OrderedNode, self).__init__(uniquename)
+        self.attributes_factory = WidgetAttributes
         self.getter = value_or_getter
         self.extractors = extractors
         self.renderers = renderers
@@ -310,7 +305,8 @@ class Widget(OrderedNode):
         data.current_prefix = None
         data.preprocessed = True 
         return data
-        
+
+
 class Factory(object):
     
     def __init__(self):
