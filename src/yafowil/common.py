@@ -452,7 +452,7 @@ def input_checkbox_extractor(widget, data):
         return widget.dottedpath in data.request
     elif format == 'string':
         return data.request.get(widget.dottedpath, '')
-    raise ValueError, 'Checkbox widget has invalid format % s set' % format
+    raise ValueError, "Checkbox widget has invalid format '%s' set" % format
 
 @managedprops('format', *css_managed_props)
 def input_checkbox_renderer(widget, data):
