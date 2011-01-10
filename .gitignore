@@ -18,3 +18,4 @@ var
 devsrc
 docs/Makefile
 docs/make.bat
+dist
