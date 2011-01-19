@@ -1,5 +1,6 @@
 Test UNSET
 ==========
+
 ::
 
     >>> from yafowil.utils import UNSET
@@ -17,6 +18,8 @@ Test UNSET
 
 Test the Vocabulary
 ===================
+
+::
 
     >>> from yafowil.utils import vocabulary
     >>> vocabulary('foo')
@@ -42,7 +45,9 @@ Test the Vocabulary
         
 Test Tag renderer
 =================
+
 ::
+
     >>> from yafowil.utils import Tag
     >>> tag = Tag(lambda msg: msg)    
     >>> a = {'class': u'fancy', 'id': '2f5b8a234ff'}
@@ -68,12 +73,16 @@ deprecated test::
     
 Test CSS Classes
 ================
+
 ::
+
+    >>> from plumber import Plumber
     >>> from node.base import OrderedNode
-    >>> from node.behavior import behavior, Attributed 
-    >>> @behavior(Attributed)
-    ... class CSSTestNode(OrderedNode):
-    ...     pass
+    >>> from node.plumbing.nodespace import Nodespaces
+    >>> from node.plumbing.attributes import Attributes
+    >>> class CSSTestNode(OrderedNode):
+    ...     __metaclass__ = Plumber
+    ...     __pipeline__ = Nodespaces, Attributes
     >>> widget = CSSTestNode()
     >>> widget.attrs['required'] = False
     >>> widget.attrs['required_class'] = None
@@ -161,5 +170,3 @@ Test managedprops annotation
     (1, 2, 3)
     >>> somefunc.__yafowil_managed_props__
     ('foo', 'bar')
-    
-    

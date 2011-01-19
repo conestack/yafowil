@@ -3,7 +3,7 @@ from plumber import Plumber
 from node.base import OrderedNode
 from node.plumbing.attributes import Attributes
 from node.plumbing.attributes import NodeAttributes
-from node.plumbing.nodespace import NodeSpace
+from node.plumbing.nodespace import Nodespaces
 from yafowil.utils import (
     Tag,
     UNSET,
@@ -22,7 +22,7 @@ class RuntimeData(OrderedNode):
     """Holds Runtime data of widget.
     """
     __metaclass__ = Plumber
-    __pipeline__ = NodeSpace, Attributes
+    __pipeline__ = Nodespaces, Attributes
         
     def __init__(self, name=None):
         super(OrderedNode, self).__init__(name=name)
@@ -104,7 +104,7 @@ class TBSupplementWidget(object):
 class WidgetAttributes(NodeAttributes):
     
     __metaclass__ = Plumber
-    __pipeline__ = NodeSpace, Attributes
+    __pipeline__ = Nodespaces, Attributes
     
     __str__ = __repr__ = _dict__repr__
         
@@ -142,7 +142,7 @@ class Widget(OrderedNode):
     """Base Widget Class
     """
     __metaclass__ = Plumber
-    __pipeline__ = NodeSpace, Attributes
+    __pipeline__ = Nodespaces, Attributes
     
     def __init__(self, extractors, renderers, preprocessors, 
                  uniquename=None, value_or_getter=UNSET, properties=dict(),
