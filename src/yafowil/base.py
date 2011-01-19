@@ -9,7 +9,7 @@ from yafowil.utils import (
     UNSET,
 )
 
-def _dict__repr__(self):  
+def _dict__repr__(self):
     return '{%s}' % ', '.join(['%s: %s' % (repr(k), repr(v)) 
                                for k,v in self.items()])
 
@@ -67,7 +67,8 @@ class RuntimeData(OrderedNode):
     @property
     def noderepr(self):
         return repr(self)
-    
+
+
 class ExtractionError(Exception):
     """Indicates problems on extraction time, such as conversion, validation
     or similar problems.
@@ -88,7 +89,8 @@ class ExtractionError(Exception):
         
     def __repr__(self):
         return u"ExtractionError('%s',)" % str(self)
-    
+
+
 class TBSupplementWidget(object):
 
     def __init__(self, widget, func, task, descr):
