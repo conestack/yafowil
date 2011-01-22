@@ -3,13 +3,13 @@ from plumber import Plumber
 from node.base import OrderedNode
 from node.plumbing.attributes import Attributes
 from node.plumbing.attributes import NodeAttributes
-from node.plumbing.nodespace import NodeSpace
+from node.plumbing.nodespace import Nodespaces
 from yafowil.utils import (
     Tag,
     UNSET,
 )
 
-def _dict__repr__(self):  
+def _dict__repr__(self):
     return '{%s}' % ', '.join(['%s: %s' % (repr(k), repr(v)) 
                                for k,v in self.items()])
 
@@ -22,7 +22,7 @@ class RuntimeData(OrderedNode):
     """Holds Runtime data of widget.
     """
     __metaclass__ = Plumber
-    __plumbing__ = NodeSpace, Attributes
+    __plumbing__ = Nodespaces, Attributes
         
     def __init__(self, name=None):
         super(OrderedNode, self).__init__(name=name)
@@ -67,7 +67,8 @@ class RuntimeData(OrderedNode):
     @property
     def noderepr(self):
         return repr(self)
-    
+
+
 class ExtractionError(Exception):
     """Indicates problems on extraction time, such as conversion, validation
     or similar problems.
@@ -88,7 +89,8 @@ class ExtractionError(Exception):
         
     def __repr__(self):
         return u"ExtractionError('%s',)" % str(self)
-    
+
+
 class TBSupplementWidget(object):
 
     def __init__(self, widget, func, task, descr):
@@ -104,7 +106,7 @@ class TBSupplementWidget(object):
 class WidgetAttributes(NodeAttributes):
     
     __metaclass__ = Plumber
-    __plumbing__ = NodeSpace, Attributes
+    __plumbing__ = Nodespaces, Attributes
     
     __str__ = __repr__ = _dict__repr__
         
@@ -142,7 +144,7 @@ class Widget(OrderedNode):
     """Base Widget Class
     """
     __metaclass__ = Plumber
-    __plumbing__ = NodeSpace, Attributes
+    __plumbing__ = Nodespaces, Attributes
     
     def __init__(self, extractors, renderers, preprocessors, 
                  uniquename=None, value_or_getter=UNSET, properties=dict(),
