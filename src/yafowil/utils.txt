@@ -82,7 +82,7 @@ Test CSS Classes
     >>> from node.plumbing.attributes import Attributes
     >>> class CSSTestNode(OrderedNode):
     ...     __metaclass__ = Plumber
-    ...     __pipeline__ = Nodespaces, Attributes
+    ...     __plumbing__ = Nodespaces, Attributes
     >>> widget = CSSTestNode()
     >>> widget.attrs['required'] = False
     >>> widget.attrs['required_class'] = None
