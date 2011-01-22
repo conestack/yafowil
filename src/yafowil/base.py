@@ -22,7 +22,7 @@ class RuntimeData(OrderedNode):
     """Holds Runtime data of widget.
     """
     __metaclass__ = Plumber
-    __pipeline__ = NodeSpace, Attributes
+    __plumbing__ = NodeSpace, Attributes
         
     def __init__(self, name=None):
         super(OrderedNode, self).__init__(name=name)
@@ -104,7 +104,7 @@ class TBSupplementWidget(object):
 class WidgetAttributes(NodeAttributes):
     
     __metaclass__ = Plumber
-    __pipeline__ = NodeSpace, Attributes
+    __plumbing__ = NodeSpace, Attributes
     
     __str__ = __repr__ = _dict__repr__
         
@@ -142,7 +142,7 @@ class Widget(OrderedNode):
     """Base Widget Class
     """
     __metaclass__ = Plumber
-    __pipeline__ = NodeSpace, Attributes
+    __plumbing__ = NodeSpace, Attributes
     
     def __init__(self, extractors, renderers, preprocessors, 
                  uniquename=None, value_or_getter=UNSET, properties=dict(),
