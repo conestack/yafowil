@@ -1,9 +1,9 @@
 from threading import RLock
 from plumber import Plumber
 from node.base import OrderedNode
-from node.plumbing.attributes import Attributes
-from node.plumbing.attributes import NodeAttributes
-from node.plumbing.nodespace import Nodespaces
+from node.parts.attributes import Attributes
+from node.parts.attributes import NodeAttributes
+from node.parts.nodespace import Nodespaces
 from yafowil.utils import (
     Tag,
     UNSET,
