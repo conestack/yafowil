@@ -1,14 +1,16 @@
 from threading import RLock
 from plumber import plumber
-from node.parts.adopt import Adopt
-from node.parts.nodify import NodeRepr
-from node.parts.nodify import Nodify
-from node.parts.validate import NodeChildValidate
-from node.parts.storage import DictStorage
-from node.parts.storage import OdictStorage
-from node.parts.attributes import Attributes
-from node.parts.attributes import NodeAttributes
-from node.parts.nodespace import Nodespaces
+from node.parts import (
+    Adopt,
+    NodeRepr,
+    Nodify,
+    NodeChildValidate,
+    DictStorage,
+    OdictStorage,
+    Attributes,
+    NodeAttributes,
+    Nodespaces,
+)
 from yafowil.utils import (
     Tag,
     UNSET,
