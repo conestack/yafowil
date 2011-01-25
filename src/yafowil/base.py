@@ -1,6 +1,11 @@
 from threading import RLock
-from plumber import Plumber
-from node.base import OrderedNode
+from plumber import plumber
+from node.parts.adopt import Adopt
+from node.parts.nodify import NodeRepr
+from node.parts.nodify import Nodify
+from node.parts.validate import NodeChildValidate
+from node.parts.storage import DictStorage
+from node.parts.storage import OdictStorage
 from node.parts.attributes import Attributes
 from node.parts.attributes import NodeAttributes
 from node.parts.nodespace import Nodespaces
@@ -18,14 +23,25 @@ class RuntimeDataAttributes(NodeAttributes):
     __str__ = __repr__ = _dict__repr__
 
 
-class RuntimeData(OrderedNode):
+class RuntimeData(object):
     """Holds Runtime data of widget.
     """
-    __metaclass__ = Plumber
-    __plumbing__ = Nodespaces, Attributes
+    __metaclass__ = plumber
+    __plumbing__ = (
+        Nodespaces,
+        Attributes,
+        NodeChildValidate,
+        Adopt,
+        Nodify,
+        OdictStorage,
+    )
         
     def __init__(self, name=None):
-        super(OrderedNode, self).__init__(name=name)
+        #super(OrderedNode, self).__init__(name=name)
+        
+        self.__name__ = name
+        self.__parent__ = None
+        
         self.attributes_factory = RuntimeDataAttributes
         self.request = UNSET
         self.value = UNSET
@@ -105,9 +121,6 @@ class TBSupplementWidget(object):
 
 class WidgetAttributes(NodeAttributes):
     
-    __metaclass__ = Plumber
-    __plumbing__ = Nodespaces, Attributes
-    
     __str__ = __repr__ = _dict__repr__
         
     def __getitem__(self, name):
@@ -140,11 +153,19 @@ class WidgetAttributes(NodeAttributes):
             return default
 
              
-class Widget(OrderedNode):
+class Widget(object):
     """Base Widget Class
     """
-    __metaclass__ = Plumber
-    __plumbing__ = Nodespaces, Attributes
+    __metaclass__ = plumber
+    __plumbing__ = (
+        Nodespaces,
+        Attributes,
+        NodeChildValidate,
+        Adopt,
+        Nodify,
+        NodeRepr,
+        OdictStorage,
+    )
     
     def __init__(self, extractors, renderers, preprocessors, 
                  uniquename=None, value_or_getter=UNSET, properties=dict(),
@@ -188,7 +209,11 @@ class Widget(OrderedNode):
         ``defaults``
             a dict with defaults value for the widgets attributes.
         """
-        super(OrderedNode, self).__init__(uniquename)
+        #super(self.__class__, self).__init__(uniquename)
+        
+        self.__name__ = uniquename
+        self.__parent__ = None
+        
         self.attributes_factory = WidgetAttributes
         self.getter = value_or_getter
         self.extractors = extractors
