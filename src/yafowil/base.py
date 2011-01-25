@@ -37,11 +37,8 @@ class RuntimeData(object):
     )
         
     def __init__(self, name=None):
-        #super(OrderedNode, self).__init__(name=name)
-        
         self.__name__ = name
         self.__parent__ = None
-        
         self.attributes_factory = RuntimeDataAttributes
         self.request = UNSET
         self.value = UNSET
@@ -209,18 +206,14 @@ class Widget(object):
         ``defaults``
             a dict with defaults value for the widgets attributes.
         """
-        #super(self.__class__, self).__init__(uniquename)
-        
         self.__name__ = uniquename
         self.__parent__ = None
-        
         self.attributes_factory = WidgetAttributes
         self.getter = value_or_getter
         self.extractors = extractors
         self.renderers = renderers
         self.preprocessors = preprocessors or list()
         self.defaults = defaults
-        self.__name__ = uniquename
         self._lock = RLock()
         self.current_prefix = None
         # keep properties for use in dottedpath to avoid recursion errors
