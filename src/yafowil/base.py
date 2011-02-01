@@ -37,9 +37,9 @@ class RuntimeData(object):
         OdictStorage,
     )
         
-    def __init__(self, name=None):
+    def __init__(self, name=None, parent=None):
         self.__name__ = name
-        self.__parent__ = None
+        self.__parent__ = parent
         self.attributes_factory = RuntimeDataAttributes
         self.request = UNSET
         self.value = UNSET
