@@ -110,18 +110,6 @@ def generic_required_extractor(widget, data):
 @managedprops('type', 'size', 'disabled', *css_managed_props)
 def input_generic_renderer(widget, data):
     """Generic HTML ``input`` tag render.
-    
-    Properties:
-    
-    ``type``
-        Type of this input tag.
-    
-    ``size``
-        Size of input tag.
-    
-    ``disabled``
-        Bool evaluating value, if evaluates to True, sets disabled="disabled" 
-        on input tag.
     """
     tag = data.tag
     input_attrs = {
@@ -655,6 +643,10 @@ def email_extractor(widget, data):
     if not re.match(EMAIL_RE, val is not UNSET and val or ''):
         raise ExtractionError(u'Input not a valid email address.')
     return val
+
+factory.doc['widget']['email'] = \
+"""E-mail input widget.
+"""
 
 factory.defaults['email.type'] = 'text'
 factory.defaults['email.default'] = ''
