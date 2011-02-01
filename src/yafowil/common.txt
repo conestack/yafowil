@@ -36,6 +36,31 @@ Text Input Widget
     u'<input class="hidden" id="input-MYHIDDEN" name="MYHIDDEN" type="hidden" 
     value="Test Hidden" />'
 
+Autofocus Text Input
+---------------------
+::
+    >>> widget = factory(
+    ...     'text',
+    ...     name='AUTOFOCUS',
+    ...     value='',
+    ...     props={
+    ...         'autofocus': True})
+    >>> widget()
+    u'<input autofocus="autofocus" class="text" id="input-AUTOFOCUS" 
+    name="AUTOFOCUS" type="text" value="" />'
+
+Placeholder Text Input
+----------------------
+::
+    >>> widget = factory(
+    ...     'text',
+    ...     name='PLACEHOLDER',
+    ...     value='',
+    ...     props={
+    ...         'placeholder': 'This is a placeholder.'})
+    >>> widget()
+    u'<input class="text" id="input-PLACEHOLDER" name="PLACEHOLDER" 
+    placeholder="This is a placeholder." type="text" value="" />'
 
 Required Input Widget
 ---------------------
@@ -50,7 +75,7 @@ Required Input Widget
     ...         'error_class': True})
     >>> widget()
     u'<input class="required text" id="input-REQUIRED" name="REQUIRED" 
-    type="text" value="" />'
+    required="required" type="text" value="" />'
 
 Extract with empty request, key not in request therefore no error.
 ::
@@ -85,7 +110,7 @@ With getter value set, empty request, no error expected.
 
     >>> widget(data=data)
     u'<input class="required text" id="input-REQUIRED" name="REQUIRED" 
-    type="text" value="Test Text" />'
+    required="required" type="text" value="Test Text" />'
 
 With getter value set, request given, error expected.
 ::    
@@ -96,8 +121,8 @@ With getter value set, request given, error expected.
     
     >>> widget(data=data)
     u'<input class="error required text" id="input-REQUIRED" name="REQUIRED" 
-    type="text" value="" />'
-
+    required="required" type="text" value="" />'    
+    
 Create a custom error message.
 ::    
 
@@ -558,7 +583,7 @@ Email Widget
     ...     'email',
     ...     name='email')
     >>> pxml(widget())
-    <input class="email" id="input-email" name="email" type="text" value=""/>
+    <input class="email" id="input-email" name="email" type="email" value=""/>
     
     >>> data = widget.extract({'email': 'foo@bar'})
     >>> data.errors
@@ -569,5 +594,26 @@ Email Widget
     [ExtractionError('Input not a valid email address.',)]
     
     >>> data = widget.extract({'email': 'foo@bar.com'})
+    >>> data.errors
+    []
+    
+URL Widget
+----------
+
+    >>> widget = factory(
+    ...     'url',
+    ...     name='url')
+    >>> pxml(widget())
+    <input class="url" id="input-url" name="url" type="url" value=""/>
+    
+    >>> data = widget.extract({'url': 'htt:/bla'})
+    >>> data.errors
+    [ExtractionError('Input not a valid web address.',)]
+    
+    >>> data = widget.extract({'url': 'invalid'})
+    >>> data.errors
+    [ExtractionError('Input not a valid web address.',)]
+    
+    >>> data = widget.extract({'url': 'http://www.foo.bar.com:8080/bla#fasel?blubber=bla&bla=fasel'})
     >>> data.errors
     []

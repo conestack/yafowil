@@ -100,11 +100,11 @@ Render form with empty request
     >>> pxml(form(data))
     <form action="http://fubar.com" enctype="multipart/form-data" id="form-testform" method="post">
       <input class="text" id="input-testform-field1" name="testform.field1" type="text" value="hello world"/>
-      <input class="required text" id="input-testform-field2" name="testform.field2" type="text" value=""/>
+      <input class="required text" id="input-testform-field2" name="testform.field2" required="required" type="text" value=""/>
       <input id="input-testform-save" name="action.testform.save" type="submit" value="Save"/>
       <input id="input-testform-cancel" name="action.testform.cancel" type="submit" value="Cancel"/>
     </form>
-    <BLANKLINE>    
+    <BLANKLINE>
 
 Create controller for form.
 ::
@@ -172,7 +172,7 @@ Render the form performed.
     >>> pxml(controller.rendered)
     <form action="http://fubar.com" enctype="multipart/form-data" id="form-testform" method="post">
       <input class="text" id="input-testform-field1" name="testform.field1" type="text" value="hello world"/>
-      <input class="required text" id="input-testform-field2" name="testform.field2" type="text" value="1"/>
+      <input class="required text" id="input-testform-field2" name="testform.field2" required="required" type="text" value="1"/>
       <input id="input-testform-save" name="action.testform.save" type="submit" value="Save"/>
       <input id="input-testform-cancel" name="action.testform.cancel" type="submit" value="Cancel"/>
     </form>
@@ -197,11 +197,12 @@ Render form not performed
     >>> pxml(controller.rendered)
     <form action="http://fubar.com" enctype="multipart/form-data" id="form-testform" method="post">
       <input class="text" id="input-testform-field1" name="testform.field1" type="text" value="hello world"/>
-      <input class="required text" id="input-testform-field2" name="testform.field2" type="text" value=""/>
+      <input class="required text" id="input-testform-field2" name="testform.field2" required="required" type="text" value=""/>
       <input id="input-testform-save" name="action.testform.save" type="submit" value="Save"/>
       <input id="input-testform-cancel" name="action.testform.cancel" type="submit" value="Cancel"/>
     </form>
     <BLANKLINE>
+
 
 
 Try recursive lookup of actions
