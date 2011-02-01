@@ -496,9 +496,14 @@ def input_checkbox_renderer(widget, data):
     }
     exists_marker = tag('input', **input_attrs)
     return checkbox + exists_marker 
-
+factory.doc['widget']['checkbox'] = """\
+Single checkbox.
+"""
 factory.defaults['checkbox.default'] = False
 factory.defaults['checkbox.format'] = 'bool'
+factory.doc['props']['checkbox.format'] = """\
+Data-type of the extracted value. One out of ``bool`` or ``string``. 
+"""
 factory.defaults['checkbox.required_class'] = 'required'
 factory.register('checkbox', 
                  [input_checkbox_extractor, generic_required_extractor], 
@@ -575,6 +580,10 @@ def select_renderer(widget, data):
         exists_marker = tag('input', **attrs)            
         return exists_marker + u''.join(tags)
         
+factory.doc['widget']['select'] = """\
+Selection Widget. Single selection as dropdown or radio-buttons. Multiple 
+selection as selection-list or as checkboxes. 
+"""        
 factory.defaults['select.multivalued'] = None
 factory.defaults['select.default'] = []
 factory.defaults['select.format'] = 'block'
@@ -720,6 +729,9 @@ factory.register('url',
 # search
 ###############################################################################
 
+factory.doc['widget']['search'] = """\
+Search widget (HTML5).
+"""
 factory.defaults['search.type'] = 'search'
 factory.defaults['search.default'] = ''
 factory.defaults['search.required_class'] = 'required'
@@ -757,6 +769,9 @@ def number_extractor(widget, data):
                               widget.attrs.get('step'))        
     return val
 
+factory.doc['widget']['number'] = """\
+Number widget (HTML5).
+"""
 factory.defaults['number.type'] = 'number'
 factory.defaults['number.datatype'] = 'float'
 factory.doc['props']['number.datatype'] = """\

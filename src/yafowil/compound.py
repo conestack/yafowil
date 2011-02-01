@@ -31,6 +31,14 @@ def compound_renderer(widget, data):
             result += widget[childname](data=subdata)
     return result
 
+factory.doc['widget']['compound'] = """\
+A compound of widgets. This widget is a node which can contain sub-widgets.
+"""
+factory.defaults['structural'] = False
+factory.doc['props']['structural'] = """\
+If a compound is structural, it will be omitted in the dotted-path levels and 
+will not have an own runtime-data. 
+"""
 factory.register('compound', 
                  [compound_extractor], 
                  [compound_renderer],
