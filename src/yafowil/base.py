@@ -2,7 +2,6 @@ from threading import RLock
 from plumber import plumber
 from node.parts import (
     Adopt,
-    NodeRepr,
     Nodify,
     NodeChildValidate,
     DictStorage,
@@ -162,7 +161,6 @@ class Widget(object):
         NodeChildValidate,
         Adopt,
         Nodify,
-        NodeRepr,
         OdictStorage,
     )
     
