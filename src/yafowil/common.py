@@ -39,6 +39,17 @@ factory.doc['props']['error_class_default'] = \
 given.
 """
 
+factory.defaults['autofocus'] = False
+factory.doc['props']['autofocus'] = \
+"""Wether this field is get the focus automatically or not (if browser supports 
+it).
+"""
+
+factory.defaults['placeholder'] = False
+factory.doc['props']['placeholder'] = \
+"""Wether this field has a placeholder value or not (if browser supports it).
+"""
+
 factory.defaults['required'] = False
 factory.doc['props']['required'] = \
 """Wether this value is required or not.
@@ -119,6 +130,9 @@ def input_generic_renderer(widget, data):
         'id': cssid(widget, 'input'),    
         'class_': cssclasses(widget, data),
         'size': widget.attrs.get('size'),
+        'placeholder': widget.attrs.get('placeholder') or None,
+        'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
+        'required': widget.attrs.get('required') and 'required' or None,
         'disabled': bool(widget.attrs.get('disabled')) and 'disabled' or None,
     }
     return tag('input', **input_attrs)
@@ -224,6 +238,9 @@ def textarea_renderer(widget, data):
         'cols': widget.attrs['cols'],
         'rows': widget.attrs['rows'],
         'readonly': widget.attrs['readonly'] and 'readonly',
+        'placeholder': widget.attrs.get('placeholder') or None,
+        'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
+        'required': widget.attrs.get('required') and 'required' or None,        
     }
     return tag('textarea', fetch_value(widget, data), **area_attrs)
 
@@ -511,6 +528,9 @@ def select_renderer(widget, data):
             'id': cssid(widget, 'input'),
             'class_': cssclasses(widget, data),                        
             'multiple': widget.attrs['multivalued'] and 'multiple' or None,
+            'placeholder': widget.attrs.get('placeholder') or None,
+            'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
+            'required': widget.attrs.get('required') and 'required' or None,            
         }
         return tag('select', *optiontags, **select_attrs)
     else:
@@ -573,6 +593,9 @@ def input_file_renderer(widget, data):
         'class_': cssclasses(widget, data),            
         'type': 'file',
         'value':  '',
+        'placeholder': widget.attrs.get('placeholder') or None,
+        'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
+        'required': widget.attrs.get('required') and 'required' or None,        
     }
     if widget.attrs.get('accept'):
         input_attrs['accept'] = widget.attrs['accept']
@@ -648,7 +671,7 @@ factory.doc['widget']['email'] = \
 """E-mail input widget.
 """
 
-factory.defaults['email.type'] = 'text'
+factory.defaults['email.type'] = 'email'
 factory.defaults['email.default'] = ''
 factory.defaults['email.required_class'] = 'required'
 factory.defaults['email.class'] = 'email'
@@ -657,6 +680,30 @@ factory.defaults['email.disabled'] = False
 factory.register('email', 
                  [generic_extractor, generic_required_extractor,
                   email_extractor],
+                 [input_generic_renderer])
+
+###############################################################################
+# url
+###############################################################################
+
+URL_RE = u'^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:'+\
+         u'.?+=&%@!\-\/]))?$'
+
+def url_extractor(widget, data):
+    val = data.extracted
+    if not re.match(URL_RE, val is not UNSET and val or ''):
+        raise ExtractionError(u'Input not a valid web address.')
+    return val
+
+factory.defaults['url.type'] = 'url'
+factory.defaults['url.default'] = ''
+factory.defaults['url.required_class'] = 'required'
+factory.defaults['url.class'] = 'url'
+factory.defaults['url.size'] = None
+factory.defaults['url.disabled'] = False
+factory.register('url', 
+                 [generic_extractor, generic_required_extractor,
+                  url_extractor],
                  [input_generic_renderer])
 
 ###############################################################################

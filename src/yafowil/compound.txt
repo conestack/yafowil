@@ -17,7 +17,7 @@ Render Compound.
     >>> pxml(tag('div', compound()))
     <div>
       <input class="text" id="input-COMPOUND-inner" name="COMPOUND.inner" type="text" value="value1"/>
-      <input class="required text" id="input-COMPOUND-inner2" name="COMPOUND.inner2" type="text" value="value2"/>
+      <input class="required text" id="input-COMPOUND-inner2" name="COMPOUND.inner2" required="required" type="text" value="value2"/>
     </div>
     <BLANKLINE>
 
