@@ -39,20 +39,25 @@ factory.doc['props']['error_class_default'] = \
 given.
 """
 
-factory.defaults['autofocus'] = False
+factory.defaults['autofocus'] = None
 factory.doc['props']['autofocus'] = \
-"""Wether this field is get the focus automatically or not (if browser supports 
+"""Whether this field gets the focus automatically or not (if browser supports 
 it).
 """
 
-factory.defaults['placeholder'] = False
+factory.defaults['autocomplete'] = None
+factory.doc['props']['autocomplete'] = \
+"""Switch autocomplete explizit to ``on`` or ``off``.
+"""
+
+factory.defaults['placeholder'] = None
 factory.doc['props']['placeholder'] = \
-"""Wether this field has a placeholder value or not (if browser supports it).
+"""Whether this field has a placeholder value or not (if browser supports it).
 """
 
 factory.defaults['required'] = False
 factory.doc['props']['required'] = \
-"""Wether this value is required or not.
+"""Whether this value is required or not.
 """
 
 factory.defaults['required_message'] = u'Mandatory field was empty'          
@@ -63,6 +68,16 @@ factory.doc['props']['required_message'] = \
 factory.defaults['required_class'] = None
 factory.doc['props']['required_class'] = \
 """CSS-class to put on in case if required condition was not met.
+"""
+
+factory.defaults['size'] = None
+factory.doc['props']['size'] = \
+"""Allowed input size.
+"""
+
+factory.defaults['disabled'] = None
+factory.doc['props']['disabled'] = \
+"""Disables field.
 """
 
 factory.defaults['required_class_default'] = 'required'
@@ -101,7 +116,7 @@ def generic_required_extractor(widget, data):
     Properties:
     
     ``required``
-        Define wether value is required ot not. Either basestring instance or
+        Define  value is required ot not. Either basestring instance or
         callable returning basestring is expected.
     
     ``required_message``
@@ -118,7 +133,7 @@ def generic_required_extractor(widget, data):
         raise ExtractionError(required)
     raise ExtractionError(widget.attrs['required_message'])
 
-@managedprops('type', 'size', 'disabled', *css_managed_props)
+@managedprops('type', 'size', 'disabled', 'autofocus', 'placeholder', *css_managed_props)
 def input_generic_renderer(widget, data):
     """Generic HTML ``input`` tag render.
     """
@@ -135,6 +150,10 @@ def input_generic_renderer(widget, data):
         'required': widget.attrs.get('required') and 'required' or None,
         'disabled': bool(widget.attrs.get('disabled')) and 'disabled' or None,
     }
+    if widget.attrs['type'] in ['range', 'number']:
+        input_attrs['min'] = widget.attrs.get('min') or None
+        input_attrs['max'] = widget.attrs.get('min') or None
+        input_attrs['step'] = widget.attrs.get('step') or None
     return tag('input', **input_attrs)
 
 ###############################################################################
@@ -159,14 +178,9 @@ factory.defaults['text.default'] = ''
 
 factory.defaults['text.class'] = 'text'
 
-factory.defaults['text.size'] = None
-factory.doc['props']['text.size'] = \
-"""Allowed input size.
-"""
-
 factory.defaults['text.disabled'] = False
 factory.doc['props']['text.disabled'] = \
-"""Flag wether input field is disabled.
+"""Flag  input field is disabled.
 """
 
 ###############################################################################
@@ -225,7 +239,8 @@ factory.defaults['proxy.class'] = None
 # textarea
 ###############################################################################
 
-@managedprops('wrap', 'cols', 'rows', 'readonly', *css_managed_props)
+@managedprops('wrap', 'cols', 'rows', 'readonly', 'autofocus', 'placeholder', 
+              *css_managed_props)
 def textarea_renderer(widget, data):
     """Renders text area.
     """
@@ -269,7 +284,7 @@ factory.doc['props']['textarea.rows'] = \
 
 factory.defaults['textarea.readonly'] = None
 factory.doc['props']['textarea.readonly'] = \
-"""Flag wether textarea is readonly.
+"""Flag  textarea is readonly.
 """
 
 ###############################################################################
@@ -306,7 +321,7 @@ def ascii_extractor(widget, data):
     Properties:
     
     ``ascii``
-        Flag wether ascii check should perform.
+        Flag  ascii check should perform.
     """
     val = data.extracted
     if val is UNSET:
@@ -368,23 +383,10 @@ def password_extractor(widget, data):
         raise ExtractionError(widget.attrs.get('weak_password_message'))
     return val
 
-@managedprops('size', 'disabled', *css_managed_props)
+@managedprops('size', 'disabled', 'placeholder', 'autofocus', 'required',
+              *css_managed_props)
 def password_renderer(widget, data):
     """Render password widget.
-    
-    The password is never rendered to markup, instead
-    ``yafowil.common.PASSWORD_NOCHANGE_VALUE`` is set as ``value`` property on
-    dom element. See ``yafowil.common.password_extractor`` for details on
-    password extraction.
-    
-    Properties:
-    
-    ``size``
-        Maximum size of password.
-    
-    ``disabled``
-        Bool evaluating value, if evaluates to True, set disabled="disabled" on
-        password input tag.
     """
     tag = data.tag
     def pwd_value(widget, data):
@@ -402,6 +404,9 @@ def password_renderer(widget, data):
         'id': cssid(widget, 'input'),    
         'class_': cssclasses(widget, data),
         'size': widget.attrs.get('size'),
+        'placeholder': widget.attrs.get('placeholder') or None,
+        'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,      
+        'required': widget.attrs.get('required') and 'required' or None,
         'disabled': widget.attrs.get('disabled'),
     }
     return tag('input', **input_attrs)
@@ -413,6 +418,11 @@ factory.register('password',
                  [])
 factory.doc['widget']['password'] = \
 """Password widget.
+
+The password is never rendered to markup, instead
+``yafowil.common.PASSWORD_NOCHANGE_VALUE`` is set as ``value`` property on
+dom element. See ``yafowil.common.password_extractor`` for details on
+password extraction.
 """
 
 factory.defaults['password.required_class'] = 'required'
@@ -421,13 +431,17 @@ factory.defaults['password.default'] = ''
 factory.defaults['password.class'] = 'password'
 
 factory.defaults['password.minlength'] = -1
+factory.doc['props']['password.size'] = \
+"""Maximum length of password.
+"""
+
 factory.doc['props']['password.minlength'] = \
-"""Minlength of password.
+"""Minimum length of password.
 """
 
 factory.defaults['password.ascii'] = False
 factory.doc['props']['password.ascii'] = \
-"""Flag wether ascii check should performed.
+"""Flag  ascii check should performed.
 """
 
 factory.defaults['password.strength'] = 'strength'
@@ -675,8 +689,6 @@ factory.defaults['email.type'] = 'email'
 factory.defaults['email.default'] = ''
 factory.defaults['email.required_class'] = 'required'
 factory.defaults['email.class'] = 'email'
-factory.defaults['email.size'] = None
-factory.defaults['email.disabled'] = False
 factory.register('email', 
                  [generic_extractor, generic_required_extractor,
                   email_extractor],
@@ -699,11 +711,68 @@ factory.defaults['url.type'] = 'url'
 factory.defaults['url.default'] = ''
 factory.defaults['url.required_class'] = 'required'
 factory.defaults['url.class'] = 'url'
-factory.defaults['url.size'] = None
-factory.defaults['url.disabled'] = False
-factory.register('url', 
+factory.register('url',
                  [generic_extractor, generic_required_extractor,
                   url_extractor],
+                 [input_generic_renderer])
+
+###############################################################################
+# search
+###############################################################################
+
+factory.defaults['search.type'] = 'search'
+factory.defaults['search.default'] = ''
+factory.defaults['search.required_class'] = 'required'
+factory.defaults['search.class'] = 'search'
+factory.register('search', 
+                 [generic_extractor, generic_required_extractor],
+                 [input_generic_renderer])
+
+###############################################################################
+# number
+###############################################################################
+
+def number_extractor(widget, data):
+    val = data.extracted
+    if widget.attrs.get('datatype') == 'integer':
+        convert = int
+    elif widget.attrs.get('datatype') == 'float':
+        convert = float
+    else:
+        raise ValueError, 'Output datatype must be integer or float'
+    try:
+        val = convert(val)
+    except ValueError:
+        raise ExtractionError(u'Input is not a valid number (%s).' % \
+                              widget.attrs.get('datatype'))
+    if widget.attrs.get('min') and val < widget.attrs.get('min'):
+        raise ExtractionError(u'Value has to be at minimum %s.' %
+                              widget.attrs.get('min'))
+    if widget.attrs.get('max') and val > widget.attrs.get('max'):
+        raise ExtractionError(u'Value has to be at maximum %s.' %
+                              widget.attrs.get('max'))
+    if widget.attrs.get('step') \
+       and (val - (widget.attrs.get('min') or 0)) %  widget.attrs.get('step'):
+        raise ExtractionError(u'Value has to be in stepping of %s.' %
+                              widget.attrs.get('step'))        
+    return val
+
+factory.defaults['number.type'] = 'number'
+factory.defaults['number.datatype'] = 'float'
+factory.doc['props']['number.datatype'] = """\
+Output datatype, one out of ``integer`` or ``float``.
+"""
+
+factory.defaults['number.default'] = ''
+
+factory.defaults['number.min'] = None
+factory.defaults['number.max'] = None
+factory.defaults['number.step'] = None
+factory.defaults['number.required_class'] = 'required'
+factory.defaults['number.class'] = 'number'
+factory.register('number', 
+                 [generic_extractor, generic_required_extractor,
+                  number_extractor],
                  [input_generic_renderer])
 
 ###############################################################################

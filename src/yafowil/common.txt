@@ -564,7 +564,7 @@ Chained password inside error inside field.
     <div class="field" id="field-password">
       <div class="error">
         <div class="errormessage">No password given!</div>
-        <input class="password required" id="input-password" name="password" type="password" value=""/>
+        <input class="password required" id="input-password" name="password" required="required" type="password" value=""/>
       </div>
     </div>
     <BLANKLINE>
@@ -572,9 +572,10 @@ Chained password inside error inside field.
     >>> data = widget.extract({'password': 'secret'})
     >>> pxml(widget(data=data))
     <div class="field" id="field-password">
-      <input class="password required" id="input-password" name="password" type="password" value="secret"/>
+      <input class="password required" id="input-password" name="password" required="required" type="password" value="secret"/>
     </div>
     <BLANKLINE>
+
 
 Email Widget
 ------------
@@ -617,3 +618,106 @@ URL Widget
     >>> data = widget.extract({'url': 'http://www.foo.bar.com:8080/bla#fasel?blubber=bla&bla=fasel'})
     >>> data.errors
     []
+    
+Number Widget
+-------------
+
+Default behaviour::
+
+    >>> widget = factory(
+    ...     'number',
+    ...     name='NUMBER')
+    >>> pxml(widget())
+    <input class="number" id="input-NUMBER" name="NUMBER" type="number" value=""/>
+    <BLANKLINE>
+
+    >>> data = widget.extract({'NUMBER': 'abc'})
+    >>> data.errors
+    [ExtractionError('Input is not a valid number (float).',)]
+    
+    >>> data = widget.extract({'NUMBER': '10'})
+    >>> data.errors
+    []
+
+    >>> data = widget.extract({'NUMBER': '10.0'})
+    >>> data.errors
+    []
+
+With integer datatype::
+
+    >>> widget = factory(
+    ...     'number',
+    ...     name='NUMBER',
+    ...     props={'datatype': 'integer'})
+
+    >>> data = widget.extract({'NUMBER': '10.0'})
+    >>> data.errors
+    [ExtractionError('Input is not a valid number (integer).',)]
+    
+With min set::
+
+    >>> widget = factory(
+    ...     'number',
+    ...     name='NUMBER',
+    ...     props={'min': 10})
+
+    >>> data = widget.extract({'NUMBER': '9'})
+    >>> data.errors
+    [ExtractionError('Value has to be at minimum 10.',)]
+
+    >>> data = widget.extract({'NUMBER': '10'})
+    >>> data.errors
+    []
+    
+    >>> data = widget.extract({'NUMBER': '11'})
+    >>> data.errors
+    []
+    
+With max set::
+
+    >>> widget = factory(
+    ...     'number',
+    ...     name='NUMBER',
+    ...     props={'max': 10})
+
+    >>> data = widget.extract({'NUMBER': '9'})
+    >>> data.errors
+    []
+
+    >>> data = widget.extract({'NUMBER': '10'})
+    >>> data.errors
+    []
+    
+    >>> data = widget.extract({'NUMBER': '11'})
+    >>> data.errors
+    [ExtractionError('Value has to be at maximum 10.',)]
+    
+With step set::
+
+    >>> widget = factory(
+    ...     'number',
+    ...     name='NUMBER',
+    ...     props={'step': 2})
+
+    >>> data = widget.extract({'NUMBER': '9'})
+    >>> data.errors
+    [ExtractionError('Value has to be in stepping of 2.',)]
+
+    >>> data = widget.extract({'NUMBER': '6'})
+    >>> data.errors
+    []
+
+With step and min set::
+
+    >>> widget = factory(
+    ...     'number',
+    ...     name='NUMBER',
+    ...     props={'step': 2, 'min': 3})
+
+    >>> data = widget.extract({'NUMBER': '9'})
+    >>> data.errors
+    []
+
+    >>> data = widget.extract({'NUMBER': '6'})
+    >>> data.errors
+    [ExtractionError('Value has to be in stepping of 2.',)]
