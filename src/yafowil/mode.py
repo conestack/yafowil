@@ -7,6 +7,7 @@ from yafowil.utils import (
     cssclasses,
     css_managed_props,
     managedprops,
+    UNSET
 )
 
 def edit_renderer(widget, data):
@@ -42,7 +43,7 @@ def mode_renderer(widget, data):
         return tag('div', value)
     items = [tag('li', item) for item in value]
     return tag('ul', *items)
-
+factory.doc['widget']['mode'] = UNSET
 factory.defaults['mode.mode'] = 'edit'
 factory.defaults['mode.edit'] = edit_renderer
 factory.defaults['mode.none'] = none_renderer

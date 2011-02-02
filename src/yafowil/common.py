@@ -133,7 +133,8 @@ def generic_required_extractor(widget, data):
         raise ExtractionError(required)
     raise ExtractionError(widget.attrs['required_message'])
 
-@managedprops('type', 'size', 'disabled', 'autofocus', 'placeholder', *css_managed_props)
+@managedprops('type', 'size', 'disabled', 'autofocus', 'placeholder', 
+              *css_managed_props)
 def input_generic_renderer(widget, data):
     """Generic HTML ``input`` tag render.
     """
@@ -587,6 +588,12 @@ selection as selection-list or as checkboxes.
 factory.defaults['select.multivalued'] = None
 factory.defaults['select.default'] = []
 factory.defaults['select.format'] = 'block'
+factory.doc['props']['select.vocabulary'] = """\
+Vocabulary to be used for the selection list. Expects a dict-like or an iterable 
+or a callable which returns one of both first. An iterable can consist out of 
+strings or out of tuples with ``(key, value)``.   
+"""
+
 factory.register('select', 
                  [select_extractor], 
                  [select_renderer])
@@ -607,7 +614,7 @@ def file_extracor(widget, data):
             return UNSET
     return data.request[name]
 
-@managedprops('accept',*css_managed_props)
+@managedprops('accept', 'placeholder', 'autofocus', 'required', *css_managed_props)
 def input_file_renderer(widget, data):
     tag = data.tag
     input_attrs = {
@@ -624,7 +631,7 @@ def input_file_renderer(widget, data):
         input_attrs['accept'] = widget.attrs['accept']
     return tag('input', **input_attrs)
 
-@managedprops('vocabulary', *css_managed_props)
+@managedprops(*css_managed_props)
 def file_options_renderer(widget, data):
     if data.value in [None, UNSET, '']:
         return data.rendered
@@ -648,8 +655,16 @@ def file_options_renderer(widget, data):
         tags.append(tag('div', input, text, 
                         **{'id': cssid(widget, 'radio', key)}))
     return data.rendered + u''.join(tags)
-    
+
+factory.doc['widget']['file'] = """\
+A basic file upload widget.
+"""
 factory.defaults['file.multivalued'] = False
+factory.defaults['file.accept'] = None
+factory.doc['props']['file.accept'] = """\
+Content type sto accept.
+"""
+
 factory.defaults['file.vocabulary'] = [
     ('keep', 'Keep Existing file'),
     ('replace', 'Replace existing file'),
@@ -663,7 +678,7 @@ factory.register('file',
 # submit
 ###############################################################################
 
-@managedprops('label', 'class', 'action')
+@managedprops('label', 'class', 'action', 'handler', 'next', 'skip')
 def submit_renderer(widget, data):
     tag = data.tag
     input_attrs = {
@@ -674,8 +689,33 @@ def submit_renderer(widget, data):
         'value': widget.attrs.get('label', widget.__name__),
     }
     return tag('input', **input_attrs)
+factory.doc['widget']['submit'] = """\
+Submit tag inside the form
+"""
+factory.doc['props']['submit.label'] = """\
+Label of the submit.
+"""
 
-factory.defaults['submit.action'] = None
+factory.defaults['submit.action'] = True
+factory.doc['props']['submit.action'] = """\
+Marks this widget as an action. One out of ``True`` or ``False``.
+"""
+
+factory.defaults['submit.skip'] = False
+factory.doc['props']['submit.skip'] = """\
+Skips action and only perform next. One out of ``True`` or ``False``.
+"""
+
+factory.doc['props']['submit.handler'] = """\
+Handler is a callable which get called if this action performs. It expects two 
+parameters: ``widget``, ``data``.
+"""
+
+factory.doc['props']['submit.next'] = """\
+Next is a callable expected to return the web address. It expects a request as
+the only parameter. 
+"""
+
 factory.register('submit', [], [submit_renderer])
 
 ###############################################################################
@@ -691,7 +731,7 @@ def email_extractor(widget, data):
     return val
 
 factory.doc['widget']['email'] = \
-"""E-mail input widget.
+"""E-mail (HTML5) input widget.
 """
 
 factory.defaults['email.type'] = 'email'
@@ -715,6 +755,10 @@ def url_extractor(widget, data):
     if not re.match(URL_RE, val is not UNSET and val or ''):
         raise ExtractionError(u'Input not a valid web address.')
     return val
+
+factory.doc['widget']['url'] = \
+"""URL aka web address (HTML5) input widget.
+"""
 
 factory.defaults['url.type'] = 'url'
 factory.defaults['url.default'] = ''
@@ -813,7 +857,24 @@ def label_renderer(widget, data):
         return data.rendered + tag('label', label_text, help, **label_attrs)
     return tag('label', label_text, help, **label_attrs) + data.rendered
 
+factory.doc['widget']['label'] = """\
+Label widget.
+"""
 factory.defaults['label.position'] = 'before'
+factory.doc['props']['label.position'] = """\
+Label can be rendered at 3 different positions: ``before`` or ``after`` the 
+prior rendered output or with ``inner`` it puts the prior rendered output inside
+the label tag.
+"""
+
+factory.doc['props']['label.label'] = """\
+Text to be displayed as a label.
+"""
+factory.doc['props']['label.help'] = """\
+Optional help text (alternative description) to be rendered inside a div after
+the label.
+"""
+
 factory.defaults['label.help'] = None
 factory.defaults['label.help_class'] = 'help'
 factory.register('label', [], [label_renderer])
@@ -833,15 +894,22 @@ def field_renderer(widget, data):
         div_attrs['class_'] += u' %s' % widget.attrs['witherror']
     return tag('div', data.rendered, **div_attrs)
 
+factory.doc['widget']['field'] = """\
+Renders a div with an class field around the prior rendered output. This is 
+supposed to be used for styling and grouping purposes.
+"""
 factory.defaults['field.class'] = 'field'
 factory.defaults['field.witherror'] = None
+factory.doc['props']['field.witherror'] = """\
+Put the class given with this property on the div if an error happened.
+"""
 factory.register('field', [], [field_renderer])
 
 ###############################################################################
 # error
 ###############################################################################
 
-@managedprops('message_class', *css_managed_props)
+@managedprops('message_class', 'error_class', 'error', *css_managed_props)
 def error_renderer(widget, data):
     if not data.errors:
         return data.rendered
@@ -851,6 +919,9 @@ def error_renderer(widget, data):
         msgs += tag('div', str(error), class_=widget.attrs['message_class'])
     return tag('div', msgs, data.rendered, class_=cssclasses(widget, data))
 
+factory.doc['widget']['error'] = """\
+Renders a div with an errormessage around the prior rendered output.
+"""
 factory.defaults['error.error_class'] = 'error'
 factory.defaults['error.message_class'] = 'errormessage'
 factory.register('error', [], [error_renderer])

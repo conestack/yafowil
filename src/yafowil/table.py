@@ -13,6 +13,9 @@ def table_renderer(widget, data):
     }
     return data.tag('table', data.rendered, **attrs)
 
+factory.doc['widget']['table'] = """\
+``<table>`` compound widget for table creation.
+"""
 factory.register('table',
                  factory.extractors('compound'),
                  factory.renderers('compound') + [table_renderer])
@@ -20,6 +23,9 @@ factory.register('table',
 def thead_renderer(widget, data):
     return data.tag('thead', data.rendered)
 
+factory.doc['widget']['thead'] = """\
+``<thead>`` compound widget for table creation.
+"""
 factory.register('thead',
                  factory.extractors('compound'),
                  factory.renderers('compound') + [thead_renderer])
@@ -27,6 +33,9 @@ factory.register('thead',
 def tbody_renderer(widget, data):
     return data.tag('tbody', data.rendered)
 
+factory.doc['widget']['tbody'] = """\
+``<tbody>`` compound widget for table creation.
+"""
 factory.register('tbody',
                  factory.extractors('compound'),
                  factory.renderers('compound') + [tbody_renderer])
@@ -39,6 +48,9 @@ def tr_renderer(widget, data):
     }
     return data.tag('tr', data.rendered, **attrs)
 
+factory.doc['widget']['tr'] = """\
+``<tr>`` compound widget for table creation.
+"""
 factory.register('tr',
                  factory.extractors('compound'),
                  factory.renderers('compound') + [tr_renderer])
@@ -56,6 +68,9 @@ def th_renderer(widget, data):
         contents = data.rendered
     return data.tag('th', contents, **attrs)
 
+factory.doc['widget']['th'] = """\
+``<th>`` compound widget for table creation.
+"""
 factory.register('th',
                  [],
                  [th_renderer])
@@ -70,6 +85,9 @@ def td_renderer(widget, data):
     }
     return data.tag('td', data.rendered, **attrs)
 
+factory.doc['widget']['td'] = """\
+``<td>`` compound widget for table creation.
+"""
 factory.register('td',
                  [],
                  [td_renderer])

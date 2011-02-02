@@ -55,6 +55,9 @@ def fieldset_renderer(widget, data):
         rendered = data.tag('legend', widget.attrs['legend']) + rendered
     return data.tag('fieldset', rendered, **fs_attrs)   
 
+factory.doc['widget']['fieldset'] = """\
+Renders a fieldset around the prior rendered output.
+"""
 factory.defaults['fieldset.legend'] = False
 factory.defaults['fieldset.class'] = None
 factory.register('fieldset', 
@@ -75,9 +78,24 @@ def form_renderer(widget, data):
         form_attrs['action'] =  form_attrs['action'](widget, data)
     return data.tag('form', data.rendered, **form_attrs)
 
+factory.doc['widget']['form'] = """\
+A html-form element. It is intended as a compound of widgets. 
+"""
 factory.defaults['form.method'] = 'post'
+factory.doc['props']['form.method'] = """\
+One out of ``get`` or ``post``.
+""" 
+
+factory.doc['props']['form.action'] = """\
+Target web address (URL) to send the form to. 
+""" 
+
 factory.defaults['form.enctype'] = 'multipart/form-data'
-factory.defaults['form.class'] = None
+factory.doc['props']['form.enctype'] = """\
+Encryption type of the form. Only relevant for method ``post``. Expect one out 
+of ``application/x-www-form-urlencoded`` or ``multipart/form-data``.
+""" 
+
 factory.register('form', 
                  factory.extractors('compound'), 
                  factory.renderers('compound') + [form_renderer])
