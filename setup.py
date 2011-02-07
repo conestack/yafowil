@@ -1,10 +1,7 @@
-# Copyright 2009, BlueDynamics Alliance - http://bluedynamics.com
-# Python Software Foundation License
-
 from setuptools import setup, find_packages
-import sys, os
+import os
 
-version = '1.0-beta2'
+version = '1.0'
 shortdesc = \
 'YAFOWIL - Yet Another Form Widget Lib: Lightweight, Extensible, Pluggable, Pure.'
 longdesc = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
@@ -17,13 +14,11 @@ setup(name='yafowil',
       description=shortdesc,
       long_description=longdesc,
       classifiers=[
-            #'Development Status :: 5 - Production/Stable',
-            'Development Status :: 4 - Beta',
             'Operating System :: OS Independent',
             'Programming Language :: Python',
             'Topic :: Software Development',
-            'Topic :: Internet :: WWW/HTTP :: Dynamic Content', 
-            'License :: OSI Approved :: BSD License',                        
+            'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
+            'License :: OSI Approved :: BSD License',
       ],
       keywords='html input widgets form compound',
       author='BlueDynamics Alliance',
