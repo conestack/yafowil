@@ -71,7 +71,7 @@ class RuntimeData(object):
         )  
         if self.errors:
             rep += ', %d error(s)' % len(self.errors)
-        if self.attrs:
+        if len(self.attrs):
             rep += ', attrs=%s' % repr(self.attrs)
         rep += ' at %s>' % hex(id(self))[:-1]
         return rep
