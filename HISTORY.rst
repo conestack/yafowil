@@ -2,6 +2,12 @@
 History
 =======
 
+1.0.1
+-----
+
+- Add ``html5required`` property
+  [rnix, 2011-03-16]
+
 1.0
 ---
 
