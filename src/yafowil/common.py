@@ -741,18 +741,24 @@ def email_extractor(widget, data):
         raise ExtractionError(u'Input not a valid email address.')
     return val
 
+def email_renderer(widget, data):
+    if not widget.attrs['html5type']:
+        widget.attrs['type'] = 'text'
+    return input_generic_renderer(widget, data)
+
 factory.doc['widget']['email'] = \
 """E-mail (HTML5) input widget.
 """
 
 factory.defaults['email.type'] = 'email'
+factory.defaults['email.html5type'] = True
 factory.defaults['email.default'] = ''
 factory.defaults['email.required_class'] = 'required'
 factory.defaults['email.class'] = 'email'
 factory.register('email', 
                  [generic_extractor, generic_required_extractor,
                   email_extractor],
-                 [input_generic_renderer])
+                 [email_renderer])
 
 ###############################################################################
 # url

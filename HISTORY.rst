@@ -2,6 +2,12 @@
 History
 =======
 
+1.0.2
+-----
+
+- Add ``html5type`` property for email widget
+  [rnix, 2011-03-16]
+
 1.0.1
 -----
 
