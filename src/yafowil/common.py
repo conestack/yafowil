@@ -70,6 +70,11 @@ factory.doc['props']['required_class'] = \
 """CSS-class to put on in case if required condition was not met.
 """
 
+factory.defaults['html5required'] = True
+factory.doc['props']['html5required'] = \
+"""Flag whether HTML5 required attribute should be rendered.
+"""
+
 factory.defaults['size'] = None
 factory.doc['props']['size'] = \
 """Allowed input size.
@@ -148,9 +153,12 @@ def input_generic_renderer(widget, data):
         'size': widget.attrs.get('size'),
         'placeholder': widget.attrs.get('placeholder') or None,
         'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
-        'required': widget.attrs.get('required') and 'required' or None,
         'disabled': bool(widget.attrs.get('disabled')) and 'disabled' or None,
     }
+    html5required = widget.attrs['html5required']
+    if html5required:
+        input_attrs['required'] = \
+            widget.attrs.get('required') and 'required' or None
     if widget.attrs['type'] in ['range', 'number']:
         input_attrs['min'] = widget.attrs.get('min') or None
         input_attrs['max'] = widget.attrs.get('min') or None
@@ -397,7 +405,7 @@ def password_renderer(widget, data):
           and data.value is not None:
             return PASSWORD_NOCHANGE_VALUE
         return widget.attrs['default']
-    value = pwd_value(widget, data) 
+    value = pwd_value(widget, data)
     input_attrs = {
         'type': 'password',
         'value':  value,
@@ -407,9 +415,12 @@ def password_renderer(widget, data):
         'size': widget.attrs.get('size'),
         'placeholder': widget.attrs.get('placeholder') or None,
         'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,      
-        'required': widget.attrs.get('required') and 'required' or None,
         'disabled': widget.attrs.get('disabled'),
     }
+    html5required = widget.attrs['html5required']
+    if html5required:
+        input_attrs['required'] = \
+            widget.attrs.get('required') and 'required' or None
     return tag('input', **input_attrs)
 
 factory.register('password', 
