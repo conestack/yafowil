@@ -5,6 +5,9 @@ History
 1.0.3dev
 --------
 
+- number extractor - return val if UNSET
+  [rnix, 2011-04-14]
+
 - textarea renderer - check value against None and render empty string instead
   [rnix, 2011-04-14]
 

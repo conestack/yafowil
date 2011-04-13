@@ -538,7 +538,7 @@ def select_extractor(widget, data):
             extracted = []
         else:
             extracted = ''
-    return extracted 
+    return extracted
 
 @managedprops('format', 'vocabulary', 'multivalued', *css_managed_props)
 def select_renderer(widget, data):
@@ -608,7 +608,7 @@ or a callable which returns one of both first. An iterable can consist out of
 strings or out of tuples with ``(key, value)``.   
 """
 
-factory.register('select', 
+factory.register('select',
                  [select_extractor], 
                  [select_renderer])
 
@@ -810,6 +810,8 @@ factory.register('search',
 
 def number_extractor(widget, data):
     val = data.extracted
+    if val is UNSET:
+        return val
     if widget.attrs.get('datatype') == 'integer':
         convert = int
     elif widget.attrs.get('datatype') == 'float':
