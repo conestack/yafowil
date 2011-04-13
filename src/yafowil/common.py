@@ -266,7 +266,10 @@ def textarea_renderer(widget, data):
         'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
         'required': widget.attrs.get('required') and 'required' or None,        
     }
-    return tag('textarea', fetch_value(widget, data), **area_attrs)
+    value = fetch_value(widget, data)
+    if value is None:
+        value = ''
+    return tag('textarea', value, **area_attrs)
 
 factory.register('textarea', 
                  [generic_extractor, generic_required_extractor], 

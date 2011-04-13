@@ -2,6 +2,12 @@
 History
 =======
 
+1.0.3dev
+--------
+
+- textarea renderer - check value against None and render empty string instead
+  [rnix, 2011-04-14]
+
 1.0.2
 -----
 
