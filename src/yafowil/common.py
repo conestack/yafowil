@@ -138,7 +138,7 @@ def generic_required_extractor(widget, data):
         raise ExtractionError(required)
     raise ExtractionError(widget.attrs['required_message'])
 
-@managedprops('type', 'size', 'disabled', 'autofocus', 'placeholder', 
+@managedprops('type', 'size', 'disabled', 'autofocus', 'placeholder', 'autocomplete', 
               *css_managed_props)
 def input_generic_renderer(widget, data):
     """Generic HTML ``input`` tag render.
@@ -154,6 +154,7 @@ def input_generic_renderer(widget, data):
         'placeholder': widget.attrs.get('placeholder') or None,
         'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
         'disabled': bool(widget.attrs.get('disabled')) and 'disabled' or None,
+        'autocomplete': widget.attrs.get('autocomplete'),
     }
     html5required = widget.attrs['html5required']
     if html5required:
