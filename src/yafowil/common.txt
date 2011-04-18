@@ -334,6 +334,19 @@ Submit Widget (action)
     >>> widget()
     u'<input id="input-save" name="action.save" type="submit" value="Action name" />'
 
+Reset Widget (action)
+----------------------
+::
+
+    >>> props = {
+    ...     'action': True,
+    ...     'label': 'Action name',
+    ...     'reset': True
+    ... }
+    >>> widget = factory('submit', name='reset', props=props)
+    >>> widget()
+    u'<input id="input-reset" name="action.reset" type="reset" value="Action name" />'
+
 
 Proxy Widget
 ------------
