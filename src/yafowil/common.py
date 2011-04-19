@@ -693,14 +693,14 @@ factory.register('file',
 # submit
 ###############################################################################
 
-@managedprops('label', 'class', 'action', 'handler', 'next', 'skip', 'reset')
+@managedprops('label', 'class', 'action', 'handler', 'next', 'skip')
 def submit_renderer(widget, data):
     tag = data.tag
     input_attrs = {
         'name': widget.attrs['action'] and 'action.%s' % widget.dottedpath,
         'id': cssid(widget, 'input'),
         'class_': widget.attrs.get('class'),
-        'type': widget.attrs.get('reset') and 'reset' or 'submit',
+        'type': 'submit',
         'value': widget.attrs.get('label', widget.__name__),
     }
     return tag('input', **input_attrs)
@@ -729,11 +729,6 @@ parameters: ``widget``, ``data``.
 factory.doc['props']['submit.next'] = """\
 Next is a callable expected to return the web address. It expects a request as
 the only parameter. 
-"""
-
-factory.defaults['submit.reset'] = False
-factory.doc['props']['submit.type'] = """\
-Set the submit input to reset. 
 """
 
 factory.defaults['text.disabled'] = False
