@@ -5,6 +5,9 @@ History
 1.0.3dev
 --------
 
+- compound_renderer - consider 'structural' property on widget node
+  [rnix, 2011-04-19]
+
 - number extractor - return val if UNSET
   [rnix, 2011-04-14]
 
