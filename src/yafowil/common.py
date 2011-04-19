@@ -14,6 +14,7 @@ from utils import (
     vocabulary,
 )
 
+
 ###############################################################################
 # common defaults
 ###############################################################################
@@ -91,6 +92,7 @@ factory.doc['props']['required_class_default'] = \
 class was given.
 """
 
+
 ###############################################################################
 # generic
 ###############################################################################
@@ -101,7 +103,8 @@ def _value(widget, data):
     logging.warn("Deprecated usage of 'yafowil.common._value', please use "+\
                  "'yafowil.common.fetch_value' instead.") 
     return fetch_value(widget, data)   
-    
+
+ 
 def generic_extractor(widget, data):
     """Extract raw data from request by ``widget.dottedpath``.
     """
@@ -109,6 +112,7 @@ def generic_extractor(widget, data):
     if widget.dottedpath not in data.request:
         return UNSET
     return data.request[widget.dottedpath]
+
 
 @managedprops('required', 'required_message')
 def generic_required_extractor(widget, data):
@@ -138,8 +142,9 @@ def generic_required_extractor(widget, data):
         raise ExtractionError(required)
     raise ExtractionError(widget.attrs['required_message'])
 
-@managedprops('type', 'size', 'disabled', 'autofocus', 'placeholder', 'autocomplete', 
-              *css_managed_props)
+
+@managedprops('type', 'size', 'disabled', 'autofocus', 'placeholder', 
+              'autocomplete', *css_managed_props)
 def input_generic_renderer(widget, data):
     """Generic HTML ``input`` tag render.
     """
@@ -165,6 +170,7 @@ def input_generic_renderer(widget, data):
         input_attrs['max'] = widget.attrs.get('min') or None
         input_attrs['step'] = widget.attrs.get('step') or None
     return tag('input', **input_attrs)
+
 
 ###############################################################################
 # text
@@ -193,6 +199,7 @@ factory.doc['props']['text.disabled'] = \
 """Flag  input field is disabled.
 """
 
+
 ###############################################################################
 # hidden
 ###############################################################################
@@ -212,6 +219,7 @@ factory.doc['props']['hidden.type'] = \
 factory.defaults['hidden.default'] = ''
 
 factory.defaults['hidden.class'] = 'hidden'
+
 
 ###############################################################################
 # proxy 
@@ -236,6 +244,7 @@ def input_proxy_renderer(widget, data):
     }
     return tag('input', **input_attrs)
 
+
 factory.register('proxy', 
                  [generic_extractor], 
                  [input_proxy_renderer])
@@ -244,6 +253,7 @@ factory.doc['widget']['proxy'] = \
 """
 
 factory.defaults['proxy.class'] = None
+
 
 ###############################################################################
 # textarea
@@ -271,6 +281,7 @@ def textarea_renderer(widget, data):
     if value is None:
         value = ''
     return tag('textarea', value, **area_attrs)
+
 
 factory.register('textarea', 
                  [generic_extractor, generic_required_extractor], 
@@ -300,6 +311,7 @@ factory.doc['props']['textarea.readonly'] = \
 """Flag  textarea is readonly.
 """
 
+
 ###############################################################################
 # password
 ###############################################################################
@@ -324,6 +336,7 @@ def minlength_extractor(widget, data):
             message = u'Input must have at least %i characters.' % minlength
             raise ExtractionError(message)
     return val
+
 
 @managedprops('ascii')
 def ascii_extractor(widget, data):
@@ -357,6 +370,7 @@ RE_PASSWORD_ALL = [
     DIGIT_RE,
     SPECIAL_CHAR_RE]
 PASSWORD_NOCHANGE_VALUE = '_NOCHANGE_'
+
 
 @managedprops('strength', 'weak_password_message')
 def password_extractor(widget, data):
@@ -396,6 +410,7 @@ def password_extractor(widget, data):
         raise ExtractionError(widget.attrs.get('weak_password_message'))
     return val
 
+
 @managedprops('size', 'disabled', 'placeholder', 'autofocus', 'required',
               *css_managed_props)
 def password_renderer(widget, data):
@@ -426,6 +441,7 @@ def password_renderer(widget, data):
         input_attrs['required'] = \
             widget.attrs.get('required') and 'required' or None
     return tag('input', **input_attrs)
+
 
 factory.register('password', 
                  [generic_extractor, generic_required_extractor,
@@ -472,6 +488,7 @@ factory.doc['props']['password.strength'] = \
 """Message shown if password is not strong enough.
 """
 
+
 ###############################################################################
 # checkbox
 ###############################################################################
@@ -488,6 +505,7 @@ def input_checkbox_extractor(widget, data):
     elif format == 'string':
         return data.request.get(widget.dottedpath, '')
     raise ValueError, "Checkbox widget has invalid format '%s' set" % format
+
 
 @managedprops('format', *css_managed_props)
 def input_checkbox_renderer(widget, data):
@@ -511,7 +529,9 @@ def input_checkbox_renderer(widget, data):
         'id': cssid(widget, 'checkboxexists'),    
     }
     exists_marker = tag('input', **input_attrs)
-    return checkbox + exists_marker 
+    return checkbox + exists_marker
+
+
 factory.doc['widget']['checkbox'] = """\
 Single checkbox.
 """
@@ -525,6 +545,7 @@ factory.register('checkbox',
                  [input_checkbox_extractor, generic_required_extractor], 
                  [input_checkbox_renderer])
 
+
 ###############################################################################
 # selection
 ###############################################################################
@@ -533,13 +554,24 @@ factory.register('checkbox',
 def select_extractor(widget, data):
     extracted = generic_extractor(widget, data)
     if extracted is UNSET \
-       and widget.attrs['format'] != 'block' \
        and '%s-exists' % widget.dottedpath in data.request:
         if widget.attrs['multivalued']:
             extracted = []
         else:
             extracted = ''
     return extracted
+
+
+def select_exists_marker(widget, data):
+    tag = data.tag
+    attrs = {
+        'type': 'hidden',
+        'value':  'exists',
+        'name_': "%s-exists" % widget.dottedpath,
+        'id': cssid(widget, 'exists'),
+    }
+    return tag('input', **attrs)
+
 
 @managedprops('format', 'vocabulary', 'multivalued', *css_managed_props)
 def select_renderer(widget, data):
@@ -567,7 +599,16 @@ def select_renderer(widget, data):
             'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
             'required': widget.attrs.get('required') and 'required' or None,            
         }
-        return tag('select', *optiontags, **select_attrs)
+        rendered = tag('select', *optiontags, **select_attrs)
+        if widget.attrs['multivalued']:
+            attrs = {
+                'type': 'hidden',
+                'value':  'exists',
+                'name_': "%s-exists" % widget.dottedpath,
+                'id': cssid(widget, 'exists'),
+            }
+            rendered = select_exists_marker(widget, data) + rendered
+        return rendered
     else:
         tags = []
         for key, term in vocabulary(widget.attrs.get('vocabulary', [])):
@@ -585,17 +626,11 @@ def select_renderer(widget, data):
             }
             input = tag('input', **attrs)
             text = tag('span', term)
-            tags.append(tag('div', input, text, 
+            tags.append(tag('div', input, text,
                             **{'id': cssid(widget, 'radio', key)}))
-        attrs = {
-            'type': 'hidden',
-            'value':  'exists',
-            'name_': "%s-exists" % widget.dottedpath,
-            'id': cssid(widget, 'exists'),    
-        }
-        exists_marker = tag('input', **attrs)            
-        return exists_marker + u''.join(tags)
-        
+        return select_exists_marker(widget, data) + u''.join(tags)
+
+
 factory.doc['widget']['select'] = """\
 Selection Widget. Single selection as dropdown or radio-buttons. Multiple 
 selection as selection-list or as checkboxes. 
@@ -610,8 +645,9 @@ strings or out of tuples with ``(key, value)``.
 """
 
 factory.register('select',
-                 [select_extractor], 
+                 [select_extractor, generic_required_extractor], 
                  [select_renderer])
+
 
 ###############################################################################
 # file
@@ -629,7 +665,9 @@ def file_extracor(widget, data):
             return UNSET
     return data.request[name]
 
-@managedprops('accept', 'placeholder', 'autofocus', 'required', *css_managed_props)
+
+@managedprops('accept', 'placeholder', 'autofocus', 
+              'required', *css_managed_props)
 def input_file_renderer(widget, data):
     tag = data.tag
     input_attrs = {
@@ -645,6 +683,7 @@ def input_file_renderer(widget, data):
     if widget.attrs.get('accept'):
         input_attrs['accept'] = widget.attrs['accept']
     return tag('input', **input_attrs)
+
 
 @managedprops(*css_managed_props)
 def file_options_renderer(widget, data):
@@ -671,6 +710,7 @@ def file_options_renderer(widget, data):
                         **{'id': cssid(widget, 'radio', key)}))
     return data.rendered + u''.join(tags)
 
+
 factory.doc['widget']['file'] = """\
 A basic file upload widget.
 """
@@ -689,6 +729,7 @@ factory.register('file',
                  [file_extracor, generic_required_extractor],
                  [input_file_renderer, file_options_renderer])
 
+
 ###############################################################################
 # submit
 ###############################################################################
@@ -704,6 +745,8 @@ def submit_renderer(widget, data):
         'value': widget.attrs.get('label', widget.__name__),
     }
     return tag('input', **input_attrs)
+
+
 factory.doc['widget']['submit'] = """\
 Submit tag inside the form
 """
@@ -736,8 +779,8 @@ factory.doc['props']['text.disabled'] = \
 """Flag  input field is disabled.
 """
 
-
 factory.register('submit', [], [submit_renderer])
+
 
 ###############################################################################
 # email
@@ -745,16 +788,19 @@ factory.register('submit', [], [submit_renderer])
 
 EMAIL_RE = u'^[a-zA-Z0-9\._\-]+@[a-zA-Z0-9\._\-]+.[a-zA-Z0-9]{2,6}$'
 
+
 def email_extractor(widget, data):
     val = data.extracted
     if not re.match(EMAIL_RE, val is not UNSET and val or ''):
         raise ExtractionError(u'Input not a valid email address.')
     return val
 
+
 def email_renderer(widget, data):
     if not widget.attrs['html5type']:
         widget.attrs['type'] = 'text'
     return input_generic_renderer(widget, data)
+
 
 factory.doc['widget']['email'] = \
 """E-mail (HTML5) input widget.
@@ -770,6 +816,7 @@ factory.register('email',
                   email_extractor],
                  [email_renderer])
 
+
 ###############################################################################
 # url
 ###############################################################################
@@ -777,11 +824,13 @@ factory.register('email',
 URL_RE = u'^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:'+\
          u'.?+=&%@!\-\/]))?$'
 
+
 def url_extractor(widget, data):
     val = data.extracted
     if not re.match(URL_RE, val is not UNSET and val or ''):
         raise ExtractionError(u'Input not a valid web address.')
     return val
+
 
 factory.doc['widget']['url'] = \
 """URL aka web address (HTML5) input widget.
@@ -795,6 +844,7 @@ factory.register('url',
                  [generic_extractor, generic_required_extractor,
                   url_extractor],
                  [input_generic_renderer])
+
 
 ###############################################################################
 # search
@@ -810,6 +860,7 @@ factory.defaults['search.class'] = 'search'
 factory.register('search', 
                  [generic_extractor, generic_required_extractor],
                  [input_generic_renderer])
+
 
 ###############################################################################
 # number
@@ -842,6 +893,7 @@ def number_extractor(widget, data):
                               widget.attrs.get('step'))        
     return val
 
+
 factory.doc['widget']['number'] = """\
 Number widget (HTML5).
 """
@@ -862,6 +914,7 @@ factory.register('number',
                  [generic_extractor, generic_required_extractor,
                   number_extractor],
                  [input_generic_renderer])
+
 
 ###############################################################################
 # label
@@ -886,6 +939,7 @@ def label_renderer(widget, data):
         return data.rendered + tag('label', label_text, help, **label_attrs)
     return tag('label', label_text, help, **label_attrs) + data.rendered
 
+
 factory.doc['widget']['label'] = """\
 Label widget.
 """
@@ -908,6 +962,7 @@ factory.defaults['label.help'] = None
 factory.defaults['label.help_class'] = 'help'
 factory.register('label', [], [label_renderer])
 
+
 ###############################################################################
 # field
 ###############################################################################
@@ -923,6 +978,7 @@ def field_renderer(widget, data):
         div_attrs['class_'] += u' %s' % widget.attrs['witherror']
     return tag('div', data.rendered, **div_attrs)
 
+
 factory.doc['widget']['field'] = """\
 Renders a div with an class field around the prior rendered output. This is 
 supposed to be used for styling and grouping purposes.
@@ -933,6 +989,7 @@ factory.doc['props']['field.witherror'] = """\
 Put the class given with this property on the div if an error happened.
 """
 factory.register('field', [], [field_renderer])
+
 
 ###############################################################################
 # error
@@ -947,6 +1004,7 @@ def error_renderer(widget, data):
     for error in data.errors:
         msgs += tag('div', str(error), class_=widget.attrs['message_class'])
     return tag('div', msgs, data.rendered, class_=cssclasses(widget, data))
+
 
 factory.doc['widget']['error'] = """\
 Renders a div with an errormessage around the prior rendered output.

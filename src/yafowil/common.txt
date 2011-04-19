@@ -3,13 +3,11 @@
 Common widgets
 ==============
 
-Trigger registry by importing module.
-::
+Trigger registry by importing module::
 
     >>> import yafowil.common
 
-Helper
-::
+Helper::
 
     >>> from yafowil.utils import Tag
     >>> tag = Tag(lambda msg: msg)           
@@ -18,7 +16,6 @@ Helper
 Text Input Widget
 -----------------
 ::
-
     >>> from yafowil.base import factory
     >>> widget = factory(
     ...     'text',
@@ -65,7 +62,6 @@ Placeholder Text Input
 Required Input Widget
 ---------------------
 ::
-
     >>> widget = factory(
     ...     'text',
     ...     name='REQUIRED',
@@ -77,15 +73,13 @@ Required Input Widget
     u'<input class="required text" id="input-REQUIRED" name="REQUIRED" 
     required="required" type="text" value="" />'
 
-Extract with empty request, key not in request therefore no error.
-::
+Extract with empty request, key not in request therefore no error::
     
     >>> data = widget.extract({})
     >>> data
     <RuntimeData REQUIRED, value='', extracted=<UNSET> at ...>
         
-Extract with empty input sent, required error expected.
-::    
+Extract with empty input sent, required error expected::    
     
     >>> data = widget.extract({'REQUIRED': ''})
     >>> data
@@ -94,8 +88,7 @@ Extract with empty input sent, required error expected.
     >>> data.errors
     [ExtractionError('Mandatory field was empty',)]
 
-With getter value set, empty request, no error expected.
-::    
+With getter value set, empty request, no error expected::    
     
     >>> widget = factory(
     ...     'text',
@@ -112,8 +105,7 @@ With getter value set, empty request, no error expected.
     u'<input class="required text" id="input-REQUIRED" name="REQUIRED" 
     required="required" type="text" value="Test Text" />'
 
-With getter value set, request given, error expected.
-::    
+With getter value set, request given, error expected::    
 
     >>> data = widget.extract({'REQUIRED': ''})
     >>> data
@@ -123,8 +115,7 @@ With getter value set, request given, error expected.
     u'<input class="error required text" id="input-REQUIRED" name="REQUIRED" 
     required="required" type="text" value="" />'    
     
-Create a custom error message.
-::    
+Create a custom error message::    
 
     >>> widget = factory(
     ...     'text',
@@ -139,8 +130,7 @@ Create a custom error message.
     >>> data.errors
     [ExtractionError('You fool, fill in a value!',)]
 
-``required`` property could be a callable as well.
-::
+``required`` property could be a callable as well::
 
     >>> def required_callback(widget, data):
     ...     return u"Foooo"
@@ -158,8 +148,7 @@ Create a custom error message.
 Checkbox Widget
 ---------------
 
-A boolean checkbox widget (default).
-::
+A boolean checkbox widget (default)::
     
     >>> widget = factory('checkbox', 'MYCHECKBOX')    
     >>> widget()
@@ -173,8 +162,7 @@ A boolean checkbox widget (default).
     type="checkbox" value="" /><input id="checkboxexists-MYCHECKBOX" 
     name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />'
 
-A checkbox widget with an value or an empty string.
-::
+A checkbox widget with an value or an empty string::
 
     >>> widget = factory(
     ...     'checkbox',
@@ -245,20 +233,24 @@ Selection Widget
     ...             ('two', 'Two'), 
     ...             ('three', 'Three'),
     ...             ('four', 'Four')]})
-    >>> widget()
-    u'<select id="input-MYSELECT" name="MYSELECT"><option id="input-MYSELECT-one" 
-    selected="selected" value="one">One</option><option id="input-MYSELECT-two" 
-    value="two">Two</option><option id="input-MYSELECT-three" selected="selected" 
-    value="three">Three</option><option id="input-MYSELECT-four" 
-    value="four">Four</option></select>'
+    >>> pxml(widget())
+    <select id="input-MYSELECT" name="MYSELECT">
+      <option id="input-MYSELECT-one" selected="selected" value="one">One</option>
+      <option id="input-MYSELECT-two" value="two">Two</option>
+      <option id="input-MYSELECT-three" selected="selected" value="three">Three</option>
+      <option id="input-MYSELECT-four" value="four">Four</option>
+    </select>
+    <BLANKLINE>
 
     >>> data = widget.extract({'MYSELECT': 'two'})
-    >>> widget(data=data)
-    u'<select id="input-MYSELECT" name="MYSELECT"><option id="input-MYSELECT-one" 
-    value="one">One</option><option id="input-MYSELECT-two" selected="selected" 
-    value="two">Two</option><option id="input-MYSELECT-three" 
-    value="three">Three</option><option id="input-MYSELECT-four" 
-    value="four">Four</option></select>'
+    >>> pxml(widget(data=data))
+    <select id="input-MYSELECT" name="MYSELECT">
+      <option id="input-MYSELECT-one" value="one">One</option>
+      <option id="input-MYSELECT-two" selected="selected" value="two">Two</option>
+      <option id="input-MYSELECT-three" value="three">Three</option>
+      <option id="input-MYSELECT-four" value="four">Four</option>
+    </select>
+    <BLANKLINE>
     
     >>> widget = factory(
     ...     'select',
@@ -283,9 +275,59 @@ Selection Widget
     id="input-MYSELECT-four" name="MYSELECT" type="radio" value="four" 
     /><span>Four</span></div>'
 
+Check selection required::
+
+    >>> widget = factory(
+    ...     'select',
+    ...     'reqselect',
+    ...     props={
+    ...         'required': 'Selection required',
+    ...         'vocabulary': [
+    ...             ('one','One'), 
+    ...             ('two', 'Two'), 
+    ...             ('three', 'Three'),
+    ...             ('four', 'Four')]})
+    >>> pxml(widget())
+    <select id="input-reqselect" name="reqselect" required="required">
+      <option id="input-reqselect-one" value="one">One</option>
+      <option id="input-reqselect-two" value="two">Two</option>
+      <option id="input-reqselect-three" value="three">Three</option>
+      <option id="input-reqselect-four" value="four">Four</option>
+    </select>
+    <BLANKLINE>
+    
+    >>> data = widget.extract(request={'reqselect': ''})
+    >>> data.printtree()
+    <RuntimeData reqselect, value=<UNSET>, extracted='', 1 error(s) at ...>
+    
+    >>> widget = factory(
+    ...     'select',
+    ...     'reqselect',
+    ...     props={
+    ...         'required': 'Selection required',
+    ...         'multivalued': True,
+    ...         'vocabulary': [
+    ...             ('one','One'), 
+    ...             ('two', 'Two'), 
+    ...             ('three', 'Three'),
+    ...             ('four', 'Four')]})
+    >>> widget()
+    u'<input id="exists-reqselect" name="reqselect-exists" type="hidden" 
+    value="exists" /><select id="input-reqselect" multiple="multiple" 
+    name="reqselect" required="required"><option id="input-reqselect-one" 
+    value="one">One</option><option id="input-reqselect-two" 
+    value="two">Two</option><option id="input-reqselect-three" 
+    value="three">Three</option><option id="input-reqselect-four" 
+    value="four">Four</option></select>'
+    
+    >>> data = widget.extract(request={'reqselect-exists': 'exists'})
+    >>> data.printtree()
+    <RuntimeData reqselect, value=<UNSET>, extracted=[], 1 error(s) at ...>
+
     
 File Widget
 -----------
+::
 
     >>> widget = factory('file', 'MYFILE')
     >>> widget()
@@ -338,8 +380,7 @@ Submit Widget (action)
 Proxy Widget
 ------------
 
-Used to pass hidden arguments out of form namespace.
-::
+Used to pass hidden arguments out of form namespace::
 
     >>> widget = factory('proxy', name='proxy', value='1')
     >>> widget()
@@ -349,8 +390,7 @@ Used to pass hidden arguments out of form namespace.
 Label Widget
 ------------
 
-Default.
-::
+Default::
 
     >>> widget = factory('label:file', name='MYFILE', \
     ...                   props={'label': 'MY FILE'})
@@ -361,8 +401,7 @@ Default.
     </div>
     <BLANKLINE>
     
-Label after widget.
-::
+Label after widget::
 
     >>> widget = factory('label:file', name='MYFILE', \
     ...                   props={'label': 'MY FILE',
@@ -374,8 +413,7 @@ Label after widget.
     </div>
     <BLANKLINE>
     
-Same with inner label.
-::
+Same with inner label::
 
     >>> widget = factory('label:file', name='MYFILE', \
     ...                   props={'label': 'MY FILE',
@@ -386,11 +424,11 @@ Same with inner label.
     </div>
     <BLANKLINE>    
 
+
 Field Widget
 ------------
     
-Chained file inside field with label.
-::
+Chained file inside field with label::
 
     >>> widget = factory('field:label:file', name='MYFILE', \
     ...                   props={'label': 'MY FILE'})
@@ -401,14 +439,14 @@ Chained file inside field with label.
     </div>
     <BLANKLINE>
 
+
 Password Widget
 ---------------
 
 Password widget has some additional properties, ``strength``, ``minlength``
 and ``ascii``.
 
-Use in add forms, no password set yet.
-::
+Use in add forms, no password set yet::
     
     >>> widget = factory(
     ...     'password',
@@ -428,7 +466,7 @@ Use in add forms, no password set yet.
 
 Use in edit forms. note that password is never shown up in markup, but a
 placeholder is used when a password is already set. Thus, if a extracted
-password value is UNSET, this means that password was not changed.
+password value is UNSET, this means that password was not changed::
 
     >>> widget = factory(
     ...     'password',
@@ -450,8 +488,7 @@ password value is UNSET, this means that password was not changed.
     >>> widget(data=data)
     u'<input class="password" id="input-password" name="password" type="password" value="foo" />'
 
-Password validation.
-::
+Password validation::
 
     >>> widget = factory(
     ...     'password',
@@ -483,8 +520,7 @@ Password validation.
     >>> data.errors
     []
 
-Minlength validation.
-::
+Minlength validation::
 
     >>> widget = factory(
     ...     'password',
@@ -500,8 +536,7 @@ Minlength validation.
     >>> data.errors
     []
 
-Ascii validation.
-::
+Ascii validation::
 
     >>> widget = factory(
     ...     'password',
@@ -517,8 +552,7 @@ Ascii validation.
     >>> data.errors
     []
 
-Combine all validations.
-::
+Combine all validations::
 
     >>> widget = factory(
     ...     'password',
@@ -549,11 +583,11 @@ Combine all validations.
     >>> data.errors
     []
 
+
 Error Widget
 ------------
 
-Chained password inside error inside field.
-::
+Chained password inside error inside field::
 
     >>> widget = factory('field:error:password', name='password',
     ...                  props={'label': 'Password',
@@ -579,6 +613,7 @@ Chained password inside error inside field.
 
 Email Widget
 ------------
+::
 
     >>> widget = factory(
     ...     'email',
@@ -597,9 +632,11 @@ Email Widget
     >>> data = widget.extract({'email': 'foo@bar.com'})
     >>> data.errors
     []
-    
+
+
 URL Widget
 ----------
+::
 
     >>> widget = factory(
     ...     'url',
@@ -618,6 +655,7 @@ URL Widget
     >>> data = widget.extract({'url': 'http://www.foo.bar.com:8080/bla#fasel?blubber=bla&bla=fasel'})
     >>> data.errors
     []
+  
     
 Number Widget
 -------------

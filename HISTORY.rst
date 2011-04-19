@@ -5,7 +5,10 @@ History
 1.0.3dev
 --------
 
-- compound_renderer - consider 'structural' property on widget node
+- select extractor - fix required behavior
+  [rnix, 2011-04-19]
+
+- compound renderer - consider 'structural' property on widget node
   [rnix, 2011-04-19]
 
 - number extractor - return val if UNSET
