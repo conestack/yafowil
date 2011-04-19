@@ -21,10 +21,15 @@ def compound_extractor(widget, data):
     return
 
 def compound_renderer(widget, data):
-    """Delegates rendering to children."""
+    """Delegates rendering to children.
+    """
     result = u''
     for childname in widget:
-        subdata = data.get(childname, None)
+        child = widget[childname]
+        if child.attrs.get('structural'):
+            subdata = data
+        else:
+            subdata = data.get(childname, None)
         if subdata is None:
             result += widget[childname](request=data.request)
         else:

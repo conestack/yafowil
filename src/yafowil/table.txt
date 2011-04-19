@@ -75,19 +75,49 @@ Build same table again but set some nodes structural. This is considered in
 ``Widget.dottedpath``.
 
     >>> form = factory('form',
-    ...                name='myform',
+    ...                name='mytableform',
     ...                props={
-    ...                    'action': 'myaction',
+    ...                    'action': 'mytableaction',
     ...                })
     >>> form['table'] = factory('table', props={'structural': True})
     >>> form['table']['row1'] = factory('tr', props={'structural': True})
-    >>> form['table']['row1']['field1'] = factory('td:text', name='field1')
+    >>> form['table']['row1']['field1'] = factory(
+    ...     'td:error:text',
+    ...     props={
+    ...         'required': 'Field 1 is required',
+    ...     }
+    ... )
     >>> pxml(form())
-    <form action="myaction" enctype="multipart/form-data" id="form-myform" method="post">
+    <form action="mytableaction" enctype="multipart/form-data" id="form-mytableform" method="post">
       <table>
         <tr>
           <td>
-            <input class="text" id="input-myform-field1" name="myform.field1" type="text" value=""/>
+            <input class="required text" id="input-mytableform-field1" name="mytableform.field1" required="required" type="text" value=""/>
+          </td>
+        </tr>
+      </table>
+    </form>
+    <BLANKLINE>
+    
+    >>> data = form.extract({})
+    >>> data.printtree()
+    <RuntimeData mytableform, value=<UNSET>, extracted=None at ...>
+      <RuntimeData mytableform.field1, value=<UNSET>, extracted=<UNSET> at ...>
+    
+    >>> data = form.extract({'mytableform.field1': ''})
+    >>> data.printtree()
+    <RuntimeData mytableform, value=<UNSET>, extracted=None at ...>
+      <RuntimeData mytableform.field1, value=<UNSET>, extracted='', 1 error(s) at ...>
+    
+    >>> pxml(form(data))
+    <form action="mytableaction" enctype="multipart/form-data" id="form-mytableform" method="post">
+      <table>
+        <tr>
+          <td>
+            <div class="error">
+              <div class="errormessage">Field 1 is required</div>
+              <input class="required text" id="input-mytableform-field1" name="mytableform.field1" required="required" type="text" value=""/>
+            </div>
           </td>
         </tr>
       </table>
