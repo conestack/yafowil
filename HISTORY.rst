@@ -5,6 +5,9 @@ History
 1.0.3dev
 --------
 
+- add optional ``for`` property for label widget.
+  [rnix, 2011-04-23]
+
 - select extractor - fix required behavior
   [rnix, 2011-04-19]
 
