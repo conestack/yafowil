@@ -920,12 +920,21 @@ factory.register('number',
 # label
 ###############################################################################
 
-@managedprops('position', 'label', 'help', 'help_class', *css_managed_props)
+@managedprops('position', 'label', 'for', 'help', 'help_class',
+              *css_managed_props)
 def label_renderer(widget, data):
     tag = data.tag
     label_text = widget.attrs.get('label', widget.__name__)
+    for_path = widget.attrs['for']
+    if for_path:
+        for_widget = widget.root
+        for name in for_path.split('.'):
+            for_widget = for_widget[name]
+        for_ = cssid(for_widget, 'input')
+    else:
+        for_ = cssid(widget, 'input')
     label_attrs = {
-        'for_': cssid(widget, 'input'),
+        'for_': for_,
         'class_': cssclasses(widget, data)
     }
     help = u''
@@ -933,11 +942,12 @@ def label_renderer(widget, data):
         help_attrs = {'class_': widget.attrs['help_class']}
         help = tag('div', widget.attrs['help'], help_attrs)
     pos = widget.attrs['position']
+    rendered = data.rendered is not UNSET and data.rendered or u''
     if pos == 'inner':
-        return tag('label', label_text, help, data.rendered, **label_attrs)
+        return tag('label', label_text, help, rendered, **label_attrs)
     elif pos == 'after':
-        return data.rendered + tag('label', label_text, help, **label_attrs)
-    return tag('label', label_text, help, **label_attrs) + data.rendered
+        return rendered + tag('label', label_text, help, **label_attrs)
+    return tag('label', label_text, help, **label_attrs) + rendered
 
 
 factory.doc['widget']['label'] = """\
@@ -953,11 +963,15 @@ the label tag.
 factory.doc['props']['label.label'] = """\
 Text to be displayed as a label.
 """
+factory.doc['props']['label.for'] = """\
+Optional dottedpath of widget to be labled
+"""
 factory.doc['props']['label.help'] = """\
 Optional help text (alternative description) to be rendered inside a div after
 the label.
 """
 
+factory.defaults['label.for'] = None
 factory.defaults['label.help'] = None
 factory.defaults['label.help_class'] = 'help'
 factory.register('label', [], [label_renderer])
