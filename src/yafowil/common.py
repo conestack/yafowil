@@ -559,6 +559,8 @@ def select_extractor(widget, data):
             extracted = []
         else:
             extracted = ''
+    if widget.attrs['multivalued'] and isinstance(extracted, basestring):
+        extracted = [extracted]
     return extracted
 
 
