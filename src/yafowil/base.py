@@ -15,6 +15,7 @@ from yafowil.utils import (
     UNSET,
 )
 
+
 def _dict__repr__(self):
     return '{%s}' % ', '.join(['%s: %s' % (repr(k), repr(v)) 
                                for k,v in self.items()])
@@ -111,8 +112,8 @@ class TBSupplementWidget(object):
         self.manageable_object = func
         try:
             name = widget.dottedpath
-        except ValueError:
-            name = '(name not set)'
+        except ValueError:                                  #pragma NO COVERAGE
+            name = '(name not set)'                         #pragma NO COVERAGE
         self.warnings = ['Occurred on %s in widget "%s" %s' % \
                          (task, name, descr)]     
 

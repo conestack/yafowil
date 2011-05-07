@@ -5,6 +5,13 @@ History
 1.0.3dev
 --------
 
+- add widget value validation checking 'multivalued' property against 'value'
+  length.
+  [rnix, 2011-05-07]
+
+- remove outdated ``_value``. user ``fetch_value`` instead.
+  [rnix, 2011-05-07]
+
 - add optional ``for`` property for label widget.
   [rnix, 2011-04-23]
 

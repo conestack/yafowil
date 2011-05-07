@@ -120,6 +120,7 @@ Test view widget with iterable value.
     ...     props = {
     ...         'label': 'Foo',
     ...         'mode': modedecider,
+    ...         'multivalued': True,
     ...     })
     
     >>> pxml(widget(request={'mode': 'view'}))

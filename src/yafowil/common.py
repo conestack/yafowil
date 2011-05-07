@@ -97,13 +97,6 @@ class was given.
 # generic
 ###############################################################################
 
-def _value(widget, data):
-    """BBB
-    """
-    logging.warn("Deprecated usage of 'yafowil.common._value', please use "+\
-                 "'yafowil.common.fetch_value' instead.") 
-    return fetch_value(widget, data)   
-
  
 def generic_extractor(widget, data):
     """Extract raw data from request by ``widget.dottedpath``.
@@ -398,7 +391,7 @@ def password_extractor(widget, data):
     if val is UNSET:
         return val
     required_strength = widget.attrs.get('strength', 0)
-    if not required_strength:
+    if required_strength <= 0:
         return val
     if required_strength > len(RE_PASSWORD_ALL):
         required_strength = len(RE_PASSWORD_ALL)
@@ -579,10 +572,13 @@ def select_exists_marker(widget, data):
 def select_renderer(widget, data):
     tag = data.tag
     value = fetch_value(widget, data)
-    if value is UNSET:
-        value = []
+    # Seem to be never called... keep a while
+    #if value is UNSET:
+    #    value = []
     if isinstance(value, basestring) or not hasattr(value, '__iter__'):
         value = [value]
+    if not widget.attrs['multivalued'] and len(value) > 1:
+        raise ValueError(u"Multiple values for single selection.")
     if widget.attrs['format'] == 'block':
         optiontags = []
         for key, term in vocabulary(widget.attrs.get('vocabulary', [])):
@@ -629,7 +625,7 @@ def select_renderer(widget, data):
             input = tag('input', **attrs)
             text = tag('span', term)
             tags.append(tag('div', input, text,
-                            **{'id': cssid(widget, 'radio', key)}))
+                            **{'id': cssid(widget, tagtype, key)}))
         return select_exists_marker(widget, data) + u''.join(tags)
 
 
@@ -942,7 +938,7 @@ def label_renderer(widget, data):
     help = u''
     if widget.attrs['help']:
         help_attrs = {'class_': widget.attrs['help_class']}
-        help = tag('div', widget.attrs['help'], help_attrs)
+        help = tag('div', widget.attrs['help'], **help_attrs)
     pos = widget.attrs['position']
     rendered = data.rendered is not UNSET and data.rendered or u''
     if pos == 'inner':
