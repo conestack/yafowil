@@ -1,26 +1,22 @@
-Required imports
-::
+Required imports::
 
     >>> import yafowil.common
     >>> import yafowil.compound
     >>> from yafowil.base import factory
     >>> from yafowil.controller import Controller
 
-Dummy context
-::
+Dummy context::
 
     >>> class Context(object):
     ...     value = 'hello world'    
     >>> context = Context()
 
-Dummy getter
-::
+Dummy getter::
 
     >>> def getter(widget, data):
     ...     return data.request.context.value
 
-Create Widget tree
-::
+Create Widget tree::
  
     >>> form = factory(u'form',
     ...                name='testform',
@@ -31,22 +27,19 @@ Create Widget tree
     ...                          value='',
     ...                          props={'required': True})
 
-Define action ``handler``
-::
+Define action ``handler``::
 
     >>> def handler(widget, data):
     ...     print 'handler called "%s"' % '.'.join(widget.path)
 
-Define action ``next``
-::
+Define action ``next``::
 
     >>> def next(request):
     ...     return 'next return value'
 
 Indicate widget to be an ``action`` definition by setting ``action`` attribute
 to widget properties. ``expression``, ``handler`` and ``next`` are action
-referring properties.
-::
+referring properties::
     
     >>> props = {
     ...     'action': 'save',
@@ -57,14 +50,12 @@ referring properties.
     ...     'skip': False,
     ... }
 
-Add save action.
-::
+Add save action::
 
     >>> form['save'] = factory('submit', props=props)
 
 Add cancel action. In this case we want the form processing to be skipped and
-just the next action to be performed.
-::
+just the next action to be performed::
 
     >>> props = {
     ...     'action': 'cancel',
@@ -76,8 +67,7 @@ just the next action to be performed.
     ... }
     >>> form['cancel'] = factory('submit', props=props)
 
-Check widget tree
-::
+Check widget tree::
 
     >>> form.printtree()
     <class 'yafowil.base.Widget'>: testform
@@ -86,15 +76,13 @@ Check widget tree
       <class 'yafowil.base.Widget'>: save
       <class 'yafowil.base.Widget'>: cancel
 
-Dummy request
-::
+Dummy request::
   
     >>> class Request(dict):
     ...     context = context
     >>> request = Request()
 
-Render form with empty request
-::
+Render form with empty request::
 
     >>> data = form.extract(request)
     >>> pxml(form(data))
@@ -106,41 +94,35 @@ Render form with empty request
     </form>
     <BLANKLINE>
 
-Create controller for form.
-::
+Create controller for form::
 
     >>> controller = Controller(form, request)
     
 If action is not triggered, or ``action['next']`` is not set,
-``Controller.next`` is ``None``.
-::
+``Controller.next`` is ``None``::
     
     >>> controller.next
     
-An empty request does not trigger validation failures.
-::
+An empty request does not trigger validation failures::
 
     >>> controller.error
     False
 
-Provide empty required field and it fails!
-::
+Provide empty required field and it fails!::
 
     >>> request['testform.field2'] = ''
     >>> controller = Controller(form, request)
     >>> controller.error
     True
 
-Provide required field and all is fine.
-::
+Provide required field and all is fine::
 
     >>> request['testform.field2'] = '1'
     >>> controller = Controller(form, request)
     >>> controller.error
     False
 
-Trigger save action without required field
-::
+Trigger save action without required field::
 
     >>> request['testform.field2'] = ''
     >>> request['action.testform.save'] = '1'
@@ -151,8 +133,7 @@ Trigger save action without required field
     >>> controller.performed
     True
 
-Trigger save action with valid input
-::
+Trigger save action with valid input::
 
     >>> request['testform.field2'] = '1'
     >>> controller = Controller(form, request)
@@ -167,8 +148,8 @@ Trigger save action with valid input
     >>> controller.performed
     True
 
-Render the form performed.
-::
+Render the form performed::
+
     >>> pxml(controller.rendered)
     <form action="http://fubar.com" enctype="multipart/form-data" id="form-testform" method="post">
       <input class="text" id="input-testform-field1" name="testform.field1" type="text" value="hello world"/>
@@ -178,8 +159,7 @@ Render the form performed.
     </form>
     <BLANKLINE>
 
-Trigger cancel action. performing is skipped.
-::
+Trigger cancel action. performing is skipped::
 
     >>> del request['action.testform.save']
     >>> request['action.testform.cancel'] = '1'
@@ -191,8 +171,7 @@ Trigger cancel action. performing is skipped.
     >>> controller.performed
     False
     
-Render form not performed
-::
+Render form not performed::
 
     >>> pxml(controller.rendered)
     <form action="http://fubar.com" enctype="multipart/form-data" id="form-testform" method="post">
@@ -203,10 +182,7 @@ Render form not performed
     </form>
     <BLANKLINE>
 
-
-
-Try recursive lookup of actions
-::
+Try recursive lookup of actions::
 
     >>> form = factory(u'form',
     ...                name='testform',
@@ -224,6 +200,3 @@ Try recursive lookup of actions
     [<Widget object 'level1' at ...>, 
     <Widget object 'level2' at ...>, 
     <Widget object 'level3' at ...>]
-    
-    
-    

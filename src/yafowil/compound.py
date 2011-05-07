@@ -7,6 +7,7 @@ from yafowil.utils import (
     managedprops,
 )
 
+
 @managedprops('structural')
 def compound_extractor(widget, data):
     """Delegates extraction to children.
@@ -19,6 +20,7 @@ def compound_extractor(widget, data):
         else:
             childdata = child.extract(data.request, parent=data)
     return
+
 
 def compound_renderer(widget, data):
     """Delegates rendering to children.
@@ -49,6 +51,7 @@ factory.register('compound',
                  [compound_renderer],
                  [])
 
+
 @managedprops('legend', *css_managed_props)
 def fieldset_renderer(widget, data):
     fs_attrs = {
@@ -68,6 +71,7 @@ factory.defaults['fieldset.class'] = None
 factory.register('fieldset', 
                  factory.extractors('compound'), 
                  factory.renderers('compound') + [fieldset_renderer])
+
 
 @managedprops('action', 'method', 'enctype', *css_managed_props)
 def form_renderer(widget, data):

@@ -7,8 +7,7 @@ only be displayed or completly hidden, or even do anything else.
 You could solve this in two ways. The first way is to use the custom chain
 mechanism.
 
-Define custom renderer.
-::
+Define custom renderer::
 
     >>> def hideordisplay(widget, data):
     ...     if data.request.get('hide'):
@@ -17,8 +16,7 @@ Define custom renderer.
     ...         return '<div>' + data.value + '</div>'
     ...     return data.rendered
 
-Hook custom to chain on widget generation.
-::
+Hook custom to chain on widget generation::
 
     >>> import yafowil.loader
     >>> from yafowil.base import factory
@@ -33,8 +31,7 @@ Hook custom to chain on widget generation.
     ...         'hideordisplay': ([], [hideordisplay], [], []),
     ...     })
 
-Check results.
-::
+Check results::
 
     >>> pxml(widget(request={}))
     <div class="field" id="field-foo">
@@ -59,16 +56,13 @@ repeation and even more debugging by copy and paste errors.
 
 The second way is to use the registered 'mode' widget. Basically its constrolled
 by the 'mode' property and tries to render data.value decided on type.
-::
 
-Dummy mode decider function.
-::
+Dummy mode decider function::
 
     >>> def modedecider(widget, data):
     ...     return data.request.get('mode', 'edit')
 
-Test view widget with single string value.
-::
+Test view widget with single string value::
 
     >>> widget = factory(
     ...     'mode:field:label:text',
@@ -95,8 +89,7 @@ Test view widget with single string value.
     >>> widget(request={'mode': 'none'})
     u''
 
-Test view widget with boolean value.
-::
+Test view widget with boolean value::
 
     >>> widget = factory(
     ...     'mode:field:label:text',
@@ -110,8 +103,7 @@ Test view widget with boolean value.
     >>> widget(request={'mode': 'view'}) 
     u'<div>True</div>'
     
-Test view widget with iterable value.
-::
+Test view widget with iterable value::
 
     >>> widget = factory(
     ...     'mode:field:label:select',
@@ -132,8 +124,7 @@ Test view widget with iterable value.
 
 Finally you might want to use your own renderers for mode. You can define this
 with the related mode name in props. Just define a callback function doing the 
-rendering job.
-::
+rendering job::
 
     >>> def alternative_renderer(widget, data):
     ...     return u'<p>alternative</p>'

@@ -2,8 +2,7 @@ Table rendering
 ---------------
 
 Table elements are available as widgets as well, often you want to organize
-your form elements inside a table to provide pretty looking forms.
-::
+your form elements inside a table to provide pretty looking forms::
 
     >>> import yafowil.loader
     >>> from yafowil.base import factory
@@ -72,7 +71,7 @@ your form elements inside a table to provide pretty looking forms.
     <BLANKLINE>
     
 Build same table again but set some nodes structural. This is considered in
-``Widget.dottedpath``.
+``Widget.dottedpath``::
 
     >>> form = factory('form',
     ...                name='mytableform',

@@ -18,12 +18,15 @@ TESTFILES = [
     'table.txt',
 ]
 
+
 def fxml(xml):
     et = etree.fromstring(xml)
     return etree.tostring(et, pretty_print=True)
 
+
 def pxml(xml):
     print fxml(xml)
+
 
 def test_suite():
     return unittest.TestSuite([

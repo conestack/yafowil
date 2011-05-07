@@ -5,6 +5,7 @@ from yafowil.utils import (
     managedprops,
 )
 
+
 @managedprops('id', *css_managed_props)
 def table_renderer(widget, data):
     attrs = {
@@ -16,9 +17,11 @@ def table_renderer(widget, data):
 factory.doc['widget']['table'] = """\
 ``<table>`` compound widget for table creation.
 """
+
 factory.register('table',
                  factory.extractors('compound'),
                  factory.renderers('compound') + [table_renderer])
+
 
 def thead_renderer(widget, data):
     return data.tag('thead', data.rendered)
@@ -26,9 +29,11 @@ def thead_renderer(widget, data):
 factory.doc['widget']['thead'] = """\
 ``<thead>`` compound widget for table creation.
 """
+
 factory.register('thead',
                  factory.extractors('compound'),
                  factory.renderers('compound') + [thead_renderer])
+
 
 def tbody_renderer(widget, data):
     return data.tag('tbody', data.rendered)
@@ -36,9 +41,11 @@ def tbody_renderer(widget, data):
 factory.doc['widget']['tbody'] = """\
 ``<tbody>`` compound widget for table creation.
 """
+
 factory.register('tbody',
                  factory.extractors('compound'),
                  factory.renderers('compound') + [tbody_renderer])
+
 
 @managedprops('id', *css_managed_props)
 def tr_renderer(widget, data):
@@ -51,9 +58,11 @@ def tr_renderer(widget, data):
 factory.doc['widget']['tr'] = """\
 ``<tr>`` compound widget for table creation.
 """
+
 factory.register('tr',
                  factory.extractors('compound'),
                  factory.renderers('compound') + [tr_renderer])
+
 
 @managedprops('id', 'rowspan', 'colspan', 'label', *css_managed_props)
 def th_renderer(widget, data):
@@ -71,9 +80,11 @@ def th_renderer(widget, data):
 factory.doc['widget']['th'] = """\
 ``<th>`` compound widget for table creation.
 """
+
 factory.register('th',
                  [],
                  [th_renderer])
+
 
 @managedprops('id', 'rowspan', 'colspan', *css_managed_props)
 def td_renderer(widget, data):
@@ -88,6 +99,7 @@ def td_renderer(widget, data):
 factory.doc['widget']['td'] = """\
 ``<td>`` compound widget for table creation.
 """
+
 factory.register('td',
                  [],
                  [td_renderer])

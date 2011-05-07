@@ -1,5 +1,6 @@
 import logging
 
+
 class Unset(object): 
     
     def __nonzero__(self):
@@ -15,6 +16,7 @@ class Unset(object):
         return '<UNSET>'
 
 UNSET = Unset()
+
 
 def vocabulary(definition):
     """Convert different kinds of input into a list of bi-tuples, both strings.
@@ -45,6 +47,7 @@ def vocabulary(definition):
                     new_vocab.append((entry[0], entry[0]))
         return new_vocab
     return definition
+
 
 class Tag(object):
 
@@ -99,7 +102,8 @@ class Tag(object):
             'attrs': attributes,
             'value': u''.join(i for i in cl),
         }
-        
+
+
 ## Deprecation message
 def _deprecated_null_localization(msg):
     logging.warn("Deprecated usage of 'yafowil.utils.tag', please use the "+\
@@ -107,7 +111,7 @@ def _deprecated_null_localization(msg):
     return msg
 
 tag = Tag(_deprecated_null_localization)        
-        
+
 
 class managedprops(object):
     
@@ -117,16 +121,19 @@ class managedprops(object):
     def __call__(self, func):
         func.__yafowil_managed_props__ = self.__yafowil_managed_props__
         return func
-    
+
+
 def cssid(widget, prefix, postfix=None):
     path = widget.dottedpath.replace('.', '-')
     id = "%s-%s" % (prefix, path)
     if postfix is not None:
         id = '%s-%s' % (id, postfix) 
     return id
-    
+
+
 css_managed_props = ['class', 'error_class', 'error_class_default',
                      'required_class', 'required_class_default']
+
 def cssclasses(widget, data, classattr='class', additional=[]):
     _classes = list()
     attrs = widget.attrs

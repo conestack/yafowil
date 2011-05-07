@@ -2,8 +2,11 @@
 History
 =======
 
-1.0.3dev
---------
+1.0.3
+-----
+
+- test coverage
+  [rnix, 2011-05-07]
 
 - add widget value validation checking 'multivalued' property against 'value'
   length.

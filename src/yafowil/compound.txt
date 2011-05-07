@@ -1,5 +1,4 @@
-Preparation
-::
+Preparation::
 
     >>> import yafowil.common
     >>> import yafowil.compound
@@ -7,8 +6,7 @@ Preparation
     >>> from yafowil.utils import Tag
     >>> tag = Tag(lambda msg: msg)           
         
-Render Compound.
-::
+Render Compound::
 
     >>> compound = factory('compound', name='COMPOUND')
     >>> compound['inner']  = factory('text', value='value1')
@@ -21,8 +19,7 @@ Render Compound.
     </div>
     <BLANKLINE>
 
-Extract Compound empty.
-::    
+Extract Compound empty::    
 
     >>> data = compound.extract({})
     >>> data    
@@ -31,22 +28,20 @@ Extract Compound empty.
     >>> data['inner']
     <RuntimeData COMPOUND.inner, value='value1', extracted=<UNSET> at ...>    
 
-Extract with a value in request
-::
+Extract with a value in request::
 
     >>> data = compound.extract({'COMPOUND.inner': 'newvalue'})
     >>> data['inner']
     <RuntimeData COMPOUND.inner, value='value1', extracted='newvalue' at ...>    
 
-Extract with empty required, error should be there.
+Extract with empty required, error should be there::
 
     >>> data = compound.extract({'COMPOUND.inner2': ''})
     >>> data['inner2']
     <RuntimeData COMPOUND.inner2, value='value2', extracted='', 
     1 error(s) at ...>
 
-Test Fieldset
-::
+Test Fieldset::
 
     >>> compound = factory('fieldset', 
     ...                    'COMPOUND',
@@ -63,15 +58,15 @@ Test Fieldset
     </fieldset>
     <BLANKLINE>
 
-Test Form
-::
+Test Form::
 
     >>> form = factory('form',
     ...                name = 'FORM',
     ...                props={'action': 'http://fubar.com'})
     >>> form()
     u'<form action="http://fubar.com" enctype="multipart/form-data" id="form-FORM" method="post"></form>'
-    
+
+  
 Hello World
 -----------
 
@@ -97,8 +92,7 @@ Create a form::
     >>> form['submit'] = factory('submit', 
     ...     props={'handler': formaction, 'next': formnext, 'action': True})
     
-
-Render an empty form    
+Render an empty form::
 
     >>> pxml(form())
     <form action="http://www.domain.tld/someform" enctype="multipart/form-data" id="form-myform" method="post">
@@ -108,7 +102,6 @@ Render an empty form
     </form>
     <BLANKLINE>
 
-    
 Get form data out of request (request is expected dict-like)::
 
     >>> request = {'myform.someinput': 'Hello World', 
@@ -117,3 +110,18 @@ Get form data out of request (request is expected dict-like)::
     <RuntimeData myform, value=<UNSET>, extracted=None at ...>
       <RuntimeData myform.someinput, value=<UNSET>, extracted='Hello World' at ...>
       <RuntimeData myform.submit, value=<UNSET>, extracted=<UNSET> at ...>
+
+Form action property can be callable::
+
+    >>> def action(widget, data):
+    ...     return 'actionfromcall'
+    
+    >>> form = factory(
+    ...     'form',
+    ...     name='form',
+    ...     props={
+    ...         'action':action,
+    ...     })
+    >>> form()
+    u'<form action="actionfromcall" enctype="multipart/form-data" 
+    id="form-form" method="post"></form>'
