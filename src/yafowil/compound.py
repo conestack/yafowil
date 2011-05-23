@@ -78,8 +78,9 @@ def form_renderer(widget, data):
     form_attrs = {
         'action': widget.attrs['action'],
         'method': widget.attrs['method'],
-        'enctype': widget.attrs['method']=='post' and \
+        'enctype': widget.attrs['method'] == 'post' and \
                    widget.attrs['enctype'] or None,
+        'novalidate': widget.attrs['novalidate'] and 'novalidate' or None,
         'class_': cssclasses(widget, data),
         'id': 'form-%s' % '-'.join(widget.path),
     }
@@ -90,6 +91,7 @@ def form_renderer(widget, data):
 factory.doc['widget']['form'] = """\
 A html-form element. It is intended as a compound of widgets. 
 """
+
 factory.defaults['form.method'] = 'post'
 factory.doc['props']['form.method'] = """\
 One out of ``get`` or ``post``.
@@ -103,7 +105,12 @@ factory.defaults['form.enctype'] = 'multipart/form-data'
 factory.doc['props']['form.enctype'] = """\
 Encryption type of the form. Only relevant for method ``post``. Expect one out 
 of ``application/x-www-form-urlencoded`` or ``multipart/form-data``.
-""" 
+"""
+
+factory.defaults['form.novalidate'] = True
+factory.doc['props']['form.novalidate'] = \
+"""Flag whether HTML5 form validation should be suppressed.
+"""
 
 factory.register('form', 
                  factory.extractors('compound'), 

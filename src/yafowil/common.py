@@ -71,6 +71,7 @@ factory.doc['props']['required_class'] = \
 """CSS-class to put on in case if required condition was not met.
 """
 
+# XXX: remove. Controlled by form.novalidate
 factory.defaults['html5required'] = True
 factory.doc['props']['html5required'] = \
 """Flag whether HTML5 required attribute should be rendered.
@@ -154,6 +155,7 @@ def input_generic_renderer(widget, data):
         'disabled': bool(widget.attrs.get('disabled')) and 'disabled' or None,
         'autocomplete': widget.attrs.get('autocomplete'),
     }
+    # XXX: remove. Controlled by form.novalidate
     html5required = widget.attrs['html5required']
     if html5required:
         input_attrs['required'] = \
@@ -429,6 +431,7 @@ def password_renderer(widget, data):
         'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,      
         'disabled': widget.attrs.get('disabled'),
     }
+    # XXX: remove. Controlled form.novalidate instead
     html5required = widget.attrs['html5required']
     if html5required:
         input_attrs['required'] = \
@@ -795,6 +798,7 @@ def email_extractor(widget, data):
 
 
 def email_renderer(widget, data):
+    # XXX: remove. Controlled form.novalidate instead
     if not widget.attrs['html5type']:
         widget.attrs['type'] = 'text'
     return input_generic_renderer(widget, data)
@@ -805,6 +809,7 @@ factory.doc['widget']['email'] = \
 """
 
 factory.defaults['email.type'] = 'email'
+# XXX: remove. Controlled form.novalidate instead
 factory.defaults['email.html5type'] = True
 factory.defaults['email.default'] = ''
 factory.defaults['email.required_class'] = 'required'

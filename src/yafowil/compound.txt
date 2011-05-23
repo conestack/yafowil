@@ -64,7 +64,7 @@ Test Form::
     ...                name = 'FORM',
     ...                props={'action': 'http://fubar.com'})
     >>> form()
-    u'<form action="http://fubar.com" enctype="multipart/form-data" id="form-FORM" method="post"></form>'
+    u'<form action="http://fubar.com" enctype="multipart/form-data" id="form-FORM" method="post" novalidate="novalidate"></form>'
 
   
 Hello World
@@ -95,7 +95,7 @@ Create a form::
 Render an empty form::
 
     >>> pxml(form())
-    <form action="http://www.domain.tld/someform" enctype="multipart/form-data" id="form-myform" method="post">
+    <form action="http://www.domain.tld/someform" enctype="multipart/form-data" id="form-myform" method="post" novalidate="novalidate">
       <label for="input-myform-someinput">Your Text</label>
       <input class="text" id="input-myform-someinput" name="myform.someinput" type="text" value=""/>
       <input id="input-myform-submit" name="action.myform.submit" type="submit" value="submit"/>
@@ -124,4 +124,4 @@ Form action property can be callable::
     ...     })
     >>> form()
     u'<form action="actionfromcall" enctype="multipart/form-data" 
-    id="form-form" method="post"></form>'
+    id="form-form" method="post" novalidate="novalidate"></form>'

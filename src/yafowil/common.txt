@@ -776,7 +776,8 @@ Create label for field in other compound::
     >>> form['field'] = factory('text')
     >>> form()
     u'<form action="action" enctype="multipart/form-data" id="form-form" 
-    method="post"><label for="input-form-field">Foo</label><input 
+    method="post" novalidate="novalidate"><label 
+    for="input-form-field">Foo</label><input 
     class="text" id="input-form-field" name="form.field" type="text" 
     value="" /></form>'
 
