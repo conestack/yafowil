@@ -37,6 +37,8 @@ def mode_renderer(widget, data):
     if ren:
         return ren(widget, data)
     value = data.value
+    if value is UNSET:
+        return u''
     if isinstance(value, bool):
         value = widget.attrs['showbool'][value and 1 or 0]
     if isinstance(value, basestring):

@@ -5,6 +5,9 @@ History
 1.0.4dev
 --------
 
+- return empty string in mode renderer if value is UNSET
+  [rnix, 2011-05-23]
+
 1.0.3
 -----
 
