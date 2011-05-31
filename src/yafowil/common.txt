@@ -371,16 +371,19 @@ Render selection as radio buttons::
     ...             ('four', 'Four')],
     ...         'format': 'single'})
     >>> widget()
-    u'<input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
-    value="exists" /><div id="radio-MYSELECT-one"><input checked="checked" 
-    id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one" 
-    /><span>One</span></div><div id="radio-MYSELECT-two"><input 
-    id="input-MYSELECT-two" name="MYSELECT" type="radio" value="two" 
-    /><span>Two</span></div><div id="radio-MYSELECT-three"><input 
-    id="input-MYSELECT-three" name="MYSELECT" type="radio" 
-    value="three" /><span>Three</span></div><div id="radio-MYSELECT-four"><input 
-    id="input-MYSELECT-four" name="MYSELECT" type="radio" value="four" 
-    /><span>Four</span></div>'
+    u'<input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
+    value="exists" /><div id="radio-MYSELECT-one"><input checked="checked"
+    id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one" /><label
+    for="input-MYSELECT-one">One</label></div><div
+    id="radio-MYSELECT-two"><input id="input-MYSELECT-two" name="MYSELECT"
+    type="radio" value="two" /><label
+    for="input-MYSELECT-two">Two</label></div><div
+    id="radio-MYSELECT-three"><input id="input-MYSELECT-three" name="MYSELECT"
+    type="radio" value="three" /><label
+    for="input-MYSELECT-three">Three</label></div><div
+    id="radio-MYSELECT-four"><input id="input-MYSELECT-four" name="MYSELECT"
+    type="radio" value="four" /><label
+    for="input-MYSELECT-four">Four</label></div>'
 
 Render multi selection as checkboxes::
 
@@ -397,16 +400,19 @@ Render multi selection as checkboxes::
     ...             ('four', 'Four')],
     ...         'format': 'single'})
     >>> widget()
-    u'<input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
-    value="exists" /><div id="checkbox-MYSELECT-one"><input checked="checked" 
-    id="input-MYSELECT-one" name="MYSELECT" type="checkbox" value="one" 
-    /><span>One</span></div><div id="checkbox-MYSELECT-two"><input 
-    id="input-MYSELECT-two" name="MYSELECT" type="checkbox" value="two" 
-    /><span>Two</span></div><div id="checkbox-MYSELECT-three"><input 
-    id="input-MYSELECT-three" name="MYSELECT" type="checkbox" value="three" 
-    /><span>Three</span></div><div id="checkbox-MYSELECT-four"><input 
-    id="input-MYSELECT-four" name="MYSELECT" type="checkbox" value="four" 
-    /><span>Four</span></div>'
+    u'<input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
+    value="exists" /><div id="checkbox-MYSELECT-one"><input checked="checked"
+    id="input-MYSELECT-one" name="MYSELECT" type="checkbox" value="one"
+    /><label for="input-MYSELECT-one">One</label></div><div
+    id="checkbox-MYSELECT-two"><input id="input-MYSELECT-two" name="MYSELECT"
+    type="checkbox" value="two" /><label
+    for="input-MYSELECT-two">Two</label></div><div
+    id="checkbox-MYSELECT-three"><input id="input-MYSELECT-three"
+    name="MYSELECT" type="checkbox" value="three" /><label
+    for="input-MYSELECT-three">Three</label></div><div
+    id="checkbox-MYSELECT-four"><input id="input-MYSELECT-four"
+    name="MYSELECT" type="checkbox" value="four" /><label
+    for="input-MYSELECT-four">Four</label></div>'
 
 Check selection required::
 

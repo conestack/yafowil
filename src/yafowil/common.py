@@ -626,7 +626,7 @@ def select_renderer(widget, data):
                 'class_': cssclasses(widget, data),    
             }
             input = tag('input', **attrs)
-            text = tag('span', term)
+            text = tag('label', term, for_=attrs['id'])
             tags.append(tag('div', input, text,
                             **{'id': cssid(widget, tagtype, key)}))
         return select_exists_marker(widget, data) + u''.join(tags)
