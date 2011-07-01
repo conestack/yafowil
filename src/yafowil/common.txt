@@ -767,26 +767,6 @@ Render with help text::
     >>> widget()
     u'<label for="input-MYFILE">MYFILE<div class="help">Help!</div></label>'
 
-Create label for field in other compound::
-
-    >>> form = factory(
-    ...     'form',
-    ...     name = 'form',
-    ...     props = {
-    ...         'action': 'action'})
-    >>> form['label'] = factory(
-    ...     'label',
-    ...     props={
-    ...         'label': 'Foo',
-    ...         'for': 'field'})
-    >>> form['field'] = factory('text')
-    >>> form()
-    u'<form action="action" enctype="multipart/form-data" id="form-form" 
-    method="post" novalidate="novalidate"><label 
-    for="input-form-field">Foo</label><input 
-    class="text" id="input-form-field" name="form.field" type="text" 
-    value="" /></form>'
-
 
 Field Widget
 ------------
