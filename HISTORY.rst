@@ -5,6 +5,9 @@ History
 1.0.4dev
 --------
 
+- add ``disabled`` attribute for select widget. 
+  [jensens, 2011-06-01] 
+
 - add ``novalidate`` property for form
   [rnix, 2011-05-23]
 

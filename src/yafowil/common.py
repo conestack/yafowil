@@ -503,7 +503,7 @@ def input_checkbox_extractor(widget, data):
     raise ValueError, "Checkbox widget has invalid format '%s' set" % format
 
 
-@managedprops('format', *css_managed_props)
+@managedprops('format', 'disabled', *css_managed_props)
 def input_checkbox_renderer(widget, data):
     tag = data.tag
     value = fetch_value(widget, data)
@@ -513,7 +513,8 @@ def input_checkbox_renderer(widget, data):
         'value': value,
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),    
-        'class_': cssclasses(widget, data),    
+        'class_': cssclasses(widget, data),
+        'disabled': bool(widget.attrs.get('disabled')) and 'disabled' or None,            
     }
     if widget.attrs['format'] == 'bool':
         input_attrs['value'] = ''
@@ -571,7 +572,7 @@ def select_exists_marker(widget, data):
     return tag('input', **attrs)
 
 
-@managedprops('format', 'vocabulary', 'multivalued', *css_managed_props)
+@managedprops('format', 'vocabulary', 'multivalued', 'disabled', *css_managed_props)
 def select_renderer(widget, data):
     tag = data.tag
     value = fetch_value(widget, data)
@@ -582,6 +583,7 @@ def select_renderer(widget, data):
         value = [value]
     if not widget.attrs['multivalued'] and len(value) > 1:
         raise ValueError(u"Multiple values for single selection.")
+    disabled = widget.attrs.get('disabled', False)
     if widget.attrs['format'] == 'block':
         optiontags = []
         for key, term in vocabulary(widget.attrs.get('vocabulary', [])):
@@ -590,7 +592,9 @@ def select_renderer(widget, data):
                 'value': key,
                 'id': cssid(widget, 'input', key),
             }
-            optiontags.append(tag('option', term, **attrs))
+            if disabled and disabled is not True and key in disabled:
+                attrs['disabled'] = 'disabled'                 
+            optiontags.append(tag('option', term, **attrs))            
         select_attrs = {
             'name_': widget.dottedpath,
             'id': cssid(widget, 'input'),
@@ -599,7 +603,9 @@ def select_renderer(widget, data):
             'placeholder': widget.attrs.get('placeholder') or None,
             'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
             'required': widget.attrs.get('required') and 'required' or None,            
-        }
+        }        
+        if disabled is True:
+            select_attrs['disabled'] = 'disabled'
         rendered = tag('select', *optiontags, **select_attrs)
         if widget.attrs['multivalued']:
             attrs = {
@@ -623,8 +629,11 @@ def select_renderer(widget, data):
                 'checked': (key in value) and 'checked' or None,
                 'name_': widget.dottedpath,
                 'id': cssid(widget, 'input', key),    
-                'class_': cssclasses(widget, data),    
+                'class_': cssclasses(widget, data),
             }
+            if (disabled and disabled is not True and key in disabled) \
+               or disabled is True:
+                attrs['disabled'] = 'disabled'                                 
             input = tag('input', **attrs)
             text = tag('label', term, for_=attrs['id'])
             tags.append(tag('div', input, text,
@@ -643,6 +652,11 @@ factory.doc['props']['select.vocabulary'] = """\
 Vocabulary to be used for the selection list. Expects a dict-like or an iterable 
 or a callable which returns one of both first. An iterable can consist out of 
 strings or out of tuples with ``(key, value)``.   
+"""
+factory.doc['props']['select.disabled'] = """\
+Disables the whole widget or single selections. To disable the whole widget just
+set the value to 'True'. To disable single selection pass a iterable of keys to 
+disable, i.e. ``['foo', 'baz']``. Defaults to False.
 """
 
 factory.register('select',
