@@ -547,7 +547,7 @@ factory.register('checkbox',
 # selection
 ###############################################################################
 
-@managedprops('format', 'multivalued')
+@managedprops('format', 'multivalued', 'disabled')
 def select_extractor(widget, data):
     extracted = generic_extractor(widget, data)
     if extracted is UNSET \
@@ -556,8 +556,21 @@ def select_extractor(widget, data):
             extracted = []
         else:
             extracted = ''
+    if extracted is UNSET:
+        return extracted
     if widget.attrs['multivalued'] and isinstance(extracted, basestring):
         extracted = [extracted]
+    disabled = widget.attrs.get('disabled', False)
+    if not disabled:
+        return extracted
+    if not widget.attrs['multivalued']:
+        return data.value
+    disabled_items = disabled is True and data.value or disabled
+    if isinstance(disabled_items, basestring):
+        disabled_items = [disabled_items]
+    for item in disabled_items:
+        if item not in extracted:
+            extracted.append(item) 
     return extracted
 
 

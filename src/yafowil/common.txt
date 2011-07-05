@@ -566,7 +566,8 @@ Single selection extraction without value::
     ...             ('two', 'Two')]})
     
     >>> request = {
-    ...     'myselect': 'one', 
+    ...     'myselect': 'one',
+    ...     'myselect-exists': True, 
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
@@ -590,6 +591,21 @@ Single selection extraction with value::
     >>> data.printtree()
     <RuntimeData myselect, value='two', extracted='one' at ...>
 
+Single selection extraction disabled (means browser does not post the value) 
+with value::
+
+    >>> widget.attrs['disabled'] = True
+    >>> data = widget.extract({'myselect-exists': True})
+    >>> data.printtree()
+    <RuntimeData myselect, value='two', extracted='two' at ...>    
+
+Disabled can be also the value itself::
+
+    >>> widget.attrs['disabled'] = 'two'
+    >>> data = widget.extract({'myselect-exists': True})
+    >>> data.printtree()
+    <RuntimeData myselect, value='two', extracted='two' at ...>    
+
 Single selection extraction required::
 
     >>> widget = factory(
@@ -608,6 +624,13 @@ Single selection extraction required::
     >>> data = widget.extract(request)
     >>> data.printtree()
     <RuntimeData myselect, value='two', extracted='', 1 error(s) at ...>
+
+A disabled and required returns value itself::
+
+    >>> widget.attrs['disabled'] = True
+    >>> data = widget.extract({'myselect-exists': True})
+    >>> data.printtree()
+    <RuntimeData myselect, value='two', extracted='two' at ...>    
 
 Multiple selection extraction without value::
 
@@ -641,11 +664,63 @@ Multiple selection extraction with value::
     ...             ('three', 'Three')]})
     
     >>> request = {
-    ...     'myselect': 'one', 
+    ...     'myselect': ['one'], 
+    ...     'myselect-exists': True,
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
     <RuntimeData myselect, value='three', extracted=['one'] at ...>
+
+Multiselection, completly disabled::
+
+    >>> widget.attrs['disabled'] = True
+    >>> data = widget.extract({'myselect-exists': True})
+    >>> data.printtree()
+    <RuntimeData myselect, value='three', extracted=['three'] at ...>    
+
+Multiselection, partly disabled, empty request::
+
+    >>> widget = factory(
+    ...     'select',
+    ...     'myselect',
+    ...     value=['one', 'three'],
+    ...     props={
+    ...         'multivalued': True,
+    ...         'disabled': ['two', 'three'],
+    ...         'vocabulary': [
+    ...             ('one','One'), 
+    ...             ('two', 'Two'),
+    ...             ('three', 'Three'),
+    ...             ('four', 'Four')]})
+    
+    >>> data = widget.extract({})
+    >>> data.printtree()
+    <RuntimeData myselect, value=['one', 'three'], extracted=<UNSET> at ...>
+
+Multiselection, partly disabled, non-empty request::
+
+    >>> widget = factory(
+    ...     'select',
+    ...     'myselect',
+    ...     value=['one', 'three'],
+    ...     props={
+    ...         'multivalued': True,
+    ...         'disabled': ['two', 'three'],
+    ...         'vocabulary': [
+    ...             ('one','One'), 
+    ...             ('two', 'Two'),
+    ...             ('three', 'Three'),
+    ...             ('four', 'Four')]})
+    
+    >>> request = {
+    ...     'myselect': ['one'], 
+    ...     'myselect-exists': True,
+    ... }
+    >>> data = widget.extract(request)
+    >>> data.printtree()
+    <RuntimeData myselect, value=['one', 'three'], 
+    extracted=['one', 'two', 'three'] at ...>
+
 
 Single selection radio extraction::
 
