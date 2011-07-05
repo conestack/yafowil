@@ -702,24 +702,34 @@ Multiselection, partly disabled, non-empty request::
     >>> widget = factory(
     ...     'select',
     ...     'myselect',
-    ...     value=['one', 'three'],
+    ...     value=['one', 'two', 'four'],
     ...     props={
     ...         'multivalued': True,
-    ...         'disabled': ['two', 'three'],
+    ...         'disabled': ['two', 'three', 'four', 'five'],
     ...         'vocabulary': [
     ...             ('one','One'), 
     ...             ('two', 'Two'),
     ...             ('three', 'Three'),
-    ...             ('four', 'Four')]})
-    
+    ...             ('four', 'Four'),
+    ...             ('five', 'Five')]})
     >>> request = {
-    ...     'myselect': ['one'], 
+    ...     'myselect': ['one', 'two'], 
     ...     'myselect-exists': True,
     ... }
+    
+Explanation: 
+* one is a simple value as usal, 
+* two is disabled and in value, so it should be kept in.
+* three is disabled and not in value, so it should kept out,
+* four is disabled and in value, but someone removed it in the request, it 
+  should get recovered,
+* five is disabled and not in value, but someone put it in the request. it 
+  should get removed.
+    
     >>> data = widget.extract(request)
     >>> data.printtree()
-    <RuntimeData myselect, value=['one', 'three'], 
-    extracted=['one', 'two', 'three'] at ...>
+    <RuntimeData myselect, value=['one', 'two', 'four'], 
+    extracted=['one', 'two', 'four'] at ...>
 
 
 Single selection radio extraction::

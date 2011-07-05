@@ -569,8 +569,10 @@ def select_extractor(widget, data):
     if isinstance(disabled_items, basestring):
         disabled_items = [disabled_items]
     for item in disabled_items:
-        if item not in extracted:
-            extracted.append(item) 
+        if item in extracted and item not in data.value:
+            del data.value[item]
+        elif item not in extracted and item in data.value:
+            extracted.append(item)
     return extracted
 
 
