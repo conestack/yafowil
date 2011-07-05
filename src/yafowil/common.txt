@@ -664,7 +664,7 @@ Multiple selection extraction with value::
     ...             ('three', 'Three')]})
     
     >>> request = {
-    ...     'myselect': ['one'], 
+    ...     'myselect': 'one', 
     ...     'myselect-exists': True,
     ... }
     >>> data = widget.extract(request)
@@ -713,7 +713,7 @@ Multiselection, partly disabled, non-empty request::
     ...             ('four', 'Four'),
     ...             ('five', 'Five')]})
     >>> request = {
-    ...     'myselect': ['one', 'two'], 
+    ...     'myselect': ['one', 'two', 'five'], 
     ...     'myselect-exists': True,
     ... }
     

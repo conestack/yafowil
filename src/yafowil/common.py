@@ -570,7 +570,7 @@ def select_extractor(widget, data):
         disabled_items = [disabled_items]
     for item in disabled_items:
         if item in extracted and item not in data.value:
-            del data.value[item]
+            extracted.remove(item)
         elif item not in extracted and item in data.value:
             extracted.append(item)
     return extracted
