@@ -432,13 +432,18 @@ class Factory(object):
         for reg_name in reg_names:
             if reg_name.startswith('*'):
                 part_name = reg_name[1:]
-                ex, eren, pre, bui, dren = custom[part_name]
+                if len(custom[part_name]) < 5:
+                    # BBB:
+                    ex, eren, pre, bui = custom[part_name]
+                    dren = []
+                else:
+                    ex, eren, pre, bui, dren = custom[part_name]
             else:                   
                 part_name = reg_name
                 ex, eren, pre, bui, dren  = self._factories[part_name]
             extractors = [(part_name, _) for _ in ex]  + extractors
             edit_renderers = [(part_name, _) for _ in eren] + edit_renderers
-            disp_renderers = [(part_name, _) for _ in eren] + disp_renderers
+            disp_renderers = [(part_name, _) for _ in dren] + disp_renderers
             preprocessors = preprocessors + [(part_name, _) for _ in pre]
             builders      = builders + [(part_name, _) for _ in bui]
         global_pre  = [('__GLOBAL__', _) for _ in self._global_preprocessors]

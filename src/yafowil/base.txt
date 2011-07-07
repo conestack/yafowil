@@ -174,17 +174,47 @@ Preprocessor is only called once!::
     >>> data.attrs['test_preprocessor']
     'reset'    
     
-Different cases::    
+Different cases, 
+
+a.1) defaults: edit::     
     
     >>> testwidget = Widget([('1', test_extractor)], 
     ...                     [('1', test_edit_renderer)], 
     ...                     [('1', test_display_renderer)], 
     ...                     [],
     ...                     'MYUID', test_getter,
-    ...                     dict(test1='Test1', test2='Test2'))    
+    ...                     dict(test1='Test1', test2='Test2'),
+    ...                     )    
     >>> testwidget()
     ('r1', 'MYUID', "<RuntimeData MYUID, value='Test Value', extracted=<UNSET> 
     at ...>", "{'test1': 'Test1', 'test2': 'Test2'}")
+
+a.2) mode display::   
+    
+    >>> testwidget = Widget([('1', test_extractor)], 
+    ...                     [('1', test_edit_renderer)], 
+    ...                     [('1', test_display_renderer)], 
+    ...                     [],
+    ...                     'MYUID', test_getter,
+    ...                     dict(test1='Test1', test2='Test2'),
+    ...                     mode='display')    
+    >>> testwidget()
+    ('disr1', 'MYUID', "<RuntimeData MYUID, value='Test Value', extracted=<UNSET> 
+    at ...>", "{'test1': 'Test1', 'test2': 'Test2'}")
+
+a.3) mode skip::   
+    
+    >>> testwidget = Widget([('1', test_extractor)], 
+    ...                     [('1', test_edit_renderer)], 
+    ...                     [('1', test_display_renderer)], 
+    ...                     [],
+    ...                     'MYUID', test_getter,
+    ...                     dict(test1='Test1', test2='Test2'),
+    ...                     mode='skip')    
+    >>> testwidget()
+    u''
+    
+b.1) two extractors w/o request:: 
         
     >>> testwidget = Widget([('1', test_extractor), ('2', test_extractor2)], 
     ...                     [('1', test_edit_renderer), 
@@ -197,15 +227,31 @@ Different cases::
     ('r2', 'MYUID2', "<RuntimeData MYUID2, value='Test Value', 
     extracted=<UNSET> at ...>", "{'test1': 'Test1', 'test2': 'Test2'}")
     
+b.2) extractor with request, non int has to fail::
+    
     >>> testwidget = Widget([('1', test_extractor3)], 
     ...                     [('1', test_edit_renderer)], 
     ...                     [('1', test_display_renderer)], 
     ...                     [],
     ...                     'MYUID2', test_getter2,
     ...                     dict(test1='Test1', test2='Test2'))
-
     >>> testwidget.extract({'MYUID2': 'ABC'})
     <RuntimeData MYUID2, value=999, extracted=<UNSET>, 1 error(s) at ...>    
+
+b.3) extractor with request, but mode display::
+    
+    >>> testwidget = Widget([('1', test_extractor3)], 
+    ...                     [('1', test_edit_renderer)], 
+    ...                     [('1', test_display_renderer)], 
+    ...                     [],
+    ...                     'MYUID2', test_getter2,
+    ...                     dict(test1='Test1', test2='Test2'),
+    ...                     mode='display')    
+    >>> testwidget.extract({'MYUID2': '123'})
+    <RuntimeData MYUID2, value=999, extracted=<UNSET> ...>    
+
+b.3) two extractors with request::
+
     >>> testwidget = Widget([('1', test_extractor3)], 
     ...                     [('1', test_edit_renderer)], 
     ...                     [('1', test_display_renderer)], 
@@ -260,7 +306,7 @@ Plausability::
     Traceback (most recent call last):
     ...
     ValueError: if data is passed in, don't pass in request!
-    
+        
 The dottedpath.
 
 Fails with no name in root::
@@ -285,7 +331,44 @@ At this test level the factory is not used, so we pass it directly to Widget::
    >>> testwidget['child']['level3'].dottedpath
    'root.child.level3'
 
+The mode::
 
+    >>> testwidget = Widget([], [], [], [], uniquename='root')
+    >>> data = testwidget.extract({})
+    >>> data.mode
+    'edit'    
+
+    >>> testwidget = Widget([], [], [], [], uniquename='root', mode='display')
+    >>> data = testwidget.extract({})
+    >>> data.mode
+    'display'    
+
+    >>> testwidget = Widget([], [], [], [], uniquename='root', mode='skip')
+    >>> data = testwidget.extract({})
+    >>> data.mode
+    'skip'    
+
+    >>> testwidget = Widget([], [], [], [], uniquename='root', mode='other')
+    >>> data = testwidget.extract({})
+    Traceback (most recent call last):
+    ...      
+    ValueError: mode must be one out of 'edit', 'display', 'skip', but 'other' was given
+    
+    >>> def mode(widget, data):
+    ...     return 'edit'
+    >>> testwidget = Widget([], [], [], [], uniquename='root', mode=mode)
+    >>> data = testwidget.extract({})
+    >>> data.mode
+    'edit'    
+
+    >>> def mode(widget, data):
+    ...     return 'display'
+    >>> testwidget = Widget([], [], [], [], uniquename='root', mode=mode)
+    >>> data = testwidget.extract({})
+    >>> data.mode
+    'display'    
+     
+     
 factory
 -------
 ::
@@ -373,7 +456,17 @@ string as well::
     ...     return data.extracted + ['extracted outer']
         
     >>> factory.register('inner', [inner_extractor], [inner_renderer])
-    >>> factory.register('outer', [outer_extractor], [outer_renderer])
+    >>> factory.register('outer', [outer_extractor], [outer_renderer])    
+    >>> factory.display_renderers('inner')
+    [<function inner_renderer at ...>]
+
+    >>> factory.edit_renderers('inner')
+    [<function inner_renderer at ...>]
+
+    >>> factory.renderers('inner')
+    Traceback (most recent call last):
+    ...
+    RuntimeError: Deprecated since 1.2, use either edit_renderers or display_renderers
     
 Colon seperated chain definition::
     
@@ -407,7 +500,7 @@ you can inject your custom special render or extractor into the chain::
 
     >>> def special_extractor(widget, data):
     ...     return data.extracted + ['extracted special']
-        
+
     >>> widget = factory('outer:*special:inner', 
     ...                  custom={'special': ([special_extractor], 
     ...                                      [special_renderer], 
@@ -418,6 +511,15 @@ you can inject your custom special render or extractor into the chain::
 
     >>> widget(data)
     u'<OUTER><SPECIAL><INNER /></SPECIAL></OUTER>'
+
+BBB, w/o display_renderer::        
+    >>> widget = factory('outer:*special:inner', 
+    ...                  custom={'special': ([special_extractor], 
+    ...                                      [special_renderer], 
+    ...                                      [], [])})
+    >>> data = widget.extract({})
+    >>> data.extracted
+    ['extracted inner', 'extracted special', 'extracted outer']
 
 
 Prefixes with widgets and factories
