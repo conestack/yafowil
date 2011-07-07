@@ -2,8 +2,13 @@
 History
 =======
 
-1.0.4dev
---------
+1.1dev
+------
+
+- in progress
+
+1.0.4
+-----
 
 - add ``disabled`` attribute for select widget. 
   [jensens, 2011-06-01] 
