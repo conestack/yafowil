@@ -146,6 +146,37 @@ Create a custom error message::
     >>> data = widget.extract({'REQUIRED': ''})
     >>> data.errors
     [ExtractionError('Foooo',)]
+    
+Generic display renderer::
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='DISPLAY',
+    ...     value='lorem ipsum',
+    ...     mode='display')
+    >>> widget()
+    u'<div class="display-text" id="display-DISPLAY">lorem ipsum</div>'
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='DISPLAY',
+    ...     value=123.4567890,
+    ...     mode='display',
+    ...     props=dict(template='%0.3f'))
+    >>> widget()
+        u'<div class="display-text" id="display-DISPLAY">123.457</div>'
+
+    >>> def mytemplate(widget, data):
+    ...     return '<TEMPLATE>%s</TEMPLATE>' % data.value
+    >>> widget = factory(
+    ...     'text',
+    ...     name='DISPLAY',
+    ...     value='lorem ipsum',
+    ...     mode='display',
+    ...     props=dict(template=mytemplate))
+    >>> widget()
+    u'<div class="display-text" id="display-DISPLAY"><TEMPLATE>lorem 
+    ipsum</TEMPLATE></div>'
 
 
 Checkbox Widget
@@ -172,21 +203,26 @@ A checkbox widget with an value or an empty string::
     ...     'MYCHECKBOX',
     ...     value='',
     ...     props={'format': 'string'})
-    >>> widget()
-    u'<input id="input-MYCHECKBOX" name="MYCHECKBOX" 
-    type="checkbox" value="" /><input id="checkboxexists-MYCHECKBOX" 
-    name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />'
-
+    >>> pxml('<div>'+widget()+'</div>')
+    <div>
+      <input id="input-MYCHECKBOX" name="MYCHECKBOX" type="checkbox" value=""/>
+      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
+      type="hidden" value="checkboxexists"/>
+    </div>
+    
     >>> widget = factory(
     ...     'checkbox',
     ...     'MYCHECKBOX',
     ...     value='Test Checkbox',
     ...     props={'format': 'string'})
-    >>> widget()
-    u'<input checked="checked" id="input-MYCHECKBOX" name="MYCHECKBOX" 
-    type="checkbox" value="Test Checkbox" /><input 
-    id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
-    type="hidden" value="checkboxexists" />'
+    >>> pxml('<div>'+widget()+'</div>')
+    <div>
+      <input checked="checked" id="input-MYCHECKBOX" name="MYCHECKBOX" 
+      type="checkbox" value="Test Checkbox"/>
+      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
+      type="hidden" value="checkboxexists"/>
+    </div>
+    <BLANKLINE>
 
 Checkbox extraction::
 
@@ -249,6 +285,16 @@ invalid format::
     Traceback (most recent call last):
       ...
     ValueError: Checkbox widget has invalid format 'invalid' set
+    
+display::    
+
+    >>> widget = factory(
+    ...     'checkbox',
+    ...     'MYCHECKBOX',
+    ...     value='',
+    ...     mode='display',
+    ...     props={'format': 'string'})
+    >>> pxml('<div>'+widget()+'</div>')
 
 
 Textarea Widget

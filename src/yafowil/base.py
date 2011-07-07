@@ -267,7 +267,6 @@ class Widget(object):
             if request is not None:
                 data.request = request
             data = self._runpreprocessors(data)
-        self.lock()
         if data.mode == 'skip':
             data.rendered = u''
             return data.rendered
@@ -275,6 +274,10 @@ class Widget(object):
             renderers = self.display_renderers
         else:
             renderers = self.edit_renderers
+        if not renderers:
+            raise ValueError, "no renderers given for widget '%s' at mode '%s'"\
+                              % (self.dottedpath, data.mode) 
+        self.lock()
         try:
             for ren_name, renderer in renderers:
                 self.current_prefix = ren_name
@@ -374,7 +377,7 @@ class Factory(object):
             'widget': dict(),
         }
         
-    def register(self, name, extractors, edit_renderers, 
+    def register(self, name, extractors=[], edit_renderers=[], 
                  preprocessors=[], builders=[], display_renderers=[]):
         if name.startswith('*'):
             raise ValueError, 'Asterisk * as first char not allowed as name.'
@@ -446,7 +449,7 @@ class Factory(object):
             edit_renderers = [(part_name, _) for _ in eren] + edit_renderers
             disp_renderers = [(part_name, _) for _ in dren] + disp_renderers
             preprocessors = preprocessors + [(part_name, _) for _ in pre]
-            builders      = builders + [(part_name, _) for _ in bui]
+            builders      = builders + [(part_name, _) for _ in bui]            
         global_pre  = [('__GLOBAL__', _) for _ in self._global_preprocessors]
         widget = Widget(extractors, 
                         edit_renderers, 

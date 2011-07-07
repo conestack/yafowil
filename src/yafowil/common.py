@@ -87,6 +87,13 @@ factory.doc['props']['required_class_default'] = \
 class was given.
 """
 
+factory.defaults['template'] = '%s'
+factory.doc['props']['template'] = \
+"""Format string with pythons a built-in string format template. If a callable 
+is given it will be used instead and is called with ``widget`` and ``data`` as 
+parameters.  
+"""
+
 
 ###############################################################################
 # generic
@@ -136,7 +143,6 @@ def generic_required_extractor(widget, data):
 def input_generic_renderer(widget, data):
     """Generic HTML ``input`` tag render.
     """
-    tag = data.tag
     input_attrs = {
         'type': widget.attrs['type'],
         'value': fetch_value(widget, data),
@@ -155,11 +161,21 @@ def input_generic_renderer(widget, data):
         input_attrs['min'] = widget.attrs.get('min') or None
         input_attrs['max'] = widget.attrs.get('min') or None
         input_attrs['step'] = widget.attrs.get('step') or None
-    return tag('input', **input_attrs)
+    return data.tag('input', **input_attrs)
 
+@managedprops('template')
 def generic_display_renderer(widget, data):
-    """Generic display renderer to render a single value.
+    """Generic display renderer to render a value.
     """
+    if callable(widget.attrs['template']):
+        content = widget.attrs['template'](widget, data)
+    else:
+        content = widget.attrs['template'] % fetch_value(widget, data)
+    attrs = {
+        'id': cssid(widget, 'display'),
+        'class_': 'display-%s' % widget.attrs['class'] or 'generic'
+    }
+    return data.tag('div', content, **attrs)
 
 ###############################################################################
 # text
@@ -167,7 +183,9 @@ def generic_display_renderer(widget, data):
 
 factory.register('text', 
                  [generic_extractor, generic_required_extractor], 
-                 [input_generic_renderer])
+                 [input_generic_renderer],
+                 [], [],
+                 [generic_display_renderer])
 factory.doc['widget']['text'] = \
 """Text input widget.
 """
@@ -938,18 +956,18 @@ factory.register('number',
 def label_renderer(widget, data):
     tag = data.tag
     label_text = widget.attrs.get('label', widget.__name__)
-    for_path = widget.attrs['for']
-    if for_path:
-        for_widget = widget.root
-        for name in for_path.split('.'):
-            for_widget = for_widget[name]
-        for_ = cssid(for_widget, 'input')
-    else:
-        for_ = cssid(widget, 'input')
     label_attrs = {
-        'for_': for_,
         'class_': cssclasses(widget, data)
     }
+    if data.mode == 'edit':
+        for_path = widget.attrs['for']
+        if for_path:
+            for_widget = widget.root
+            for name in for_path.split('.'):
+                for_widget = for_widget[name]
+            label_attrs['for_'] = cssid(for_widget, 'input')
+        else:
+            label_attrs['for_'] = cssid(widget, 'input')
     help = u''
     if widget.attrs['help']:
         help_attrs = {'class_': widget.attrs['help_class']}

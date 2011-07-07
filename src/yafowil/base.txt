@@ -214,6 +214,18 @@ a.3) mode skip::
     >>> testwidget()
     u''
     
+a.4) mode w/o renderer:: 
+
+    >>> testwidget = Widget([('1', test_extractor)], 
+    ...                     [], [], [],
+    ...                     'MYUID', test_getter,
+    ...                     dict(test1='Test1', test2='Test2'),
+    ...                     mode='display')    
+    >>> testwidget()
+    Traceback (most recent call last):
+    ...
+    ValueError: no renderers given for widget 'MYUID' at mode 'display'
+    
 b.1) two extractors w/o request:: 
         
     >>> testwidget = Widget([('1', test_extractor), ('2', test_extractor2)], 
