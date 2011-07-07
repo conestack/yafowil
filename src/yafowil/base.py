@@ -390,7 +390,8 @@ class Factory(object):
                  name=None, 
                  value=UNSET, 
                  props=dict(),
-                 custom=dict()):
+                 custom=dict(),
+                 mode="edit"):
         """Creates a widget.
         
         ``reg_names``
@@ -454,7 +455,8 @@ class Factory(object):
                         uniquename=name, 
                         value_or_getter=value, 
                         properties=props,
-                        defaults=self.defaults)
+                        defaults=self.defaults,
+                        mode=mode)
         for part_name, builder_func in builders:
             widget.current_prefix = part_name
             builder_func(widget, self)

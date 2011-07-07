@@ -400,7 +400,13 @@ factory
     >>> factory.preprocessors('widget_test')
     [<function test_global_preprocessor at 0x...>, 
     <function test_preprocessor at 0x...>]
-    
+
+    >>> testwidget = factory('widget_test', name='MYFAC', value=test_getter, 
+    ...                      props=dict(foo='bar'), mode='display')
+    >>> data = testwidget.extract({})
+    >>> data.mode
+    'display'    
+        
 We can create sets of static builders, i.e. to have a validating password
 field with two input fields in. Here a simpler example:: 
 

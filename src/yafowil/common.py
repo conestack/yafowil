@@ -157,6 +157,9 @@ def input_generic_renderer(widget, data):
         input_attrs['step'] = widget.attrs.get('step') or None
     return tag('input', **input_attrs)
 
+def generic_display_renderer(widget, data):
+    """Generic display renderer to render a single value.
+    """
 
 ###############################################################################
 # text
@@ -422,7 +425,6 @@ def password_renderer(widget, data):
         'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,      
         'disabled': widget.attrs.get('disabled'),
     }
-    # XXX: remove. Controlled form.novalidate instead
     input_attrs['required'] = \
         widget.attrs.get('required') and 'required' or None
     return tag('input', **input_attrs)
