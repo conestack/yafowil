@@ -18,7 +18,8 @@ Define custom renderer::
 
 Hook custom to chain on widget generation::
 
-    >>> import yafowil.loader
+    >>> import yafowil.common
+    >>> import yafowil.mode
     >>> from yafowil.base import factory
     >>> widget = factory(
     ...     '*hideordisplay:field:label:text',
@@ -28,7 +29,7 @@ Hook custom to chain on widget generation::
     ...         'label': 'Foo',
     ...     },
     ...     custom = {
-    ...         'hideordisplay': ([], [hideordisplay], [], []),
+    ...         'hideordisplay': ([], [hideordisplay], [], [], []),
     ...     })
 
 Check results::

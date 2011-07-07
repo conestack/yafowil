@@ -70,7 +70,7 @@ factory.defaults['fieldset.legend'] = False
 factory.defaults['fieldset.class'] = None
 factory.register('fieldset', 
                  factory.extractors('compound'), 
-                 factory.renderers('compound') + [fieldset_renderer])
+                 factory.edit_renderers('compound') + [fieldset_renderer])
 
 
 @managedprops('action', 'method', 'enctype', *css_managed_props)
@@ -114,4 +114,4 @@ factory.doc['props']['form.novalidate'] = \
 
 factory.register('form', 
                  factory.extractors('compound'), 
-                 factory.renderers('compound') + [form_renderer])
+                 factory.edit_renderers('compound') + [form_renderer])

@@ -72,7 +72,6 @@ Hello World
 
 A simple hello world form works like so::
 
-    >>> import yafowil.loader
     >>> from yafowil.base import factory
     >>> from yafowil.controller import Controller
     

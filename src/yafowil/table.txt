@@ -4,8 +4,10 @@ Table rendering
 Table elements are available as widgets as well, often you want to organize
 your form elements inside a table to provide pretty looking forms::
 
-    >>> import yafowil.loader
     >>> from yafowil.base import factory
+    >>> import yafowil.common
+    >>> import yafowil.compound
+    >>> import yafowil.table
     >>> factory('table', name='foo')()
     u'<table></table>'
     

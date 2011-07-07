@@ -20,7 +20,7 @@ factory.doc['widget']['table'] = """\
 
 factory.register('table',
                  factory.extractors('compound'),
-                 factory.renderers('compound') + [table_renderer])
+                 factory.edit_renderers('compound') + [table_renderer])
 
 
 def thead_renderer(widget, data):
@@ -32,7 +32,7 @@ factory.doc['widget']['thead'] = """\
 
 factory.register('thead',
                  factory.extractors('compound'),
-                 factory.renderers('compound') + [thead_renderer])
+                 factory.edit_renderers('compound') + [thead_renderer])
 
 
 def tbody_renderer(widget, data):
@@ -44,7 +44,7 @@ factory.doc['widget']['tbody'] = """\
 
 factory.register('tbody',
                  factory.extractors('compound'),
-                 factory.renderers('compound') + [tbody_renderer])
+                 factory.edit_renderers('compound') + [tbody_renderer])
 
 
 @managedprops('id', *css_managed_props)
@@ -61,7 +61,7 @@ factory.doc['widget']['tr'] = """\
 
 factory.register('tr',
                  factory.extractors('compound'),
-                 factory.renderers('compound') + [tr_renderer])
+                 factory.edit_renderers('compound') + [tr_renderer])
 
 
 @managedprops('id', 'rowspan', 'colspan', 'label', *css_managed_props)

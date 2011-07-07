@@ -110,15 +110,20 @@ Create some test dummies::
     >>> def fail_extractor(widget, data):
     ...     raise ValueError, 'extractor has to fail'
     
-    >>> def test_renderer(widget, data):
-    ...     #interact(locals())
+    >>> def test_edit_renderer(widget, data):
     ...     return 'r1', widget.__name__, str(data), str(widget.attributes)
 
-    >>> def test_renderer2(widget, data):
+    >>> def test_edit_renderer2(widget, data):
     ...     return 'r2', widget.__name__, str(data), str(widget.attributes)
 
-    >>> def fail_renderer(widget, data):
+    >>> def fail_edit_renderer(widget, data):
     ...     raise ValueError, 'renderer has to fail'
+
+    >>> def test_display_renderer(widget, data):
+    ...     return 'disr1', widget.__name__, str(data), str(widget.attributes)
+
+    >>> def fail_display_renderer(widget, data):
+    ...     raise ValueError, 'display renderer has to fail'
     
     >>> def test_preprocessor(widget, data):
     ...     data.attrs['test_preprocessor'] = 'called'
@@ -134,7 +139,8 @@ The widget class::
     
     >>> test_request = {'MYUID': 'New Test Value'}
     >>> testwidget = Widget([('1', test_extractor)], 
-    ...                     [('1', test_renderer)], 
+    ...                     [('1', test_edit_renderer)], 
+    ...                     [('1', test_display_renderer)], 
     ...                     [('1', test_preprocessor)],
     ...                     'MYUID', test_getter,
     ...                     dict(test1='Test1', test2='Test2'))
@@ -171,7 +177,8 @@ Preprocessor is only called once!::
 Different cases::    
     
     >>> testwidget = Widget([('1', test_extractor)], 
-    ...                     [('1', test_renderer)], 
+    ...                     [('1', test_edit_renderer)], 
+    ...                     [('1', test_display_renderer)], 
     ...                     [],
     ...                     'MYUID', test_getter,
     ...                     dict(test1='Test1', test2='Test2'))    
@@ -180,7 +187,9 @@ Different cases::
     at ...>", "{'test1': 'Test1', 'test2': 'Test2'}")
         
     >>> testwidget = Widget([('1', test_extractor), ('2', test_extractor2)], 
-    ...                     [('1', test_renderer), ('2', test_renderer2)], 
+    ...                     [('1', test_edit_renderer), 
+    ...                      ('2', test_edit_renderer2)], 
+    ...                     [('1', test_display_renderer)], 
     ...                     [],
     ...                     'MYUID2', test_getter,
     ...                     dict(test1='Test1', test2='Test2'))
@@ -189,7 +198,8 @@ Different cases::
     extracted=<UNSET> at ...>", "{'test1': 'Test1', 'test2': 'Test2'}")
     
     >>> testwidget = Widget([('1', test_extractor3)], 
-    ...                     [('1', test_renderer)], 
+    ...                     [('1', test_edit_renderer)], 
+    ...                     [('1', test_display_renderer)], 
     ...                     [],
     ...                     'MYUID2', test_getter2,
     ...                     dict(test1='Test1', test2='Test2'))
@@ -197,7 +207,8 @@ Different cases::
     >>> testwidget.extract({'MYUID2': 'ABC'})
     <RuntimeData MYUID2, value=999, extracted=<UNSET>, 1 error(s) at ...>    
     >>> testwidget = Widget([('1', test_extractor3)], 
-    ...                     [('1', test_renderer)], 
+    ...                     [('1', test_edit_renderer)], 
+    ...                     [('1', test_display_renderer)], 
     ...                     [],
     ...                     'MYUID2', test_getter2,
     ...                     dict(test1='Test1', test2='Test2'))
@@ -209,7 +220,8 @@ A failing widget::
 
     >>> import sys, traceback
     >>> testwidget = Widget([('1', fail_extractor)], 
-    ...                     [('1', fail_renderer)], 
+    ...                     [('1', fail_edit_renderer)], 
+    ...                     [('1', test_display_renderer)], 
     ...                     [],
     ...                     'MYFAIL', '',
     ...                     dict())
@@ -238,7 +250,7 @@ A failing widget::
       File ".../yafowil/base.py", line ..., in __call__
         data.rendered = renderer(self, data)
        - Warning: Occurred on render in widget "MYFAIL" with name "1"
-      File "<doctest base.txt[...]>", line 2, in fail_renderer
+      File "<doctest base.txt[...]>", line 2, in fail_edit_renderer
         raise ValueError, 'renderer has to fail'
     ValueError: renderer has to fail        
     
@@ -253,7 +265,7 @@ The dottedpath.
 
 Fails with no name in root::
  
-    >>> testwidget = Widget([], [], [])    
+    >>> testwidget = Widget([], [], [], [])    
     >>> testwidget.dottedpath
     Traceback (most recent call last):
     ...
@@ -261,15 +273,15 @@ Fails with no name in root::
     
 At this test level the factory is not used, so we pass it directly to Widget::    
 
-    >>> testwidget = Widget([], [], [], uniquename='root')    
+    >>> testwidget = Widget([], [], [], [], uniquename='root')    
     >>> testwidget.dottedpath
     'root'
     
-   >>> testwidget['child'] = Widget([], [], [])
+   >>> testwidget['child'] = Widget([], [], [], [])
    >>> testwidget['child'].dottedpath
    'root.child'
 
-   >>> testwidget['child']['level3'] = Widget([], [], [])
+   >>> testwidget['child']['level3'] = Widget([], [], [], [])
    >>> testwidget['child']['level3'].dottedpath
    'root.child.level3'
 
@@ -279,12 +291,12 @@ factory
 ::
     >>> from yafowil.base import Factory
     >>> factory = Factory()
-    >>> factory.register('widget_test', [test_extractor], [test_renderer])
+    >>> factory.register('widget_test', [test_extractor], [test_edit_renderer])
     >>> factory.extractors('widget_test')
     [<function test_extractor at ...>]
     
-    >>> factory.renderers('widget_test')
-    [<function test_renderer at ...>]
+    >>> factory.edit_renderers('widget_test')
+    [<function test_edit_renderer at ...>]
     
     >>> testwidget = factory('widget_test', name='MYFAC', value=test_getter, 
     ...                      props=dict(foo='bar'))
@@ -292,7 +304,7 @@ factory
     ('r1', 'MYFAC', "<RuntimeData MYFAC, value='Test Value', extracted=<UNSET> 
     at ...>", "{'foo': 'bar'}")
 
-    >>> factory.register('widget_test', [test_extractor], [test_renderer], 
+    >>> factory.register('widget_test', [test_extractor], [test_edit_renderer], 
     ...                  preprocessors=[test_preprocessor])
     
     >>> factory.preprocessors('widget_test')
@@ -323,7 +335,7 @@ field with two input fields in. Here a simpler example::
     >>> factory.builders('static_compound')
     [<function create_static_compound at 0x...>]
     
-Some basic name chacke are done::
+Some basic name checks are done::
     
     >>> factory.register('*notallowed', [], [])
     Traceback (most recent call last):
@@ -343,7 +355,7 @@ Sometimes we want to wrap inputs by UI candy, primary for usability reasons.
 This might be a label, some error output or div around. We dont want to register
 an amount of X possible widgets with an amount of Y possible wrappers. Therefore
 we can factor a widget in a chain defined colon-separated, i.e 'outer:inner' or 
-'field:error:text'. Chaining works for all parts: renderers, extractors, 
+'field:error:text'. Chaining works for all parts: edit_renderers, extractors, 
 preprocessors and builders. Most inner and first executed is right (we prefix 
 with wrappers)!. The chain can be defined as list instead of a colon seperated
 string as well::
@@ -399,7 +411,7 @@ you can inject your custom special render or extractor into the chain::
     >>> widget = factory('outer:*special:inner', 
     ...                  custom={'special': ([special_extractor], 
     ...                                      [special_renderer], 
-    ...                                      [], [])})
+    ...                                      [], [], [])})
     >>> data = widget.extract({})
     >>> data.extracted
     ['extracted inner', 'extracted special', 'extracted outer']

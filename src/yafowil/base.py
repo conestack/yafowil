@@ -165,9 +165,9 @@ class Widget(object):
         OdictStorage,
     )
     
-    def __init__(self, extractors, renderers, preprocessors, 
-                 uniquename=None, value_or_getter=UNSET, properties=dict(),
-                 defaults=dict()
+    def __init__(self, extractors, edit_renderers, display_renderers, 
+                 preprocessors, uniquename=None, value_or_getter=UNSET, 
+                 properties=dict(), defaults=dict(), mode='edit'
                  ):
         """Initialize the widget. 
             
@@ -181,11 +181,19 @@ class Widget(object):
             dict-like. Properties gets a key ``extracted`` set, a list of 
             results of previous extractors in chain-   
             
-        ``renderers``
-            list of tuples with chain part name and callable rendering widget. 
-            Callable need to accept ``value``, ``uniquename`` and properties as 
-            dict-like. Properties gets a key ``rendered`` set, a list of results 
-            of previous extractors in chain. Has same signature a s extract.
+        ``edit_renderers``
+            list of tuples with chain part name and callable rendering widget in 
+            edit mode. Callable need to accept ``value``, ``uniquename`` and 
+            properties as dict-like. Properties gets a key ``rendered`` set, a 
+            list of results  of previous extractors in chain. Has same signature 
+            as extract.
+
+        ``display_renderers``
+            list of tuples with chain part name and callable rendering widget in 
+            display mode. Callable need to accept ``value``, ``uniquename`` and 
+            properties as dict-like. Properties gets a key ``rendered`` set, a 
+            list of results of previous extractors in chain. Has same signature 
+            as extract.
 
         ``preprocessors``
             list of tuples with chain part name and callable executed before 
@@ -206,13 +214,20 @@ class Widget(object):
             
         ``defaults``
             a dict with defaults value for the widgets attributes.
+
+        ``mode``
+            Rendering mode of widget: One out of ``edit``, ``display``, 
+            ``skip``.  Default is ``edit`` Expects string or callable accepting 
+            two parameters  ``widget`` and ``data``.
         """
         self.__name__ = uniquename
         self.__parent__ = None
         self.attributes_factory = WidgetAttributes
         self.getter = value_or_getter
+        self.mode = mode
         self.extractors = extractors
-        self.renderers = renderers
+        self.edit_renderers = edit_renderers
+        self.display_renderers = display_renderers
         self.preprocessors = preprocessors or list()
         self.defaults = defaults
         self._lock = RLock()
@@ -253,8 +268,15 @@ class Widget(object):
                 data.request = request
             data = self._runpreprocessors(data)
         self.lock()
+        if data.mode == 'skip':
+            data.rendered = u''
+            return data.rendered
+        elif data.mode == 'display':
+            renderers = self.display_renderers
+        else:
+            renderers = self.edit_renderers
         try:
-            for ren_name, renderer in self.renderers:
+            for ren_name, renderer in renderers:
                 self.current_prefix = ren_name
                 __traceback_supplement__ = (TBSupplementWidget, self, renderer, 
                                             'render', 
@@ -279,6 +301,8 @@ class Widget(object):
         if parent is not None:
             parent[self.__name__] = data
         data = self._runpreprocessors(data)
+        if data.mode != 'edit':
+            return data
         self.lock()     
         try:    
             for ex_name, extractor in self.extractors:     
@@ -321,6 +345,13 @@ class Widget(object):
             data.value = self.getter(self, data)
         else:
             data.value = self.getter        
+        if callable(self.mode):
+            data.mode = self.mode(self, data)
+        else:
+            data.mode = self.mode
+        if data.mode not in ('edit', 'display', 'skip'):
+            raise ValueError, "mode must be one out of 'edit', 'display', "+\
+                              "'skip', but '%s' was given " % data.mode            
         for ppname, pp in self.preprocessors:
             data.current_prefix = ppname
             __traceback_supplement__ = (TBSupplementWidget, self, pp, 
@@ -343,14 +374,14 @@ class Factory(object):
             'widget': dict(),
         }
         
-    def register(self, name, extractors, renderers, 
-                 preprocessors=[], builders=[]):
+    def register(self, name, extractors, edit_renderers, 
+                 preprocessors=[], builders=[], display_renderers=[]):
         if name.startswith('*'):
             raise ValueError, 'Asterisk * as first char not allowed as name.'
         if ':' in name:
             raise ValueError, 'Colon : as char not allowed in name.'
-        self._factories[name] = (extractors, renderers, 
-                                 preprocessors, builders)
+        self._factories[name] = (extractors, edit_renderers, 
+                                 preprocessors, builders, display_renderers)
         
     def register_global_preprocessors(self, preprocessors):
         self._global_preprocessors += preprocessors
@@ -392,7 +423,8 @@ class Factory(object):
             renderers, preprocessors, builders.    
         """
         extractors = list()
-        renderers = list()
+        edit_renderers = list()
+        disp_renderers = list()
         preprocessors = list()
         builders = list()
         if isinstance(reg_names, basestring):
@@ -400,17 +432,19 @@ class Factory(object):
         for reg_name in reg_names:
             if reg_name.startswith('*'):
                 part_name = reg_name[1:]
-                ex, ren, pre, bui = custom[part_name]
+                ex, eren, pre, bui, dren = custom[part_name]
             else:                   
                 part_name = reg_name
-                ex, ren, pre, bui = self._factories[part_name]
-            extractors    = [(part_name, _) for _ in ex]  + extractors
-            renderers     = [(part_name, _) for _ in ren] + renderers
+                ex, eren, pre, bui, dren  = self._factories[part_name]
+            extractors = [(part_name, _) for _ in ex]  + extractors
+            edit_renderers = [(part_name, _) for _ in eren] + edit_renderers
+            disp_renderers = [(part_name, _) for _ in eren] + disp_renderers
             preprocessors = preprocessors + [(part_name, _) for _ in pre]
             builders      = builders + [(part_name, _) for _ in bui]
         global_pre  = [('__GLOBAL__', _) for _ in self._global_preprocessors]
         widget = Widget(extractors, 
-                        renderers, 
+                        edit_renderers, 
+                        disp_renderers, 
                         global_pre + preprocessors,
                         uniquename=name, 
                         value_or_getter=value, 
@@ -426,6 +460,13 @@ class Factory(object):
         return self._factories[name][0]
     
     def renderers(self, name):
+        raise RuntimeError, 'Deprecated since 1.2, use either edit_renderers '+\
+                            'or display_renderers'
+
+    def edit_renderers(self, name):
+        return self._factories[name][1]
+
+    def display_renderers(self, name):
         return self._factories[name][1]
 
     def preprocessors(self, name):
@@ -433,9 +474,9 @@ class Factory(object):
 
     def builders(self, name):
         return self._factories[name][3]
-        
-factory = Factory()
 
+factory = Factory()        
+        
 def fetch_value(widget, data):
     """Fetch extracted, given value or default .
     """
