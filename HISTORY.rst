@@ -13,6 +13,9 @@ History
 1.0.4
 -----
 
+- clean up html5 handling, we believe in novalidate now...
+  [jensensm 2011-06-11]
+
 - add ``disabled`` attribute for select widget. 
   [jensens, 2011-06-01] 
 
