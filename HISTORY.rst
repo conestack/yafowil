@@ -5,7 +5,10 @@ History
 1.1dev
 ------
 
-- in progress
+- Now mode is a central element: each Widget instance has a mode now: edit, 
+  display or skip. edit is default and works as usal. Display renders the new 
+  display_renderer chain. Skip just renders an empty Unicode string.
+  [jensens, 2011-07-07]
 
 1.0.4
 -----
