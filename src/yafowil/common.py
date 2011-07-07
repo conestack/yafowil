@@ -71,12 +71,6 @@ factory.doc['props']['required_class'] = \
 """CSS-class to put on in case if required condition was not met.
 """
 
-# XXX: remove. Controlled by form.novalidate
-factory.defaults['html5required'] = True
-factory.doc['props']['html5required'] = \
-"""Flag whether HTML5 required attribute should be rendered.
-"""
-
 factory.defaults['size'] = None
 factory.doc['props']['size'] = \
 """Allowed input size.
@@ -155,11 +149,8 @@ def input_generic_renderer(widget, data):
         'disabled': bool(widget.attrs.get('disabled')) and 'disabled' or None,
         'autocomplete': widget.attrs.get('autocomplete'),
     }
-    # XXX: remove. Controlled by form.novalidate
-    html5required = widget.attrs['html5required']
-    if html5required:
-        input_attrs['required'] = \
-            widget.attrs.get('required') and 'required' or None
+    input_attrs['required'] = \
+        widget.attrs.get('required') and 'required' or None
     if widget.attrs['type'] in ['range', 'number']:
         input_attrs['min'] = widget.attrs.get('min') or None
         input_attrs['max'] = widget.attrs.get('min') or None
@@ -432,10 +423,8 @@ def password_renderer(widget, data):
         'disabled': widget.attrs.get('disabled'),
     }
     # XXX: remove. Controlled form.novalidate instead
-    html5required = widget.attrs['html5required']
-    if html5required:
-        input_attrs['required'] = \
-            widget.attrs.get('required') and 'required' or None
+    input_attrs['required'] = \
+        widget.attrs.get('required') and 'required' or None
     return tag('input', **input_attrs)
 
 
@@ -825,28 +814,18 @@ def email_extractor(widget, data):
         raise ExtractionError(u'Input not a valid email address.')
     return val
 
-
-def email_renderer(widget, data):
-    # XXX: remove. Controlled form.novalidate instead
-    if not widget.attrs['html5type']:
-        widget.attrs['type'] = 'text'
-    return input_generic_renderer(widget, data)
-
-
 factory.doc['widget']['email'] = \
 """E-mail (HTML5) input widget.
 """
 
 factory.defaults['email.type'] = 'email'
-# XXX: remove. Controlled form.novalidate instead
-factory.defaults['email.html5type'] = True
 factory.defaults['email.default'] = ''
 factory.defaults['email.required_class'] = 'required'
 factory.defaults['email.class'] = 'email'
 factory.register('email', 
                  [generic_extractor, generic_required_extractor,
                   email_extractor],
-                 [email_renderer])
+                 [input_generic_renderer])
 
 
 ###############################################################################

@@ -1154,18 +1154,6 @@ Chained password inside error inside field::
 Email Widget
 ------------
 
-Supress HTML5::
-
-    >>> widget = factory(
-    ...     'email',
-    ...     name='email',
-    ...     props={'html5type': False})
-    >>> pxml(widget())
-    <input class="email" id="input-email" name="email" type="text" value=""/>
-    <BLANKLINE>
-
-As HTML5::
-
     >>> widget = factory(
     ...     'email',
     ...     name='email')
