@@ -38,18 +38,21 @@ def compound_renderer(widget, data):
             result += widget[childname](data=subdata)
     return result
 
+
+factory.register(
+    'compound', 
+    extractors=[compound_extractor], 
+    edit_renderers=[compound_renderer])
+
 factory.doc['widget']['compound'] = """\
 A compound of widgets. This widget is a node which can contain sub-widgets.
 """
+
 factory.defaults['structural'] = False
 factory.doc['props']['structural'] = """\
 If a compound is structural, it will be omitted in the dotted-path levels and 
 will not have an own runtime-data. 
 """
-factory.register('compound', 
-                 [compound_extractor], 
-                 [compound_renderer],
-                 [])
 
 
 @managedprops('legend', *css_managed_props)
@@ -63,14 +66,19 @@ def fieldset_renderer(widget, data):
         rendered = data.tag('legend', widget.attrs['legend']) + rendered
     return data.tag('fieldset', rendered, **fs_attrs)   
 
+
+factory.register(
+    'fieldset', 
+    extractors=factory.extractors('compound'), 
+    edit_renderers=factory.edit_renderers('compound') + [fieldset_renderer])
+
 factory.doc['widget']['fieldset'] = """\
 Renders a fieldset around the prior rendered output.
 """
+
 factory.defaults['fieldset.legend'] = False
+
 factory.defaults['fieldset.class'] = None
-factory.register('fieldset', 
-                 factory.extractors('compound'), 
-                 factory.edit_renderers('compound') + [fieldset_renderer])
 
 
 @managedprops('action', 'method', 'enctype', *css_managed_props)
@@ -87,6 +95,12 @@ def form_renderer(widget, data):
     if callable(form_attrs['action']):
         form_attrs['action'] =  form_attrs['action'](widget, data)
     return data.tag('form', data.rendered, **form_attrs)
+
+
+factory.register(
+    'form', 
+    extractors=factory.extractors('compound'), 
+    edit_renderers=factory.edit_renderers('compound') + [form_renderer])
 
 factory.doc['widget']['form'] = """\
 A html-form element. It is intended as a compound of widgets. 
@@ -111,7 +125,3 @@ factory.defaults['form.novalidate'] = True
 factory.doc['props']['form.novalidate'] = \
 """Flag whether HTML5 form validation should be suppressed.
 """
-
-factory.register('form', 
-                 factory.extractors('compound'), 
-                 factory.edit_renderers('compound') + [form_renderer])

@@ -10,11 +10,14 @@ from yafowil.utils import (
     UNSET
 )
 
+
 def edit_renderer(widget, data):
     return data.rendered
 
+
 def none_renderer(widget, data):
     return u''
+
 
 @managedprops(*css_managed_props)
 def hidden_renderer(widget, data):
@@ -26,6 +29,7 @@ def hidden_renderer(widget, data):
         'class_': cssclasses(widget, data),    
     }
     return data.tag('input', **hidden_attrs)
+
 
 @managedprops('mode', 'edit', 'none', 'hidden', 'display', 'showbool')
 def mode_renderer(widget, data):
@@ -45,11 +49,22 @@ def mode_renderer(widget, data):
         return tag('div', value)
     items = [tag('li', item) for item in value]
     return tag('ul', *items)
+
+
+factory.register(
+    'mode',
+    edit_renderers=[mode_renderer])
+
 factory.doc['widget']['mode'] = 'DEPRECATED, do not use it anymore'
+
 factory.defaults['mode.mode'] = 'edit'
+
 factory.defaults['mode.edit'] = edit_renderer
+
 factory.defaults['mode.none'] = none_renderer
+
 factory.defaults['mode.hidden'] = hidden_renderer
+
 factory.defaults['mode.display'] = None
+
 factory.defaults['mode.showbool'] = ('False', 'True')
-factory.register('mode', [], [mode_renderer])
