@@ -1,3 +1,4 @@
+import logging
 from yafowil.base import (
     factory, 
     fetch_value
@@ -21,6 +22,8 @@ def none_renderer(widget, data):
 
 @managedprops(*css_managed_props)
 def hidden_renderer(widget, data):
+    logging.warn("Deprecated usage of yafowil 'mode' widget, please use "+\
+                 "mode property of factory call instead.")
     hidden_attrs = {
         'type': 'hidden',
         'value':  fetch_value(widget, data),
@@ -33,6 +36,8 @@ def hidden_renderer(widget, data):
 
 @managedprops('mode', 'edit', 'none', 'hidden', 'display', 'showbool')
 def mode_renderer(widget, data):
+    logging.warn("Deprecated usage of yafowil 'mode' widget, please use "+\
+                 "mode property of factory call instead.")
     tag = data.tag
     mode = widget.attrs['mode']
     if not isinstance(mode, basestring):
