@@ -294,7 +294,8 @@ display::
     ...     value='',
     ...     mode='display',
     ...     props={'format': 'string'})
-    >>> pxml('<div>'+widget()+'</div>')
+    
+    >> pxml('<div>'+widget()+'</div>')
 
 
 Textarea Widget

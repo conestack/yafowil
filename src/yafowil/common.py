@@ -163,6 +163,7 @@ def input_generic_renderer(widget, data):
         input_attrs['step'] = widget.attrs.get('step') or None
     return data.tag('input', **input_attrs)
 
+
 @managedprops('template')
 def generic_display_renderer(widget, data):
     """Generic display renderer to render a value.
@@ -177,15 +178,17 @@ def generic_display_renderer(widget, data):
     }
     return data.tag('div', content, **attrs)
 
+
 ###############################################################################
 # text
 ###############################################################################
 
-factory.register('text', 
-                 [generic_extractor, generic_required_extractor], 
-                 [input_generic_renderer],
-                 [], [],
-                 [generic_display_renderer])
+factory.register(
+    'text', 
+    extractors=[generic_extractor, generic_required_extractor], 
+    edit_renderers=[input_generic_renderer],
+    display_renderers=[generic_display_renderer])
+
 factory.doc['widget']['text'] = \
 """Text input widget.
 """
@@ -211,9 +214,11 @@ factory.doc['props']['text.disabled'] = \
 # hidden
 ###############################################################################
 
-factory.register('hidden', 
-                 [generic_extractor], 
-                 [input_generic_renderer])
+factory.register(
+     'hidden', 
+     extractors=[generic_extractor], 
+     edit_renderers=[input_generic_renderer])
+
 factory.doc['widget']['hidden'] = \
 """Hidden input widget.
 """
@@ -252,9 +257,11 @@ def input_proxy_renderer(widget, data):
     return tag('input', **input_attrs)
 
 
-factory.register('proxy', 
-                 [generic_extractor], 
-                 [input_proxy_renderer])
+factory.register(
+    'proxy', 
+    extractors=[generic_extractor], 
+    edit_renderers=[input_proxy_renderer])
+
 factory.doc['widget']['proxy'] = \
 """Used to pass hidden arguments out of form namespace.
 """
@@ -290,9 +297,11 @@ def textarea_renderer(widget, data):
     return tag('textarea', value, **area_attrs)
 
 
-factory.register('textarea', 
-                 [generic_extractor, generic_required_extractor], 
-                 [textarea_renderer])
+factory.register(
+    'textarea', 
+    extractors=[generic_extractor, generic_required_extractor], 
+    edit_renderers=[textarea_renderer])
+
 factory.doc['widget']['textarea'] = \
 """HTML textarea widget.
 """
@@ -366,6 +375,7 @@ def ascii_extractor(widget, data):
     except UnicodeEncodeError:
         raise ExtractionError(u'Input contains illegal characters.')
     return val
+
 
 LOWER_CASE_RE = '(?=.*[a-z])'
 UPPER_CASE_RE = '(?=.*[A-Z])'
@@ -448,11 +458,12 @@ def password_renderer(widget, data):
     return tag('input', **input_attrs)
 
 
-factory.register('password', 
-                 [generic_extractor, generic_required_extractor,
-                  minlength_extractor, ascii_extractor, password_extractor],
-                 [password_renderer],
-                 [])
+factory.register(
+    'password', 
+    extractors=[generic_extractor, generic_required_extractor,
+                minlength_extractor, ascii_extractor, password_extractor],
+    edit_renderers=[password_renderer])
+
 factory.doc['widget']['password'] = \
 """Password widget.
 
@@ -538,18 +549,23 @@ def input_checkbox_renderer(widget, data):
     return checkbox + exists_marker
 
 
+factory.register(
+    'checkbox', 
+    extractors=[input_checkbox_extractor, generic_required_extractor], 
+    edit_renderers=[input_checkbox_renderer])
+
 factory.doc['widget']['checkbox'] = """\
 Single checkbox.
 """
+
 factory.defaults['checkbox.default'] = False
+
 factory.defaults['checkbox.format'] = 'bool'
 factory.doc['props']['checkbox.format'] = """\
 Data-type of the extracted value. One out of ``bool`` or ``string``. 
 """
+
 factory.defaults['checkbox.required_class'] = 'required'
-factory.register('checkbox', 
-                 [input_checkbox_extractor, generic_required_extractor], 
-                 [input_checkbox_renderer])
 
 
 ###############################################################################
@@ -665,27 +681,33 @@ def select_renderer(widget, data):
         return select_exists_marker(widget, data) + u''.join(tags)
 
 
+factory.register(
+    'select',
+    extractors=[select_extractor, generic_required_extractor], 
+    edit_renderers=[select_renderer])
+
 factory.doc['widget']['select'] = """\
 Selection Widget. Single selection as dropdown or radio-buttons. Multiple 
 selection as selection-list or as checkboxes. 
-"""        
+"""
+    
 factory.defaults['select.multivalued'] = None
+
 factory.defaults['select.default'] = []
+
 factory.defaults['select.format'] = 'block'
+
 factory.doc['props']['select.vocabulary'] = """\
 Vocabulary to be used for the selection list. Expects a dict-like or an iterable 
 or a callable which returns one of both first. An iterable can consist out of 
 strings or out of tuples with ``(key, value)``.   
 """
+
 factory.doc['props']['select.disabled'] = """\
 Disables the whole widget or single selections. To disable the whole widget just
 set the value to 'True'. To disable single selection pass a iterable of keys to 
 disable, i.e. ``['foo', 'baz']``. Defaults to False.
 """
-
-factory.register('select',
-                 [select_extractor, generic_required_extractor], 
-                 [select_renderer])
 
 
 ###############################################################################
@@ -750,10 +772,17 @@ def file_options_renderer(widget, data):
     return data.rendered + u''.join(tags)
 
 
+factory.register(
+    'file',
+    extractors=[file_extracor, generic_required_extractor],
+    edit_renderers=[input_file_renderer, file_options_renderer])
+
 factory.doc['widget']['file'] = """\
 A basic file upload widget.
 """
+
 factory.defaults['file.multivalued'] = False
+
 factory.defaults['file.accept'] = None
 factory.doc['props']['file.accept'] = """\
 Content type sto accept.
@@ -764,9 +793,6 @@ factory.defaults['file.vocabulary'] = [
     ('replace', 'Replace existing file'),
     ('delete', 'Delete existing file'),
 ]
-factory.register('file',
-                 [file_extracor, generic_required_extractor],
-                 [input_file_renderer, file_options_renderer])
 
 
 ###############################################################################
@@ -786,9 +812,14 @@ def submit_renderer(widget, data):
     return tag('input', **input_attrs)
 
 
+factory.register(
+    'submit',
+    edit_renderers=[submit_renderer])
+
 factory.doc['widget']['submit'] = """\
 Submit tag inside the form
 """
+
 factory.doc['props']['submit.label'] = """\
 Label of the submit.
 """
@@ -818,8 +849,6 @@ factory.doc['props']['text.disabled'] = \
 """Flag  input field is disabled.
 """
 
-factory.register('submit', [], [submit_renderer])
-
 
 ###############################################################################
 # email
@@ -834,18 +863,23 @@ def email_extractor(widget, data):
         raise ExtractionError(u'Input not a valid email address.')
     return val
 
+
+factory.register(
+    'email', 
+    extractors=[generic_extractor, generic_required_extractor, email_extractor],
+    edit_renderers=[input_generic_renderer])
+
 factory.doc['widget']['email'] = \
 """E-mail (HTML5) input widget.
 """
 
 factory.defaults['email.type'] = 'email'
+
 factory.defaults['email.default'] = ''
+
 factory.defaults['email.required_class'] = 'required'
+
 factory.defaults['email.class'] = 'email'
-factory.register('email', 
-                 [generic_extractor, generic_required_extractor,
-                  email_extractor],
-                 [input_generic_renderer])
 
 
 ###############################################################################
@@ -863,34 +897,44 @@ def url_extractor(widget, data):
     return val
 
 
+factory.register(
+    'url',
+    extractors=[generic_extractor, generic_required_extractor, url_extractor],
+    edit_renderers=[input_generic_renderer])
+
 factory.doc['widget']['url'] = \
 """URL aka web address (HTML5) input widget.
 """
 
 factory.defaults['url.type'] = 'url'
+
 factory.defaults['url.default'] = ''
+
 factory.defaults['url.required_class'] = 'required'
+
 factory.defaults['url.class'] = 'url'
-factory.register('url',
-                 [generic_extractor, generic_required_extractor,
-                  url_extractor],
-                 [input_generic_renderer])
 
 
 ###############################################################################
 # search
 ###############################################################################
 
+factory.register(
+    'search', 
+    extractors=[generic_extractor, generic_required_extractor],
+    edit_renderers=[input_generic_renderer])
+
 factory.doc['widget']['search'] = """\
 Search widget (HTML5).
 """
+
 factory.defaults['search.type'] = 'search'
+
 factory.defaults['search.default'] = ''
+
 factory.defaults['search.required_class'] = 'required'
+
 factory.defaults['search.class'] = 'search'
-factory.register('search', 
-                 [generic_extractor, generic_required_extractor],
-                 [input_generic_renderer])
 
 
 ###############################################################################
@@ -925,10 +969,18 @@ def number_extractor(widget, data):
     return val
 
 
+factory.register(
+    'number', 
+    extractors=[generic_extractor, generic_required_extractor,
+                number_extractor],
+    edit_renderers=[input_generic_renderer])
+
 factory.doc['widget']['number'] = """\
 Number widget (HTML5).
 """
+
 factory.defaults['number.type'] = 'number'
+
 factory.defaults['number.datatype'] = 'float'
 factory.doc['props']['number.datatype'] = """\
 Output datatype, one out of ``integer`` or ``float``.
@@ -937,14 +989,14 @@ Output datatype, one out of ``integer`` or ``float``.
 factory.defaults['number.default'] = ''
 
 factory.defaults['number.min'] = None
+
 factory.defaults['number.max'] = None
+
 factory.defaults['number.step'] = None
+
 factory.defaults['number.required_class'] = 'required'
+
 factory.defaults['number.class'] = 'number'
-factory.register('number', 
-                 [generic_extractor, generic_required_extractor,
-                  number_extractor],
-                 [input_generic_renderer])
 
 
 ###############################################################################
@@ -981,9 +1033,14 @@ def label_renderer(widget, data):
     return tag('label', label_text, help, **label_attrs) + rendered
 
 
+factory.register(
+    'label',
+    edit_renderers=[label_renderer])
+
 factory.doc['widget']['label'] = """\
 Label widget.
 """
+
 factory.defaults['label.position'] = 'before'
 factory.doc['props']['label.position'] = """\
 Label can be rendered at 3 different positions: ``before`` or ``after`` the 
@@ -994,18 +1051,19 @@ the label tag.
 factory.doc['props']['label.label'] = """\
 Text to be displayed as a label.
 """
+
+factory.defaults['label.for'] = None
 factory.doc['props']['label.for'] = """\
 Optional dottedpath of widget to be labled
 """
+
+factory.defaults['label.help'] = None
 factory.doc['props']['label.help'] = """\
 Optional help text (alternative description) to be rendered inside a div after
 the label.
 """
 
-factory.defaults['label.for'] = None
-factory.defaults['label.help'] = None
 factory.defaults['label.help_class'] = 'help'
-factory.register('label', [], [label_renderer])
 
 
 ###############################################################################
@@ -1024,16 +1082,21 @@ def field_renderer(widget, data):
     return tag('div', data.rendered, **div_attrs)
 
 
+factory.register(
+    'field',
+    edit_renderers=[field_renderer])
+
 factory.doc['widget']['field'] = """\
 Renders a div with an class field around the prior rendered output. This is 
 supposed to be used for styling and grouping purposes.
 """
+
 factory.defaults['field.class'] = 'field'
+
 factory.defaults['field.witherror'] = None
 factory.doc['props']['field.witherror'] = """\
 Put the class given with this property on the div if an error happened.
 """
-factory.register('field', [], [field_renderer])
 
 
 ###############################################################################
@@ -1051,9 +1114,14 @@ def error_renderer(widget, data):
     return tag('div', msgs, data.rendered, class_=cssclasses(widget, data))
 
 
+factory.register(
+    'error',
+    edit_renderers=[error_renderer])
+
 factory.doc['widget']['error'] = """\
 Renders a div with an errormessage around the prior rendered output.
 """
+
 factory.defaults['error.error_class'] = 'error'
+
 factory.defaults['error.message_class'] = 'errormessage'
-factory.register('error', [], [error_renderer])
