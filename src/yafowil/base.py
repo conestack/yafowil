@@ -424,7 +424,11 @@ class Factory(object):
         ``custom`` 
             dict, where keys are matching to asterisk prefixed custom chains.
             each chains part is tuple with 4 lists of callables: extractors, 
-            renderers, preprocessors, builders.    
+            renderers, preprocessors, builders.   
+        
+        ``mode``
+            either a callable returning one of 'edit', 'display', 'skip' or
+            direct value. Defaults to 'edit'.
         """
         extractors = list()
         edit_renderers = list()
