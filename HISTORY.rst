@@ -5,6 +5,9 @@ History
 1.1dev
 ------
 
+- define label and field renderer as display renderer as well
+  [rnix, 2011-07-25]
+
 - deprecate use of mode widget
   [rnix, 2011-07-08]
 
@@ -17,7 +20,7 @@ History
 -----
 
 - clean up html5 handling, we believe in novalidate now...
-  [jensensm 2011-06-11]
+  [jensens, 2011-06-11]
 
 - add ``disabled`` attribute for select widget. 
   [jensens, 2011-06-01] 
