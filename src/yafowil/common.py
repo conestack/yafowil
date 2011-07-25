@@ -1036,7 +1036,8 @@ def label_renderer(widget, data):
 
 factory.register(
     'label',
-    edit_renderers=[label_renderer])
+    edit_renderers=[label_renderer],
+    display_renderers=[label_renderer])
 
 factory.doc['widget']['label'] = """\
 Label widget.
@@ -1085,7 +1086,8 @@ def field_renderer(widget, data):
 
 factory.register(
     'field',
-    edit_renderers=[field_renderer])
+    edit_renderers=[field_renderer],
+    display_renderers=[field_renderer])
 
 factory.doc['widget']['field'] = """\
 Renders a div with an class field around the prior rendered output. This is 
