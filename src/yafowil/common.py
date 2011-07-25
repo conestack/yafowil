@@ -476,6 +476,7 @@ password extraction.
 factory.defaults['password.required_class'] = 'required'
 
 factory.defaults['password.default'] = ''
+
 factory.defaults['password.class'] = 'password'
 
 factory.defaults['password.minlength'] = -1
