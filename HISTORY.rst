@@ -5,6 +5,9 @@ History
 1.1dev
 ------
 
+- Plumb ``node.parts.Order`` to widget node
+  [rnix, 2011-07-28]
+
 - define label and field renderer as display renderer as well
   [rnix, 2011-07-25]
 

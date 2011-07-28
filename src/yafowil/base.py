@@ -4,11 +4,11 @@ from node.parts import (
     Adopt,
     Nodify,
     NodeChildValidate,
-    DictStorage,
     OdictStorage,
     Attributes,
     NodeAttributes,
     Nodespaces,
+    Order,
 )
 from yafowil.utils import (
     Tag,
@@ -161,6 +161,7 @@ class Widget(object):
         Attributes,
         NodeChildValidate,
         Adopt,
+        Order,
         Nodify,
         OdictStorage,
     )
