@@ -179,6 +179,12 @@ def generic_display_renderer(widget, data):
     return data.tag('div', content, **attrs)
 
 
+def empty_display_renderer(widget, data):
+    """Display renderer which renders an empty string.
+    """
+    return u''
+
+
 ###############################################################################
 # text
 ###############################################################################
@@ -217,7 +223,8 @@ factory.doc['props']['text.disabled'] = \
 factory.register(
      'hidden', 
      extractors=[generic_extractor], 
-     edit_renderers=[input_generic_renderer])
+     edit_renderers=[input_generic_renderer],
+     display_renderers=[empty_display_renderer])
 
 factory.doc['widget']['hidden'] = \
 """Hidden input widget.

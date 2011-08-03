@@ -13,18 +13,10 @@ Helper::
     >>> tag = Tag(lambda msg: msg)           
 
 
-Text Input Widget
------------------
+Hidden Input Widget
+-------------------
 ::
     >>> from yafowil.base import factory
-    >>> widget = factory(
-    ...     'text',
-    ...     name='MYTEXT',
-    ...     value='Test Text')   
-    >>> widget()
-    u'<input class="text" id="input-MYTEXT" name="MYTEXT" type="text" 
-    value="Test Text" />'
-
     >>> widget = factory(
     ...     'hidden',
     ...     name='MYHIDDEN',
@@ -32,6 +24,38 @@ Text Input Widget
     >>> widget()
     u'<input class="hidden" id="input-MYHIDDEN" name="MYHIDDEN" type="hidden" 
     value="Test Hidden" />'
+
+Display mode of hidden widget renders empty string.::
+
+    >>> widget = factory(
+    ...     'hidden',
+    ...     name='MYHIDDEN',
+    ...     value='Test Hidden',
+    ...     mode='display')
+    >>> widget()
+    u''
+
+As well does skip mode::
+
+    >>> widget = factory(
+    ...     'hidden',
+    ...     name='MYHIDDEN',
+    ...     value='Test Hidden',
+    ...     mode='skip')
+    >>> widget()
+    u''
+
+
+Text Input Widget
+-----------------
+::
+    >>> widget = factory(
+    ...     'text',
+    ...     name='MYTEXT',
+    ...     value='Test Text')   
+    >>> widget()
+    u'<input class="text" id="input-MYTEXT" name="MYTEXT" type="text" 
+    value="Test Text" />'
 
 
 Autofocus Text Input
@@ -147,7 +171,7 @@ Create a custom error message::
     >>> data.errors
     [ExtractionError('Foooo',)]
     
-Generic display renderer::
+Display mode of text widget uses ``generic_display_renderer``::
 
     >>> widget = factory(
     ...     'text',
@@ -177,6 +201,16 @@ Generic display renderer::
     >>> widget()
     u'<div class="display-text" id="display-DISPLAY"><TEMPLATE>lorem 
     ipsum</TEMPLATE></div>'
+
+Skip mode renders empty string.::
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='SKIP',
+    ...     value='lorem ipsum',
+    ...     mode='skip')
+    >>> widget()
+    u''
 
 
 Checkbox Widget
