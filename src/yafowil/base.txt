@@ -449,6 +449,34 @@ Some basic name checks are done::
     ValueError: Colon : as char not allowed in name.
 
 
+Widget tree manipulation
+------------------------
+
+Widget trees provide functionality described in ``node.interfaces.IOrder``,
+which makes it possible to insert widgets at a specific place in an existing
+widget tree::
+
+    >>> widget = factory('widget_test', name='root')
+    >>> widget['1'] = factory('widget_test')
+    >>> widget['2'] = factory('widget_test')
+    >>> widget.printtree()
+    <class 'yafowil.base.Widget'>: root
+      <class 'yafowil.base.Widget'>: 1
+      <class 'yafowil.base.Widget'>: 2
+    
+    >>> new = factory('widget_test', name='3')
+    >>> ref = widget['1']
+    >>> widget.insertbefore(new, ref)
+    >>> new = factory('widget_test', name='4')
+    >>> widget.insertafter(new, ref)
+    >>> widget.printtree()
+    <class 'yafowil.base.Widget'>: root
+      <class 'yafowil.base.Widget'>: 3
+      <class 'yafowil.base.Widget'>: 1
+      <class 'yafowil.base.Widget'>: 4
+      <class 'yafowil.base.Widget'>: 2
+
+
 Request chains via factory
 --------------------------
 
