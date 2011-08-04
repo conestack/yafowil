@@ -57,6 +57,10 @@ Text Input Widget
     u'<input class="text" id="input-MYTEXT" name="MYTEXT" type="text" 
     value="Test Text" />'
 
+    >>> widget.mode = 'display'
+    >>> widget()
+    u'<div class="display-text" id="display-MYTEXT">Test Text</div>'
+
 
 Autofocus Text Input
 ---------------------
@@ -224,11 +228,19 @@ A boolean checkbox widget (default)::
     type="checkbox" value="" /><input id="checkboxexists-MYCHECKBOX" 
     name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />'
 
+    >>> widget.mode = 'display'
+    >>> widget()
+    u'<div class="display-None" id="display-MYCHECKBOX">no</div>'
+
     >>> widget = factory('checkbox', 'MYCHECKBOX', value='True')    
     >>> widget()
     u'<input checked="checked" id="input-MYCHECKBOX" name="MYCHECKBOX" 
     type="checkbox" value="" /><input id="checkboxexists-MYCHECKBOX" 
     name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />'
+
+    >>> widget.mode = 'display'
+    >>> widget()
+    u'<div class="display-None" id="display-MYCHECKBOX">yes</div>'
 
 A checkbox widget with an value or an empty string::
 
@@ -243,6 +255,10 @@ A checkbox widget with an value or an empty string::
       <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
       type="hidden" value="checkboxexists"/>
     </div>
+
+    >>> widget.mode = 'display'
+    >>> widget()
+    u'<div class="display-None" id="display-MYCHECKBOX">no</div>'
     
     >>> widget = factory(
     ...     'checkbox',
@@ -257,6 +273,10 @@ A checkbox widget with an value or an empty string::
       type="hidden" value="checkboxexists"/>
     </div>
     <BLANKLINE>
+
+    >>> widget.mode = 'display'
+    >>> widget()
+    u'<div class="display-None" id="display-MYCHECKBOX">Test Checkbox</div>'
 
 Checkbox extraction::
 
@@ -349,6 +369,10 @@ Textarea Widget
     >> interact(locals())
     >>> widget()
     u'<textarea cols="80" id="input-MYTEXTAREA" name="MYTEXTAREA" rows="25"></textarea>'
+    
+    >>> widget.mode = 'display'
+    >>> widget()    
+    u'<div class="display-None" id="display-MYTEXTAREA"></div>'
     
     >>> widget = factory(
     ...     'textarea',

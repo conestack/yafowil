@@ -171,7 +171,10 @@ def generic_display_renderer(widget, data):
     if callable(widget.attrs['template']):
         content = widget.attrs['template'](widget, data)
     else:
-        content = widget.attrs['template'] % fetch_value(widget, data)
+        value = fetch_value(widget, data)
+        if value is None:
+            value = u''
+        content = widget.attrs['template'] % value
     attrs = {
         'id': cssid(widget, 'display'),
         'class_': 'display-%s' % widget.attrs['class'] or 'generic'
@@ -267,7 +270,8 @@ def input_proxy_renderer(widget, data):
 factory.register(
     'proxy', 
     extractors=[generic_extractor], 
-    edit_renderers=[input_proxy_renderer])
+    edit_renderers=[input_proxy_renderer],
+    display_renderers=[empty_display_renderer])
 
 factory.doc['widget']['proxy'] = \
 """Used to pass hidden arguments out of form namespace.
@@ -307,7 +311,8 @@ def textarea_renderer(widget, data):
 factory.register(
     'textarea', 
     extractors=[generic_extractor, generic_required_extractor], 
-    edit_renderers=[textarea_renderer])
+    edit_renderers=[textarea_renderer],
+    display_renderers=[generic_display_renderer])
 
 factory.doc['widget']['textarea'] = \
 """HTML textarea widget.
@@ -435,20 +440,21 @@ def password_extractor(widget, data):
     return val
 
 
+def _pwd_value(widget, data):
+    if data.extracted is not UNSET:
+        return data.extracted
+    if data.value is not UNSET \
+      and data.value is not None:
+        return PASSWORD_NOCHANGE_VALUE
+    return widget.attrs['default']
+
 @managedprops('size', 'disabled', 'placeholder', 'autofocus', 'required',
               *css_managed_props)
-def password_renderer(widget, data):
+def password_edit_renderer(widget, data):
     """Render password widget.
     """
     tag = data.tag
-    def pwd_value(widget, data):
-        if data.extracted is not UNSET:
-            return data.extracted
-        if data.value is not UNSET \
-          and data.value is not None:
-            return PASSWORD_NOCHANGE_VALUE
-        return widget.attrs['default']
-    value = pwd_value(widget, data)
+    value = _pwd_value(widget, data)
     input_attrs = {
         'type': 'password',
         'value':  value,
@@ -464,12 +470,20 @@ def password_renderer(widget, data):
         widget.attrs.get('required') and 'required' or None
     return tag('input', **input_attrs)
 
+@managedprops('displayplaceholder')
+def password_display_renderer(widget, data):
+    value = _pwd_value(widget, data)
+    if value == PASSWORD_NOCHANGE_VALUE:
+        return widget.attrs['displayplaceholder']
+    return u''
+
 
 factory.register(
     'password', 
     extractors=[generic_extractor, generic_required_extractor,
                 minlength_extractor, ascii_extractor, password_extractor],
-    edit_renderers=[password_renderer])
+    edit_renderers=[password_edit_renderer],
+    display_renderers=[password_display_renderer])
 
 factory.doc['widget']['password'] = \
 """Password widget.
@@ -500,7 +514,6 @@ factory.doc['props']['password.ascii'] = \
 """Flag  ascii check should performed.
 """
 
-factory.defaults['password.strength'] = 'strength'
 factory.defaults['password.strength'] = -1
 factory.doc['props']['password.strength'] = \
 """Integer value <= 4. Define how many rules must apply to consider a password
@@ -510,6 +523,10 @@ valid.
 factory.defaults['weak_password_message'] = u'Password too weak'
 factory.doc['props']['password.strength'] = \
 """Message shown if password is not strong enough.
+"""
+factory.defaults['password.displayplaceholder'] = u'*'*8
+factory.doc['props']['password.displayplaceholder'] = \
+"""Placeholder shown in display mode if password was set. 
 """
 
 
@@ -532,7 +549,7 @@ def input_checkbox_extractor(widget, data):
 
 
 @managedprops('format', 'disabled', *css_managed_props)
-def input_checkbox_renderer(widget, data):
+def input_checkbox_edit_renderer(widget, data):
     tag = data.tag
     value = fetch_value(widget, data)
     input_attrs = {
@@ -556,11 +573,31 @@ def input_checkbox_renderer(widget, data):
     exists_marker = tag('input', **input_attrs)
     return checkbox + exists_marker
 
+@managedprops('bool', 'vocabulary')
+def display_checkbox_renderer(widget, data):
+    """Generic display renderer to render a value.
+    """
+    value = fetch_value(widget, data)
+    if widget.attrs['format'] == 'string' and bool(value):
+        content = value
+    else:
+        vocab = widget.attrs.get('vocabulary')
+        if callable(vocab):
+            vocab = vocab(widget, data)
+        content = vocab[bool(value)]
+
+    attrs = {
+        'id': cssid(widget, 'display'),
+        'class_': 'display-%s' % widget.attrs['class'] or 'generic'
+    }
+    return data.tag('div', content, **attrs)
+
 
 factory.register(
     'checkbox', 
     extractors=[input_checkbox_extractor, generic_required_extractor], 
-    edit_renderers=[input_checkbox_renderer])
+    edit_renderers=[input_checkbox_edit_renderer],
+    display_renderers=[display_checkbox_renderer])
 
 factory.doc['widget']['checkbox'] = """\
 Single checkbox.
@@ -571,6 +608,19 @@ factory.defaults['checkbox.default'] = False
 factory.defaults['checkbox.format'] = 'bool'
 factory.doc['props']['checkbox.format'] = """\
 Data-type of the extracted value. One out of ``bool`` or ``string``. 
+"""
+
+factory.defaults['checkbox.format'] = 'bool'
+factory.doc['props']['checkbox.format'] = """\
+Data-type of the extracted value. One out of ``bool`` or ``string``. 
+"""
+
+factory.defaults['checkbox.vocabulary'] = { True:'yes', False: 'no', 
+                                            UNSET: 'not set' }
+factory.doc['props']['checkbox.vocabulary'] = """\
+In display mode and if ```bool``` is set to ```True``` this mapping will be used
+for display of the value. Expected keys are ```True```, ```False``` and 
+```UNSET```.
 """
 
 factory.defaults['checkbox.required_class'] = 'required'
