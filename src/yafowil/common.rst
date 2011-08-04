@@ -63,7 +63,7 @@ Text Input Widget
 
 
 Autofocus Text Input
----------------------
+--------------------
 ::
     >>> widget = factory(
     ...     'text',
@@ -1125,6 +1125,10 @@ Use in add forms, no password set yet::
     >>> data = widget.extract({'pwd': 'xx'})
     >>> data.extracted
     'xx'
+    
+    >>> widget.mode = 'display'
+    >>> widget()
+    u''
 
 Use in edit forms. note that password is never shown up in markup, but a
 placeholder is used when a password is already set. Thus, if a extracted
@@ -1149,6 +1153,10 @@ password value is UNSET, this means that password was not changed::
     
     >>> widget(data=data)
     u'<input class="password" id="input-password" name="password" type="password" value="foo" />'
+
+    >>> widget.mode = 'display'
+    >>> widget()
+    u'********'
 
 Password validation::
 

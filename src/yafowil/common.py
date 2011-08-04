@@ -581,9 +581,7 @@ def checkbox_display_renderer(widget, data):
     if widget.attrs['format'] == 'string' and bool(value):
         content = value
     else:
-        vocab = widget.attrs.get('vocabulary')
-        if callable(vocab):
-            vocab = vocab(widget, data)
+        vocab = dict(vocabulary(widget.attrs.get('vocabulary', [])))
         content = vocab[bool(value)]
 
     attrs = {
