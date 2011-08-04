@@ -14,19 +14,34 @@ your form elements inside a table to provide pretty looking forms::
     >>> factory('table', name='foo_table', props={'id': 'id', 'class': 'css'})()
     u'<table class="css" id="id"></table>'
     
+    >>> factory('table', name='foo', mode='display')()
+    u'<table></table>'
+    
     >>> factory('thead', name='foo')()
+    u'<thead></thead>'
+    
+    >>> factory('thead', name='foo', mode='display')()
     u'<thead></thead>'
     
     >>> factory('tbody', name='foo')()
     u'<tbody></tbody>'
     
+    >>> factory('tbody', name='foo', mode='display')()
+    u'<tbody></tbody>'
+    
     >>> factory('tr', name='foo')()
+    u'<tr></tr>'
+    
+    >>> factory('tr', name='foo', mode='display')()
     u'<tr></tr>'
     
     >>> factory('tr', name='foo', props={'id': 'id', 'class': 'css'})()
     u'<tr class="css" id="id"></tr>'
     
     >>> factory('th', name='foo')()
+    u'<th></th>'
+    
+    >>> factory('th', name='foo', mode='display')()
     u'<th></th>'
     
     >>> factory('th',
@@ -40,6 +55,9 @@ your form elements inside a table to provide pretty looking forms::
     u'<th class="css" colspan="2" id="id" rowspan="2"></th>'
     
     >>> factory('td', name='foo')()
+    u'<td></td>'
+    
+    >>> factory('td', name='foo', mode='display')()
     u'<td></td>'
     
     >>> factory('td',

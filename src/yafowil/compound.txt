@@ -41,12 +41,17 @@ Extract with empty required, error should be there::
     <RuntimeData COMPOUND.inner2, value='value2', extracted='', 
     1 error(s) at ...>
 
+Compound display renderers, same as edit renderers::
+
+    >>> compound = factory('compound', name='COMPOUND', mode='display')
+    >>> pxml(tag('div', compound()))
+    <div/>
+    <BLANKLINE>
+
 Test Fieldset::
 
     >>> compound = factory('fieldset', 
     ...                    'COMPOUND',
-    ...                    {'inner': 'somevalue', 
-    ...                     'inner2': 'othervalue'},
     ...                    props={'legend': 'Some Test'})
     >>> compound['inner'] = factory('text', 'inner', 'value')
     >>> compound['inner2'] = factory('text', 'inner2', 'value2')
@@ -58,6 +63,18 @@ Test Fieldset::
     </fieldset>
     <BLANKLINE>
 
+Fieldset display renderers are the same as fieldset edit renderers::
+
+    >>> compound = factory('fieldset', 
+    ...                    'COMPOUND',
+    ...                    props={'legend': 'Some Test'},
+    ...                    mode='display')
+    >>> pxml(compound())
+    <fieldset id="fieldset-COMPOUND">
+      <legend>Some Test</legend>
+    </fieldset>
+    <BLANKLINE>
+
 Test Form::
 
     >>> form = factory('form',
@@ -65,6 +82,15 @@ Test Form::
     ...                props={'action': 'http://fubar.com'})
     >>> form()
     u'<form action="http://fubar.com" enctype="multipart/form-data" id="form-FORM" method="post" novalidate="novalidate"></form>'
+
+Form display renderer::
+
+    >>> form = factory('form',
+    ...                name = 'FORM',
+    ...                props={'action': 'http://fubar.com'},
+    ...                mode='display')
+    >>> form()
+    u'<div></div>'
 
   
 Hello World
@@ -144,4 +170,3 @@ Create label for field in other compound::
     for="input-form-field">Foo</label><input 
     class="text" id="input-form-field" name="form.field" type="text" 
     value="" /></form>'
-    

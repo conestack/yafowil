@@ -18,7 +18,8 @@ def table_renderer(widget, data):
 factory.register(
     'table',
     extractors=factory.extractors('compound'),
-    edit_renderers=factory.edit_renderers('compound') + [table_renderer])
+    edit_renderers=factory.edit_renderers('compound') + [table_renderer],
+    display_renderers=factory.display_renderers('compound') + [table_renderer])
 
 factory.doc['widget']['table'] = """\
 ``<table>`` compound widget for table creation.
@@ -32,7 +33,8 @@ def thead_renderer(widget, data):
 factory.register(
     'thead',
     extractors=factory.extractors('compound'),
-    edit_renderers=factory.edit_renderers('compound') + [thead_renderer])
+    edit_renderers=factory.edit_renderers('compound') + [thead_renderer],
+    display_renderers=factory.display_renderers('compound') + [thead_renderer])
 
 factory.doc['widget']['thead'] = """\
 ``<thead>`` compound widget for table creation.
@@ -46,7 +48,8 @@ def tbody_renderer(widget, data):
 factory.register(
     'tbody',
     extractors=factory.extractors('compound'),
-    edit_renderers=factory.edit_renderers('compound') + [tbody_renderer])
+    edit_renderers=factory.edit_renderers('compound') + [tbody_renderer],
+    display_renderers=factory.display_renderers('compound') + [tbody_renderer])
 
 factory.doc['widget']['tbody'] = """\
 ``<tbody>`` compound widget for table creation.
@@ -65,7 +68,8 @@ def tr_renderer(widget, data):
 factory.register(
     'tr',
     extractors=factory.extractors('compound'),
-    edit_renderers=factory.edit_renderers('compound') + [tr_renderer])
+    edit_renderers=factory.edit_renderers('compound') + [tr_renderer],
+    display_renderers=factory.display_renderers('compound') + [tr_renderer])
 
 factory.doc['widget']['tr'] = """\
 ``<tr>`` compound widget for table creation.
@@ -88,7 +92,8 @@ def th_renderer(widget, data):
 
 factory.register(
     'th',
-    edit_renderers=[th_renderer])
+    edit_renderers=[th_renderer],
+    display_renderers=[th_renderer])
 
 factory.doc['widget']['th'] = """\
 ``<th>`` compound widget for table creation.
@@ -108,7 +113,8 @@ def td_renderer(widget, data):
 
 factory.register(
     'td',
-    edit_renderers=[td_renderer])
+    edit_renderers=[td_renderer],
+    display_renderers=[td_renderer])
 
 factory.doc['widget']['td'] = """\
 ``<td>`` compound widget for table creation.

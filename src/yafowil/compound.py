@@ -42,7 +42,8 @@ def compound_renderer(widget, data):
 factory.register(
     'compound', 
     extractors=[compound_extractor], 
-    edit_renderers=[compound_renderer])
+    edit_renderers=[compound_renderer],
+    display_renderers=[compound_renderer])
 
 factory.doc['widget']['compound'] = """\
 A compound of widgets. This widget is a node which can contain sub-widgets.
@@ -70,7 +71,9 @@ def fieldset_renderer(widget, data):
 factory.register(
     'fieldset', 
     extractors=factory.extractors('compound'), 
-    edit_renderers=factory.edit_renderers('compound') + [fieldset_renderer])
+    edit_renderers=factory.edit_renderers('compound') + [fieldset_renderer],
+    display_renderers=factory.display_renderers('compound') + \
+        [fieldset_renderer])
 
 factory.doc['widget']['fieldset'] = """\
 Renders a fieldset around the prior rendered output.
@@ -82,7 +85,7 @@ factory.defaults['fieldset.class'] = None
 
 
 @managedprops('action', 'method', 'enctype', *css_managed_props)
-def form_renderer(widget, data):
+def form_edit_renderer(widget, data):
     form_attrs = {
         'action': widget.attrs['action'],
         'method': widget.attrs['method'],
@@ -97,10 +100,16 @@ def form_renderer(widget, data):
     return data.tag('form', data.rendered, **form_attrs)
 
 
+def form_display_renderer(widget, data):
+    return data.tag('div', data.rendered)
+
+
 factory.register(
     'form', 
     extractors=factory.extractors('compound'), 
-    edit_renderers=factory.edit_renderers('compound') + [form_renderer])
+    edit_renderers=factory.edit_renderers('compound') + [form_edit_renderer],
+    display_renderers=factory.display_renderers('compound') + \
+        [form_display_renderer])
 
 factory.doc['widget']['form'] = """\
 A html-form element. It is intended as a compound of widgets. 
