@@ -14,7 +14,6 @@ TESTFILES = [
     'common.txt',
     'compound.txt',
     'controller.txt',
-    'mode.txt',
     'table.txt',
 ]
 
