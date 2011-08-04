@@ -535,7 +535,7 @@ factory.doc['props']['password.displayplaceholder'] = \
 ###############################################################################
 
 @managedprops('format')
-def input_checkbox_extractor(widget, data):
+def checkbox_extractor(widget, data):
     """Extracts data from a single input with type checkbox.
     """
     if '%s-exists' % widget.dottedpath not in data.request:
@@ -549,7 +549,7 @@ def input_checkbox_extractor(widget, data):
 
 
 @managedprops('format', 'disabled', *css_managed_props)
-def input_checkbox_edit_renderer(widget, data):
+def checkbox_edit_renderer(widget, data):
     tag = data.tag
     value = fetch_value(widget, data)
     input_attrs = {
@@ -574,7 +574,7 @@ def input_checkbox_edit_renderer(widget, data):
     return checkbox + exists_marker
 
 @managedprops('bool', 'vocabulary')
-def display_checkbox_renderer(widget, data):
+def checkbox_display_renderer(widget, data):
     """Generic display renderer to render a value.
     """
     value = fetch_value(widget, data)
@@ -595,9 +595,9 @@ def display_checkbox_renderer(widget, data):
 
 factory.register(
     'checkbox', 
-    extractors=[input_checkbox_extractor, generic_required_extractor], 
-    edit_renderers=[input_checkbox_edit_renderer],
-    display_renderers=[display_checkbox_renderer])
+    extractors=[checkbox_extractor, generic_required_extractor], 
+    edit_renderers=[checkbox_edit_renderer],
+    display_renderers=[checkbox_display_renderer])
 
 factory.doc['widget']['checkbox'] = """\
 Single checkbox.

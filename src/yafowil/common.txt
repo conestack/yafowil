@@ -278,6 +278,8 @@ A checkbox widget with an value or an empty string::
     >>> widget()
     u'<div class="display-None" id="display-MYCHECKBOX">Test Checkbox</div>'
 
+    >>> widget.mode = 'edit'
+
 Checkbox extraction::
 
     >>> request = {
