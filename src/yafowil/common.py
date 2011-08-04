@@ -859,9 +859,9 @@ Content type sto accept.
 """
 
 factory.defaults['file.vocabulary'] = [
-    ('keep', 'Keep Existing file'),
-    ('replace', 'Replace existing file'),
-    ('delete', 'Delete existing file'),
+    ('keep', u'Keep Existing file'),
+    ('replace', u'Replace existing file'),
+    ('delete', u'Delete existing file'),
 ]
 
 
@@ -884,7 +884,8 @@ def submit_renderer(widget, data):
 
 factory.register(
     'submit',
-    edit_renderers=[submit_renderer])
+    edit_renderers=[submit_renderer],
+    display_renderers=[empty_display_renderer])
 
 factory.doc['widget']['submit'] = """\
 Submit tag inside the form
@@ -1188,7 +1189,8 @@ def error_renderer(widget, data):
 
 factory.register(
     'error',
-    edit_renderers=[error_renderer])
+    edit_renderers=[error_renderer],
+    display_renderers=[empty_display_renderer])
 
 factory.doc['widget']['error'] = """\
 Renders a div with an errormessage around the prior rendered output.
