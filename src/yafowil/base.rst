@@ -289,13 +289,7 @@ A failing widget::
     ... except Exception, e:
     ...    traceback.print_exc(file=sys.stdout)
     Traceback (most recent call last):
-      File "<doctest base.txt[...]>", line 2, in <module>
-        testwidget.extract({})
-      File ".../yafowil/base.py", line ..., in extract
-        data.extracted = extractor(self, data)
-       - Warning: Occurred on extract in widget "MYFAIL" with name "1"
-      File "<doctest base.txt[...]>", line 2, in fail_extractor
-        raise ValueError, 'extractor has to fail'
+    ...
     ValueError: extractor has to fail   
 
     >>> try:
@@ -303,13 +297,7 @@ A failing widget::
     ... except Exception, e:
     ...    traceback.print_exc(file=sys.stdout)
     Traceback (most recent call last):
-      File "<doctest base.txt[...]>", line 2, in <module>
-        testwidget()
-      File ".../yafowil/base.py", line ..., in __call__
-        data.rendered = renderer(self, data)
-       - Warning: Occurred on render in widget "MYFAIL" with name "1"
-      File "<doctest base.txt[...]>", line 2, in fail_edit_renderer
-        raise ValueError, 'renderer has to fail'
+    ...
     ValueError: renderer has to fail        
     
 Plausability::
