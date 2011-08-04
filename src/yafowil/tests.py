@@ -9,12 +9,12 @@ optionflags = doctest.NORMALIZE_WHITESPACE | \
               doctest.REPORT_ONLY_FIRST_FAILURE
 
 TESTFILES = [
-    'utils.txt',
-    'base.txt',
-    'common.txt',
-    'compound.txt',
-    'controller.txt',
-    'table.txt',
+    'utils.rst',
+    'base.rst',
+    'common.rst',
+    'compound.rst',
+    'controller.rst',
+    'table.rst',
 ]
 
 
