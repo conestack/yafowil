@@ -414,6 +414,12 @@ Single valued::
       <option id="input-MYSELECT-four" value="four">Four</option>
     </select>
     <BLANKLINE>
+
+    >>> widget.mode = 'display'
+    >>> widget()
+    u'<div class="display-None" id="display-MYSELECT">one</div>'
+
+    >>> widget.mode = 'edit'
     
     >>> data = widget.extract({'MYSELECT': 'two'})
     >>> pxml(widget(data=data))
@@ -473,6 +479,15 @@ Multi valued::
       </select>
     </div>
     <BLANKLINE>    
+
+    >>> widget.mode = 'display'
+    >>> pxml(widget())
+    <ul class="display-None" id="display-MYSELECT">
+      <li>One</li>
+      <li>Two</li>
+    </ul>
+    <BLANKLINE>
+    
 
 Multiple values on single valued selection fails::
 

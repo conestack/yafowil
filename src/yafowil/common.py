@@ -164,7 +164,7 @@ def input_generic_renderer(widget, data):
     return data.tag('input', **input_attrs)
 
 
-@managedprops('template')
+@managedprops('template', 'class')
 def generic_display_renderer(widget, data):
     """Generic display renderer to render a value.
     """
@@ -671,12 +671,9 @@ def select_exists_marker(widget, data):
 
 
 @managedprops('format', 'vocabulary', 'multivalued', 'disabled', *css_managed_props)
-def select_renderer(widget, data):
+def select_edit_renderer(widget, data):
     tag = data.tag
     value = fetch_value(widget, data)
-    # Seem to be never called... keep a while
-    #if value is UNSET:
-    #    value = []
     if isinstance(value, basestring) or not hasattr(value, '__iter__'):
         value = [value]
     if not widget.attrs['multivalued'] and len(value) > 1:
@@ -737,12 +734,29 @@ def select_renderer(widget, data):
             tags.append(tag('div', input, text,
                             **{'id': cssid(widget, tagtype, key)}))
         return select_exists_marker(widget, data) + u''.join(tags)
+    
 
+@managedprops('template', 'class', 'multivalued')
+def select_display_renderer(widget, data):
+    value = fetch_value(widget, data)
+    if not widget.attrs['multivalued'] or not value:
+        return generic_display_renderer(widget, data)
+    attrs = {
+        'id': cssid(widget, 'display'),
+        'class_': 'display-%s' % widget.attrs['class'] or 'generic'
+    }
+    content = u''
+    vocab = dict(vocabulary(widget.attrs.get('vocabulary', [])))
+    for key in value:
+        content += data.tag('li', vocab[key])
+    return data.tag('ul', content, **attrs)
+        
 
 factory.register(
     'select',
     extractors=[select_extractor, generic_required_extractor], 
-    edit_renderers=[select_renderer])
+    edit_renderers=[select_edit_renderer],
+    display_renderers=[select_display_renderer])
 
 factory.doc['widget']['select'] = """\
 Selection Widget. Single selection as dropdown or radio-buttons. Multiple 
