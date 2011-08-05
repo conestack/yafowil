@@ -5,6 +5,9 @@ History
 1.1dev
 ------
 
+- Extend select widget for better UI control of selections and multi selections
+  [rnix, 2011-08-05]
+
 - Plumb ``node.parts.Order`` to widget node
   [rnix, 2011-07-28]
 

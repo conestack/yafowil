@@ -711,6 +711,9 @@ def select_edit_renderer(widget, data):
         return rendered
     else:
         tags = []
+        label_pos = widget.attrs['listing_label_position']
+        listing_tag = widget.attrs['listing_tag']
+        item_tag = listing_tag == 'div' and 'div' or 'li'
         for key, term in vocabulary(widget.attrs.get('vocabulary', [])):
             if widget.attrs['multivalued']:
                 tagtype = 'checkbox'
@@ -727,12 +730,19 @@ def select_edit_renderer(widget, data):
             if (disabled and disabled is not True and key in disabled) \
                or disabled is True:
                 attrs['disabled'] = 'disabled'                                 
+            
             input = tag('input', **attrs)
-            text = tag('label', term, for_=attrs['id'])
-            tags.append(tag('div', input, text,
+            if label_pos == 'inner':
+                item = tag('label', term, input, for_=attrs['id'])
+            elif label_pos == 'after':
+                item = input + tag('label', term, for_=attrs['id'])
+            else:
+                item = tag('label', term, for_=attrs['id']) + input
+            tags.append(tag(item_tag, item,
                             **{'id': cssid(widget, tagtype, key)}))
-        return select_exists_marker(widget, data) + u''.join(tags)
-    
+        return select_exists_marker(widget, data) + \
+            tag(listing_tag, *tags, **{'id': cssid(widget, tagtype, 'wrapper')})
+
 
 @managedprops('template', 'class', 'multivalued')
 def select_display_renderer(widget, data):
@@ -766,6 +776,18 @@ factory.defaults['select.multivalued'] = None
 factory.defaults['select.default'] = []
 
 factory.defaults['select.format'] = 'block'
+
+factory.defaults['select.listing_tag'] = 'div'
+factory.doc['props']['select.listing_tag'] = """\
+Desired rendering tag for selection if selection format is 'single'. Valid
+values are 'div' and 'ul'.
+"""
+
+factory.defaults['select.listing_label_position'] = 'before'
+factory.doc['props']['select.listing_label_position'] = """\
+Label position if format is 'single'. Behaves the same way as label widget
+position property.
+"""
 
 factory.doc['props']['select.vocabulary'] = """\
 Vocabulary to be used for the selection list. Expects a dict-like or an iterable 
