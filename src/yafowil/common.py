@@ -668,7 +668,9 @@ def select_exists_marker(widget, data):
     return tag('input', **attrs)
 
 
-@managedprops('format', 'vocabulary', 'multivalued', 'disabled', *css_managed_props)
+@managedprops('format', 'vocabulary', 'multivalued', 'disabled', 
+              'listing_label_position', 'listing_tag', 
+              *css_managed_props)
 def select_edit_renderer(widget, data):
     tag = data.tag
     value = fetch_value(widget, data)
