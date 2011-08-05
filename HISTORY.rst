@@ -2,8 +2,8 @@
 History
 =======
 
-1.1dev
-------
+1.1
+---
 
 - Extend select widget for better UI control of selections and multi selections
   [rnix, 2011-08-05]
