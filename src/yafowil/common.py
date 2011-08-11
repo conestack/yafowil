@@ -185,7 +185,7 @@ def generic_display_renderer(widget, data):
 def empty_display_renderer(widget, data):
     """Display renderer which renders an empty string.
     """
-    return u''
+    return data.rendered or u''
 
 
 ###############################################################################

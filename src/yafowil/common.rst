@@ -818,7 +818,7 @@ Single selection extraction with value::
     >>> data.printtree()
     <RuntimeData myselect, value='two', extracted='one' at ...>
 
-Single selection extraction disabled (means browser does not post the value) 
+Single selection extraction disabled (means browser does not post the value)
 with value::
 
     >>> widget.attrs['disabled'] = True
@@ -944,18 +944,18 @@ Multiselection, partly disabled, non-empty request::
     ...     'myselect-exists': True,
     ... }
     
-Explanation: 
-* one is a simple value as usal, 
+Explanation:
+* one is a simple value as usal,
 * two is disabled and in value, so it should be kept in.
 * three is disabled and not in value, so it should kept out,
-* four is disabled and in value, but someone removed it in the request, it 
+* four is disabled and in value, but someone removed it in the request, it
   should get recovered,
-* five is disabled and not in value, but someone put it in the request. it 
+* five is disabled and not in value, but someone put it in the request. it
   should get removed.
-    
+
     >>> data = widget.extract(request)
     >>> data.printtree()
-    <RuntimeData myselect, value=['one', 'two', 'four'], 
+    <RuntimeData myselect, value=['one', 'two', 'four'],
     extracted=['one', 'two', 'four'] at ...>
 
 
@@ -1174,7 +1174,7 @@ Render with help text::
 
 Field Widget
 ------------
-    
+
 Chained file inside field with label::
 
     >>> widget = factory(
@@ -1385,10 +1385,17 @@ Chained password inside error inside field::
     </div>
     <BLANKLINE>
 
+    >>> widget = factory('error:text', name='mydisplay',
+    ...                  value='somevalue',
+    ...                  mode='display')
+    >>> widget()
+    u'<div class="display-text" id="display-mydisplay">somevalue</div>'
+
 
 Email Widget
 ------------
 
+::
     >>> widget = factory(
     ...     'email',
     ...     name='email')

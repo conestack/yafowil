@@ -2,6 +2,14 @@
 History
 =======
 
+1.1.1
+-----
+
+- Bugfix: mode ``display`` did eat up all previous renderings. This made error 
+  widget fail in display mode to show the value. Fixed: empty_display_renderer
+  proxies now all previous rendered.
+  [jensens, 2011-08-11]
+
 1.1
 ---
 
