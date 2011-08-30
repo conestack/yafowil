@@ -2,6 +2,12 @@
 History
 =======
 
+1.1.2
+-----
+
+- traceback supplement is now better formatted. 
+  [jensens, 2011-08-30]
+
 1.1.1
 -----
 

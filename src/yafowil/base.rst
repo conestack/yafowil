@@ -84,6 +84,15 @@ It fails if if root element name is wrong::
     ...
     KeyError: 'Invalid name of root element'
 
+It fails if sub path element is wrong::
+
+    >>> fetched = data['fieldset']['age'].fetch('root.unknown') 
+    Traceback (most recent call last):
+    ...
+        data = data[key]
+       - __traceback_info__: fetch path: ['root', 'unknown']
+    ...
+    KeyError: 'unknown'
 
 Base Widget
 -----------
@@ -174,7 +183,7 @@ Preprocessor is only called once!::
     >>> data.attrs['test_preprocessor']
     'reset'    
     
-Different cases, 
+Different cases,
 
 a.1) defaults: edit::     
     
@@ -289,6 +298,12 @@ A failing widget::
     ... except Exception, e:
     ...    traceback.print_exc(file=sys.stdout)
     Traceback (most recent call last):
+    ...
+        data.extracted = extractor(self, data)
+        yafowil widget processing info:
+        - widget: MYFAIL
+        - task  : extract
+        - descr : with name "1"
     ...
     ValueError: extractor has to fail   
 
@@ -468,12 +483,12 @@ widget tree::
 Request chains via factory
 --------------------------
 
-Sometimes we want to wrap inputs by UI candy, primary for usability reasons. 
+Sometimes we want to wrap inputs by UI candy, primary for usability reasons.
 This might be a label, some error output or div around. We dont want to register
 an amount of X possible widgets with an amount of Y possible wrappers. Therefore
-we can factor a widget in a chain defined colon-separated, i.e 'outer:inner' or 
-'field:error:text'. Chaining works for all parts: edit_renderers, extractors, 
-preprocessors and builders. Most inner and first executed is right (we prefix 
+we can factor a widget in a chain defined colon-separated, i.e 'outer:inner' or
+'field:error:text'. Chaining works for all parts: edit_renderers, extractors,
+preprocessors and builders. Most inner and first executed is right (we prefix
 with wrappers)!. The chain can be defined as list instead of a colon seperated
 string as well::
 
@@ -558,8 +573,8 @@ BBB, w/o display_renderer::
 
 Prefixes with widgets and factories
 -----------------------------------
- 
-Factory called widget attributes should now about its factory name with a 
+
+Factory called widget attributes should now about its factory name with a
 prefix:: 
 
     >>> def prefix_renderer(widget, data):

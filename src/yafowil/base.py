@@ -56,6 +56,7 @@ class RuntimeData(object):
         data = self.root
         if path[0] != data.__name__:
             raise KeyError, 'Invalid name of root element'
+        __traceback_info__ = 'fetch path: %s' % path
         for key in path[1:]:
             data = data[key]
         return data
@@ -114,9 +115,13 @@ class TBSupplementWidget(object):
             name = widget.dottedpath
         except ValueError:                                  #pragma NO COVERAGE
             name = '(name not set)'                         #pragma NO COVERAGE
-        self.warnings = ['Occurred on %s in widget "%s" %s' % \
-                         (task, name, descr)]     
-
+        self._info =  '    yafowil widget processing info:\n' 
+        self._info += '    - widget: %s\n' % name
+        self._info += '    - task  : %s\n' % task
+        self._info += '    - descr : %s' % descr
+    
+    def getInfo(self):        
+        return self._info            
 
 class WidgetAttributes(NodeAttributes):
     
