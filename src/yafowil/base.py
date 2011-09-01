@@ -115,13 +115,22 @@ class TBSupplementWidget(object):
             name = widget.dottedpath
         except ValueError:                                  #pragma NO COVERAGE
             name = '(name not set)'                         #pragma NO COVERAGE
-        self._info =  '    yafowil widget processing info:\n' 
-        self._info += '    - widget: %s\n' % name
-        self._info += '    - task  : %s\n' % task
-        self._info += '    - descr : %s' % descr
+        self.name = name
+        self.task = task
+        self.descr = descr
     
-    def getInfo(self):        
-        return self._info            
+    def getInfo(self, html=1):
+        if not html:
+            info =  '    yafowil widget processing info:\n' 
+            info += '    - widget: %s\n' % self.name
+            info += '    - task  : %s\n' % self.task
+            info += '    - descr : %s' % self.descr
+            return info
+        tag = Tag(lambda x: x)
+        li = tag('li', 'widget: ', tag('strong', self.name))
+        li += tag('li', 'task: ', tag('strong', self.task))
+        li += tag('li', 'description: ', tag('strong', self.descr))
+        return  tag('p', 'yafowil widget processing info:', tag('ul', li))        
 
 class WidgetAttributes(NodeAttributes):
     

@@ -5,6 +5,12 @@ History
 1.1.2
 -----
 
+- traceback supplement now with html support. test for html part is missing for now.  
+  [jensens, 2011-09-01]
+
+1.1.2
+-----
+
 - traceback supplement is now better formatted. 
   [jensens, 2011-08-30]
 
