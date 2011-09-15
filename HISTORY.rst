@@ -2,7 +2,13 @@
 History
 =======
 
-1.1.2
+1.1.4dev
+--------
+
+- fix traceback test
+  [rnix, 2011-09-15]
+
+1.1.3
 -----
 
 - traceback supplement now with html support. test for html part is missing for now.  
