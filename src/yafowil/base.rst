@@ -298,6 +298,18 @@ A failing widget::
     ... except Exception, e:
     ...    traceback.print_exc(file=sys.stdout)
     Traceback (most recent call last):
+      ...
+        data.extracted = extractor(self, data)
+    <p>yafowil widget processing info:<ul><li>widget: 
+    <strong>MYFAIL</strong></li><li>task: 
+    <strong>extract</strong></li><li>description: 
+    <strong>with name "1"</strong></li></ul></p>
+      ...
+    ValueError: extractor has to fail
+
+XXX: produce non html output test, currently html is default::
+
+    Traceback (most recent call last):
     ...
         data.extracted = extractor(self, data)
         yafowil widget processing info:
