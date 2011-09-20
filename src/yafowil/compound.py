@@ -18,8 +18,7 @@ def compound_extractor(widget, data):
             for structuralchildname in child:
                 compound_extractor(child[structuralchildname], data)
         else:
-            childdata = child.extract(data.request, parent=data)
-    return
+            child.extract(data.request, parent=data)
 
 
 def compound_renderer(widget, data):
@@ -45,8 +44,9 @@ factory.register(
     edit_renderers=[compound_renderer],
     display_renderers=[compound_renderer])
 
-factory.doc['widget']['compound'] = """\
-A compound of widgets. This widget is a node which can contain sub-widgets.
+factory.doc['blueprint']['compound'] = """\
+A blueprint to create a compound of widgets. This blueprint creates a node. A
+node can contain sub-widgets.
 """
 
 factory.defaults['structural'] = False
@@ -75,7 +75,7 @@ factory.register(
     display_renderers=factory.display_renderers('compound') + \
         [fieldset_renderer])
 
-factory.doc['widget']['fieldset'] = """\
+factory.doc['blueprint']['fieldset'] = """\
 Renders a fieldset around the prior rendered output.
 """
 
@@ -111,8 +111,8 @@ factory.register(
     display_renderers=factory.display_renderers('compound') + \
         [form_display_renderer])
 
-factory.doc['widget']['form'] = """\
-A html-form element. It is intended as a compound of widgets. 
+factory.doc['blueprint']['form'] = """\
+A html-form element as a compound of widgets. 
 """
 
 factory.defaults['form.method'] = 'post'

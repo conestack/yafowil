@@ -21,7 +21,7 @@ factory.register(
     edit_renderers=factory.edit_renderers('compound') + [table_renderer],
     display_renderers=factory.display_renderers('compound') + [table_renderer])
 
-factory.doc['widget']['table'] = """\
+factory.doc['blueprint']['table'] = """\
 ``<table>`` compound widget for table creation.
 """
 
@@ -36,7 +36,7 @@ factory.register(
     edit_renderers=factory.edit_renderers('compound') + [thead_renderer],
     display_renderers=factory.display_renderers('compound') + [thead_renderer])
 
-factory.doc['widget']['thead'] = """\
+factory.doc['blueprint']['thead'] = """\
 ``<thead>`` compound widget for table creation.
 """
 
@@ -51,7 +51,7 @@ factory.register(
     edit_renderers=factory.edit_renderers('compound') + [tbody_renderer],
     display_renderers=factory.display_renderers('compound') + [tbody_renderer])
 
-factory.doc['widget']['tbody'] = """\
+factory.doc['blueprint']['tbody'] = """\
 ``<tbody>`` compound widget for table creation.
 """
 
@@ -71,7 +71,7 @@ factory.register(
     edit_renderers=factory.edit_renderers('compound') + [tr_renderer],
     display_renderers=factory.display_renderers('compound') + [tr_renderer])
 
-factory.doc['widget']['tr'] = """\
+factory.doc['blueprint']['tr'] = """\
 ``<tr>`` compound widget for table creation.
 """
 
@@ -95,7 +95,7 @@ factory.register(
     edit_renderers=[th_renderer],
     display_renderers=[th_renderer])
 
-factory.doc['widget']['th'] = """\
+factory.doc['blueprint']['th'] = """\
 ``<th>`` compound widget for table creation.
 """
 
@@ -116,6 +116,6 @@ factory.register(
     edit_renderers=[td_renderer],
     display_renderers=[td_renderer])
 
-factory.doc['widget']['td'] = """\
+factory.doc['blueprint']['td'] = """\
 ``<td>`` compound widget for table creation.
 """

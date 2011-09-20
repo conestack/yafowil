@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 
-Common widgets
-==============
+Common Blueprints
+=================
+
+This test creates widgets from ist blueprints with different properties.
+
+Prepare
+-------
 
 Trigger registry by importing module::
 
@@ -13,8 +18,9 @@ Helper::
     >>> tag = Tag(lambda msg: msg)           
 
 
-Hidden Input Widget
--------------------
+Hidden
+------
+
 ::
     >>> from yafowil.base import factory
     >>> widget = factory(
@@ -46,8 +52,8 @@ As well does skip mode::
     u''
 
 
-Text Input Widget
------------------
+Text Input
+----------
 ::
     >>> widget = factory(
     ...     'text',
@@ -90,8 +96,8 @@ Placeholder Text Input
     placeholder="This is a placeholder." type="text" value="" />'
 
 
-Required Input Widget
----------------------
+Required Input
+--------------
 ::
     >>> widget = factory(
     ...     'text',
@@ -217,8 +223,8 @@ Skip mode renders empty string.::
     u''
 
 
-Checkbox Widget
----------------
+Checkbox
+--------
 
 A boolean checkbox widget (default)::
     
@@ -354,8 +360,8 @@ display::
     >> pxml('<div>'+widget()+'</div>')
 
 
-Textarea Widget
----------------
+Textarea
+--------
 ::
     >>> widget = factory(
     ...     'textarea',
@@ -391,10 +397,13 @@ Textarea Widget
     rows="25">Test Textarea</textarea>'
 
 
-Selection Widget
-----------------
+Selection
+---------
 
-Single valued::
+Single Valued
+.............
+
+::
 
     >>> widget = factory(
     ...     'select',
@@ -455,7 +464,10 @@ Single valued with specific options disabled::
     </select>
     <BLANKLINE>
 
-Multi valued::
+Multi valued
+............
+
+::
 
     >>> widget = factory(
     ...     'select',
@@ -541,6 +553,9 @@ Render single selection as radio buttons::
       </div>
     </div>
     <BLANKLINE>
+    
+With Radio
+..........
 
 Render single selection as radio buttons, disables all::
 
@@ -596,6 +611,9 @@ Render single selection as radio buttons, disables some::
     </div>
     <BLANKLINE>
     
+With Checkboxes
+...............
+
 Render multi selection as checkboxes::
 
     >>> widget = factory(
@@ -633,6 +651,9 @@ Render multi selection as checkboxes::
       </div>
     </div>
     <BLANKLINE>
+    
+Specials
+........
 
 Using 'ul' instead of 'div' for rendering radio or checkbox selections::
 
@@ -1039,8 +1060,8 @@ Select values::
     <RuntimeData myselect, value=<UNSET>, extracted=['one', 'two'] at ...>
 
 
-File Widget
------------
+File
+----
 ::
     >>> widget = factory('file', 'MYFILE')
     >>> widget()
@@ -1098,8 +1119,8 @@ File Widget
     type="file" value="" />'
 
 
-Submit Widget (action)
-----------------------
+Submit(action)
+--------------
 ::
     >>> props = {
     ...     'action': True,
@@ -1110,8 +1131,8 @@ Submit Widget (action)
     u'<input id="input-save" name="action.save" type="submit" value="Action name" />'
 
 
-Proxy Widget
-------------
+Proxy
+-----
 
 Used to pass hidden arguments out of form namespace::
 
@@ -1123,8 +1144,8 @@ Used to pass hidden arguments out of form namespace::
     u'<input id="input-proxy" name="proxy" type="hidden" value="2" />'
 
 
-Label Widget
-------------
+Label
+-----
 
 Default::
 
@@ -1172,8 +1193,8 @@ Render with help text::
     u'<label for="input-MYFILE">MYFILE<div class="help">Help!</div></label>'
 
 
-Field Widget
-------------
+Field
+-----
 
 Chained file inside field with label::
 
@@ -1207,8 +1228,8 @@ Render error class directly on field::
     <BLANKLINE>
 
 
-Password Widget
----------------
+Password
+--------
 
 Password widget has some additional properties, ``strength``, ``minlength``
 and ``ascii``.
@@ -1359,8 +1380,8 @@ Combine all validations::
     []
 
 
-Error Widget
-------------
+Error
+-----
 
 Chained password inside error inside field::
 
@@ -1392,8 +1413,8 @@ Chained password inside error inside field::
     u'<div class="display-text" id="display-mydisplay">somevalue</div>'
 
 
-Email Widget
-------------
+e-mail
+------
 
 ::
     >>> widget = factory(
@@ -1415,8 +1436,9 @@ Email Widget
     []
 
 
-URL Widget
-----------
+URL
+---
+
 ::
     >>> widget = factory(
     ...     'url',
@@ -1437,8 +1459,8 @@ URL Widget
     []
   
     
-Number Widget
--------------
+Number
+------
 
 Default behaviour::
 

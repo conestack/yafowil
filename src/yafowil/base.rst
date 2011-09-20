@@ -398,7 +398,9 @@ The mode::
      
 factory
 -------
-::
+
+Fill factory with test blueprints::
+
     >>> from yafowil.base import Factory
     >>> factory = Factory()
     >>> factory.register('widget_test', [test_extractor], [test_edit_renderer])
@@ -529,7 +531,7 @@ string as well::
     ...
     RuntimeError: Deprecated since 1.2, use either edit_renderers or display_renderers
     
-Colon seperated chain definition::
+Colon seperated blueprint chain definition::
     
     >>> widget = factory('outer:inner')
     >>> data = widget.extract({})
@@ -539,7 +541,7 @@ Colon seperated chain definition::
     >>> widget(data)
     u'<OUTER><INNER /></OUTER>'
 
-Chain definition as list::
+Blueprint chain definition as list::
     
     >>> widget = factory(['outer', 'inner'])
     >>> data = widget.extract({})
@@ -550,8 +552,8 @@ Chain definition as list::
     u'<OUTER><INNER /></OUTER>'
     
 
-Inject custom specials parts in the chain
------------------------------------------
+Inject custom specials blueprints into  chain
+---------------------------------------------
 
 You may need an behavior just one time and just for one special widget. Here
 you can inject your custom special render or extractor into the chain::
@@ -586,7 +588,7 @@ BBB, w/o display_renderer::
 Prefixes with widgets and factories
 -----------------------------------
 
-Factory called widget attributes should now about its factory name with a
+Factory called widget attributes should know about its factory name with a
 prefix:: 
 
     >>> def prefix_renderer(widget, data):

@@ -53,7 +53,7 @@ factory.doc['props']['autocomplete'] = \
 
 factory.defaults['placeholder'] = None
 factory.doc['props']['placeholder'] = \
-"""Whether this field has a placeholder value or not (if browser supports it).
+"""Whether this input has a placeholder value or not (if browser supports it).
 """
 
 factory.defaults['required'] = False
@@ -78,18 +78,18 @@ factory.doc['props']['size'] = \
 
 factory.defaults['disabled'] = None
 factory.doc['props']['disabled'] = \
-"""Disables field.
+"""Disables input.
 """
 
 factory.defaults['required_class_default'] = 'required'
 factory.doc['props']['required_class_default'] = \
-"""CSS-class to put on in case if required condition was not met if no specific 
-class was given.
+"""CSS-class to apply if required condition was not met - if no specific class 
+was given.
 """
 
 factory.defaults['template'] = '%s'
 factory.doc['props']['template'] = \
-"""Format string with pythons a built-in string format template. If a callable 
+"""Format string with pythons built-in string format template. If a callable 
 is given it will be used instead and is called with ``widget`` and ``data`` as 
 parameters.  
 """
@@ -198,8 +198,8 @@ factory.register(
     edit_renderers=[input_generic_renderer],
     display_renderers=[generic_display_renderer])
 
-factory.doc['widget']['text'] = \
-"""Text input widget.
+factory.doc['blueprint']['text'] = \
+"""Text input blueprint.
 """
 
 factory.defaults['text.type'] = 'text'
@@ -229,8 +229,8 @@ factory.register(
      edit_renderers=[input_generic_renderer],
      display_renderers=[empty_display_renderer])
 
-factory.doc['widget']['hidden'] = \
-"""Hidden input widget.
+factory.doc['blueprint']['hidden'] = \
+"""Hidden input blueprint.
 """
 
 factory.defaults['hidden.type'] = 'hidden'
@@ -273,7 +273,7 @@ factory.register(
     edit_renderers=[input_proxy_renderer],
     display_renderers=[empty_display_renderer])
 
-factory.doc['widget']['proxy'] = \
+factory.doc['blueprint']['proxy'] = \
 """Used to pass hidden arguments out of form namespace.
 """
 
@@ -314,8 +314,8 @@ factory.register(
     edit_renderers=[textarea_renderer],
     display_renderers=[generic_display_renderer])
 
-factory.doc['widget']['textarea'] = \
-"""HTML textarea widget.
+factory.doc['blueprint']['textarea'] = \
+"""HTML textarea blueprint.
 """
 
 factory.defaults['textarea.default'] = ''
@@ -485,8 +485,8 @@ factory.register(
     edit_renderers=[password_edit_renderer],
     display_renderers=[password_display_renderer])
 
-factory.doc['widget']['password'] = \
-"""Password widget.
+factory.doc['blueprint']['password'] = \
+"""Password blueprint.
 
 The password is never rendered to markup, instead
 ``yafowil.common.PASSWORD_NOCHANGE_VALUE`` is set as ``value`` property on
@@ -597,8 +597,8 @@ factory.register(
     edit_renderers=[checkbox_edit_renderer],
     display_renderers=[checkbox_display_renderer])
 
-factory.doc['widget']['checkbox'] = """\
-Single checkbox.
+factory.doc['blueprint']['checkbox'] = """\
+Single checkbox blueprint.
 """
 
 factory.defaults['checkbox.default'] = False
@@ -768,8 +768,8 @@ factory.register(
     edit_renderers=[select_edit_renderer],
     display_renderers=[select_display_renderer])
 
-factory.doc['widget']['select'] = """\
-Selection Widget. Single selection as dropdown or radio-buttons. Multiple 
+factory.doc['blueprint']['select'] = """\
+Selection Blueprint. Single selection as dropdown or radio-buttons. Multiple 
 selection as selection-list or as checkboxes. 
 """
     
@@ -871,8 +871,8 @@ factory.register(
     extractors=[file_extracor, generic_required_extractor],
     edit_renderers=[input_file_renderer, file_options_renderer])
 
-factory.doc['widget']['file'] = """\
-A basic file upload widget.
+factory.doc['blueprint']['file'] = """\
+A basic file upload blueprint.
 """
 
 factory.defaults['file.multivalued'] = False
@@ -911,8 +911,8 @@ factory.register(
     edit_renderers=[submit_renderer],
     display_renderers=[empty_display_renderer])
 
-factory.doc['widget']['submit'] = """\
-Submit tag inside the form
+factory.doc['blueprint']['submit'] = """\
+Submit action inside the form
 """
 
 factory.doc['props']['submit.label'] = """\
@@ -964,8 +964,8 @@ factory.register(
     extractors=[generic_extractor, generic_required_extractor, email_extractor],
     edit_renderers=[input_generic_renderer])
 
-factory.doc['widget']['email'] = \
-"""E-mail (HTML5) input widget.
+factory.doc['blueprint']['email'] = \
+"""E-mail (HTML5) input blueprint.
 """
 
 factory.defaults['email.type'] = 'email'
@@ -997,8 +997,8 @@ factory.register(
     extractors=[generic_extractor, generic_required_extractor, url_extractor],
     edit_renderers=[input_generic_renderer])
 
-factory.doc['widget']['url'] = \
-"""URL aka web address (HTML5) input widget.
+factory.doc['blueprint']['url'] = \
+"""URL aka web address (HTML5) input blueprint.
 """
 
 factory.defaults['url.type'] = 'url'
@@ -1019,8 +1019,8 @@ factory.register(
     extractors=[generic_extractor, generic_required_extractor],
     edit_renderers=[input_generic_renderer])
 
-factory.doc['widget']['search'] = """\
-Search widget (HTML5).
+factory.doc['blueprint']['search'] = """\
+Search blueprint (HTML5).
 """
 
 factory.defaults['search.type'] = 'search'
@@ -1070,8 +1070,8 @@ factory.register(
                 number_extractor],
     edit_renderers=[input_generic_renderer])
 
-factory.doc['widget']['number'] = """\
-Number widget (HTML5).
+factory.doc['blueprint']['number'] = """\
+Number blueprint (HTML5).
 """
 
 factory.defaults['number.type'] = 'number'
@@ -1133,8 +1133,8 @@ factory.register(
     edit_renderers=[label_renderer],
     display_renderers=[label_renderer])
 
-factory.doc['widget']['label'] = """\
-Label widget.
+factory.doc['blueprint']['label'] = """\
+Label blueprint.
 """
 
 factory.defaults['label.position'] = 'before'
@@ -1183,7 +1183,7 @@ factory.register(
     edit_renderers=[field_renderer],
     display_renderers=[field_renderer])
 
-factory.doc['widget']['field'] = """\
+factory.doc['blueprint']['field'] = """\
 Renders a div with an class field around the prior rendered output. This is 
 supposed to be used for styling and grouping purposes.
 """
@@ -1216,7 +1216,7 @@ factory.register(
     edit_renderers=[error_renderer],
     display_renderers=[empty_display_renderer])
 
-factory.doc['widget']['error'] = """\
+factory.doc['blueprint']['error'] = """\
 Renders a div with an errormessage around the prior rendered output.
 """
 

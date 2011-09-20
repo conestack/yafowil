@@ -1,8 +1,8 @@
 Table rendering
 ---------------
 
-Table elements are available as widgets as well, often you want to organize
-your form elements inside a table to provide pretty looking forms::
+Table elements are available as blueprints, often one wanta to organize
+form elements inside a table, providing pretty looking forms::
 
     >>> from yafowil.base import factory
     >>> import yafowil.common

@@ -384,44 +384,46 @@ class Widget(object):
 class Factory(object):
     
     def __init__(self):
-        self._factories = dict()
+        self._blueprints = dict()
         self._global_preprocessors = list()
         self.defaults = dict()
         self.doc = {
             'props': dict(),
-            'widget': dict(),
+            'blueprint': dict(),
         }
         
     def register(self, name, extractors=[], edit_renderers=[], 
                  preprocessors=[], builders=[], display_renderers=[]):
+        """Registers a blueprint in the factory.
+        """
         if name.startswith('*'):
             raise ValueError, 'Asterisk * as first char not allowed as name.'
         if ':' in name:
             raise ValueError, 'Colon : as char not allowed in name.'
-        self._factories[name] = (extractors, edit_renderers, 
+        self._blueprints[name] = (extractors, edit_renderers, 
                                  preprocessors, builders, display_renderers)
         
     def register_global_preprocessors(self, preprocessors):
         self._global_preprocessors += preprocessors
         
-    def __call__(self, reg_names, 
+    def __call__(self, blueprints, 
                  name=None, 
                  value=UNSET, 
                  props=dict(),
                  custom=dict(),
                  mode="edit"):
-        """Creates a widget.
+        """Creates a widget from blueprints.
         
-        ``reg_names``
-            a string or list defining which widget(s) to build. If reg_names is
-            a string it contains a colon separated list of names in the
-            registry. To create a simple text widget from common its ``text``.
-            To wrap a text widget with a label it is ``label:text``. Latter
-            concatenates the chains of both. registrations. Custom chains not
-            registered in the registry can be added by using the asterisk 
-            syntax. I.e. injecting an validating extractor works with 
-            ``label:*myextractor:text``. Latter implies to use the ``custom`` 
-            keyword argument (see below)   
+        ``blueprints``
+            chain of blueprint names. Either a colon separated string or a list 
+            of strings defining which widget to build.             
+            I.e. creating a simple text widget use ``"text"``. Wrapping a text 
+            blueprint with a label use ``"label:text"`` or 
+            ``["label", "text"]``.  
+            Custom blueprints not registered in the registry are added using the 
+            asterisk syntax. I.e. inject a validating extractor with 
+            ``label:*myextractor:text`` and use the ``custom`` keyword argument 
+            (see below).
             
         ``name``
             a name for the widget. optional. if not set it has to be set later
@@ -429,8 +431,8 @@ class Factory(object):
             if not set the widget wont work. 
             
         ``value``
-            a value or a callable used as getter. if a callable is given it has 
-            to accept the widget and runtime data as argument.
+            a value or a callable used as getter. If callable is given it has 
+            to accept widget and runtime-data as argument.
             
         ``props``
             dict-like object containing properties to be copied to widgets 
@@ -439,22 +441,23 @@ class Factory(object):
         ``custom`` 
             dict, where keys are matching to asterisk prefixed custom chains.
             each chains part is tuple with 4 lists of callables: extractors, 
-            renderers, preprocessors, builders.   
+            renderers, preprocessors, builders, display_renderers.   
         
         ``mode``
-            either a callable returning one of 'edit', 'display', 'skip' or
-            direct value. Defaults to 'edit'.
+            either a callable (widget and runtime-data as argument) or string 
+            returning one of 'edit', 'display', 'skip' or direct value. 
+            Defaults to 'edit'.
         """
         extractors = list()
         edit_renderers = list()
         disp_renderers = list()
         preprocessors = list()
         builders = list()
-        if isinstance(reg_names, basestring):
-            reg_names = reg_names.split(':')
-        for reg_name in reg_names:
-            if reg_name.startswith('*'):
-                part_name = reg_name[1:]
+        if isinstance(blueprints, basestring):
+            blueprints = blueprints.split(':')
+        for blueprint in blueprints:
+            if blueprint.startswith('*'):
+                part_name = blueprint[1:]
                 if len(custom[part_name]) < 5:
                     # BBB:
                     ex, eren, pre, bui = custom[part_name]
@@ -462,8 +465,8 @@ class Factory(object):
                 else:
                     ex, eren, pre, bui, dren = custom[part_name]
             else:                   
-                part_name = reg_name
-                ex, eren, pre, bui, dren  = self._factories[part_name]
+                part_name = blueprint
+                ex, eren, pre, bui, dren  = self._blueprints[part_name]
             extractors = [(part_name, _) for _ in ex]  + extractors
             edit_renderers = [(part_name, _) for _ in eren] + edit_renderers
             disp_renderers = [(part_name, _) for _ in dren] + disp_renderers
@@ -486,28 +489,28 @@ class Factory(object):
         return widget
     
     def extractors(self, name):
-        return self._factories[name][0]
+        return self._blueprints[name][0]
     
     def renderers(self, name):
         raise RuntimeError, 'Deprecated since 1.2, use either edit_renderers '+\
                             'or display_renderers'
 
     def edit_renderers(self, name):
-        return self._factories[name][1]
+        return self._blueprints[name][1]
 
     def display_renderers(self, name):
-        return self._factories[name][1]
+        return self._blueprints[name][1]
 
     def preprocessors(self, name):
-        return self._global_preprocessors + self._factories[name][2]
+        return self._global_preprocessors + self._blueprints[name][2]
 
     def builders(self, name):
-        return self._factories[name][3]
+        return self._blueprints[name][3]
 
 factory = Factory()        
         
 def fetch_value(widget, data):
-    """Fetch extracted, given value or default .
+    """Fetch extracted, either form-data, value or default .
     """
     if data.extracted is not UNSET:
         return data.extracted
