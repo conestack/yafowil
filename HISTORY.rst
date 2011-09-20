@@ -2,8 +2,11 @@
 History
 =======
 
-1.1.4dev
+1.2
 --------
+
+- naming makes a difference between blueprints and widgets
+  [jensens, 2011-09-20]
 
 - fix traceback test
   [rnix, 2011-09-15]

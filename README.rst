@@ -9,7 +9,7 @@ web-framework.
 It's all just about rendering widgets and extracting the data returned from the
 browser per widget. It does not fight with storage.
 
-Yafowil widgets are a bit different: Its all just configuration. No
+YAFOWIL vary from most other HTML form packages: Its all just configuration. No
 subclassing needed any more; no specific schema-framework is necessary.
 
 Yafowil provides a factory where you can fetch your widgets instances from.
