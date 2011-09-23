@@ -62,15 +62,19 @@ Wrapped compound
     >>> wrapped_compound['inner2'] = factory('text', value='value2', 
     ...                                      props={'required': True})
     >>> pxml(wrapped_compound())
-    <div id="div-WRAPPED_COMPOUND">
+    <div>
       <input class="text" id="input-WRAPPED_COMPOUND-inner" name="WRAPPED_COMPOUND.inner" type="text" value="value1"/>
       <input class="required text" id="input-WRAPPED_COMPOUND-inner2" name="WRAPPED_COMPOUND.inner2" required="required" type="text" value="value2"/>
     </div>
     <BLANKLINE>
     
-    >>> wrapped_compound = factory('div', name='WRAPPED_COMPOUND', mode='display')
+    >>> wrapped_compound = factory(
+    ...     'div',
+    ...     name='WRAPPED_COMPOUND',
+    ...     props={'class': 'foo'},
+    ...     mode='display')
     >>> pxml(wrapped_compound())
-    <div id="div-WRAPPED_COMPOUND"/>
+    <div class="foo"/>
     <BLANKLINE>
 
 

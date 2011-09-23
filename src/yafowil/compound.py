@@ -59,7 +59,6 @@ will not have an own runtime-data.
 @managedprops(*css_managed_props)
 def div_renderer(widget, data):
     attrs = {
-        'id': cssid(widget, 'div'),
         'class_': cssclasses(widget, data)
     }
     rendered = data.rendered
