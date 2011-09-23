@@ -2,8 +2,14 @@
 History
 =======
 
-1.2
+1.2.1dev
 --------
+
+- Add ``div`` blueprint. Like ``compound`` but renders within '<div>' element.
+  [rnix, 2011-09-23]
+
+1.2
+---
 
 - naming makes a difference between blueprints and widgets
   [jensens, 2011-09-20]

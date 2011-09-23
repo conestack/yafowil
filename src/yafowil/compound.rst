@@ -1,3 +1,6 @@
+Compound
+--------
+
 Preparation::
 
     >>> import yafowil.common
@@ -48,7 +51,33 @@ Compound display renderers, same as edit renderers::
     <div/>
     <BLANKLINE>
 
-Test Fieldset::
+
+Wrapped compound
+----------------
+
+::
+
+    >>> wrapped_compound = factory('div', name='WRAPPED_COMPOUND')
+    >>> wrapped_compound['inner']  = factory('text', value='value1')
+    >>> wrapped_compound['inner2'] = factory('text', value='value2', 
+    ...                                      props={'required': True})
+    >>> pxml(wrapped_compound())
+    <div id="div-WRAPPED_COMPOUND">
+      <input class="text" id="input-WRAPPED_COMPOUND-inner" name="WRAPPED_COMPOUND.inner" type="text" value="value1"/>
+      <input class="required text" id="input-WRAPPED_COMPOUND-inner2" name="WRAPPED_COMPOUND.inner2" required="required" type="text" value="value2"/>
+    </div>
+    <BLANKLINE>
+    
+    >>> wrapped_compound = factory('div', name='WRAPPED_COMPOUND', mode='display')
+    >>> pxml(wrapped_compound())
+    <div id="div-WRAPPED_COMPOUND"/>
+    <BLANKLINE>
+
+
+Fieldset
+--------
+
+::
 
     >>> compound = factory('fieldset', 
     ...                    'COMPOUND',
@@ -93,10 +122,10 @@ Form display renderer::
     u'<div></div>'
 
   
-Hello World
------------
+Form
+----
 
-A simple hello world form works like so::
+::
 
     >>> from yafowil.base import factory
     >>> from yafowil.controller import Controller

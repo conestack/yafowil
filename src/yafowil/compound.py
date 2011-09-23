@@ -56,6 +56,28 @@ will not have an own runtime-data.
 """
 
 
+@managedprops(*css_managed_props)
+def div_renderer(widget, data):
+    attrs = {
+        'id': cssid(widget, 'div'),
+        'class_': cssclasses(widget, data)
+    }
+    rendered = data.rendered
+    return data.tag('div', rendered, **attrs)   
+
+
+factory.register(
+    'div', 
+    extractors=factory.extractors('compound'), 
+    edit_renderers=factory.edit_renderers('compound') + [div_renderer],
+    display_renderers=factory.display_renderers('compound') + \
+        [div_renderer])
+
+factory.doc['blueprint']['div'] = """\
+Like ``compound`` blueprint but renders within '<div>' element.
+"""
+
+
 @managedprops('legend', *css_managed_props)
 def fieldset_renderer(widget, data):
     fs_attrs = {
