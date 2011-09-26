@@ -8,6 +8,14 @@ History
 - Add ``div`` blueprint. Like ``compound`` but renders within '<div>' element.
   [rnix, 2011-09-23]
 
+- Pass ``blueprints`` and ``custom`` arguments to Widget constructor in factory
+  for debugging and duplication purposes.
+  [rnix, 2011-09-26]
+
+- Rename ``yafowil.base.Widget._properties`` to
+  ``yafowil.base.Widget.properties``.
+  [rnix, 2011-09-26]
+
 1.2
 ---
 

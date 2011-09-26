@@ -180,11 +180,22 @@ class Widget(object):
         OdictStorage,
     )
     
-    def __init__(self, extractors, edit_renderers, display_renderers, 
-                 preprocessors, uniquename=None, value_or_getter=UNSET, 
-                 properties=dict(), defaults=dict(), mode='edit'
-                 ):
+    def __init__(self,
+                 blueprints,
+                 extractors,
+                 edit_renderers,
+                 display_renderers, 
+                 preprocessors,
+                 uniquename=None,
+                 value_or_getter=UNSET, 
+                 properties=dict(),
+                 custom=dict(),
+                 defaults=dict(),
+                 mode='edit'):
         """Initialize the widget. 
+        
+        ``blueprints``
+            The blueprint names used to create this widget as list of strings.
             
         ``extractors``
             list of tuples with chain part name and callables extracting the 
@@ -221,11 +232,14 @@ class Widget(object):
             
         ``value_or_getter``
             either a callable or the value itself. If callable, its called 
-            before passing to given ``renderer`` 
+            before passing to given ``renderer`` .
                         
         ``properties``
             arbitrary dict-like passed through for use in renderer and 
             extractor, static data must never be modifed!
+        
+        ``custom``
+            Definitions for custom factory chain parts.
             
         ``defaults``
             a dict with defaults value for the widgets attributes.
@@ -238,6 +252,7 @@ class Widget(object):
         self.__name__ = uniquename
         self.__parent__ = None
         self.attributes_factory = WidgetAttributes
+        self.blueprints = blueprints
         self.getter = value_or_getter
         self.mode = mode
         self.extractors = extractors
@@ -248,9 +263,10 @@ class Widget(object):
         self._lock = RLock()
         self.current_prefix = None
         # keep properties for use in dottedpath to avoid recursion errors
-        self._properties = properties
+        self.properties = properties
         for key in properties:
             self.attrs[key] = properties[key]
+        self.custom = custom
             
     def lock(self):
         self._lock.acquire()
@@ -347,7 +363,7 @@ class Widget(object):
         path = list()
         node = self
         while node is not None:
-            if not node._properties.get('structural'):
+            if not node.properties.get('structural'):
                 path.append(node.__name__)
             node = node.__parent__
         path.reverse()
@@ -473,13 +489,15 @@ class Factory(object):
             preprocessors = preprocessors + [(part_name, _) for _ in pre]
             builders      = builders + [(part_name, _) for _ in bui]            
         global_pre  = [('__GLOBAL__', _) for _ in self._global_preprocessors]
-        widget = Widget(extractors, 
+        widget = Widget(blueprints,
+                        extractors, 
                         edit_renderers, 
                         disp_renderers, 
                         global_pre + preprocessors,
                         uniquename=name, 
                         value_or_getter=value, 
                         properties=props,
+                        custom=custom,
                         defaults=self.defaults,
                         mode=mode)
         for part_name, builder_func in builders:
