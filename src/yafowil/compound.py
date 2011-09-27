@@ -17,13 +17,18 @@ def compound_extractor(widget, data):
         child = widget[childname]
         if child.attrs.get('structural'):
             for structuralchildname in child:
-                compound_extractor(child[structuralchildname], data)
+                structuralchild = child[structuralchildname]
+                if len(structuralchild) \
+                  and structuralchild.attrs.get('structural'):
+                    # call compound extractor if structural child has children
+                    # which are as well structural compounds.
+                    compound_extractor(structuralchild, data)
+                else:
+                    # call extract on widget directly
+                    structuralchild.extract(data.request, parent=data)
         else:
             child.extract(data.request, parent=data)
-    extracted = odict()
-    for k, v in data.items():
-        extracted[k] = v.extracted
-    return extracted
+    return odict([(k, v.extracted) for k, v in data.items()])
 
 
 def compound_renderer(widget, data):
@@ -34,9 +39,9 @@ def compound_renderer(widget, data):
     for childname in widget:
         child = widget[childname]
         if child.attrs.get('structural'):
-            # XXX: how to handle preset values from compound on structural
-            #      children?
             subdata = data
+            if value is not UNSET and child.getter is UNSET:
+                child.getter = value
         else:
             subdata = data.get(childname, None)
             if value is not UNSET and childname in value:

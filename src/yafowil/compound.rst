@@ -17,8 +17,7 @@ Render Compound with values set via compound widget::
     ... }
     >>> compound = factory('compound', name='COMPOUND', value=value)
     >>> compound['inner']  = factory('text')
-    >>> compound['inner2'] = factory('text', 
-    ...                              props={'required': True})
+    >>> compound['inner2'] = factory('text', props={'required': True})
     >>> pxml(tag('div', compound()))
     <div>
       <input class="text" id="input-COMPOUND-inner" name="COMPOUND.inner" type="text" value="Value 1 from parent"/>
@@ -57,13 +56,19 @@ Extract Compound empty::
     extracted=odict([('inner', <UNSET>), ('inner2', <UNSET>)]) at ...> 
 
     >>> data['inner']
-    <RuntimeData COMPOUND.inner, value='value1', extracted=<UNSET> at ...>    
+    <RuntimeData COMPOUND.inner, value='value1', extracted=<UNSET> at ...>
+    
+    >>> data.extracted
+    odict([('inner', <UNSET>), ('inner2', <UNSET>)])
 
 Extract with a value in request::
 
     >>> data = compound.extract({'COMPOUND.inner': 'newvalue'})
     >>> data['inner']
-    <RuntimeData COMPOUND.inner, value='value1', extracted='newvalue' at ...>    
+    <RuntimeData COMPOUND.inner, value='value1', extracted='newvalue' at ...> 
+    
+    >>> data.extracted
+    odict([('inner', 'newvalue'), ('inner2', <UNSET>)])
 
 Extract with empty required, error should be there::
 
@@ -78,6 +83,129 @@ Compound display renderers, same as edit renderers::
     >>> pxml(tag('div', compound()))
     <div/>
     <BLANKLINE>
+
+Compound with structural compound as child::
+
+    >>> value = {
+    ...     'inner': 'Value 1 from parent',
+    ...     'inner2': 'Value 2 from parent',
+    ... }
+    >>> compound = factory('compound', name='COMPOUND', value=value)
+    >>> structural = compound['STRUCTURAL'] = factory(
+    ...     'compound',
+    ...     props={'structural': True})
+    >>> structural['inner']  = factory('text')
+    >>> structural['inner2'] = factory('text', props={'required': True})
+    >>> pxml(tag('div', compound()))
+    <div>
+      <input class="text" id="input-COMPOUND-inner" name="COMPOUND.inner" type="text" value="Value 1 from parent"/>
+      <input class="required text" id="input-COMPOUND-inner2" name="COMPOUND.inner2" required="required" type="text" value="Value 2 from parent"/>
+    </div>
+    <BLANKLINE>
+    
+    >>> compound.printtree()
+    <class 'yafowil.base.Widget'>: COMPOUND
+      <class 'yafowil.base.Widget'>: STRUCTURAL
+        <class 'yafowil.base.Widget'>: inner
+        <class 'yafowil.base.Widget'>: inner2
+    
+    >>> data = compound.extract({
+    ...     'COMPOUND.inner': 'newvalue',
+    ...     'COMPOUND.inner2': '',
+    ... })
+    >>> data.printtree()
+    <RuntimeData COMPOUND, value={'inner2': 'Value 2 from parent', 'inner': 'Value 1 from parent'}, extracted=odict([('inner', 'newvalue'), ('inner2', '')]) at ...>
+      <RuntimeData COMPOUND.inner, value='Value 1 from parent', extracted='newvalue' at ...>
+      <RuntimeData COMPOUND.inner2, value='Value 2 from parent', extracted='', 1 error(s) at ...>
+    
+    >>> data.extracted
+    odict([('inner', 'newvalue'), ('inner2', '')])
+
+Compound with compound as child::
+
+    >>> value = {
+    ...     'CHILD_COMPOUND': {
+    ...         'inner': 'Value 1 from parent',
+    ...         'inner2': 'Value 2 from parent',
+    ...     }
+    ... }
+    >>> compound = factory('compound', name='COMPOUND', value=value)
+    >>> child_compound = compound['CHILD_COMPOUND'] = factory('compound')
+    >>> child_compound['inner']  = factory('text')
+    >>> child_compound['inner2'] = factory('text', props={'required': True})
+    >>> pxml(tag('div', compound()))
+    <div>
+      <input class="text" id="input-COMPOUND-CHILD_COMPOUND-inner" name="COMPOUND.CHILD_COMPOUND.inner" type="text" value="Value 1 from parent"/>
+      <input class="required text" id="input-COMPOUND-CHILD_COMPOUND-inner2" name="COMPOUND.CHILD_COMPOUND.inner2" required="required" type="text" value="Value 2 from parent"/>
+    </div>
+    <BLANKLINE>
+    
+    >>> data = compound.extract({
+    ...     'COMPOUND.CHILD_COMPOUND.inner': 'newvalue',
+    ...     'COMPOUND.CHILD_COMPOUND.inner2': 'newvalue2',
+    ... })
+    >>> data.printtree()
+    <RuntimeData COMPOUND, value={'CHILD_COMPOUND': {'inner2': 'Value 2 from parent', 'inner': 'Value 1 from parent'}}, extracted=odict([('CHILD_COMPOUND', odict([('inner', 'newvalue'), ('inner2', 'newvalue2')]))]) at ...>
+      <RuntimeData COMPOUND.CHILD_COMPOUND, value={'inner2': 'Value 2 from parent', 'inner': 'Value 1 from parent'}, extracted=odict([('inner', 'newvalue'), ('inner2', 'newvalue2')]) at ...>
+        <RuntimeData COMPOUND.CHILD_COMPOUND.inner, value='Value 1 from parent', extracted='newvalue' at ...>
+        <RuntimeData COMPOUND.CHILD_COMPOUND.inner2, value='Value 2 from parent', extracted='newvalue2' at ...>
+
+    >>> data.extracted
+    odict([('CHILD_COMPOUND', 
+    odict([('inner', 'newvalue'), 
+    ('inner2', 'newvalue2')]))])
+
+
+Compound with structural compound with compound as children::
+
+    >>> value = {
+    ...     'CHILD_COMPOUND': {
+    ...         'inner': 'Value 1 from parent',
+    ...         'inner2': 'Value 2 from parent',
+    ...     }
+    ... }
+    >>> compound = factory('compound', name='COMPOUND', value=value)
+    >>> structural = compound['STRUCTURAL'] = factory(
+    ...     'compound',
+    ...     props={'structural': True})
+    >>> child_compound = structural['CHILD_COMPOUND'] = factory('compound')
+    >>> child_compound['inner']  = factory('text')
+    >>> child_compound['inner2'] = factory('text', props={'required': True})
+    >>> pxml(tag('div', compound()))
+    <div>
+      <input class="text" id="input-COMPOUND-CHILD_COMPOUND-inner" name="COMPOUND.CHILD_COMPOUND.inner" type="text" value="Value 1 from parent"/>
+      <input class="required text" id="input-COMPOUND-CHILD_COMPOUND-inner2" name="COMPOUND.CHILD_COMPOUND.inner2" required="required" type="text" value="Value 2 from parent"/>
+    </div>
+    <BLANKLINE>
+    
+    >>> compound.printtree()
+    <class 'yafowil.base.Widget'>: COMPOUND
+      <class 'yafowil.base.Widget'>: STRUCTURAL
+        <class 'yafowil.base.Widget'>: CHILD_COMPOUND
+          <class 'yafowil.base.Widget'>: inner
+          <class 'yafowil.base.Widget'>: inner2
+    
+    >>> compound['STRUCTURAL'].attrs
+    {'structural': True}
+    
+    >>> compound['STRUCTURAL']['CHILD_COMPOUND'].attrs
+    {}
+    
+    >>> data = compound.extract({
+    ...     'COMPOUND.CHILD_COMPOUND.inner': 'newvalue',
+    ...     'COMPOUND.CHILD_COMPOUND.inner2': 'newvalue2',
+    ... })
+    
+    >>> data.printtree()
+    <RuntimeData COMPOUND, value={'CHILD_COMPOUND': {'inner2': 'Value 2 from parent', 'inner': 'Value 1 from parent'}}, extracted=odict([('CHILD_COMPOUND', odict([('inner', 'newvalue'), ('inner2', 'newvalue2')]))]) at ...>
+      <RuntimeData COMPOUND.CHILD_COMPOUND, value={'inner2': 'Value 2 from parent', 'inner': 'Value 1 from parent'}, extracted=odict([('inner', 'newvalue'), ('inner2', 'newvalue2')]) at ...>
+        <RuntimeData COMPOUND.CHILD_COMPOUND.inner, value='Value 1 from parent', extracted='newvalue' at ...>
+        <RuntimeData COMPOUND.CHILD_COMPOUND.inner2, value='Value 2 from parent', extracted='newvalue2' at ...>
+    
+    >>> data.extracted
+    odict([('CHILD_COMPOUND', 
+    odict([('inner', 'newvalue'), 
+    ('inner2', 'newvalue2')]))])
 
 
 Wrapped compound
