@@ -5,10 +5,11 @@ History
 1.2.1dev
 --------
 
-- Accept value property for compounds.
+- Accept value property on compounds.
   [rnix, 2011-09-27]
 
-- Return ``odict`` with values of children in compound_extractor.
+- Make ``data.extracted`` available as ``odict`` with values of children on
+  compounds.
   [rnix, 2011-09-27]
 
 - Pass ``blueprints`` and ``custom`` arguments to Widget constructor in factory
