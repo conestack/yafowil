@@ -8,8 +8,35 @@ Preparation::
     >>> from yafowil.base import factory
     >>> from yafowil.utils import Tag
     >>> tag = Tag(lambda msg: msg)           
-        
-Render Compound::
+
+Render Compound with values set via compound widget::
+
+    >>> value = {
+    ...     'inner': 'Value 1 from parent',
+    ...     'inner2': 'Value 2 from parent',
+    ... }
+    >>> compound = factory('compound', name='COMPOUND', value=value)
+    >>> compound['inner']  = factory('text')
+    >>> compound['inner2'] = factory('text', 
+    ...                              props={'required': True})
+    >>> pxml(tag('div', compound()))
+    <div>
+      <input class="text" id="input-COMPOUND-inner" name="COMPOUND.inner" type="text" value="Value 1 from parent"/>
+      <input class="required text" id="input-COMPOUND-inner2" name="COMPOUND.inner2" required="required" type="text" value="Value 2 from parent"/>
+    </div>
+    <BLANKLINE>
+
+ValueError if value for a compound member is defined both::
+
+    >>> value = {'inner': 'Value 1 from parent'}
+    >>> compound = factory('compound', name='COMPOUND', value=value)
+    >>> compound['inner']  = factory('text', value='value1')
+    >>> pxml(tag('div', compound()))
+    Traceback (most recent call last):
+      ...
+    ValueError: Both compound and compound member provide a value for 'inner'
+
+Render Compound with values set via compound members::
 
     >>> compound = factory('compound', name='COMPOUND')
     >>> compound['inner']  = factory('text', value='value1')
@@ -25,8 +52,9 @@ Render Compound::
 Extract Compound empty::    
 
     >>> data = compound.extract({})
-    >>> data    
-    <RuntimeData COMPOUND, value=<UNSET>, extracted=None at ...>
+    >>> data 
+    <RuntimeData COMPOUND, value=<UNSET>, 
+    extracted=odict([('inner', <UNSET>), ('inner2', <UNSET>)]) at ...> 
 
     >>> data['inner']
     <RuntimeData COMPOUND.inner, value='value1', extracted=<UNSET> at ...>    
@@ -165,7 +193,7 @@ Get form data out of request (request is expected dict-like)::
     >>> request = {'myform.someinput': 'Hello World', 
     ...            'action.myform.submit': 'submit'}
     >>> controller = Controller(form, request)
-    <RuntimeData myform, value=<UNSET>, extracted=None at ...>
+    <RuntimeData myform, value=<UNSET>, extracted=odict([('someinput', 'Hello World'), ('submit', <UNSET>)]) at ...>
       <RuntimeData myform.someinput, value=<UNSET>, extracted='Hello World' at ...>
       <RuntimeData myform.submit, value=<UNSET>, extracted=<UNSET> at ...>
 

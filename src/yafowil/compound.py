@@ -1,3 +1,4 @@
+from odict import odict
 from yafowil.base import factory
 from yafowil.utils import (
     UNSET,
@@ -19,22 +20,35 @@ def compound_extractor(widget, data):
                 compound_extractor(child[structuralchildname], data)
         else:
             child.extract(data.request, parent=data)
+    extracted = odict()
+    for k, v in data.items():
+        extracted[k] = v.extracted
+    return extracted
 
 
 def compound_renderer(widget, data):
     """Delegates rendering to children.
     """
+    value = widget.getter
     result = u''
     for childname in widget:
         child = widget[childname]
         if child.attrs.get('structural'):
+            # XXX: how to handle preset values from compound on structural
+            #      children?
             subdata = data
         else:
             subdata = data.get(childname, None)
+            if value is not UNSET and childname in value:
+                if child.getter is UNSET:
+                    child.getter = value[childname]
+                else:
+                    raise ValueError(u"Both compound and compound member "
+                                     u"provide a value for '%s'" % childname)
         if subdata is None:
-            result += widget[childname](request=data.request)
+            result += child(request=data.request)
         else:
-            result += widget[childname](data=subdata)
+            result += child(data=subdata)
     return result
 
 

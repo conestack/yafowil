@@ -120,12 +120,12 @@ Build same table again but set some nodes structural. This is considered in
     
     >>> data = form.extract({})
     >>> data.printtree()
-    <RuntimeData mytableform, value=<UNSET>, extracted=None at ...>
+    <RuntimeData mytableform, value=<UNSET>, extracted=odict([('field1', <UNSET>)]) at ...>
       <RuntimeData mytableform.field1, value=<UNSET>, extracted=<UNSET> at ...>
     
     >>> data = form.extract({'mytableform.field1': ''})
     >>> data.printtree()
-    <RuntimeData mytableform, value=<UNSET>, extracted=None at ...>
+    <RuntimeData mytableform, value=<UNSET>, extracted=odict([('field1', '')]) at ...>
       <RuntimeData mytableform.field1, value=<UNSET>, extracted='', 1 error(s) at ...>
     
     >>> pxml(form(data))

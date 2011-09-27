@@ -5,8 +5,11 @@ History
 1.2.1dev
 --------
 
-- Add ``div`` blueprint. Like ``compound`` but renders within '<div>' element.
-  [rnix, 2011-09-23]
+- Accept value property for compounds.
+  [rnix, 2011-09-27]
+
+- Return ``odict`` with values of children in compound_extractor.
+  [rnix, 2011-09-27]
 
 - Pass ``blueprints`` and ``custom`` arguments to Widget constructor in factory
   for debugging and duplication purposes.
@@ -15,6 +18,9 @@ History
 - Rename ``yafowil.base.Widget._properties`` to
   ``yafowil.base.Widget.properties``.
   [rnix, 2011-09-26]
+
+- Add ``div`` blueprint. Like ``compound`` but renders within '<div>' element.
+  [rnix, 2011-09-23]
 
 1.2
 ---
