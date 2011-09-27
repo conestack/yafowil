@@ -140,6 +140,12 @@ Compound with compound as child::
     </div>
     <BLANKLINE>
     
+    >>> compound.printtree()
+    <class 'yafowil.base.Widget'>: COMPOUND
+      <class 'yafowil.base.Widget'>: CHILD_COMPOUND
+        <class 'yafowil.base.Widget'>: inner
+        <class 'yafowil.base.Widget'>: inner2
+    
     >>> data = compound.extract({
     ...     'COMPOUND.CHILD_COMPOUND.inner': 'newvalue',
     ...     'COMPOUND.CHILD_COMPOUND.inner2': 'newvalue2',
@@ -154,7 +160,6 @@ Compound with compound as child::
     odict([('CHILD_COMPOUND', 
     odict([('inner', 'newvalue'), 
     ('inner2', 'newvalue2')]))])
-
 
 Compound with structural compound with compound as children::
 
