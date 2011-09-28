@@ -1,4 +1,8 @@
 from yafowil.base import factory
+from yafowil.compound import (
+    compound_extractor,
+    compound_renderer,
+)
 from yafowil.utils import (
     cssclasses,
     css_managed_props,
@@ -100,6 +104,12 @@ factory.doc['blueprint']['th'] = """\
 """
 
 
+def td_extractor(widget, data):
+    if len(widget):
+        return compound_extractor(widget, data)
+    return data.extracted
+
+
 @managedprops('id', 'rowspan', 'colspan', *css_managed_props)
 def td_renderer(widget, data):
     attrs = {
@@ -108,11 +118,16 @@ def td_renderer(widget, data):
         'colspan': widget.attrs.get('colspan'),
         'rowspan': widget.attrs.get('rowspan'),
     }
-    return data.tag('td', data.rendered, **attrs)
+    if len(widget):
+        rendered = compound_renderer(widget, data)
+    else:
+        rendered = data.rendered
+    return data.tag('td', rendered, **attrs)
 
 
 factory.register(
     'td',
+    extractors=[td_extractor],
     edit_renderers=[td_renderer],
     display_renderers=[td_renderer])
 

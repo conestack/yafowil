@@ -142,3 +142,56 @@ Build same table again but set some nodes structural. This is considered in
       </table>
     </form>
     <BLANKLINE>
+
+Create table with 'td' as compound::
+
+    >>> form = factory('form',
+    ...                name='mytableform',
+    ...                props={
+    ...                    'action': 'mytableaction',
+    ...                })
+    >>> form['table'] = factory('table', props={'structural': True})
+    >>> form['table']['row1'] = factory('tr', props={'structural': True})
+    >>> form['table']['row1']['td1'] = factory('td', props={'structural': True})
+    >>> form['table']['row1']['td1']['field1'] = factory(
+    ...     'error:text',
+    ...     props={
+    ...         'required': 'Field 1 is required',
+    ...     }
+    ... )
+    >>> pxml(form())
+    <form action="mytableaction" enctype="multipart/form-data" id="form-mytableform" method="post" novalidate="novalidate">
+      <table>
+        <tr>
+          <td>
+            <input class="required text" id="input-mytableform-field1" name="mytableform.field1" required="required" type="text" value=""/>
+          </td>
+        </tr>
+      </table>
+    </form>
+    <BLANKLINE>
+    
+    >>> data = form.extract({})
+    >>> data.printtree()
+    <RuntimeData mytableform, value=<UNSET>, extracted=odict([('field1', <UNSET>)]) at ...>
+      <RuntimeData mytableform.field1, value=<UNSET>, extracted=<UNSET> at ...>
+    
+    >>> data = form.extract({'mytableform.field1': ''})
+    >>> data.printtree()
+    <RuntimeData mytableform, value=<UNSET>, extracted=odict([('field1', '')]) at ...>
+      <RuntimeData mytableform.field1, value=<UNSET>, extracted='', 1 error(s) at ...>
+    
+    >>> pxml(form(data))
+    <form action="mytableaction" enctype="multipart/form-data" id="form-mytableform" method="post" novalidate="novalidate">
+      <table>
+        <tr>
+          <td>
+            <div class="error">
+              <div class="errormessage">Field 1 is required</div>
+              <input class="required text" id="input-mytableform-field1" name="mytableform.field1" required="required" type="text" value=""/>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </form>
+    <BLANKLINE>
