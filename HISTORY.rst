@@ -5,7 +5,7 @@ History
 1.2.1dev
 --------
 
-- ``div`` blueprint can be used as compound or part of leaf widget now.
+- ``td`` blueprint can be used as compound or part of leaf widget now.
   [rnix, 2011-09-28]
 
 - Accept value property on compounds.
