@@ -299,29 +299,58 @@ Check compound with value callbacks::
       <RuntimeData comp.f1, value='F1 Val', extracted='New val 1' at ...>
 
 
-Wrapped compound
-----------------
+Div
+---
 
-::
+Div blueprint can act as compound or leaf widget::
 
-    >>> wrapped_compound = factory('div', name='WRAPPED_COMPOUND')
-    >>> wrapped_compound['inner']  = factory('text', value='value1')
-    >>> wrapped_compound['inner2'] = factory('text', value='value2', 
+    >>> div = factory('div', name='WRAPPED_COMPOUND')
+    >>> div['inner']  = factory('text', value='value1')
+    >>> div['inner2'] = factory('text', value='value2', 
     ...                                      props={'required': True})
-    >>> pxml(wrapped_compound())
+    >>> pxml(div())
     <div>
       <input class="text" id="input-WRAPPED_COMPOUND-inner" name="WRAPPED_COMPOUND.inner" type="text" value="value1"/>
       <input class="required text" id="input-WRAPPED_COMPOUND-inner2" name="WRAPPED_COMPOUND.inner2" required="required" type="text" value="value2"/>
     </div>
     <BLANKLINE>
     
-    >>> wrapped_compound = factory(
+    >>> data = div.extract({
+    ...     'WRAPPED_COMPOUND.inner': '1',
+    ...     'WRAPPED_COMPOUND.inner2': '2',
+    ... })
+    >>> data.printtree()
+    <RuntimeData WRAPPED_COMPOUND, value=<UNSET>, extracted=odict([('inner', '1'), ('inner2', '2')]) at ...>
+      <RuntimeData WRAPPED_COMPOUND.inner, value='value1', extracted='1' at ...>
+      <RuntimeData WRAPPED_COMPOUND.inner2, value='value2', extracted='2' at ...>
+    
+    >>> div = factory(
     ...     'div',
     ...     name='WRAPPED_COMPOUND',
     ...     props={'class': 'foo'},
     ...     mode='display')
-    >>> pxml(wrapped_compound())
+    >>> pxml(div())
     <div class="foo"/>
+    <BLANKLINE>
+    
+    >>> input = factory('div:text', 'field', value='1')
+    >>> pxml(input())
+    <div>
+      <input class="text" id="input-field" name="field" type="text" value="1"/>
+    </div>
+    <BLANKLINE>
+    
+    >>> data = input.extract({
+    ...     'field': '2',
+    ... })
+    >>> data.printtree()
+    <RuntimeData field, value='1', extracted='2' at ...>
+    
+    >>> input = factory('div:text', 'field', value='1', mode='display')
+    >>> pxml(input())
+    <div>
+      <div class="display-text" id="display-field">1</div>
+    </div>
     <BLANKLINE>
 
 

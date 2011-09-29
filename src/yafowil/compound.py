@@ -77,21 +77,32 @@ will not have an own runtime-data.
 """
 
 
-@managedprops(*css_managed_props)
+def hybrid_extractor(widget, data):
+    """This extractor can be used if a blueprint can act as compound or leaf.
+    """
+    if len(widget):
+        return compound_extractor(widget, data)
+    return data.extracted
+
+
+@managedprops('id', *css_managed_props)
 def div_renderer(widget, data):
     attrs = {
-        'class_': cssclasses(widget, data)
+        'id': widget.attrs.get('id'),
+        'class_': cssclasses(widget, data),
     }
-    rendered = data.rendered
-    return data.tag('div', rendered, **attrs)   
+    if len(widget):
+        rendered = compound_renderer(widget, data)
+    else:
+        rendered = data.rendered
+    return data.tag('div', rendered, **attrs)
 
 
 factory.register(
-    'div', 
-    extractors=factory.extractors('compound'), 
-    edit_renderers=factory.edit_renderers('compound') + [div_renderer],
-    display_renderers=factory.display_renderers('compound') + \
-        [div_renderer])
+    'div',
+    extractors=[hybrid_extractor],
+    edit_renderers=[div_renderer],
+    display_renderers=[div_renderer])
 
 factory.doc['blueprint']['div'] = """\
 Like ``compound`` blueprint but renders within '<div>' element.

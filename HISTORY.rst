@@ -27,7 +27,8 @@ History
   ``yafowil.base.Widget.properties``.
   [rnix, 2011-09-26]
 
-- Add ``div`` blueprint. Like ``compound`` but renders within '<div>' element.
+- Add ``div`` blueprint. Renders within '<div>' element. Can be used for
+  compound and leaf widgets.
   [rnix, 2011-09-23]
 
 1.2
