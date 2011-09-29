@@ -2,8 +2,12 @@
 History
 =======
 
-1.2.1dev
---------
+1.3dev
+------
+
+- Added concept of *plans* to the factory, which is a named set of blueprints.
+  Plans are registered to the factory and can be addressed with the ``#`` sign.
+  [jensens, 2011-09-29]
 
 - ``td`` blueprint can be used as compound or part of leaf widget now.
   [rnix, 2011-09-28]
@@ -38,19 +42,19 @@ History
 1.1.3
 -----
 
-- traceback supplement now with html support. test for html part is missing for now.  
+- traceback supplement now with html support. test for html part is missing for now.
   [jensens, 2011-09-01]
 
 1.1.2
 -----
 
-- traceback supplement is now better formatted. 
+- traceback supplement is now better formatted.
   [jensens, 2011-08-30]
 
 1.1.1
 -----
 
-- Bugfix: mode ``display`` did eat up all previous renderings. This made error 
+- Bugfix: mode ``display`` did eat up all previous renderings. This made error
   widget fail in display mode to show the value. Fixed: empty_display_renderer
   proxies now all previous rendered.
   [jensens, 2011-08-11]
@@ -70,8 +74,8 @@ History
 - deprecate use of mode widget
   [rnix, 2011-07-08]
 
-- now mode is a central element: each Widget instance has a mode now: edit, 
-  display or skip. edit is default and works as usal. Display renders the new 
+- now mode is a central element: each Widget instance has a mode now: edit,
+  display or skip. edit is default and works as usal. Display renders the new
   display_renderer chain. Skip just renders an empty Unicode string.
   [jensens, 2011-07-07]
 
@@ -81,8 +85,8 @@ History
 - clean up html5 handling, we believe in novalidate now...
   [jensens, 2011-06-11]
 
-- add ``disabled`` attribute for select widget. 
-  [jensens, 2011-06-01] 
+- add ``disabled`` attribute for select widget.
+  [jensens, 2011-06-01]
 
 - add ``novalidate`` property for form
   [rnix, 2011-05-23]

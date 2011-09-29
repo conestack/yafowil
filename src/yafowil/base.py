@@ -402,25 +402,48 @@ class Factory(object):
     def __init__(self):
         self._blueprints = dict()
         self._global_preprocessors = list()
+        self._plans = dict()
         self.defaults = dict()
         self.doc = {
             'props': dict(),
             'blueprint': dict(),
         }
+    
+    def _name_check(self, name):
+        for chara in '*:#':
+            if chara in name:
+                raise ValueError, '"%s" as char not allowed as name.' % chara
         
     def register(self, name, extractors=[], edit_renderers=[], 
                  preprocessors=[], builders=[], display_renderers=[]):
         """Registers a blueprint in the factory.
         """
-        if name.startswith('*'):
-            raise ValueError, 'Asterisk * as first char not allowed as name.'
-        if ':' in name:
-            raise ValueError, 'Colon : as char not allowed in name.'
+        self._name_check(name)
         self._blueprints[name] = (extractors, edit_renderers, 
                                  preprocessors, builders, display_renderers)
         
     def register_global_preprocessors(self, preprocessors):
         self._global_preprocessors += preprocessors
+        
+    def register_plan(self, name, blueprints):
+        self._name_check(name)
+        self._plans[name] = blueprints
+                
+    def _expand_blueprints(self, blueprints):
+        result = list()
+        if isinstance(blueprints, basestring):
+            blueprints = blueprints.split(':')
+        for blueprint in blueprints:            
+            if blueprint.startswith('#'):
+                plan_name = blueprint[1:]
+                if plan_name not in self._plans:
+                    msg = "Plan with name '%s' is not registered in factory" % \
+                          plan_name
+                    raise ValueError(msg)
+                result += self._expand_blueprints(self._plans[plan_name])
+            else:
+                result.append(blueprint)
+        return result
         
     def __call__(self, blueprints, 
                  name=None, 
@@ -469,8 +492,7 @@ class Factory(object):
         disp_renderers = list()
         preprocessors = list()
         builders = list()
-        if isinstance(blueprints, basestring):
-            blueprints = blueprints.split(':')
+        blueprints = self._expand_blueprints(blueprints)
         for blueprint in blueprints:
             if blueprint.startswith('*'):
                 part_name = blueprint[1:]

@@ -474,15 +474,33 @@ field with two input fields in. Here a simpler example::
     
 Some basic name checks are done::
     
-    >>> factory.register('*notallowed', [], [])
+    >>> factory._name_check('*notallowed')
     Traceback (most recent call last):
     ...
-    ValueError: Asterisk * as first char not allowed as name.
+    ValueError: "*" as char not allowed as name.
 
-    >>> factory.register('not:allowed', [], [])
+    >>> factory._name_check('not:allowed')
     Traceback (most recent call last):
     ...
-    ValueError: Colon : as char not allowed in name.
+    ValueError: ":" as char not allowed as name.
+
+    >>> factory._name_check('#notallowed')
+    Traceback (most recent call last):
+    ...
+    ValueError: "#" as char not allowed as name.
+    
+Test the plans::
+
+    >>> factory.register_plan('test_plan', 'foo:*bar:baz')
+    >>> factory._plans
+    {'test_plan': 'foo:*bar:baz'}
+    
+    >>> factory._expand_blueprints('#test_plan')
+    ['foo', '*bar', 'baz']
+    
+    >>> factory.register_plan('test_plan2', 'alpha:#test_plan:beta')
+    >>> factory._expand_blueprints('#test_plan2')
+    ['alpha', 'foo', '*bar', 'baz', 'beta']
 
 
 Widget tree manipulation
