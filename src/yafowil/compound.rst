@@ -267,6 +267,37 @@ Address different compounds with value on parent::
       <RuntimeData comp.c3, value=<UNSET>, extracted=odict([('f4', <UNSET>)]) at ...>
         <RuntimeData comp.c3.f4, value=<UNSET>, extracted=<UNSET> at ...>
 
+Check compound with value callbacks::
+
+    >>> def val(widget, data):
+    ...     return 'val F1'
+    >>> value = {
+    ...     'f1': val,
+    ... }
+    >>> compound = factory('compound', 'comp', value=value)
+    >>> compound['f1'] = factory('text')
+    >>> compound()
+    u'<input class="text" id="input-comp-f1" name="comp.f1" type="text" value="val F1" />'
+    
+    >>> data = compound.extract({'comp.f1': 'New val 1'})
+    >>> data.printtree()
+    <RuntimeData comp, value={'f1': <function val at ...>}, extracted=odict([('f1', 'New val 1')]) at ...>
+      <RuntimeData comp.f1, value='val F1', extracted='New val 1' at ...>
+
+    >>> def value(widget, data):
+    ...     return {
+    ...         'f1': 'F1 Val'
+    ...     }
+    >>> compound = factory('compound', 'comp', value=value)
+    >>> compound['f1'] = factory('text')
+    >>> compound()
+    u'<input class="text" id="input-comp-f1" name="comp.f1" type="text" value="F1 Val" />'
+    
+    >>> data = compound.extract({'comp.f1': 'New val 1'})
+    >>> data.printtree()
+    <RuntimeData comp, value={'f1': 'F1 Val'}, extracted=odict([('f1', 'New val 1')]) at ...>
+      <RuntimeData comp.f1, value='F1 Val', extracted='New val 1' at ...>
+
 
 Wrapped compound
 ----------------

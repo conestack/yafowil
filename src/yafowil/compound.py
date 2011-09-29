@@ -44,6 +44,8 @@ def compound_renderer(widget, data):
                 child.getter = value
         else:
             subdata = data.get(childname, None)
+            if callable(value):
+                value = value(widget, data)
             if value is not UNSET and childname in value:
                 if child.getter is UNSET:
                     child.getter = value[childname]
