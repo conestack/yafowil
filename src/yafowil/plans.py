@@ -7,6 +7,8 @@ _PLANS = (
     ('urlfield',        ['field', 'label', 'error', 'url']),
     ('passwordfield',   ['field', 'label', 'error', 'password']),
     ('textfield',       ['field', 'label', 'error', 'textarea']),
+    ('selectionfield',  ['field', 'label', 'error', 'selection']),
+    ('submitfield',     ['field', 'submit']),
 )
 
 for name, blueprints in _PLANS:
