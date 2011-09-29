@@ -212,6 +212,61 @@ Compound with structural compound with compound as children::
     odict([('inner', 'newvalue'), 
     ('inner2', 'newvalue2')]))])
 
+Address different compounds with value on parent::
+
+    >>> value = {
+    ...     'c1': {
+    ...         'f1': 'Foo',
+    ...     },
+    ...     'c2': {
+    ...         'f2': 'Bar',
+    ...         'f3': 'Baz',
+    ...     },
+    ... }
+    >>> compound = factory('compound', 'comp', value=value)
+    >>> compound['c1'] = factory('compound')
+    >>> compound['c1']['f1'] = factory('text')
+    >>> compound['c2'] = factory('compound')
+    >>> compound['c2']['f2'] = factory('text')
+    >>> compound['c2']['f3'] = factory('text')
+    >>> compound['c3'] = factory('compound')
+    >>> compound['c3']['f4'] = factory('text')
+    
+    >>> pxml(tag('div', compound()))
+    <div>
+      <input class="text" id="input-comp-c1-f1" name="comp.c1.f1" type="text" value="Foo"/>
+      <input class="text" id="input-comp-c2-f2" name="comp.c2.f2" type="text" value="Bar"/>
+      <input class="text" id="input-comp-c2-f3" name="comp.c2.f3" type="text" value="Baz"/>
+      <input class="text" id="input-comp-c3-f4" name="comp.c3.f4" type="text" value=""/>
+    </div>
+    <BLANKLINE>
+    
+    >>> compound.printtree()
+    <class 'yafowil.base.Widget'>: comp
+      <class 'yafowil.base.Widget'>: c1
+        <class 'yafowil.base.Widget'>: f1
+      <class 'yafowil.base.Widget'>: c2
+        <class 'yafowil.base.Widget'>: f2
+        <class 'yafowil.base.Widget'>: f3
+      <class 'yafowil.base.Widget'>: c3
+        <class 'yafowil.base.Widget'>: f4
+    
+    >>> data = compound.extract({
+    ...     'comp.c1.f1': 'Foo 1',
+    ...     'comp.c2.f2': 'Bar 2',
+    ...     'comp.c2.f3': 'Baz 1',
+    ... })
+    
+    >>> data.printtree()
+    <RuntimeData comp, value={'c2': {'f2': 'Bar', 'f3': 'Baz'}, 'c1': {'f1': 'Foo'}}, extracted=odict([('c1', odict([('f1', 'Foo 1')])), ('c2', odict([('f2', 'Bar 2'), ('f3', 'Baz 1')])), ('c3', odict([('f4', <UNSET>)]))]) at ...>
+      <RuntimeData comp.c1, value={'f1': 'Foo'}, extracted=odict([('f1', 'Foo 1')]) at ...>
+        <RuntimeData comp.c1.f1, value='Foo', extracted='Foo 1' at ...>
+      <RuntimeData comp.c2, value={'f2': 'Bar', 'f3': 'Baz'}, extracted=odict([('f2', 'Bar 2'), ('f3', 'Baz 1')]) at ...>
+        <RuntimeData comp.c2.f2, value='Bar', extracted='Bar 2' at ...>
+        <RuntimeData comp.c2.f3, value='Baz', extracted='Baz 1' at ...>
+      <RuntimeData comp.c3, value=<UNSET>, extracted=odict([('f4', <UNSET>)]) at ...>
+        <RuntimeData comp.c3.f4, value=<UNSET>, extracted=<UNSET> at ...>
+
 
 Wrapped compound
 ----------------
