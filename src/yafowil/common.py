@@ -284,13 +284,8 @@ factory.defaults['proxy.class'] = None
 # textarea
 ###############################################################################
 
-@managedprops('wrap', 'cols', 'rows', 'readonly', 'autofocus', 'placeholder', 
-              *css_managed_props)
-def textarea_renderer(widget, data):
-    """Renders text area.
-    """
-    tag = data.tag
-    area_attrs = {
+def textarea_attributes(widget, data):
+    return {
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),
         'class_': cssclasses(widget, data),            
@@ -302,6 +297,15 @@ def textarea_renderer(widget, data):
         'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
         'required': widget.attrs.get('required') and 'required' or None,        
     }
+
+
+@managedprops('wrap', 'cols', 'rows', 'readonly', 'autofocus', 'placeholder', 
+              *css_managed_props)
+def textarea_renderer(widget, data):
+    """Renders text area.
+    """
+    tag = data.tag
+    area_attrs = textarea_attributes(widget, data)
     value = fetch_value(widget, data)
     if value is None:
         value = ''
@@ -336,6 +340,66 @@ factory.doc['props']['textarea.rows'] = \
 
 factory.defaults['textarea.readonly'] = None
 factory.doc['props']['textarea.readonly'] = \
+"""Flag  textarea is readonly.
+"""
+
+
+###############################################################################
+# lines
+###############################################################################
+
+@managedprops('wrap', 'cols', 'rows', 'readonly', 'autofocus', 'placeholder', 
+              *css_managed_props)
+def lines_renderer(widget, data):
+    """Renders text area with list value as lines.
+    """
+    tag = data.tag
+    area_attrs = textarea_attributes(widget, data)
+    value = fetch_value(widget, data)
+    if value is None:
+        value = u''
+    else:
+        value = u'\n'.join(value)
+    return tag('textarea', value, **area_attrs)
+
+
+def lines_extractor(widget, data):
+    """Extract textarea value as list of lines.
+    """
+    extracted = data.extracted
+    if not extracted:
+        return list()
+    return extracted.split('\n')
+
+
+factory.register(
+    'lines', 
+    extractors=[generic_extractor, generic_required_extractor, lines_extractor], 
+    edit_renderers=[lines_renderer],
+    display_renderers=[generic_display_renderer])
+
+factory.doc['blueprint']['lines'] = \
+"""Lines blueprint. Renders a textarea and extracts lines as list.
+"""
+
+factory.defaults['lines.default'] = ''
+factory.defaults['lines.wrap'] = None
+factory.doc['props']['lines.wrap'] = \
+"""Either ``soft``, ``hard``, ``virtual``, ``physical`` or  ``off``.
+"""
+
+factory.defaults['lines.cols'] = 40
+factory.doc['props']['lines.cols'] = \
+"""Number of characters.
+"""
+
+factory.defaults['lines.rows'] = 8
+factory.doc['props']['lines.rows'] = \
+"""Number of lines.
+"""
+
+factory.defaults['lines.readonly'] = None
+factory.doc['props']['lines.readonly'] = \
 """Flag  textarea is readonly.
 """
 

@@ -374,7 +374,6 @@ Textarea
     ...         },
     ...     })
 
-    >> interact(locals())
     >>> widget()
     u'<textarea cols="80" id="input-MYTEXTAREA" name="MYTEXTAREA" rows="25"></textarea>'
     
@@ -395,6 +394,42 @@ Textarea
     >>> widget()
     u'<textarea cols="80" id="input-MYTEXTAREA" name="MYTEXTAREA" 
     rows="25">Test Textarea</textarea>'
+
+
+Lines
+-----
+::
+    >>> widget = factory(
+    ...     'lines',
+    ...     'MYLINES',
+    ...     value=None,
+    ...     props={
+    ...         'label': 'Test Lines Widget',
+    ...     })
+    >>> widget()
+    u'<textarea cols="40" id="input-MYLINES" name="MYLINES" rows="8"></textarea>'
+    
+    >>> widget = factory(
+    ...     'lines',
+    ...     'MYLINES',
+    ...     value=['a', 'b', 'c'],
+    ...     props={
+    ...         'label': 'Test Lines Widget',
+    ...     })
+    >>> widget()
+    u'<textarea cols="40" id="input-MYLINES" name="MYLINES" rows="8">a\nb\nc</textarea>'
+    
+    >>> data = widget.extract({'MYLINES': 'a\nb\nc'})
+    >>> data.extracted
+    ['a', 'b', 'c']
+    
+    >>> data = widget.extract({'MYLINES': ''})
+    >>> data.extracted
+    []
+    
+    XXX
+    >> widget.mode = 'display'
+    >> widget()
 
 
 Selection

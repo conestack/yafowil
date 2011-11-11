@@ -5,6 +5,9 @@ History
 1.3dev
 ------
 
+- Add ``lines`` blueprint. Renders a textarea and extracts lines as list.
+  [rnix, 2011-11-11]
+
 - Added concept of *plans* to the factory, which is a named set of blueprints.
   Plans are registered to the factory and can be addressed with the ``#`` sign.
   [jensens, 2011-09-29]
