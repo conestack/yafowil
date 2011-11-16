@@ -780,11 +780,11 @@ def select_edit_renderer(widget, data):
         label_pos = widget.attrs['listing_label_position']
         listing_tag = widget.attrs['listing_tag']
         item_tag = listing_tag == 'div' and 'div' or 'li'
+        if widget.attrs['multivalued']:
+            tagtype = 'checkbox'
+        else:
+            tagtype = 'radio'
         for key, term in vocabulary(widget.attrs.get('vocabulary', [])):
-            if widget.attrs['multivalued']:
-                tagtype = 'checkbox'
-            else:
-                tagtype = 'radio'
             attrs = {
                 'type': tagtype,
                 'value':  key,

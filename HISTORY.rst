@@ -5,6 +5,10 @@ History
 1.3dev
 ------
 
+- Fix Bug in ``yafowil.common.select_edit_renderer``. Crashed with empty
+  vocabularies.
+  [rnix, 2011-11-16]
+
 - Add ``lines`` blueprint. Renders a textarea and extracts lines as list.
   [rnix, 2011-11-11]
 
