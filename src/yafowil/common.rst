@@ -248,7 +248,7 @@ A boolean checkbox widget (default)::
     >>> widget()
     u'<div class="display-None" id="display-MYCHECKBOX">yes</div>'
 
-A checkbox widget with an value or an empty string::
+A checkbox widget with a value or an empty string::
 
     >>> widget = factory(
     ...     'checkbox',
@@ -285,6 +285,42 @@ A checkbox widget with an value or an empty string::
     u'<div class="display-None" id="display-MYCHECKBOX">Test Checkbox</div>'
 
     >>> widget.mode = 'edit'
+
+Checkbox with manually set 'checked' attribute::
+
+    >>> widget = factory(
+    ...     'checkbox',
+    ...     'MYCHECKBOX',
+    ...     value='',
+    ...     props={
+    ...         'format': 'string',
+    ...         'checked': True,
+    ...     })
+    >>> pxml('<div>'+widget()+'</div>')
+    <div>
+      <input checked="checked" id="input-MYCHECKBOX" name="MYCHECKBOX" 
+      type="checkbox" value=""/>
+      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
+      type="hidden" value="checkboxexists"/>
+    </div>
+    <BLANKLINE>
+
+    >>> widget = factory(
+    ...     'checkbox',
+    ...     'MYCHECKBOX',
+    ...     value='Test Checkbox',
+    ...     props={
+    ...         'format': 'string',
+    ...         'checked': False,
+    ...     })
+    >>> pxml('<div>'+widget()+'</div>')
+    <div>
+      <input id="input-MYCHECKBOX" name="MYCHECKBOX" type="checkbox" 
+      value="Test Checkbox"/>
+      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
+      type="hidden" value="checkboxexists"/>
+    </div>
+    <BLANKLINE>
 
 Checkbox extraction::
 

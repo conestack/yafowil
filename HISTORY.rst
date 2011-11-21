@@ -5,6 +5,9 @@ History
 1.3dev
 ------
 
+- ``checked`` attribute can be set explicitly in ``checkbox`` blueprint.
+  [rnix, 2011-11-21]
+
 - Fix Bug in ``yafowil.common.select_edit_renderer``. Crashed with empty
   vocabularies.
   [rnix, 2011-11-16]

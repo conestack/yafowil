@@ -612,19 +612,23 @@ def checkbox_extractor(widget, data):
     raise ValueError, "Checkbox widget has invalid format '%s' set" % format
 
 
-@managedprops('format', 'disabled', *css_managed_props)
+@managedprops('format', 'disabled', 'checked', *css_managed_props)
 def checkbox_edit_renderer(widget, data):
     tag = data.tag
     value = fetch_value(widget, data)
     input_attrs = {
         'type': 'checkbox',
-        'checked':  value and 'checked' or None,
         'value': value,
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),    
         'class_': cssclasses(widget, data),
         'disabled': bool(widget.attrs.get('disabled')) and 'disabled' or None,            
     }
+    if widget.attrs['checked'] is not None:
+        if widget.attrs['checked']:
+            input_attrs['checked'] = 'checked'
+    else:
+        input_attrs['checked'] = value and 'checked' or None
     if widget.attrs['format'] == 'bool':
         input_attrs['value'] = ''
     checkbox = tag('input', **input_attrs)
@@ -636,6 +640,7 @@ def checkbox_edit_renderer(widget, data):
     }
     exists_marker = tag('input', **input_attrs)
     return checkbox + exists_marker
+
 
 @managedprops('bool', 'vocabulary')
 def checkbox_display_renderer(widget, data):
@@ -675,6 +680,16 @@ Data-type of the extracted value. One out of ``bool`` or ``string``.
 factory.defaults['checkbox.format'] = 'bool'
 factory.doc['props']['checkbox.format'] = """\
 Data-type of the extracted value. One out of ``bool`` or ``string``. 
+"""
+
+factory.defaults['checkbox.disabled'] = False
+factory.doc['props']['checkbox.disabled'] = """\
+Flag whether checkbox is disabled.
+"""
+
+factory.defaults['checkbox.checked'] = None
+factory.doc['props']['checkbox.checked'] = """\
+Set 'checked' attribute explicit. If not given, compute by value.
 """
 
 factory.defaults['checkbox.vocabulary'] = { True:'yes', False: 'no', 
