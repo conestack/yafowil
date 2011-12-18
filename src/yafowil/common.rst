@@ -1200,6 +1200,24 @@ Submit(action)
     >>> widget = factory('submit', name='save', props=props)
     >>> widget()
     u'<input id="input-save" name="action.save" type="submit" value="Action name" />'
+    
+    >>> props = {
+    ...     'action': True,
+    ...     'label': 'Action name',
+    ...     'expression': False,
+    ... }
+    >>> widget = factory('submit', name='save', props=props)
+    >>> widget()
+    u''
+    
+    >>> props = {
+    ...     'action': True,
+    ...     'label': 'Action name',
+    ...     'expression': lambda: False,
+    ... }
+    >>> widget = factory('submit', name='save', props=props)
+    >>> widget()
+    u''
 
 
 Proxy

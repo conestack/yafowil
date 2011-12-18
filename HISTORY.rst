@@ -5,6 +5,9 @@ History
 1.3dev
 ------
 
+- Consider ``expression`` in ``submit`` blueprint renderer.
+  [rnix, 2011-12-18]
+
 - ``checked`` attribute can be set explicitly in ``checkbox`` blueprint.
   [rnix, 2011-11-21]
 

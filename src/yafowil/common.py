@@ -972,8 +972,14 @@ factory.defaults['file.vocabulary'] = [
 # submit
 ###############################################################################
 
-@managedprops('label', 'class', 'action', 'handler', 'next', 'skip')
+@managedprops('label', 'class', 'action', 'handler',
+              'next', 'skip', 'expression')
 def submit_renderer(widget, data):
+    expression = widget.attrs['expression']
+    if callable(expression):
+        expression = expression()
+    if not expression:
+        return u''
     tag = data.tag
     input_attrs = {
         'name': widget.attrs['action'] and 'action.%s' % widget.dottedpath,
@@ -996,6 +1002,12 @@ Submit action inside the form
 
 factory.doc['props']['submit.label'] = """\
 Label of the submit.
+"""
+
+factory.defaults['submit.expression'] = True
+factory.doc['props']['submit.expression'] = """\
+Flag or expression callable whether this action is available to the user
+or not.
 """
 
 factory.defaults['submit.action'] = True
