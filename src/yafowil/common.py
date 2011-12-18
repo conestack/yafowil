@@ -858,6 +858,8 @@ factory.defaults['select.default'] = []
 
 factory.defaults['select.format'] = 'block'
 
+factory.defaults['select.class'] = 'select'
+
 factory.defaults['select.listing_tag'] = 'div'
 factory.doc['props']['select.listing_tag'] = """\
 Desired rendering tag for selection if selection format is 'single'. Valid

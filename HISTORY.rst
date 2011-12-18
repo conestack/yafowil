@@ -5,6 +5,9 @@ History
 1.3dev
 ------
 
+- Add default css class for ``select`` blueprint.
+  [rnix, 2011-12-18]
+
 - Register ``number`` blueprint display renderer.
   [rnix, 2011-12-18]
 

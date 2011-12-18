@@ -487,7 +487,7 @@ Single Valued
     ...             ('three', 'Three'),
     ...             ('four', 'Four')]})
     >>> pxml(widget())
-    <select id="input-MYSELECT" name="MYSELECT">
+    <select class="select" id="input-MYSELECT" name="MYSELECT">
       <option id="input-MYSELECT-one" selected="selected" value="one">One</option>
       <option id="input-MYSELECT-two" value="two">Two</option>
       <option id="input-MYSELECT-three" value="three">Three</option>
@@ -497,13 +497,13 @@ Single Valued
 
     >>> widget.mode = 'display'
     >>> widget()
-    u'<div class="display-None" id="display-MYSELECT">one</div>'
+    u'<div class="display-select" id="display-MYSELECT">one</div>'
 
     >>> widget.mode = 'edit'
     
     >>> data = widget.extract({'MYSELECT': 'two'})
     >>> pxml(widget(data=data))
-    <select id="input-MYSELECT" name="MYSELECT">
+    <select class="select" id="input-MYSELECT" name="MYSELECT">
       <option id="input-MYSELECT-one" value="one">One</option>
       <option id="input-MYSELECT-two" selected="selected" value="two">Two</option>
       <option id="input-MYSELECT-three" value="three">Three</option>
@@ -515,7 +515,7 @@ Single valued set to completly disabled::
 
     >>> widget.attrs['disabled'] = True    
     >>> pxml(widget())
-    <select disabled="disabled" id="input-MYSELECT" name="MYSELECT">
+    <select class="select" disabled="disabled" id="input-MYSELECT" name="MYSELECT">
       <option id="input-MYSELECT-one" selected="selected" value="one">One</option>
       <option id="input-MYSELECT-two" value="two">Two</option>
       <option id="input-MYSELECT-three" value="three">Three</option>
@@ -527,7 +527,7 @@ Single valued with specific options disabled::
 
     >>> widget.attrs['disabled'] = ['two', 'four']    
     >>> pxml(widget())
-    <select id="input-MYSELECT" name="MYSELECT">
+    <select class="select" id="input-MYSELECT" name="MYSELECT">
       <option id="input-MYSELECT-one" selected="selected" value="one">One</option>
       <option disabled="disabled" id="input-MYSELECT-two" value="two">Two</option>
       <option id="input-MYSELECT-three" value="three">Three</option>
@@ -554,7 +554,7 @@ Multi valued
     >>> pxml('<div>'+widget()+'</div>')
     <div>
       <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
-      <select id="input-MYSELECT" multiple="multiple" name="MYSELECT">
+      <select class="select" id="input-MYSELECT" multiple="multiple" name="MYSELECT">
         <option id="input-MYSELECT-one" selected="selected" value="one">One</option>
         <option id="input-MYSELECT-two" selected="selected" value="two">Two</option>
         <option id="input-MYSELECT-three" value="three">Three</option>
@@ -565,7 +565,7 @@ Multi valued
 
     >>> widget.mode = 'display'
     >>> pxml(widget())
-    <ul class="display-None" id="display-MYSELECT">
+    <ul class="display-select" id="display-MYSELECT">
       <li>One</li>
       <li>Two</li>
     </ul>
@@ -607,19 +607,19 @@ Render single selection as radio buttons::
       <div id="radio-MYSELECT-wrapper">
         <div id="radio-MYSELECT-one">
           <label for="input-MYSELECT-one">One</label>
-          <input checked="checked" id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>
+          <input checked="checked" class="select" id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>
         </div>
         <div id="radio-MYSELECT-two">
           <label for="input-MYSELECT-two">Two</label>
-          <input id="input-MYSELECT-two" name="MYSELECT" type="radio" value="two"/>
+          <input class="select" id="input-MYSELECT-two" name="MYSELECT" type="radio" value="two"/>
         </div>
         <div id="radio-MYSELECT-three">
           <label for="input-MYSELECT-three">Three</label>
-          <input id="input-MYSELECT-three" name="MYSELECT" type="radio" value="three"/>
+          <input class="select" id="input-MYSELECT-three" name="MYSELECT" type="radio" value="three"/>
         </div>
         <div id="radio-MYSELECT-four">
           <label for="input-MYSELECT-four">Four</label>
-          <input id="input-MYSELECT-four" name="MYSELECT" type="radio" value="four"/>
+          <input class="select" id="input-MYSELECT-four" name="MYSELECT" type="radio" value="four"/>
         </div>
       </div>
     </div>
@@ -637,19 +637,19 @@ Render single selection as radio buttons, disables all::
       <div id="radio-MYSELECT-wrapper">
         <div id="radio-MYSELECT-one">
           <label for="input-MYSELECT-one">One</label>
-          <input checked="checked" disabled="disabled" id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>
+          <input checked="checked" class="select" disabled="disabled" id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>
         </div>
         <div id="radio-MYSELECT-two">
           <label for="input-MYSELECT-two">Two</label>
-          <input disabled="disabled" id="input-MYSELECT-two" name="MYSELECT" type="radio" value="two"/>
+          <input class="select" disabled="disabled" id="input-MYSELECT-two" name="MYSELECT" type="radio" value="two"/>
         </div>
         <div id="radio-MYSELECT-three">
           <label for="input-MYSELECT-three">Three</label>
-          <input disabled="disabled" id="input-MYSELECT-three" name="MYSELECT" type="radio" value="three"/>
+          <input class="select" disabled="disabled" id="input-MYSELECT-three" name="MYSELECT" type="radio" value="three"/>
         </div>
         <div id="radio-MYSELECT-four">
           <label for="input-MYSELECT-four">Four</label>
-          <input disabled="disabled" id="input-MYSELECT-four" name="MYSELECT" type="radio" value="four"/>
+          <input class="select" disabled="disabled" id="input-MYSELECT-four" name="MYSELECT" type="radio" value="four"/>
         </div>
       </div>
     </div>
@@ -664,19 +664,19 @@ Render single selection as radio buttons, disables some::
       <div id="radio-MYSELECT-wrapper">
         <div id="radio-MYSELECT-one">
           <label for="input-MYSELECT-one">One</label>
-          <input checked="checked" disabled="disabled" id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>
+          <input checked="checked" class="select" disabled="disabled" id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>
         </div>
         <div id="radio-MYSELECT-two">
           <label for="input-MYSELECT-two">Two</label>
-          <input id="input-MYSELECT-two" name="MYSELECT" type="radio" value="two"/>
+          <input class="select" id="input-MYSELECT-two" name="MYSELECT" type="radio" value="two"/>
         </div>
         <div id="radio-MYSELECT-three">
           <label for="input-MYSELECT-three">Three</label>
-          <input disabled="disabled" id="input-MYSELECT-three" name="MYSELECT" type="radio" value="three"/>
+          <input class="select" disabled="disabled" id="input-MYSELECT-three" name="MYSELECT" type="radio" value="three"/>
         </div>
         <div id="radio-MYSELECT-four">
           <label for="input-MYSELECT-four">Four</label>
-          <input id="input-MYSELECT-four" name="MYSELECT" type="radio" value="four"/>
+          <input class="select" id="input-MYSELECT-four" name="MYSELECT" type="radio" value="four"/>
         </div>
       </div>
     </div>
@@ -705,19 +705,19 @@ Render multi selection as checkboxes::
       <div id="checkbox-MYSELECT-wrapper">
         <div id="checkbox-MYSELECT-one">
           <label for="input-MYSELECT-one">One</label>
-          <input checked="checked" id="input-MYSELECT-one" name="MYSELECT" type="checkbox" value="one"/>
+          <input checked="checked" class="select" id="input-MYSELECT-one" name="MYSELECT" type="checkbox" value="one"/>
         </div>
         <div id="checkbox-MYSELECT-two">
           <label for="input-MYSELECT-two">Two</label>
-          <input id="input-MYSELECT-two" name="MYSELECT" type="checkbox" value="two"/>
+          <input class="select" id="input-MYSELECT-two" name="MYSELECT" type="checkbox" value="two"/>
         </div>
         <div id="checkbox-MYSELECT-three">
           <label for="input-MYSELECT-three">Three</label>
-          <input id="input-MYSELECT-three" name="MYSELECT" type="checkbox" value="three"/>
+          <input class="select" id="input-MYSELECT-three" name="MYSELECT" type="checkbox" value="three"/>
         </div>
         <div id="checkbox-MYSELECT-four">
           <label for="input-MYSELECT-four">Four</label>
-          <input id="input-MYSELECT-four" name="MYSELECT" type="checkbox" value="four"/>
+          <input class="select" id="input-MYSELECT-four" name="MYSELECT" type="checkbox" value="four"/>
         </div>
       </div>
     </div>
@@ -747,19 +747,19 @@ Using 'ul' instead of 'div' for rendering radio or checkbox selections::
       <ul id="checkbox-MYSELECT-wrapper">
         <li id="checkbox-MYSELECT-one">
           <label for="input-MYSELECT-one">One</label>
-          <input checked="checked" id="input-MYSELECT-one" name="MYSELECT" type="checkbox" value="one"/>
+          <input checked="checked" class="select" id="input-MYSELECT-one" name="MYSELECT" type="checkbox" value="one"/>
         </li>
         <li id="checkbox-MYSELECT-two">
           <label for="input-MYSELECT-two">Two</label>
-          <input id="input-MYSELECT-two" name="MYSELECT" type="checkbox" value="two"/>
+          <input class="select" id="input-MYSELECT-two" name="MYSELECT" type="checkbox" value="two"/>
         </li>
         <li id="checkbox-MYSELECT-three">
           <label for="input-MYSELECT-three">Three</label>
-          <input id="input-MYSELECT-three" name="MYSELECT" type="checkbox" value="three"/>
+          <input class="select" id="input-MYSELECT-three" name="MYSELECT" type="checkbox" value="three"/>
         </li>
         <li id="checkbox-MYSELECT-four">
           <label for="input-MYSELECT-four">Four</label>
-          <input id="input-MYSELECT-four" name="MYSELECT" type="checkbox" value="four"/>
+          <input class="select" id="input-MYSELECT-four" name="MYSELECT" type="checkbox" value="four"/>
         </li>
       </ul>
     </div>
@@ -785,11 +785,11 @@ Render single format selection with label after input::
       <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
       <ul id="checkbox-MYSELECT-wrapper">
         <li id="checkbox-MYSELECT-one">
-          <input checked="checked" id="input-MYSELECT-one" name="MYSELECT" type="checkbox" value="one"/>
+          <input checked="checked" class="select" id="input-MYSELECT-one" name="MYSELECT" type="checkbox" value="one"/>
           <label for="input-MYSELECT-one">One</label>
         </li>
         <li id="checkbox-MYSELECT-two">
-          <input id="input-MYSELECT-two" name="MYSELECT" type="checkbox" value="two"/>
+          <input class="select" id="input-MYSELECT-two" name="MYSELECT" type="checkbox" value="two"/>
           <label for="input-MYSELECT-two">Two</label>
         </li>
       </ul>
@@ -816,10 +816,10 @@ Render single format selection with input inside label::
       <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
       <ul id="checkbox-MYSELECT-wrapper">
         <li id="checkbox-MYSELECT-one">
-          <label for="input-MYSELECT-one">One<input checked="checked" id="input-MYSELECT-one" name="MYSELECT" type="checkbox" value="one"/></label>
+          <label for="input-MYSELECT-one">One<input checked="checked" class="select" id="input-MYSELECT-one" name="MYSELECT" type="checkbox" value="one"/></label>
         </li>
         <li id="checkbox-MYSELECT-two">
-          <label for="input-MYSELECT-two">Two<input id="input-MYSELECT-two" name="MYSELECT" type="checkbox" value="two"/></label>
+          <label for="input-MYSELECT-two">Two<input class="select" id="input-MYSELECT-two" name="MYSELECT" type="checkbox" value="two"/></label>
         </li>
       </ul>
     </div>
@@ -838,7 +838,7 @@ Check selection required::
     ...             ('three', 'Three'),
     ...             ('four', 'Four')]})
     >>> pxml(widget())
-    <select id="input-reqselect" name="reqselect" required="required">
+    <select class="select" id="input-reqselect" name="reqselect" required="required">
       <option id="input-reqselect-one" value="one">One</option>
       <option id="input-reqselect-two" value="two">Two</option>
       <option id="input-reqselect-three" value="three">Three</option>
@@ -861,14 +861,17 @@ Check selection required::
     ...             ('two', 'Two'), 
     ...             ('three', 'Three'),
     ...             ('four', 'Four')]})
-    >>> widget()
-    u'<input id="exists-reqselect" name="reqselect-exists" type="hidden" 
-    value="exists" /><select id="input-reqselect" multiple="multiple" 
-    name="reqselect" required="required"><option id="input-reqselect-one" 
-    value="one">One</option><option id="input-reqselect-two" 
-    value="two">Two</option><option id="input-reqselect-three" 
-    value="three">Three</option><option id="input-reqselect-four" 
-    value="four">Four</option></select>'
+    >>> pxml('<div>' + widget() + '</div>')
+    <div>
+      <input id="exists-reqselect" name="reqselect-exists" type="hidden" value="exists"/>
+      <select class="select" id="input-reqselect" multiple="multiple" name="reqselect" required="required">
+        <option id="input-reqselect-one" value="one">One</option>
+        <option id="input-reqselect-two" value="two">Two</option>
+        <option id="input-reqselect-three" value="three">Three</option>
+        <option id="input-reqselect-four" value="four">Four</option>
+      </select>
+    </div>
+    <BLANKLINE>
     
     >>> data = widget.extract(request={'reqselect-exists': 'exists'})
     >>> data.printtree()
