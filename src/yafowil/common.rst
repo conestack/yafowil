@@ -1551,6 +1551,17 @@ URL
 Number
 ------
 
+Display renderer::
+
+    >>> widget = factory(
+    ...     'number',
+    ...     name='NUMBER',
+    ...     value=3,
+    ...     mode='display')
+    >>> pxml(widget())
+    <div class="display-number" id="display-NUMBER">3</div>
+    <BLANKLINE>
+
 Default behaviour::
 
     >>> widget = factory(

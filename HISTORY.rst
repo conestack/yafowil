@@ -5,6 +5,9 @@ History
 1.3dev
 ------
 
+- Register ``number`` blueprint display renderer.
+  [rnix, 2011-12-18]
+
 - Consider ``expression`` in ``submit`` blueprint renderer.
   [rnix, 2011-12-18]
 

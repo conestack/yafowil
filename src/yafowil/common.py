@@ -1159,7 +1159,8 @@ factory.register(
     'number', 
     extractors=[generic_extractor, generic_required_extractor,
                 number_extractor],
-    edit_renderers=[input_generic_renderer])
+    edit_renderers=[input_generic_renderer],
+    display_renderers=[generic_display_renderer])
 
 factory.doc['blueprint']['number'] = """\
 Number blueprint (HTML5).
