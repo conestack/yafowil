@@ -1129,9 +1129,16 @@ factory.defaults['search.class'] = 'search'
 # number
 ###############################################################################
 
+def _callable_attr(key, widget, data):
+    # helper, make me generic
+    value = widget.attrs.get(key)
+    if callable(value):
+        return value(widget, data)
+    return value
+
 def number_extractor(widget, data):
     val = data.extracted
-    if val is UNSET:
+    if val is UNSET or val == '':
         return val
     if widget.attrs.get('datatype') == 'integer':
         convert = int
@@ -1144,16 +1151,16 @@ def number_extractor(widget, data):
     except ValueError:
         raise ExtractionError(u'Input is not a valid number (%s).' % \
                               widget.attrs.get('datatype'))
-    if widget.attrs.get('min') and val < widget.attrs.get('min'):
-        raise ExtractionError(u'Value has to be at minimum %s.' %
-                              widget.attrs.get('min'))
-    if widget.attrs.get('max') and val > widget.attrs.get('max'):
+    if widget.attrs.get('min') and val <  _callable_attr('min', widget, data):
+            raise ExtractionError(u'Value has to be at minimum %s.' % 
+                                  _callable_attr('min', widget, data))
+    if widget.attrs.get('max') and val > _callable_attr('max', widget, data):
         raise ExtractionError(u'Value has to be at maximum %s.' %
-                              widget.attrs.get('max'))
-    if widget.attrs.get('step') \
-       and (val - (widget.attrs.get('min') or 0)) %  widget.attrs.get('step'):
-        raise ExtractionError(u'Value has to be in stepping of %s.' %
-                              widget.attrs.get('step'))        
+                              _callable_attr('max', widget, data))
+    if widget.attrs.get('step'):
+       step =  _callable_attr('step', widget, data)
+       if (val - (_callable_attr('max', widget, data) or 0)) % step:
+          raise ExtractionError(u'Value has to be in stepping of %s.' % step)
     return val
 
 
