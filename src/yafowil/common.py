@@ -889,7 +889,7 @@ disable, i.e. ``['foo', 'baz']``. Defaults to False.
 # file
 ###############################################################################
 
-def file_extracor(widget, data):
+def file_extractor(widget, data):
     name = widget.dottedpath
     if name not in data.request:
         return UNSET
@@ -949,7 +949,7 @@ def file_options_renderer(widget, data):
 
 factory.register(
     'file',
-    extractors=[file_extracor, generic_required_extractor],
+    extractors=[file_extractor, generic_required_extractor],
     edit_renderers=[input_file_renderer, file_options_renderer])
 
 factory.doc['blueprint']['file'] = """\
