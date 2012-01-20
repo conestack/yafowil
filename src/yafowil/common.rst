@@ -1657,7 +1657,7 @@ With step set::
 
     >>> data = widget.extract({'NUMBER': '9'})
     >>> data.errors
-    [ExtractionError('Value has to be in stepping of 2.',)]
+    [ExtractionError('Value 9.0 has to be in stepping of 2',)]
 
     >>> data = widget.extract({'NUMBER': '6'})
     >>> data.errors
@@ -1670,10 +1670,10 @@ With step and min set::
     ...     name='NUMBER',
     ...     props={'step': 2, 'min': 3})
 
-    >>> data = widget.extract({'NUMBER': '9'})
+    >>> data = widget.extract({'NUMBER': '7'})
     >>> data.errors
     []
 
     >>> data = widget.extract({'NUMBER': '6'})
     >>> data.errors
-    [ExtractionError('Value has to be in stepping of 2.',)]
+    [ExtractionError('Value 6.0 has to be in stepping of 2 based on a floor value of 3',)]
