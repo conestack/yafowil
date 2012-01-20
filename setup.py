@@ -3,7 +3,7 @@ import os
 
 version = '1.3dev'
 shortdesc = \
-'YAFOWIL - Yet Another Form Widget Lib: Lightweight, Extensible, Pluggable, Pure.'
+'YAFOWIL - declarative, flexible html forms, framework independent.'
 longdesc = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
 longdesc += open(os.path.join(os.path.dirname(__file__), 'HISTORY.rst')).read()
 longdesc += open(os.path.join(os.path.dirname(__file__), 'LICENSE.rst')).read()
