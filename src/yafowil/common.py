@@ -284,13 +284,8 @@ factory.defaults['proxy.class'] = None
 # textarea
 ###############################################################################
 
-@managedprops('wrap', 'cols', 'rows', 'readonly', 'autofocus', 'placeholder', 
-              *css_managed_props)
-def textarea_renderer(widget, data):
-    """Renders text area.
-    """
-    tag = data.tag
-    area_attrs = {
+def textarea_attributes(widget, data):
+    return {
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),
         'class_': cssclasses(widget, data),            
@@ -302,6 +297,15 @@ def textarea_renderer(widget, data):
         'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
         'required': widget.attrs.get('required') and 'required' or None,        
     }
+
+
+@managedprops('wrap', 'cols', 'rows', 'readonly', 'autofocus', 'placeholder', 
+              *css_managed_props)
+def textarea_renderer(widget, data):
+    """Renders text area.
+    """
+    tag = data.tag
+    area_attrs = textarea_attributes(widget, data)
     value = fetch_value(widget, data)
     if value is None:
         value = ''
@@ -336,6 +340,66 @@ factory.doc['props']['textarea.rows'] = \
 
 factory.defaults['textarea.readonly'] = None
 factory.doc['props']['textarea.readonly'] = \
+"""Flag  textarea is readonly.
+"""
+
+
+###############################################################################
+# lines
+###############################################################################
+
+@managedprops('wrap', 'cols', 'rows', 'readonly', 'autofocus', 'placeholder', 
+              *css_managed_props)
+def lines_renderer(widget, data):
+    """Renders text area with list value as lines.
+    """
+    tag = data.tag
+    area_attrs = textarea_attributes(widget, data)
+    value = fetch_value(widget, data)
+    if value is None:
+        value = u''
+    else:
+        value = u'\n'.join(value)
+    return tag('textarea', value, **area_attrs)
+
+
+def lines_extractor(widget, data):
+    """Extract textarea value as list of lines.
+    """
+    extracted = data.extracted
+    if not extracted:
+        return list()
+    return extracted.split('\n')
+
+
+factory.register(
+    'lines', 
+    extractors=[generic_extractor, generic_required_extractor, lines_extractor], 
+    edit_renderers=[lines_renderer],
+    display_renderers=[generic_display_renderer])
+
+factory.doc['blueprint']['lines'] = \
+"""Lines blueprint. Renders a textarea and extracts lines as list.
+"""
+
+factory.defaults['lines.default'] = ''
+factory.defaults['lines.wrap'] = None
+factory.doc['props']['lines.wrap'] = \
+"""Either ``soft``, ``hard``, ``virtual``, ``physical`` or  ``off``.
+"""
+
+factory.defaults['lines.cols'] = 40
+factory.doc['props']['lines.cols'] = \
+"""Number of characters.
+"""
+
+factory.defaults['lines.rows'] = 8
+factory.doc['props']['lines.rows'] = \
+"""Number of lines.
+"""
+
+factory.defaults['lines.readonly'] = None
+factory.doc['props']['lines.readonly'] = \
 """Flag  textarea is readonly.
 """
 
@@ -548,19 +612,23 @@ def checkbox_extractor(widget, data):
     raise ValueError, "Checkbox widget has invalid format '%s' set" % format
 
 
-@managedprops('format', 'disabled', *css_managed_props)
+@managedprops('format', 'disabled', 'checked', *css_managed_props)
 def checkbox_edit_renderer(widget, data):
     tag = data.tag
     value = fetch_value(widget, data)
     input_attrs = {
         'type': 'checkbox',
-        'checked':  value and 'checked' or None,
         'value': value,
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),    
         'class_': cssclasses(widget, data),
         'disabled': bool(widget.attrs.get('disabled')) and 'disabled' or None,            
     }
+    if widget.attrs['checked'] is not None:
+        if widget.attrs['checked']:
+            input_attrs['checked'] = 'checked'
+    else:
+        input_attrs['checked'] = value and 'checked' or None
     if widget.attrs['format'] == 'bool':
         input_attrs['value'] = ''
     checkbox = tag('input', **input_attrs)
@@ -572,6 +640,7 @@ def checkbox_edit_renderer(widget, data):
     }
     exists_marker = tag('input', **input_attrs)
     return checkbox + exists_marker
+
 
 @managedprops('bool', 'vocabulary')
 def checkbox_display_renderer(widget, data):
@@ -611,6 +680,16 @@ Data-type of the extracted value. One out of ``bool`` or ``string``.
 factory.defaults['checkbox.format'] = 'bool'
 factory.doc['props']['checkbox.format'] = """\
 Data-type of the extracted value. One out of ``bool`` or ``string``. 
+"""
+
+factory.defaults['checkbox.disabled'] = False
+factory.doc['props']['checkbox.disabled'] = """\
+Flag whether checkbox is disabled.
+"""
+
+factory.defaults['checkbox.checked'] = None
+factory.doc['props']['checkbox.checked'] = """\
+Set 'checked' attribute explicit. If not given, compute by value.
 """
 
 factory.defaults['checkbox.vocabulary'] = { True:'yes', False: 'no', 
@@ -669,7 +748,7 @@ def select_exists_marker(widget, data):
 
 
 @managedprops('format', 'vocabulary', 'multivalued', 'disabled', 
-              'listing_label_position', 'listing_tag', 
+              'listing_label_position', 'listing_tag', 'size'
               *css_managed_props)
 def select_edit_renderer(widget, data):
     tag = data.tag
@@ -695,6 +774,7 @@ def select_edit_renderer(widget, data):
             'id': cssid(widget, 'input'),
             'class_': cssclasses(widget, data),                        
             'multiple': widget.attrs['multivalued'] and 'multiple' or None,
+            'size': widget.attrs['size'] or None,
             'placeholder': widget.attrs.get('placeholder') or None,
             'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
             'required': widget.attrs.get('required') and 'required' or None,            
@@ -716,11 +796,11 @@ def select_edit_renderer(widget, data):
         label_pos = widget.attrs['listing_label_position']
         listing_tag = widget.attrs['listing_tag']
         item_tag = listing_tag == 'div' and 'div' or 'li'
+        if widget.attrs['multivalued']:
+            tagtype = 'checkbox'
+        else:
+            tagtype = 'radio'
         for key, term in vocabulary(widget.attrs.get('vocabulary', [])):
-            if widget.attrs['multivalued']:
-                tagtype = 'checkbox'
-            else:
-                tagtype = 'radio'
             attrs = {
                 'type': tagtype,
                 'value':  key,
@@ -775,9 +855,13 @@ selection as selection-list or as checkboxes.
     
 factory.defaults['select.multivalued'] = None
 
+factory.defaults['select.size'] = None
+
 factory.defaults['select.default'] = []
 
 factory.defaults['select.format'] = 'block'
+
+factory.defaults['select.class'] = 'select'
 
 factory.defaults['select.listing_tag'] = 'div'
 factory.doc['props']['select.listing_tag'] = """\
@@ -808,7 +892,7 @@ disable, i.e. ``['foo', 'baz']``. Defaults to False.
 # file
 ###############################################################################
 
-def file_extracor(widget, data):
+def file_extractor(widget, data):
     name = widget.dottedpath
     if name not in data.request:
         return UNSET
@@ -868,7 +952,7 @@ def file_options_renderer(widget, data):
 
 factory.register(
     'file',
-    extractors=[file_extracor, generic_required_extractor],
+    extractors=[file_extractor, generic_required_extractor],
     edit_renderers=[input_file_renderer, file_options_renderer])
 
 factory.doc['blueprint']['file'] = """\
@@ -893,8 +977,14 @@ factory.defaults['file.vocabulary'] = [
 # submit
 ###############################################################################
 
-@managedprops('label', 'class', 'action', 'handler', 'next', 'skip')
+@managedprops('label', 'class', 'action', 'handler',
+              'next', 'skip', 'expression')
 def submit_renderer(widget, data):
+    expression = widget.attrs['expression']
+    if callable(expression):
+        expression = expression()
+    if not expression:
+        return u''
     tag = data.tag
     input_attrs = {
         'name': widget.attrs['action'] and 'action.%s' % widget.dottedpath,
@@ -917,6 +1007,12 @@ Submit action inside the form
 
 factory.doc['props']['submit.label'] = """\
 Label of the submit.
+"""
+
+factory.defaults['submit.expression'] = True
+factory.doc['props']['submit.expression'] = """\
+Flag or expression callable whether this action is available to the user
+or not.
 """
 
 factory.defaults['submit.action'] = True
@@ -1036,9 +1132,16 @@ factory.defaults['search.class'] = 'search'
 # number
 ###############################################################################
 
+def _callable_attr(key, widget, data):
+    # helper, make me generic
+    value = widget.attrs.get(key)
+    if callable(value):
+        return value(widget, data)
+    return value
+
 def number_extractor(widget, data):
     val = data.extracted
-    if val is UNSET:
+    if val is UNSET or val == '':
         return val
     if widget.attrs.get('datatype') == 'integer':
         convert = int
@@ -1051,16 +1154,16 @@ def number_extractor(widget, data):
     except ValueError:
         raise ExtractionError(u'Input is not a valid number (%s).' % \
                               widget.attrs.get('datatype'))
-    if widget.attrs.get('min') and val < widget.attrs.get('min'):
-        raise ExtractionError(u'Value has to be at minimum %s.' %
-                              widget.attrs.get('min'))
-    if widget.attrs.get('max') and val > widget.attrs.get('max'):
+    if widget.attrs.get('min') and val <  _callable_attr('min', widget, data):
+            raise ExtractionError(u'Value has to be at minimum %s.' % 
+                                  _callable_attr('min', widget, data))
+    if widget.attrs.get('max') and val > _callable_attr('max', widget, data):
         raise ExtractionError(u'Value has to be at maximum %s.' %
-                              widget.attrs.get('max'))
-    if widget.attrs.get('step') \
-       and (val - (widget.attrs.get('min') or 0)) %  widget.attrs.get('step'):
-        raise ExtractionError(u'Value has to be in stepping of %s.' %
-                              widget.attrs.get('step'))        
+                              _callable_attr('max', widget, data))
+    if widget.attrs.get('step'):
+       step =  _callable_attr('step', widget, data)
+       if (val - (_callable_attr('max', widget, data) or 0)) % step:
+          raise ExtractionError(u'Value has to be in stepping of %s.' % step)
     return val
 
 
@@ -1068,7 +1171,8 @@ factory.register(
     'number', 
     extractors=[generic_extractor, generic_required_extractor,
                 number_extractor],
-    edit_renderers=[input_generic_renderer])
+    edit_renderers=[input_generic_renderer],
+    display_renderers=[generic_display_renderer])
 
 factory.doc['blueprint']['number'] = """\
 Number blueprint (HTML5).
