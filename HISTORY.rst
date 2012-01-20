@@ -5,6 +5,12 @@ History
 1.3dev
 ------
 
+- Add size attribute for ``select`` edit renderer
+  [jensens, 2012-01-20]
+
+- fix number extractor  
+  [jensens, 2012-01-20]
+
 - Add default css class for ``select`` blueprint.
   [rnix, 2011-12-18]
 
