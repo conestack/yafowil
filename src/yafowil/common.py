@@ -748,7 +748,7 @@ def select_exists_marker(widget, data):
 
 
 @managedprops('format', 'vocabulary', 'multivalued', 'disabled', 
-              'listing_label_position', 'listing_tag', 
+              'listing_label_position', 'listing_tag', 'size'
               *css_managed_props)
 def select_edit_renderer(widget, data):
     tag = data.tag
@@ -774,6 +774,7 @@ def select_edit_renderer(widget, data):
             'id': cssid(widget, 'input'),
             'class_': cssclasses(widget, data),                        
             'multiple': widget.attrs['multivalued'] and 'multiple' or None,
+            'size': widget.attrs['size'] or None,
             'placeholder': widget.attrs.get('placeholder') or None,
             'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
             'required': widget.attrs.get('required') and 'required' or None,            
@@ -853,6 +854,8 @@ selection as selection-list or as checkboxes.
 """
     
 factory.defaults['select.multivalued'] = None
+
+factory.defaults['select.size'] = None
 
 factory.defaults['select.default'] = []
 
