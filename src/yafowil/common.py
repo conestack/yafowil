@@ -1161,9 +1161,13 @@ def number_extractor(widget, data):
         raise ExtractionError(u'Value has to be at maximum %s.' %
                               _callable_attr('max', widget, data))
     if widget.attrs.get('step'):
-       step =  _callable_attr('step', widget, data)
-       if (val - (_callable_attr('max', widget, data) or 0)) % step:
-          raise ExtractionError(u'Value has to be in stepping of %s.' % step)
+        step =  _callable_attr('step', widget, data)
+        min = _callable_attr('min', widget, data) or 0
+        if (val - min) % step:
+            msg = u'Value %s has to be in stepping of %s' % (val, step)
+            if min:
+                msg += ' based on a floor value of %s' % min
+            raise ExtractionError(msg)
     return val
 
 
