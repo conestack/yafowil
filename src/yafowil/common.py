@@ -748,7 +748,7 @@ def select_exists_marker(widget, data):
 
 
 @managedprops('format', 'vocabulary', 'multivalued', 'disabled', 
-              'listing_label_position', 'listing_tag', 'size'
+              'listing_label_position', 'listing_tag', 'size',
               *css_managed_props)
 def select_edit_renderer(widget, data):
     tag = data.tag
