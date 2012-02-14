@@ -1322,7 +1322,7 @@ def error_renderer(widget, data):
     tag = data.tag
     msgs = u''
     for error in data.errors:
-        msgs += tag('div', str(error), class_=widget.attrs['message_class'])
+        msgs += tag('div', error.message, class_=widget.attrs['message_class'])
     return tag('div', msgs, data.rendered, class_=cssclasses(widget, data))
 
 
