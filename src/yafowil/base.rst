@@ -497,7 +497,13 @@ Test the plans::
     
     >>> factory._expand_blueprints('#test_plan')
     ['foo', '*bar', 'baz']
-    
+
+    >>> factory._expand_blueprints('#nonexisting')
+    Traceback (most recent call last):
+    ...
+    ValueError: Plan with name 'nonexisting' is not registered in factory
+
+
     >>> factory.register_plan('test_plan2', 'alpha:#test_plan:beta')
     >>> factory._expand_blueprints('#test_plan2')
     ['alpha', 'foo', '*bar', 'baz', 'beta']
@@ -738,3 +744,22 @@ fetch value
     >>> data_filled.value = widget_with_both.getter
     >>> fetch_value(widget_with_default, data_filled)
     'extractedvalue'        
+
+TraceBack Supplment
+===================
+
+::
+
+    >>> class Mock(object): dottedpath='test.path.abc'
+    >>> mock = Mock()
+    >>> setattr(mock, 'dottedpath', 'test.path.abc')
+    >>> from yafowil.base import TBSupplementWidget
+    >>> suppl = TBSupplementWidget(mock, lambda x:x, 'testtask',
+    ...                            'some description')
+    >>> suppl.getInfo()
+    u'<p>yafowil widget processing info:<ul><li>widget: <strong>test.path.abc</strong></li><li>task: <strong>testtask</strong></li><li>description: <strong>some description</strong></li></ul></p>'
+
+    >>> suppl.getInfo(html=0)
+    '    yafowil widget processing info:\n    - widget: test.path.abc\n    - task  : testtask\n    - descr : some description'
+
+

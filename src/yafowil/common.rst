@@ -1569,14 +1569,15 @@ Default behaviour::
 
     >>> widget = factory(
     ...     'number',
-    ...     name='NUMBER')
+    ...     name='NUMBER',
+    ...     value=lambda w,d:3)
     >>> pxml(widget())
-    <input class="number" id="input-NUMBER" name="NUMBER" type="number" value=""/>
+    <input class="number" id="input-NUMBER" name="NUMBER" type="number" value="3"/>
     <BLANKLINE>
 
     >>> data = widget.extract({})
     >>> data.printtree()
-    <RuntimeData NUMBER, value=<UNSET>, extracted=<UNSET> at ...>
+    <RuntimeData NUMBER, value=3, extracted=<UNSET> at ...>
     
     >>> data = widget.extract({'NUMBER': 'abc'})
     >>> data.errors
@@ -1604,7 +1605,7 @@ With integer datatype::
     >>> widget = factory(
     ...     'number',
     ...     name='NUMBER',
-    ...     props={'datatype': 'integer'})
+    ...     props={'datatype': "integer"})
 
     >>> data = widget.extract({'NUMBER': '10.0'})
     >>> data.errors
@@ -1634,7 +1635,7 @@ With max set::
     >>> widget = factory(
     ...     'number',
     ...     name='NUMBER',
-    ...     props={'max': 10})
+    ...     props={'max': lambda w,d: 10})
 
     >>> data = widget.extract({'NUMBER': '9'})
     >>> data.errors
