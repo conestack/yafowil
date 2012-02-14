@@ -39,4 +39,8 @@ setup(name='yafowil',
       extras_require = dict(
           test=tests_require,
       ),
+      entry_points = """
+      [yafowil.autoinclude]
+      register = yafowil.loader:register
+      """,
 )

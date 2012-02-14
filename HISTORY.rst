@@ -5,6 +5,11 @@ History
 1.3dev
 ------
 
+- Loading is done more explicit and in a pluggable way
+  using entry-points. Thus yafowil extensions such as widgets
+  can define an entry point. 
+  [jensens, 2012-02-14] 
+
 - Add size attribute for ``select`` edit renderer
   [jensens, 2012-01-20]
 
