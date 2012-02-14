@@ -14,7 +14,6 @@ from utils import (
     vocabulary,
 )
 
-
 ###############################################################################
 # common defaults
 ###############################################################################
@@ -907,7 +906,7 @@ def file_extractor(widget, data):
 
 @managedprops('accept', 'placeholder', 'autofocus', 
               'required', *css_managed_props)
-def input_file_renderer(widget, data):
+def input_file_edit_renderer(widget, data):
     tag = data.tag
     input_attrs = {
         'name_': widget.dottedpath,
@@ -923,6 +922,10 @@ def input_file_renderer(widget, data):
         input_attrs['accept'] = widget.attrs['accept']
     return tag('input', **input_attrs)
 
+def input_file_display_renderer(widget, data):
+    tag = data.tag
+    # XXX TODO
+    return tag(div, 'DISPLAY FILE TODO')
 
 @managedprops(*css_managed_props)
 def file_options_renderer(widget, data):
@@ -953,7 +956,8 @@ def file_options_renderer(widget, data):
 factory.register(
     'file',
     extractors=[file_extractor, generic_required_extractor],
-    edit_renderers=[input_file_renderer, file_options_renderer])
+    edit_renderers=[input_file_edit_renderer, file_options_renderer],
+    display_renderers=[input_file_display_renderer])
 
 factory.doc['blueprint']['file'] = """\
 A basic file upload blueprint.
@@ -1058,7 +1062,8 @@ def email_extractor(widget, data):
 factory.register(
     'email', 
     extractors=[generic_extractor, generic_required_extractor, email_extractor],
-    edit_renderers=[input_generic_renderer])
+    edit_renderers=[input_generic_renderer],
+    display_renderers=[generic_display_renderer])
 
 factory.doc['blueprint']['email'] = \
 """E-mail (HTML5) input blueprint.
@@ -1091,7 +1096,8 @@ def url_extractor(widget, data):
 factory.register(
     'url',
     extractors=[generic_extractor, generic_required_extractor, url_extractor],
-    edit_renderers=[input_generic_renderer])
+    edit_renderers=[input_generic_renderer],
+    display_renderers=[generic_display_renderer])
 
 factory.doc['blueprint']['url'] = \
 """URL aka web address (HTML5) input blueprint.
@@ -1113,7 +1119,8 @@ factory.defaults['url.class'] = 'url'
 factory.register(
     'search', 
     extractors=[generic_extractor, generic_required_extractor],
-    edit_renderers=[input_generic_renderer])
+    edit_renderers=[input_generic_renderer],
+    display_renderers=[generic_display_renderer])
 
 factory.doc['blueprint']['search'] = """\
 Search blueprint (HTML5).
