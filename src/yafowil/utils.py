@@ -14,20 +14,18 @@ def get_plugin_names(ns=None):
 def get_resource_directories(module_name=None):
     result = []
     for ep in get_entry_points(ns='resourcedir'):
-        if module is not None and ep.module_name != module_name:
+        if module_name is not None and ep.module_name != module_name:
             return    
         result += ep.resourcedir()
     return result
 
 def get_javascripts(module_name, thirdparty=True):
-    result = []
     for ep in get_entry_points(ns='javascripts'):
         if ep.module_name == module_name:
             return ep.resourcedir()
     return []
 
 def get_stylesheets(module_name, thirdparty=True):
-    result = []
     for ep in get_entry_points(ns='stylesheets'):
         if ep.module_name == module_name:
             return ep.resourcedir()
