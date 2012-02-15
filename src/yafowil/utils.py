@@ -1,5 +1,37 @@
 import logging
+from pkg_resources import iter_entry_points
 
+def get_entry_points(ns=None):
+    eps = []
+    for ep in iter_entry_points('yafowil.plugin'):
+        if ns is not None and ep.name != ns:
+            continue    
+    return eps
+
+def get_plugin_names(ns=None):
+    return [_.module_name for _ in get_entry_points(ns=ns)]
+
+def get_resource_directories(module_name=None):
+    result = []
+    for ep in get_entry_points(ns='resourcedir'):
+        if module is not None and ep.module_name != module_name:
+            return    
+        result += ep.resourcedir()
+    return result
+
+def get_javascripts(module_name, thirdparty=True):
+    result = []
+    for ep in get_entry_points(ns='javascripts'):
+        if ep.module_name == module_name:
+            return ep.resourcedir()
+    return []
+
+def get_stylesheets(module_name, thirdparty=True):
+    result = []
+    for ep in get_entry_points(ns='stylesheets'):
+        if ep.module_name == module_name:
+            return ep.resourcedir()
+    return []
 
 class Unset(object): 
     
