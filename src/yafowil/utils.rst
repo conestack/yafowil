@@ -1,4 +1,7 @@
-Test UNSET::
+Test UNSET
+----------
+
+::
 
     >>> from yafowil.utils import UNSET
     >>> UNSET
@@ -13,7 +16,10 @@ Test UNSET::
     >>> len(UNSET)
     0
 
-Test the Vocabulary::
+Test the Vocabulary
+-------------------
+
+::
 
     >>> from yafowil.utils import vocabulary
     >>> vocabulary('foo')
@@ -37,7 +43,10 @@ Test the Vocabulary::
     >>> vocabulary(None) is None
     True
         
-Test Tag renderer::
+Test Tag renderer
+-----------------
+
+::
 
     >>> from yafowil.utils import Tag
     >>> tag = Tag(lambda msg: msg)    
@@ -61,7 +70,10 @@ deprecated test::
     >>> deprecated_tag('div', 'foo')
     u'<div>foo</div>'
 
-Test CSS Classes::
+Test CSS Classes
+----------------
+
+::
 
     >>> from plumber import plumber
     >>> from node.base import OrderedNode
@@ -143,7 +155,10 @@ Test CSS Classes::
     >>> print cssclasses(widget, data, additional=['zika', 'akiz'])
     akiz bar error foo required zika
     
-Test managedprops annotation::
+Test managedprops annotation
+----------------------------
+
+::
 
     >>> from yafowil.utils import managedprops
     >>> @managedprops('foo', 'bar')
