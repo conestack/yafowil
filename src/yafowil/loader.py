@@ -1,4 +1,4 @@
-from pkg_resources import iter_entry_points
+import yafowil.utils
 
 def register():
     import yafowil.common
@@ -6,7 +6,5 @@ def register():
     import yafowil.table
     import yafowil.plans
 
-for ep in iter_entry_points('yafowil.plugin'):
-    if ep.name != 'register':
-        continue
+for ep in yafowil.utils.get_entry_points('register'):
     ep.load()()
