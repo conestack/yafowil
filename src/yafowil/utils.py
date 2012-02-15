@@ -2,11 +2,12 @@ import logging
 from pkg_resources import iter_entry_points
 
 def get_entry_points(ns=None):
-    eps = []
+    entry_points = []
     for ep in iter_entry_points('yafowil.plugin'):
         if ns is not None and ep.name != ns:
-            continue    
-    return eps
+            continue
+        entry_points.append(ep)    
+    return entry_points
 
 def get_plugin_names(ns=None):
     return [_.module_name for _ in get_entry_points(ns=ns)]
