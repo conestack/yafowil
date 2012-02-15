@@ -6,5 +6,7 @@ def register():
     import yafowil.table
     import yafowil.plans
 
-for ep in iter_entry_points('yafowil.autoinclude'):
+for ep in iter_entry_points('yafowil.plugin'):
+    if ep.name != 'register':
+        continue
     ep.load()()
