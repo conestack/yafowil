@@ -6,19 +6,18 @@ def get_entry_points(ns=None):
     for ep in iter_entry_points('yafowil.plugin'):
         if ns is not None and ep.name != ns:
             continue
-        entry_points.append(ep)    
+        entry_points.append(ep)
     return entry_points
 
 def get_plugin_names(ns=None):
     return [_.module_name for _ in get_entry_points(ns=ns)]
 
-def get_resource_directories(module_name=None):
+def get_resource_directory(module_name):
     result = []
     for ep in get_entry_points(ns='resourcedir'):
-        if module_name is not None and ep.module_name != module_name:
-            return    
-        result += ep.resourcedir()
-    return result
+        if ep.module_name != module_name:
+            continue
+        return ep.resourcedir()
 
 def get_javascripts(module_name, thirdparty=True):
     for ep in get_entry_points(ns='javascripts'):

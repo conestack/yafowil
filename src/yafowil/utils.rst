@@ -1,4 +1,22 @@
-Test
+Test entry_point support tools
+------------------------------
+
+::
+
+    >>> from yafowil.utils import get_entry_points
+    >>> get_entry_points()
+    [EntryPoint.parse('register = yafowil.loader:register')]
+
+    >>> get_entry_points('nonexisting')
+    []
+
+    >>> from yafowil.utils import get_plugin_names
+    >>> get_plugin_names()
+    ['yafowil.loader']
+
+    >>> get_plugin_names('nonexisting')
+    []
+
 
 Test UNSET
 ----------
