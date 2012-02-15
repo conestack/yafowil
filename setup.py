@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '1.3htug1'
+version = '1.3dev'
 shortdesc = \
 'YAFOWIL - declarative, flexible html forms, framework independent.'
 longdesc = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
@@ -40,7 +40,7 @@ setup(name='yafowil',
           test=tests_require,
       ),
       entry_points = """
-      [yafowil.autoinclude]
+      [yafowil.plugin]
       register = yafowil.loader:register
       """,
 )
