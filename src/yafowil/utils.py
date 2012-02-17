@@ -17,7 +17,7 @@ def get_resource_directory(module_name):
     for ep in get_entry_points(ns='resourcedir'):
         if ep.module_name != module_name:
             continue
-        return ep.resourcedir()
+        return ep.load()()
 
 def get_javascripts(module_name, thirdparty=True):
     for ep in get_entry_points(ns='javascripts'):
