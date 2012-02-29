@@ -18,18 +18,18 @@ def get_resource_directory(module_name):
         if ep.module_name != module_name:
             continue
         return ep.load()()
+    
+def _get_filepaths(module_name, ns, thirdparty):    
+    for ep in get_entry_points(ns=ns):
+        if ep.module_name == module_name:
+            return ep.load()(thirdparty=thirdparty)
+    return []
 
 def get_javascripts(module_name, thirdparty=True):
-    for ep in get_entry_points(ns='javascripts'):
-        if ep.module_name == module_name:
-            return ep.resourcedir()
-    return []
+    return _get_filepaths(module_name, 'javascripts', thirdparty)
 
 def get_stylesheets(module_name, thirdparty=True):
-    for ep in get_entry_points(ns='stylesheets'):
-        if ep.module_name == module_name:
-            return ep.resourcedir()
-    return []
+    return _get_filepaths(module_name, 'stylesheets', thirdparty)
 
 class Unset(object): 
     
