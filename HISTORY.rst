@@ -2,6 +2,12 @@
 History
 =======
 
+1.3.1dev
+--------
+
+- label property can be callable
+  [rnix, 2012-02-19]
+
 1.3
 ---
 

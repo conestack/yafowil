@@ -35,9 +35,9 @@ Contributors
 
 - Jens W. Klein <jk@kleinundpartner.at>
 
-- Peter Holzer <peter.holzer@agitator.com>
-
 - Robert Niederrreiter <rnix@squarewave.at>
+
+- Peter Holzer <peter.holzer@agitator.com>
 
 - Attila Olah
 

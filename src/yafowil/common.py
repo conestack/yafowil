@@ -922,10 +922,12 @@ def input_file_edit_renderer(widget, data):
         input_attrs['accept'] = widget.attrs['accept']
     return tag('input', **input_attrs)
 
+
 def input_file_display_renderer(widget, data):
     tag = data.tag
     # XXX TODO
-    return tag(div, 'DISPLAY FILE TODO')
+    return tag('div', 'DISPLAY FILE TODO')
+
 
 @managedprops(*css_managed_props)
 def file_options_renderer(widget, data):
@@ -1218,6 +1220,8 @@ factory.defaults['number.class'] = 'number'
 def label_renderer(widget, data):
     tag = data.tag
     label_text = widget.attrs.get('label', widget.__name__)
+    if callable(label_text):
+        label_text = label_text()
     label_attrs = {
         'class_': cssclasses(widget, data)
     }
