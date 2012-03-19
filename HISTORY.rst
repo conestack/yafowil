@@ -2,10 +2,10 @@
 History
 =======
 
-1.3dev
-------
+1.3
+---
 
-- Loading is done more explicit and in a pluggable way
+- Loading resources is done more explicit and in a pluggable way
   using entry-points. Thus yafowil extensions such as widgets
   can define an entry point. 
   [jensens, 2012-02-14] 

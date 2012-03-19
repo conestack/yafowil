@@ -19,7 +19,7 @@ Detailed Documentation
 ======================
 
 If you're interested to dig deeper: The `detailed YAFOWIL documentation
-<http://packages.python.org/yafowil>`_ is available. Read it and learn how to
+<http://yafowil.info>`_ is available. Read it and learn how to
 create your example application with YAFOWIL forms in 15 minutes.
 
 Source Code
@@ -33,7 +33,9 @@ We'd be happy to see many forks and pull-requests to make YAFOWIL even better.
 Contributors
 ============
 
-- Jens W. Klein <jens@bluedynamics.com>
+- Jens W. Klein <jk@kleinundpartner.at>
+
+- Peter Holzer <peter.holzer@agitator.com>
 
 - Robert Niederrreiter <rnix@squarewave.at>
 
