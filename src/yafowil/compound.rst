@@ -39,7 +39,7 @@ Render Compound with values set via compound members::
 
     >>> compound = factory('compound', name='COMPOUND')
     >>> compound['inner']  = factory('text', value='value1')
-    >>> compound['inner2'] = factory('text', value='value2', 
+    >>> compound['inner2'] = factory('error:text', value='value2', 
     ...                              props={'required': True})
     >>> pxml(tag('div', compound()))
     <div>
@@ -48,10 +48,10 @@ Render Compound with values set via compound members::
     </div>
     <BLANKLINE>
 
-Extract Compound empty::    
+Extract Compound with empty request::
 
     >>> data = compound.extract({})
-    >>> data 
+    >>> data
     <RuntimeData COMPOUND, value=<UNSET>, 
     extracted=odict([('inner', <UNSET>), ('inner2', <UNSET>)]) at ...> 
 
@@ -63,19 +63,29 @@ Extract Compound empty::
 
 Extract with a value in request::
 
-    >>> data = compound.extract({'COMPOUND.inner': 'newvalue'})
+    >>> request = {
+    ...     'COMPOUND.inner': 'newvalue',
+    ...     'COMPOUND.inner2': '',
+    ... }
+    >>> data = compound.extract(request)
     >>> data['inner']
     <RuntimeData COMPOUND.inner, value='value1', extracted='newvalue' at ...> 
     
-    >>> data.extracted
-    odict([('inner', 'newvalue'), ('inner2', <UNSET>)])
-
-Extract with empty required, error should be there::
-
-    >>> data = compound.extract({'COMPOUND.inner2': ''})
     >>> data['inner2']
-    <RuntimeData COMPOUND.inner2, value='value2', extracted='', 
-    1 error(s) at ...>
+    <RuntimeData COMPOUND.inner2, value='value2', extracted='', 1 error(s) at ...>
+    
+    >>> data.extracted
+    odict([('inner', 'newvalue'), ('inner2', '')])
+    
+    >>> pxml('<div>' + compound(data=data) + '</div>')
+    <div>
+      <input class="text" id="input-COMPOUND-inner" name="COMPOUND.inner" type="text" value="newvalue"/>
+      <div class="error">
+        <div class="errormessage">Mandatory field was empty</div>
+        <input class="required text" id="input-COMPOUND-inner2" name="COMPOUND.inner2" required="required" type="text" value=""/>
+      </div>
+    </div>
+    <BLANKLINE>
 
 Compound display renderers, same as edit renderers::
 
