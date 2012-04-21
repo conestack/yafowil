@@ -913,7 +913,6 @@ def input_file_edit_renderer(widget, data):
         'id': cssid(widget, 'input'),
         'class_': cssclasses(widget, data),            
         'type': 'file',
-        'value':  '',
         'placeholder': widget.attrs.get('placeholder') or None,
         'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
         'required': widget.attrs.get('required') and 'required' or None,        
@@ -925,7 +924,7 @@ def input_file_edit_renderer(widget, data):
 
 def input_file_display_renderer(widget, data):
     tag = data.tag
-    # XXX TODO
+    # XXX: Display file name, size, mimetype
     return tag('div', 'DISPLAY FILE TODO')
 
 
@@ -965,11 +964,9 @@ factory.doc['blueprint']['file'] = """\
 A basic file upload blueprint.
 """
 
-factory.defaults['file.multivalued'] = False
-
 factory.defaults['file.accept'] = None
 factory.doc['props']['file.accept'] = """\
-Content type sto accept.
+Accepted mimetype.
 """
 
 factory.defaults['file.vocabulary'] = [

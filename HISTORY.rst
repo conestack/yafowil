@@ -2,10 +2,16 @@
 History
 =======
 
+1.3.2dev
+--------
+
+- Avoid rendering of value attribute in file blueprint.
+  [rnix, 2012-04-21] 
+
 1.3.1
 -----
 
-- label property can be callable
+- Label property can be callable
   [rnix, 2012-02-19]
 
 1.3
