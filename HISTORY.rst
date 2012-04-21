@@ -5,13 +5,16 @@ History
 1.3.2dev
 --------
 
+- Fix file extractor.
+  [rnix, 2012-04-21]
+
 - Avoid rendering of value attribute in file blueprint.
-  [rnix, 2012-04-21] 
+  [rnix, 2012-04-21]
 
 1.3.1
 -----
 
-- Label property can be callable
+- Label property can be callable.
   [rnix, 2012-02-19]
 
 1.3
@@ -22,7 +25,7 @@ History
   can define an entry point. 
   [jensens, 2012-02-14] 
 
-- Add size attribute for ``select`` edit renderer
+- Add size attribute for ``select`` edit renderer.
   [jensens, 2012-01-20]
 
 - fix number extractor  

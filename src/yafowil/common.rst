@@ -1140,8 +1140,36 @@ File
     >>> widget = factory('file', 'MYFILE')
     >>> widget()
     u'<input id="input-MYFILE" name="MYFILE" type="file" />'
+
+Extract empty::
+
+    >>> request = {
+    ... }
+    >>> data = widget.extract(request)
+    >>> data.extracted
+    <UNSET>
+
+Extract ``new``::
     
-    >>> widget = factory('file', 'MYFILE', value='x')
+    >>> from StringIO import StringIO
+    >>> request = {
+    ...     'MYFILE': {'file': StringIO('123')},
+    ... }
+    >>> data = widget.extract(request)    
+    >>> data.printtree()
+    <RuntimeData MYFILE, value=<UNSET>, 
+    extracted={'action': 'new', 'file': <StringIO.StringIO instance at ...>} 
+    at ...>
+    
+    >>> data.extracted['action']
+    'new'
+    
+    >>> data.extracted['file'].read()
+    '123'
+
+File with value preset::
+
+    >>> widget = factory('file', 'MYFILE', value={'file': StringIO('321')})
     >>> pxml('<div>' + widget() + '</div>')
     <div>
       <input id="input-MYFILE" name="MYFILE" type="file"/>
@@ -1159,31 +1187,49 @@ File
       </div>
     </div>
     <BLANKLINE>
+
+Extract ``keep`` returns original value::
     
     >>> request = {
-    ... }
-    >>> data = widget.extract(request)
-    >>> data.extracted
-    <UNSET>
-    
-    >>> request = {
-    ...     'MYFILE': 'y',
+    ...     'MYFILE': {'file': StringIO('123')},
     ...     'MYFILE-action': 'keep'
     ... }
-    >>> data = widget.extract(request)
-    >>> data.extracted
-    'x'
+    >>> data = widget.extract(request)    
+    >>> data.printtree()
+    <RuntimeData MYFILE, 
+    value={'action': 'keep', 'file': <StringIO.StringIO instance at ...>}, 
+    extracted={'action': 'keep', 'file': <StringIO.StringIO instance at ...>} 
+    at ...>
+
+    >>> data.extracted['file'].read()
+    '321'
     
+    >>> data.extracted['action']
+    'keep'
+
+Extract ``replace`` returns new value::
+
     >>> request['MYFILE-action'] = 'replace'
     >>> data = widget.extract(request)
     >>> data.extracted
-    'y'
+    {'action': 'replace', 'file': <StringIO.StringIO instance at ...>}
     
+    >>> data.extracted['file'].read()
+    '123'
+    
+    >>> data.extracted['action']
+    'replace'
+
+Extract ``delete`` returns UNSET::
+
     >>> request['MYFILE-action'] = 'delete'
     >>> data = widget.extract(request)
     >>> data.extracted
-    <UNSET>
+    {'action': 'delete', 'file': <UNSET>}
     
+    >>> data.extracted['action']
+    'delete'
+
     >>> pxml('<div>' + widget(request=request) + '</div>')
     <div>
       <input id="input-MYFILE" name="MYFILE" type="file"/>

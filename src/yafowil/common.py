@@ -892,16 +892,41 @@ disable, i.e. ``['foo', 'baz']``. Defaults to False.
 ###############################################################################
 
 def file_extractor(widget, data):
+    """Return a dict with following keys:
+    
+    mimetype
+        Mimetype of file.
+    headers
+        rfc822.Message instance.
+    original
+        Original file handle from underlying framework.
+    file
+        File descriptor containing the data.
+    filename
+        File name.
+    action
+        widget flags 'new', 'keep', 'replace', 'delete'
+    """
     name = widget.dottedpath
     if name not in data.request:
         return UNSET
-    if '%s-action' % name in data.request:
-        option = data.request.get('%s-action' % name, 'keep')
-        if option == 'keep':
-            return data.value
-        elif option == 'delete':
-            return UNSET
-    return data.request[name]
+    if not '%s-action' % name in data.request:
+        value = data.request[name]
+        if value:
+            value['action'] = 'new'
+        return value
+    value = data.value
+    action = value['action'] = data.request.get('%s-action' % name, 'keep')
+    if action == 'delete':
+        value['file'] = UNSET
+    elif action == 'replace':
+        new_val = data.request[name]
+        if new_val:
+            value = new_val
+            value['action'] = 'replace'
+        else:
+            value['action'] = 'keep'
+    return value
 
 
 @managedprops('accept', 'placeholder', 'autofocus', 
