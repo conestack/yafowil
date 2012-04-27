@@ -5,6 +5,10 @@ History
 1.3.2dev
 --------
 
+- Add 'help_as_title' to label properties to render help text as title of the
+  label tag instead of a seperate div.
+  [thet, 2012-04-27]
+
 - Fix file extractor.
   [rnix, 2012-04-21]
 
