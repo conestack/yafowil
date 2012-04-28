@@ -1345,6 +1345,17 @@ Render with help text::
     >>> widget()
     u'<label for="input-MYFILE">MYFILE<div class="help">Help!</div></label>'
 
+Render with help text as title attribute::
+
+    >>> widget = factory(
+    ...     'label',
+    ...     name='MYFILE', \
+    ...     props={
+    ...         'help': 'Help!',
+    ...         'help_as_title': True})
+    >>> widget()
+    u'<label for="input-MYFILE" title="Help!">MYFILE</label>'
+
 
 Field
 -----
