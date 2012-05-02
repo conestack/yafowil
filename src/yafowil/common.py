@@ -1237,7 +1237,8 @@ factory.defaults['number.class'] = 'number'
 # label
 ###############################################################################
 
-@managedprops('position', 'label', 'for', 'help', 'help_class',
+@managedprops('position', 'label', 'for',
+              'help', 'help_class', 'help_as_title',
               *css_managed_props)
 def label_renderer(widget, data):
     tag = data.tag
@@ -1247,6 +1248,7 @@ def label_renderer(widget, data):
     label_attrs = {
         'class_': cssclasses(widget, data)
     }
+    help_ = widget.attrs['help'] or ''
     if data.mode == 'edit':
         for_path = widget.attrs['for']
         if for_path:
@@ -1256,17 +1258,20 @@ def label_renderer(widget, data):
             label_attrs['for_'] = cssid(for_widget, 'input')
         else:
             label_attrs['for_'] = cssid(widget, 'input')
-    help = u''
-    if widget.attrs['help']:
+        if help_ and widget.attrs['help_as_title']:
+            label_attrs['title'] = help_
+            help_ = ''
+
+    if help_ and not widget.attrs['help_as_title']:
         help_attrs = {'class_': widget.attrs['help_class']}
-        help = tag('div', widget.attrs['help'], **help_attrs)
+        help_ = tag('div', help_, **help_attrs)
     pos = widget.attrs['position']
     rendered = data.rendered is not UNSET and data.rendered or u''
     if pos == 'inner':
-        return tag('label', label_text, help, rendered, **label_attrs)
+        return tag('label', label_text, help_, rendered, **label_attrs)
     elif pos == 'after':
-        return rendered + tag('label', label_text, help, **label_attrs)
-    return tag('label', label_text, help, **label_attrs) + rendered
+        return rendered + tag('label', label_text, help_, **label_attrs)
+    return tag('label', label_text, help_, **label_attrs) + rendered
 
 
 factory.register(
@@ -1291,7 +1296,7 @@ Text to be displayed as a label.
 
 factory.defaults['label.for'] = None
 factory.doc['props']['label.for'] = """\
-Optional dottedpath of widget to be labled
+Optional dottedpath of widget to be labled.
 """
 
 factory.defaults['label.help'] = None
@@ -1301,6 +1306,11 @@ the label.
 """
 
 factory.defaults['label.help_class'] = 'help'
+
+factory.defaults['label.help_as_title'] = False
+factory.doc['props']['label.help_as_title'] = """\
+Render the help text as title attribute of the label.
+"""
 
 
 ###############################################################################
