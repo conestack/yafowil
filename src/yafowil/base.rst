@@ -650,6 +650,14 @@ prefix::
 modify defaults for widgets attributes via factory
 --------------------------------------------------
 
+We have the following value resolution order for properties:
+
+1) prefixed property
+2) unprefixed property
+3) prefixed default
+4) unprefixed default
+5) KeyError
+
 1st look for prefixed in attributes::
 
     >>> factory.defaults['id'] = 'Test3'
