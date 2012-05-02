@@ -658,42 +658,41 @@ We have the following value resolution order for properties:
 4) unprefixed default
 5) KeyError
 
-1st look for prefixed in attributes::
+Case for (5): We have only some unprefixed default:: 
 
-    >>> factory.defaults['id'] = 'Test3'
-    >>> widget = factory('prefix', name='test')
-    >>> widget()
-    u'<ID>Test3</ID>'
-
-2nd look for unprefixed in attributes::
-
-    >>> factory.defaults['prefix.id'] = 'Test4'
-    >>> widget = factory('prefix', name='test')
-    >>> widget()
-    u'<ID>Test4</ID>'
-
-3rd look for prefixed in defaults::
-
-    >>> widget = factory('prefix', name='test', props={'prefix.id': 'Test'})
-    >>> widget()
-    u'<ID>Test</ID>'
-
-4th look for unprefixed in defaults::
-
-    >>> widget = factory('prefix', name='test', props={'id': 'Test2'})
-    >>> widget()
-    u'<ID>Test2</ID>'
-
-5th raise keyerror::
-
-    >>> del factory.defaults['id']
-    >>> del factory.defaults['prefix.id']
     >>> widget = factory('prefix', name='test')
     >>> try:
     ...     widget()
     ... except KeyError, e:
     ...     print e
     'Property with key "id" is not given on widget "test" (no default).'
+
+Case for (4): Unprefixed default::
+
+    >>> factory.defaults['id'] = 'Test4'
+    >>> widget = factory('prefix', name='test')
+    >>> widget()
+    u'<ID>Test4</ID>'
+
+Case for (3): Prefixed default overrides unprefixed::
+
+    >>> factory.defaults['prefix.id'] = 'Test3'
+    >>> widget = factory('prefix', name='test')
+    >>> widget()
+    u'<ID>Test3</ID>'
+
+Case for (2): Unprefixed property overides any default:: 
+
+    >>> widget = factory('prefix', name='test', props={'id': 'Test2'})
+    >>> widget()
+    u'<ID>Test2</ID>'
+
+Case for (1): Prefixed default overrules all others::
+
+    >>> widget = factory('prefix', name='test', props={'prefix.id': 'Test1'})
+    >>> widget()
+    u'<ID>Test1</ID>'
+
 
 
 fetch value
