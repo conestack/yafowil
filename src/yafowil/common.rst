@@ -15,7 +15,7 @@ Trigger registry by importing module::
 Helper::
 
     >>> from yafowil.utils import Tag
-    >>> tag = Tag(lambda msg: msg)           
+    >>> tag = Tag(lambda msg: msg)
 
 
 Hidden
@@ -28,7 +28,7 @@ Hidden
     ...     name='MYHIDDEN',
     ...     value='Test Hidden')
     >>> widget()
-    u'<input class="hidden" id="input-MYHIDDEN" name="MYHIDDEN" type="hidden" 
+    u'<input class="hidden" id="input-MYHIDDEN" name="MYHIDDEN" type="hidden"
     value="Test Hidden" />'
 
 Display mode of hidden widget renders empty string.::
@@ -58,9 +58,9 @@ Text Input
     >>> widget = factory(
     ...     'text',
     ...     name='MYTEXT',
-    ...     value='Test Text')   
+    ...     value='Test Text')
     >>> widget()
-    u'<input class="text" id="input-MYTEXT" name="MYTEXT" type="text" 
+    u'<input class="text" id="input-MYTEXT" name="MYTEXT" type="text"
     value="Test Text" />'
 
     >>> widget.mode = 'display'
@@ -78,7 +78,7 @@ Autofocus Text Input
     ...     props={
     ...         'autofocus': True})
     >>> widget()
-    u'<input autofocus="autofocus" class="text" id="input-AUTOFOCUS" 
+    u'<input autofocus="autofocus" class="text" id="input-AUTOFOCUS"
     name="AUTOFOCUS" type="text" value="" />'
 
 
@@ -92,7 +92,7 @@ Placeholder Text Input
     ...     props={
     ...         'placeholder': 'This is a placeholder.'})
     >>> widget()
-    u'<input class="text" id="input-PLACEHOLDER" name="PLACEHOLDER" 
+    u'<input class="text" id="input-PLACEHOLDER" name="PLACEHOLDER"
     placeholder="This is a placeholder." type="text" value="" />'
 
 
@@ -107,17 +107,17 @@ Required Input
     ...         'required': True,
     ...         'error_class': True})
     >>> widget()
-    u'<input class="required text" id="input-REQUIRED" name="REQUIRED" 
+    u'<input class="required text" id="input-REQUIRED" name="REQUIRED"
     required="required" type="text" value="" />'
 
 Extract with empty request, key not in request therefore no error::
-    
+
     >>> data = widget.extract({})
     >>> data
     <RuntimeData REQUIRED, value='', extracted=<UNSET> at ...>
-        
-Extract with empty input sent, required error expected::    
-    
+
+Extract with empty input sent, required error expected::
+
     >>> data = widget.extract({'REQUIRED': ''})
     >>> data
     <RuntimeData REQUIRED, value='', extracted='', 1 error(s) at ...>
@@ -125,8 +125,8 @@ Extract with empty input sent, required error expected::
     >>> data.errors
     [ExtractionError('Mandatory field was empty',)]
 
-With getter value set, empty request, no error expected::    
-    
+With getter value set, empty request, no error expected::
+
     >>> widget = factory(
     ...     'text',
     ...     name='REQUIRED',
@@ -139,20 +139,20 @@ With getter value set, empty request, no error expected::
     <RuntimeData REQUIRED, value='Test Text', extracted=<UNSET> at ...>
 
     >>> widget(data=data)
-    u'<input class="required text" id="input-REQUIRED" name="REQUIRED" 
+    u'<input class="required text" id="input-REQUIRED" name="REQUIRED"
     required="required" type="text" value="Test Text" />'
 
-With getter value set, request given, error expected::    
+With getter value set, request given, error expected::
 
     >>> data = widget.extract({'REQUIRED': ''})
     >>> data
     <RuntimeData REQUIRED, value='Test Text', extracted='', 1 error(s) at ...>
-    
+
     >>> widget(data=data)
-    u'<input class="error required text" id="input-REQUIRED" name="REQUIRED" 
-    required="required" type="text" value="" />'    
-    
-Create a custom error message::    
+    u'<input class="error required text" id="input-REQUIRED" name="REQUIRED"
+    required="required" type="text" value="" />'
+
+Create a custom error message::
 
     >>> widget = factory(
     ...     'text',
@@ -163,7 +163,7 @@ Create a custom error message::
     >>> data = widget.extract({'REQUIRED': ''})
     >>> data
     <RuntimeData REQUIRED, value='', extracted='', 1 error(s) at ...>
-    
+
     >>> data.errors
     [ExtractionError('You fool, fill in a value!',)]
 
@@ -180,7 +180,7 @@ Create a custom error message::
     >>> data = widget.extract({'REQUIRED': ''})
     >>> data.errors
     [ExtractionError('Foooo',)]
-    
+
 Display mode of text widget uses ``generic_display_renderer``::
 
     >>> widget = factory(
@@ -209,7 +209,7 @@ Display mode of text widget uses ``generic_display_renderer``::
     ...     mode='display',
     ...     props=dict(template=mytemplate))
     >>> widget()
-    u'<div class="display-text" id="display-DISPLAY"><TEMPLATE>lorem 
+    u'<div class="display-text" id="display-DISPLAY"><TEMPLATE>lorem
     ipsum</TEMPLATE></div>'
 
 Skip mode renders empty string.::
@@ -227,21 +227,21 @@ Checkbox
 --------
 
 A boolean checkbox widget (default)::
-    
-    >>> widget = factory('checkbox', 'MYCHECKBOX')    
+
+    >>> widget = factory('checkbox', 'MYCHECKBOX')
     >>> widget()
-    u'<input id="input-MYCHECKBOX" name="MYCHECKBOX" 
-    type="checkbox" value="" /><input id="checkboxexists-MYCHECKBOX" 
+    u'<input id="input-MYCHECKBOX" name="MYCHECKBOX"
+    type="checkbox" value="" /><input id="checkboxexists-MYCHECKBOX"
     name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />'
 
     >>> widget.mode = 'display'
     >>> widget()
     u'<div class="display-None" id="display-MYCHECKBOX">no</div>'
 
-    >>> widget = factory('checkbox', 'MYCHECKBOX', value='True')    
+    >>> widget = factory('checkbox', 'MYCHECKBOX', value='True')
     >>> widget()
-    u'<input checked="checked" id="input-MYCHECKBOX" name="MYCHECKBOX" 
-    type="checkbox" value="" /><input id="checkboxexists-MYCHECKBOX" 
+    u'<input checked="checked" id="input-MYCHECKBOX" name="MYCHECKBOX"
+    type="checkbox" value="" /><input id="checkboxexists-MYCHECKBOX"
     name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />'
 
     >>> widget.mode = 'display'
@@ -258,14 +258,14 @@ A checkbox widget with a value or an empty string::
     >>> pxml('<div>'+widget()+'</div>')
     <div>
       <input id="input-MYCHECKBOX" name="MYCHECKBOX" type="checkbox" value=""/>
-      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
+      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists"
       type="hidden" value="checkboxexists"/>
     </div>
 
     >>> widget.mode = 'display'
     >>> widget()
     u'<div class="display-None" id="display-MYCHECKBOX">no</div>'
-    
+
     >>> widget = factory(
     ...     'checkbox',
     ...     'MYCHECKBOX',
@@ -273,9 +273,9 @@ A checkbox widget with a value or an empty string::
     ...     props={'format': 'string'})
     >>> pxml('<div>'+widget()+'</div>')
     <div>
-      <input checked="checked" id="input-MYCHECKBOX" name="MYCHECKBOX" 
+      <input checked="checked" id="input-MYCHECKBOX" name="MYCHECKBOX"
       type="checkbox" value="Test Checkbox"/>
-      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
+      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists"
       type="hidden" value="checkboxexists"/>
     </div>
     <BLANKLINE>
@@ -298,9 +298,9 @@ Checkbox with manually set 'checked' attribute::
     ...     })
     >>> pxml('<div>'+widget()+'</div>')
     <div>
-      <input checked="checked" id="input-MYCHECKBOX" name="MYCHECKBOX" 
+      <input checked="checked" id="input-MYCHECKBOX" name="MYCHECKBOX"
       type="checkbox" value=""/>
-      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
+      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists"
       type="hidden" value="checkboxexists"/>
     </div>
     <BLANKLINE>
@@ -315,9 +315,9 @@ Checkbox with manually set 'checked' attribute::
     ...     })
     >>> pxml('<div>'+widget()+'</div>')
     <div>
-      <input id="input-MYCHECKBOX" name="MYCHECKBOX" type="checkbox" 
+      <input id="input-MYCHECKBOX" name="MYCHECKBOX" type="checkbox"
       value="Test Checkbox"/>
-      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
+      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists"
       type="hidden" value="checkboxexists"/>
     </div>
     <BLANKLINE>
@@ -325,23 +325,23 @@ Checkbox with manually set 'checked' attribute::
 Checkbox extraction::
 
     >>> request = {
-    ...     'MYCHECKBOX': '1', 
+    ...     'MYCHECKBOX': '1',
     ...     'MYCHECKBOX-exists': 'checkboxexists'
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
     <RuntimeData MYCHECKBOX, value='Test Checkbox', extracted='1' at ...>
-    
+
     >>> request = {
-    ...     'MYCHECKBOX': '', 
+    ...     'MYCHECKBOX': '',
     ...     'MYCHECKBOX-exists': 'checkboxexists'
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
     <RuntimeData MYCHECKBOX, value='Test Checkbox', extracted='' at ...>
-    
+
     >>> request = {
-    ...     'MYCHECKBOX': 1, 
+    ...     'MYCHECKBOX': 1,
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
@@ -355,13 +355,13 @@ bool extraction::
     ...     value='Test Checkbox',
     ...     props={'format': 'bool'})
     >>> request = {
-    ...     'MYCHECKBOX': '', 
+    ...     'MYCHECKBOX': '',
     ...     'MYCHECKBOX-exists': 'checkboxexists'
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
     <RuntimeData MYCHECKBOX, value='Test Checkbox', extracted=True at ...>
-    
+
     >>> request = {
     ...     'MYCHECKBOX-exists': 'checkboxexists'
     ... }
@@ -376,15 +376,15 @@ invalid format::
     ...     'MYCHECKBOX',
     ...     props={'format': 'invalid'})
     >>> request = {
-    ...     'MYCHECKBOX': '', 
+    ...     'MYCHECKBOX': '',
     ...     'MYCHECKBOX-exists': 'checkboxexists'
     ... }
     >>> data = widget.extract(request)
     Traceback (most recent call last):
       ...
     ValueError: Checkbox widget has invalid format 'invalid' set
-    
-display::    
+
+display::
 
     >>> widget = factory(
     ...     'checkbox',
@@ -392,7 +392,7 @@ display::
     ...     value='',
     ...     mode='display',
     ...     props={'format': 'string'})
-    
+
     >> pxml('<div>'+widget()+'</div>')
 
 
@@ -412,11 +412,11 @@ Textarea
 
     >>> widget()
     u'<textarea cols="80" id="input-MYTEXTAREA" name="MYTEXTAREA" rows="25"></textarea>'
-    
+
     >>> widget.mode = 'display'
-    >>> widget()    
+    >>> widget()
     u'<div class="display-None" id="display-MYTEXTAREA"></div>'
-    
+
     >>> widget = factory(
     ...     'textarea',
     ...     'MYTEXTAREA',
@@ -428,7 +428,7 @@ Textarea
     ...         },
     ...     })
     >>> widget()
-    u'<textarea cols="80" id="input-MYTEXTAREA" name="MYTEXTAREA" 
+    u'<textarea cols="80" id="input-MYTEXTAREA" name="MYTEXTAREA"
     rows="25">Test Textarea</textarea>'
 
 
@@ -444,7 +444,7 @@ Lines
     ...     })
     >>> widget()
     u'<textarea cols="40" id="input-MYLINES" name="MYLINES" rows="8"></textarea>'
-    
+
     >>> widget = factory(
     ...     'lines',
     ...     'MYLINES',
@@ -454,15 +454,15 @@ Lines
     ...     })
     >>> widget()
     u'<textarea cols="40" id="input-MYLINES" name="MYLINES" rows="8">a\nb\nc</textarea>'
-    
+
     >>> data = widget.extract({'MYLINES': 'a\nb\nc'})
     >>> data.extracted
     ['a', 'b', 'c']
-    
+
     >>> data = widget.extract({'MYLINES': ''})
     >>> data.extracted
     []
-    
+
     XXX
     >> widget.mode = 'display'
     >> widget()
@@ -482,8 +482,8 @@ Single Valued
     ...     value='one',
     ...     props={
     ...         'vocabulary': [
-    ...             ('one','One'), 
-    ...             ('two', 'Two'), 
+    ...             ('one','One'),
+    ...             ('two', 'Two'),
     ...             ('three', 'Three'),
     ...             ('four', 'Four')]})
     >>> pxml(widget())
@@ -500,7 +500,7 @@ Single Valued
     u'<div class="display-select" id="display-MYSELECT">one</div>'
 
     >>> widget.mode = 'edit'
-    
+
     >>> data = widget.extract({'MYSELECT': 'two'})
     >>> pxml(widget(data=data))
     <select class="select" id="input-MYSELECT" name="MYSELECT">
@@ -510,10 +510,10 @@ Single Valued
       <option id="input-MYSELECT-four" value="four">Four</option>
     </select>
     <BLANKLINE>
-    
+
 Single valued set to completly disabled::
 
-    >>> widget.attrs['disabled'] = True    
+    >>> widget.attrs['disabled'] = True
     >>> pxml(widget())
     <select class="select" disabled="disabled" id="input-MYSELECT" name="MYSELECT">
       <option id="input-MYSELECT-one" selected="selected" value="one">One</option>
@@ -525,7 +525,7 @@ Single valued set to completly disabled::
 
 Single valued with specific options disabled::
 
-    >>> widget.attrs['disabled'] = ['two', 'four']    
+    >>> widget.attrs['disabled'] = ['two', 'four']
     >>> pxml(widget())
     <select class="select" id="input-MYSELECT" name="MYSELECT">
       <option id="input-MYSELECT-one" selected="selected" value="one">One</option>
@@ -547,8 +547,8 @@ Multi valued
     ...     props={
     ...         'multivalued': True,
     ...         'vocabulary': [
-    ...             ('one','One'), 
-    ...             ('two', 'Two'), 
+    ...             ('one','One'),
+    ...             ('two', 'Two'),
     ...             ('three', 'Three'),
     ...             ('four', 'Four')]})
     >>> pxml('<div>'+widget()+'</div>')
@@ -561,7 +561,7 @@ Multi valued
         <option id="input-MYSELECT-four" value="four">Four</option>
       </select>
     </div>
-    <BLANKLINE>    
+    <BLANKLINE>
 
     >>> widget.mode = 'display'
     >>> pxml(widget())
@@ -579,8 +579,8 @@ Multiple values on single valued selection fails::
     ...     value=['one', 'two'],
     ...     props={
     ...         'vocabulary': [
-    ...             ('one','One'), 
-    ...             ('two', 'Two'), 
+    ...             ('one','One'),
+    ...             ('two', 'Two'),
     ...             ('three', 'Three'),
     ...             ('four', 'Four')]})
     >>> pxml(widget())
@@ -596,8 +596,8 @@ Render single selection as radio buttons::
     ...     value='one',
     ...     props={
     ...         'vocabulary': [
-    ...             ('one','One'), 
-    ...             ('two', 'Two'), 
+    ...             ('one','One'),
+    ...             ('two', 'Two'),
     ...             ('three', 'Three'),
     ...             ('four', 'Four')],
     ...         'format': 'single'})
@@ -624,13 +624,13 @@ Render single selection as radio buttons::
       </div>
     </div>
     <BLANKLINE>
-    
+
 With Radio
 ..........
 
 Render single selection as radio buttons, disables all::
 
-    >>> widget.attrs['disabled'] = True    
+    >>> widget.attrs['disabled'] = True
     >>> pxml('<div>'+widget()+'</div>')
     <div>
       <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
@@ -657,7 +657,7 @@ Render single selection as radio buttons, disables all::
 
 Render single selection as radio buttons, disables some::
 
-    >>> widget.attrs['disabled'] = ['one', 'three']    
+    >>> widget.attrs['disabled'] = ['one', 'three']
     >>> pxml('<div>'+widget()+'</div>')
     <div>
       <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
@@ -681,7 +681,7 @@ Render single selection as radio buttons, disables some::
       </div>
     </div>
     <BLANKLINE>
-    
+
 With Checkboxes
 ...............
 
@@ -694,8 +694,8 @@ Render multi selection as checkboxes::
     ...     props={
     ...         'multivalued': True,
     ...         'vocabulary': [
-    ...             ('one','One'), 
-    ...             ('two', 'Two'), 
+    ...             ('one','One'),
+    ...             ('two', 'Two'),
     ...             ('three', 'Three'),
     ...             ('four', 'Four')],
     ...         'format': 'single'})
@@ -722,7 +722,7 @@ Render multi selection as checkboxes::
       </div>
     </div>
     <BLANKLINE>
-    
+
 Specials
 ........
 
@@ -735,8 +735,8 @@ Using 'ul' instead of 'div' for rendering radio or checkbox selections::
     ...     props={
     ...         'multivalued': True,
     ...         'vocabulary': [
-    ...             ('one','One'), 
-    ...             ('two', 'Two'), 
+    ...             ('one','One'),
+    ...             ('two', 'Two'),
     ...             ('three', 'Three'),
     ...             ('four', 'Four')],
     ...         'format': 'single',
@@ -774,7 +774,7 @@ Render single format selection with label after input::
     ...     props={
     ...         'multivalued': True,
     ...         'vocabulary': [
-    ...             ('one','One'), 
+    ...             ('one','One'),
     ...             ('two', 'Two'),
     ...         ],
     ...         'format': 'single',
@@ -805,7 +805,7 @@ Render single format selection with input inside label::
     ...     props={
     ...         'multivalued': True,
     ...         'vocabulary': [
-    ...             ('one','One'), 
+    ...             ('one','One'),
     ...             ('two', 'Two'),
     ...         ],
     ...         'format': 'single',
@@ -833,8 +833,8 @@ Check selection required::
     ...     props={
     ...         'required': 'Selection required',
     ...         'vocabulary': [
-    ...             ('one','One'), 
-    ...             ('two', 'Two'), 
+    ...             ('one','One'),
+    ...             ('two', 'Two'),
     ...             ('three', 'Three'),
     ...             ('four', 'Four')]})
     >>> pxml(widget())
@@ -845,11 +845,11 @@ Check selection required::
       <option id="input-reqselect-four" value="four">Four</option>
     </select>
     <BLANKLINE>
-    
+
     >>> data = widget.extract(request={'reqselect': ''})
     >>> data.printtree()
     <RuntimeData reqselect, value=<UNSET>, extracted='', 1 error(s) at ...>
-    
+
     >>> widget = factory(
     ...     'select',
     ...     'reqselect',
@@ -857,8 +857,8 @@ Check selection required::
     ...         'required': 'Selection required',
     ...         'multivalued': True,
     ...         'vocabulary': [
-    ...             ('one','One'), 
-    ...             ('two', 'Two'), 
+    ...             ('one','One'),
+    ...             ('two', 'Two'),
     ...             ('three', 'Three'),
     ...             ('four', 'Four')]})
     >>> pxml('<div>' + widget() + '</div>')
@@ -872,7 +872,7 @@ Check selection required::
       </select>
     </div>
     <BLANKLINE>
-    
+
     >>> data = widget.extract(request={'reqselect-exists': 'exists'})
     >>> data.printtree()
     <RuntimeData reqselect, value=<UNSET>, extracted=[], 1 error(s) at ...>
@@ -884,17 +884,17 @@ Single selection extraction without value::
     ...     'myselect',
     ...     props={
     ...         'vocabulary': [
-    ...             ('one','One'), 
+    ...             ('one','One'),
     ...             ('two', 'Two')]})
-    
+
     >>> request = {
     ...     'myselect': 'one',
-    ...     'myselect-exists': True, 
+    ...     'myselect-exists': True,
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
     <RuntimeData myselect, value=<UNSET>, extracted='one' at ...>
-    
+
 Single selection extraction with value::
 
     >>> widget = factory(
@@ -903,11 +903,11 @@ Single selection extraction with value::
     ...     value='two',
     ...     props={
     ...         'vocabulary': [
-    ...             ('one','One'), 
+    ...             ('one','One'),
     ...             ('two', 'Two')]})
-    
+
     >>> request = {
-    ...     'myselect': 'one', 
+    ...     'myselect': 'one',
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
@@ -919,14 +919,14 @@ with value::
     >>> widget.attrs['disabled'] = True
     >>> data = widget.extract({'myselect-exists': True})
     >>> data.printtree()
-    <RuntimeData myselect, value='two', extracted='two' at ...>    
+    <RuntimeData myselect, value='two', extracted='two' at ...>
 
 Disabled can be also the value itself::
 
     >>> widget.attrs['disabled'] = 'two'
     >>> data = widget.extract({'myselect-exists': True})
     >>> data.printtree()
-    <RuntimeData myselect, value='two', extracted='two' at ...>    
+    <RuntimeData myselect, value='two', extracted='two' at ...>
 
 Single selection extraction required::
 
@@ -937,9 +937,9 @@ Single selection extraction required::
     ...     props={
     ...         'required': True,
     ...         'vocabulary': [
-    ...             ('one','One'), 
+    ...             ('one','One'),
     ...             ('two', 'Two')]})
-    
+
     >>> request = {
     ...     'myselect':'',
     ... }
@@ -952,7 +952,7 @@ A disabled and required returns value itself::
     >>> widget.attrs['disabled'] = True
     >>> data = widget.extract({'myselect-exists': True})
     >>> data.printtree()
-    <RuntimeData myselect, value='two', extracted='two' at ...>    
+    <RuntimeData myselect, value='two', extracted='two' at ...>
 
 Multiple selection extraction without value::
 
@@ -962,11 +962,11 @@ Multiple selection extraction without value::
     ...     props={
     ...         'multivalued': True,
     ...         'vocabulary': [
-    ...             ('one','One'), 
+    ...             ('one','One'),
     ...             ('two', 'Two')]})
-    
+
     >>> request = {
-    ...     'myselect': ['one', 'two'], 
+    ...     'myselect': ['one', 'two'],
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
@@ -981,12 +981,12 @@ Multiple selection extraction with value::
     ...     props={
     ...         'multivalued': True,
     ...         'vocabulary': [
-    ...             ('one','One'), 
+    ...             ('one','One'),
     ...             ('two', 'Two'),
     ...             ('three', 'Three')]})
-    
+
     >>> request = {
-    ...     'myselect': 'one', 
+    ...     'myselect': 'one',
     ...     'myselect-exists': True,
     ... }
     >>> data = widget.extract(request)
@@ -998,7 +998,7 @@ Multiselection, completly disabled::
     >>> widget.attrs['disabled'] = True
     >>> data = widget.extract({'myselect-exists': True})
     >>> data.printtree()
-    <RuntimeData myselect, value='three', extracted=['three'] at ...>    
+    <RuntimeData myselect, value='three', extracted=['three'] at ...>
 
 Multiselection, partly disabled, empty request::
 
@@ -1010,11 +1010,11 @@ Multiselection, partly disabled, empty request::
     ...         'multivalued': True,
     ...         'disabled': ['two', 'three'],
     ...         'vocabulary': [
-    ...             ('one','One'), 
+    ...             ('one','One'),
     ...             ('two', 'Two'),
     ...             ('three', 'Three'),
     ...             ('four', 'Four')]})
-    
+
     >>> data = widget.extract({})
     >>> data.printtree()
     <RuntimeData myselect, value=['one', 'three'], extracted=<UNSET> at ...>
@@ -1029,16 +1029,16 @@ Multiselection, partly disabled, non-empty request::
     ...         'multivalued': True,
     ...         'disabled': ['two', 'three', 'four', 'five'],
     ...         'vocabulary': [
-    ...             ('one','One'), 
+    ...             ('one','One'),
     ...             ('two', 'Two'),
     ...             ('three', 'Three'),
     ...             ('four', 'Four'),
     ...             ('five', 'Five')]})
     >>> request = {
-    ...     'myselect': ['one', 'two', 'five'], 
+    ...     'myselect': ['one', 'two', 'five'],
     ...     'myselect-exists': True,
     ... }
-    
+
 Explanation:
 * one is a simple value as usal,
 * two is disabled and in value, so it should be kept in.
@@ -1062,7 +1062,7 @@ Single selection radio extraction::
     ...     props={
     ...         'format': 'single',
     ...         'vocabulary': [
-    ...             ('one','One'), 
+    ...             ('one','One'),
     ...             ('two', 'Two'),
     ...             ('three', 'Three')]})
 
@@ -1077,7 +1077,7 @@ No exists marker in request. Extracts to UNSET::
 Exists marker in request. Extracts to empty string::
 
     >>> request = {
-    ...     'myselect-exists': '1', 
+    ...     'myselect-exists': '1',
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
@@ -1102,10 +1102,10 @@ Multi selection radio extraction::
     ...         'multivalued': True,
     ...         'format': 'single',
     ...         'vocabulary': [
-    ...             ('one','One'), 
+    ...             ('one','One'),
     ...             ('two', 'Two'),
     ...             ('three', 'Three')]})
-    
+
 No exists marker in request. Extracts to UNSET::
 
     >>> request = {
@@ -1117,7 +1117,7 @@ No exists marker in request. Extracts to UNSET::
 Exists marker in request. Extracts to empty list::
 
     >>> request = {
-    ...     'myselect-exists': '1', 
+    ...     'myselect-exists': '1',
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
@@ -1150,20 +1150,20 @@ Extract empty::
     <UNSET>
 
 Extract ``new``::
-    
+
     >>> from StringIO import StringIO
     >>> request = {
     ...     'MYFILE': {'file': StringIO('123')},
     ... }
-    >>> data = widget.extract(request)    
+    >>> data = widget.extract(request)
     >>> data.printtree()
-    <RuntimeData MYFILE, value=<UNSET>, 
-    extracted={'action': 'new', 'file': <StringIO.StringIO instance at ...>} 
+    <RuntimeData MYFILE, value=<UNSET>,
+    extracted={'action': 'new', 'file': <StringIO.StringIO instance at ...>}
     at ...>
-    
+
     >>> data.extracted['action']
     'new'
-    
+
     >>> data.extracted['file'].read()
     '123'
 
@@ -1189,21 +1189,21 @@ File with value preset::
     <BLANKLINE>
 
 Extract ``keep`` returns original value::
-    
+
     >>> request = {
     ...     'MYFILE': {'file': StringIO('123')},
     ...     'MYFILE-action': 'keep'
     ... }
-    >>> data = widget.extract(request)    
+    >>> data = widget.extract(request)
     >>> data.printtree()
-    <RuntimeData MYFILE, 
-    value={'action': 'keep', 'file': <StringIO.StringIO instance at ...>}, 
-    extracted={'action': 'keep', 'file': <StringIO.StringIO instance at ...>} 
+    <RuntimeData MYFILE,
+    value={'action': 'keep', 'file': <StringIO.StringIO instance at ...>},
+    extracted={'action': 'keep', 'file': <StringIO.StringIO instance at ...>}
     at ...>
 
     >>> data.extracted['file'].read()
     '321'
-    
+
     >>> data.extracted['action']
     'keep'
 
@@ -1213,10 +1213,10 @@ Extract ``replace`` returns new value::
     >>> data = widget.extract(request)
     >>> data.extracted
     {'action': 'replace', 'file': <StringIO.StringIO instance at ...>}
-    
+
     >>> data.extracted['file'].read()
     '123'
-    
+
     >>> data.extracted['action']
     'replace'
 
@@ -1226,7 +1226,7 @@ Extract ``delete`` returns UNSET::
     >>> data = widget.extract(request)
     >>> data.extracted
     {'action': 'delete', 'file': <UNSET>}
-    
+
     >>> data.extracted['action']
     'delete'
 
@@ -1247,10 +1247,10 @@ Extract ``delete`` returns UNSET::
       </div>
     </div>
     <BLANKLINE>
-    
+
     >>> widget = factory('file', 'MYFILE', props={'accept': 'foo/bar'})
     >>> widget()
-    u'<input accept="foo/bar" id="input-MYFILE" name="MYFILE" 
+    u'<input accept="foo/bar" id="input-MYFILE" name="MYFILE"
     type="file" />'
 
 
@@ -1264,7 +1264,7 @@ Submit(action)
     >>> widget = factory('submit', name='save', props=props)
     >>> widget()
     u'<input id="input-save" name="action.save" type="submit" value="Action name" />'
-    
+
     >>> props = {
     ...     'action': True,
     ...     'label': 'Action name',
@@ -1273,7 +1273,7 @@ Submit(action)
     >>> widget = factory('submit', name='save', props=props)
     >>> widget()
     u''
-    
+
     >>> props = {
     ...     'action': True,
     ...     'label': 'Action name',
@@ -1292,7 +1292,7 @@ Used to pass hidden arguments out of form namespace::
     >>> widget = factory('proxy', name='proxy', value='1')
     >>> widget()
     u'<input id="input-proxy" name="proxy" type="hidden" value="1" />'
-    
+
     >>> widget(request={'proxy': '2'})
     u'<input id="input-proxy" name="proxy" type="hidden" value="2" />'
 
@@ -1310,7 +1310,7 @@ Default::
       <input id="input-MYFILE" name="MYFILE" type="file"/>
     </div>
     <BLANKLINE>
-    
+
 Label after widget::
 
     >>> widget = factory('label:file', name='MYFILE', \
@@ -1332,7 +1332,7 @@ Same with inner label::
     <div>
       <label for="input-MYFILE">MY FILE<input id="input-MYFILE" name="MYFILE" type="file"/></label>
     </div>
-    <BLANKLINE>    
+    <BLANKLINE>
 
 Render with help text::
 
@@ -1373,7 +1373,7 @@ Render error class directly on field::
     >>> data = widget.extract({'myfield': ''})
     >>> data.printtree()
     <RuntimeData myfield, value=<UNSET>, extracted='', 1 error(s) at ...>
-    
+
     >>> pxml(widget(data))
     <div class="field fielderrorclass" id="field-myfield">
       <input class="required text" id="input-myfield" name="myfield" required="required" type="text" value=""/>
@@ -1388,7 +1388,7 @@ Password widget has some additional properties, ``strength``, ``minlength``
 and ``ascii``.
 
 Use in add forms, no password set yet::
-    
+
     >>> widget = factory(
     ...     'password',
     ...     name='pwd',
@@ -1396,15 +1396,15 @@ Use in add forms, no password set yet::
     ...     })
     >>> widget()
     u'<input class="password" id="input-pwd" name="pwd" type="password" value="" />'
-    
+
     >>> data = widget.extract({})
     >>> data.extracted
     <UNSET>
-    
+
     >>> data = widget.extract({'pwd': 'xx'})
     >>> data.extracted
     'xx'
-    
+
     >>> widget.mode = 'display'
     >>> widget()
     u''
@@ -1421,15 +1421,15 @@ password value is UNSET, this means that password was not changed::
     ...     })
     >>> widget()
     u'<input class="password" id="input-password" name="password" type="password" value="_NOCHANGE_" />'
-    
+
     >>> data = widget.extract({'password': '_NOCHANGE_'})
     >>> data.extracted
     <UNSET>
-    
+
     >>> data = widget.extract({'password': 'foo'})
     >>> data.extracted
     'foo'
-    
+
     >>> widget(data=data)
     u'<input class="password" id="input-password" name="password" type="password" value="foo" />'
 
@@ -1448,23 +1448,23 @@ Password validation::
     >>> data = widget.extract({'pwd': ''})
     >>> data.errors
     [ExtractionError('Password too weak',)]
-    
+
     >>> data = widget.extract({'pwd': 'A0*'})
     >>> data.errors
     [ExtractionError('Password too weak',)]
-    
+
     >>> data = widget.extract({'pwd': 'a0*'})
     >>> data.errors
     [ExtractionError('Password too weak',)]
-    
+
     >>> data = widget.extract({'pwd': 'aA*'})
     >>> data.errors
     [ExtractionError('Password too weak',)]
-    
+
     >>> data = widget.extract({'pwd': 'aA0'})
     >>> data.errors
     [ExtractionError('Password too weak',)]
-    
+
     >>> data = widget.extract({'pwd': 'aA0*'})
     >>> data.errors
     []
@@ -1480,7 +1480,7 @@ Minlength validation::
     >>> data = widget.extract({'pwd': 'xx'})
     >>> data.errors
     [ExtractionError('Input must have at least 3 characters.',)]
-    
+
     >>> data = widget.extract({'pwd': 'xxx'})
     >>> data.errors
     []
@@ -1496,7 +1496,7 @@ Ascii validation::
     >>> data = widget.extract({'pwd': u'äää'})
     >>> data.errors
     [ExtractionError('Input contains illegal characters.',)]
-    
+
     >>> data = widget.extract({'pwd': u'xx'})
     >>> data.errors
     []
@@ -1515,19 +1515,19 @@ Combine all validations::
     >>> data = widget.extract({'pwd': u''})
     >>> data.errors
     [ExtractionError('No Password given',)]
-    
+
     >>> data = widget.extract({'pwd': u'xxxxx'})
     >>> data.errors
     [ExtractionError('Input must have at least 6 characters.',)]
-    
+
     >>> data = widget.extract({'pwd': u'xxxxxä'})
     >>> data.errors
     [ExtractionError('Input contains illegal characters.',)]
-    
+
     >>> data = widget.extract({'pwd': u'xxxxxx'})
     >>> data.errors
     [ExtractionError('Password too weak',)]
-    
+
     >>> data = widget.extract({'pwd': u'xX1*00'})
     >>> data.errors
     []
@@ -1541,8 +1541,8 @@ Chained password inside error inside field::
     >>> widget = factory('field:error:password', name='password',
     ...                  props={'label': 'Password',
     ...                         'required': 'No password given!'})
-    
-    >>> data = widget.extract({'password': ''}) 
+
+    >>> data = widget.extract({'password': ''})
     >>> pxml(widget(data=data))
     <div class="field" id="field-password">
       <div class="error">
@@ -1551,7 +1551,7 @@ Chained password inside error inside field::
       </div>
     </div>
     <BLANKLINE>
-    
+
     >>> data = widget.extract({'password': 'secret'})
     >>> pxml(widget(data=data))
     <div class="field" id="field-password">
@@ -1575,15 +1575,15 @@ e-mail
     ...     name='email')
     >>> pxml(widget())
     <input class="email" id="input-email" name="email" type="email" value=""/>
-    
+
     >>> data = widget.extract({'email': 'foo@bar'})
     >>> data.errors
     [ExtractionError('Input not a valid email address.',)]
-    
+
     >>> data = widget.extract({'email': '@bar.com'})
     >>> data.errors
     [ExtractionError('Input not a valid email address.',)]
-    
+
     >>> data = widget.extract({'email': 'foo@bar.com'})
     >>> data.errors
     []
@@ -1598,20 +1598,20 @@ URL
     ...     name='url')
     >>> pxml(widget())
     <input class="url" id="input-url" name="url" type="url" value=""/>
-    
+
     >>> data = widget.extract({'url': 'htt:/bla'})
     >>> data.errors
     [ExtractionError('Input not a valid web address.',)]
-    
+
     >>> data = widget.extract({'url': 'invalid'})
     >>> data.errors
     [ExtractionError('Input not a valid web address.',)]
-    
+
     >>> data = widget.extract({'url': 'http://www.foo.bar.com:8080/bla#fasel?blubber=bla&bla=fasel'})
     >>> data.errors
     []
-  
-    
+
+
 Number
 ------
 
@@ -1639,11 +1639,11 @@ Default behaviour::
     >>> data = widget.extract({})
     >>> data.printtree()
     <RuntimeData NUMBER, value=3, extracted=<UNSET> at ...>
-    
+
     >>> data = widget.extract({'NUMBER': 'abc'})
     >>> data.errors
     [ExtractionError('Input is not a valid number (float).',)]
-    
+
     >>> data = widget.extract({'NUMBER': '10'})
     >>> data.errors
     []
@@ -1651,7 +1651,7 @@ Default behaviour::
     >>> data = widget.extract({'NUMBER': '10.0'})
     >>> data.errors
     []
-    
+
     >>> widget = factory(
     ...     'number',
     ...     name='NUMBER',
@@ -1671,7 +1671,7 @@ With integer datatype::
     >>> data = widget.extract({'NUMBER': '10.0'})
     >>> data.errors
     [ExtractionError('Input is not a valid number (integer).',)]
-    
+
 With min set::
 
     >>> widget = factory(
@@ -1686,11 +1686,11 @@ With min set::
     >>> data = widget.extract({'NUMBER': '10'})
     >>> data.errors
     []
-    
+
     >>> data = widget.extract({'NUMBER': '11'})
     >>> data.errors
     []
-    
+
 With max set::
 
     >>> widget = factory(
@@ -1705,11 +1705,11 @@ With max set::
     >>> data = widget.extract({'NUMBER': '10'})
     >>> data.errors
     []
-    
+
     >>> data = widget.extract({'NUMBER': '11'})
     >>> data.errors
     [ExtractionError('Value has to be at maximum 10.',)]
-    
+
 With step set::
 
     >>> widget = factory(
