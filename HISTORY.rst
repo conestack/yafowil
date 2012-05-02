@@ -5,6 +5,9 @@ History
 1.3.2dev
 --------
 
+- Add a title attribute to the label blueprint.
+  [thet, 2012-05-02]
+
 - Fix file extractor.
   [rnix, 2012-04-21]
 

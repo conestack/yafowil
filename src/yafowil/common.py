@@ -1256,6 +1256,8 @@ def label_renderer(widget, data):
             label_attrs['for_'] = cssid(for_widget, 'input')
         else:
             label_attrs['for_'] = cssid(widget, 'input')
+        if widget.attrs['title']:
+            label_attrs['title'] = widget.attrs['title']
     help = u''
     if widget.attrs['help']:
         help_attrs = {'class_': widget.attrs['help_class']}
@@ -1301,6 +1303,11 @@ the label.
 """
 
 factory.defaults['label.help_class'] = 'help'
+
+factory.defaults['label.title'] = None
+factory.doc['props']['label.title'] = """\
+Optional help text to be rendered in the title attribute of the label.
+"""
 
 
 ###############################################################################
