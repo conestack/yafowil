@@ -16,14 +16,13 @@ def get_plugin_names(ns=None):
 
 
 def get_resource_directory(module_name):
-    result = []
     for ep in get_entry_points(ns='resourcedir'):
         if ep.module_name != module_name:
             continue
         return ep.load()()
 
 
-def _get_filepaths(module_name, ns, thirdparty):    
+def _get_filepaths(module_name, ns, thirdparty):
     for ep in get_entry_points(ns=ns):
         if ep.module_name == module_name:
             return ep.load()(thirdparty=thirdparty)
@@ -38,17 +37,17 @@ def get_stylesheets(module_name, thirdparty=True):
     return _get_filepaths(module_name, 'stylesheets', thirdparty)
 
 
-class Unset(object): 
-    
+class Unset(object):
+
     def __nonzero__(self):
         return False
-    
+
     def __str__(self):
         return ''
-    
+
     def __len__(self):
         return 0
-    
+
     def __repr__(self):
         return '<UNSET>'
 
@@ -59,13 +58,13 @@ def vocabulary(definition):
     """Convert different kinds of input into a list of bi-tuples, both strings.
     """
     if callable(definition):
-        definition = definition() 
+        definition = definition()
     if isinstance(definition, basestring):
-        return [(definition, definition),]
+        return [(definition, definition), ]
     # dict-like
     if hasattr(definition, '__getitem__') and hasattr(definition, 'keys'):
         return [(_, definition[_]) for _ in definition.keys()]
-    
+
     # iterable
     if hasattr(definition, '__iter__'):
         new_vocab = []
@@ -91,7 +90,7 @@ class Tag(object):
     def __init__(self, translate):
         self.translate = translate
         self.encoding = 'utf-8'
-                
+
     def __call__(self, tag_name, *inners, **attributes):
         """Generates some xml/html tag.
             
@@ -122,7 +121,7 @@ class Tag(object):
             cl.append((key.strip('_'), value))
         attributes = u''
         if cl:
-            attributes = u' %s' % u' '.join(sorted([u'%s="%s"' % _ for _ in cl]))     
+            attributes = u' %s' % u' '.join(sorted([u'%s="%s"' % _ for _ in cl]))
         cl = list()
         for inner in inners:
             inner = self.translate(inner)
@@ -143,18 +142,18 @@ class Tag(object):
 
 ## Deprecation message
 def _deprecated_null_localization(msg):
-    logging.warn("Deprecated usage of 'yafowil.utils.tag', please use the "+\
+    logging.warn("Deprecated usage of 'yafowil.utils.tag', please use the " + \
                  "tag factory on RuntimeData instead.")
     return msg
 
-tag = Tag(_deprecated_null_localization)        
+tag = Tag(_deprecated_null_localization)
 
 
 class managedprops(object):
-    
+
     def __init__(self, *args):
         self.__yafowil_managed_props__ = args
-        
+
     def __call__(self, func):
         func.__yafowil_managed_props__ = self.__yafowil_managed_props__
         return func
@@ -164,7 +163,7 @@ def cssid(widget, prefix, postfix=None):
     path = widget.dottedpath.replace('.', '-')
     id = "%s-%s" % (prefix, path)
     if postfix is not None:
-        id = '%s-%s' % (id, postfix) 
+        id = '%s-%s' % (id, postfix)
     return id
 
 
