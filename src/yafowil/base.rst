@@ -687,7 +687,7 @@ Case for (2): Unprefixed property overides any default::
     >>> widget()
     u'<ID>Test2</ID>'
 
-Case for (1): Prefixed default overrules all others::
+Case for (1): Prefixed property overrules all others::
 
     >>> widget = factory('prefix', name='test', props={'prefix.id': 'Test1'})
     >>> widget()
