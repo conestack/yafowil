@@ -693,6 +693,10 @@ Case for (1): Prefixed default overrules all others::
     >>> widget()
     u'<ID>Test1</ID>'
 
+Clean up::
+
+    >>> del factory.defaults['id']
+    >>> del factory.defaults['prefix.id']
 
 
 fetch value
