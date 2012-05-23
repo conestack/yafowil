@@ -5,6 +5,10 @@ History
 1.3.2dev
 --------
 
+- Check with 'if not value' instead of 'if value is None' in
+  ``generic_display_renderer``.
+  [thet, 2012-05-23]
+
 - Add a title attribute to the label blueprint.
   [thet, 2012-05-02]
 

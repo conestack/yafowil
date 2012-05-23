@@ -171,7 +171,7 @@ def generic_display_renderer(widget, data):
         content = widget.attrs['template'](widget, data)
     else:
         value = fetch_value(widget, data)
-        if value is None:
+        if not value:
             value = u''
         content = widget.attrs['template'] % value
     attrs = {
