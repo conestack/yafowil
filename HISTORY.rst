@@ -2,8 +2,8 @@
 History
 =======
 
-1.3.2dev
---------
+1.3.2
+-----
 
 - Check with 'if not value' instead of 'if value is None' in
   ``generic_display_renderer``.
