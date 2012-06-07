@@ -329,7 +329,8 @@ class Widget(object):
                 self.current_prefix = ren_name
                 __traceback_supplement__ = (TBSupplementWidget, self, renderer, 
                                             'render', 
-                                            'with name "%s"' % ren_name)
+                                            "failed at '%s' in mode '%s'" % \
+                                            (ren_name, data.mode))
                 data.rendered = renderer(self, data)
         finally:
             self.current_prefix = None
@@ -358,7 +359,7 @@ class Widget(object):
                 self.current_prefix = ex_name
                 __traceback_supplement__ = (TBSupplementWidget, self, extractor, 
                                             'extract', 
-                                            'with name "%s"' % ex_name)
+                                            "failed at '%s'" % ex_name)
                 try:
                     data.extracted = extractor(self, data)
                 except ExtractionError, e:
@@ -405,7 +406,7 @@ class Widget(object):
             data.current_prefix = ppname
             __traceback_supplement__ = (TBSupplementWidget, self, pp, 
                                         'preprocessor', 
-                                        'with name "%s"' % ppname)
+                                        "failed at '%si'" % ppname)
             data = pp(self, data)
         data.current_prefix = None
         data.preprocessed = True 

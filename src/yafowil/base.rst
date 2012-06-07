@@ -314,7 +314,7 @@ A failing widget::
         - path      : MYFAIL
         - blueprints: blueprint_names_goes_here
         - task      : extract
-        - descr     : with name "1"
+        - descr     : failed at '1'
       ...
     ValueError: extractor has to fail
 
@@ -328,7 +328,7 @@ A failing widget::
         - path      : MYFAIL
         - blueprints: blueprint_names_goes_here
         - task      : render
-        - descr     : with name "1"
+        - descr     : failed at '1' in mode 'edit'
     ...
     ValueError: renderer has to fail        
     
