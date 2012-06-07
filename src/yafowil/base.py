@@ -109,6 +109,12 @@ class ExtractionError(Exception):
 
 
 class TBSupplementWidget(object):
+    """Supplement for Tracebacks in case a widget chain part fails.
+
+    - in conjunction with ```zExceptions``` or ```zope.exceptions```
+    - goal is to ease debugging of runtime problems while processing and 
+      rendering.
+    """
 
     def __init__(self, widget, func, task, descr):
         self.manageable_object = func
@@ -116,19 +122,27 @@ class TBSupplementWidget(object):
             name = widget.dottedpath
         except ValueError:                                  #pragma NO COVERAGE
             name = '(name not set)'                         #pragma NO COVERAGE
+        self.func = func
         self.name = name
+        self.blueprints = widget.blueprints
         self.task = task
         self.descr = descr
     
-    def getInfo(self, html=1):
-        if not html:
+    def getInfo(self, as_html=0):
+        """returns additional info. zExceptions expects formatted HTML if
+        as_html evaluates to True. zope.excpetions doesnt care and turns the 
+        result into HTML on its own.
+        """
+        if not as_html:
             info =  '    yafowil widget processing info:\n' 
-            info += '    - widget: %s\n' % self.name
-            info += '    - task  : %s\n' % self.task
-            info += '    - descr : %s' % self.descr
+            info += '    - path      : %s\n' % self.name
+            info += '    - blueprints: %s\n' % self.blueprints
+            info += '    - task      : %s\n' % self.task
+            info += '    - descr     : %s' % self.descr
             return info
         tag = Tag(lambda x: x)
-        li = tag('li', 'widget: ', tag('strong', self.name))
+        li = tag('li', 'path: ', tag('strong', self.name))
+        li = tag('li', 'blueprints: ', tag('strong', self.blueprints))
         li += tag('li', 'task: ', tag('strong', self.task))
         li += tag('li', 'description: ', tag('strong', self.descr))
         return  tag('p', 'yafowil widget processing info:', tag('ul', li))        

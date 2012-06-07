@@ -310,30 +310,25 @@ A failing widget::
     Traceback (most recent call last):
       ...
         data.extracted = extractor(self, data)
-    <p>yafowil widget processing info:<ul><li>widget: 
-    <strong>MYFAIL</strong></li><li>task: 
-    <strong>extract</strong></li><li>description: 
-    <strong>with name "1"</strong></li></ul></p>
+        yafowil widget processing info:
+        - path      : MYFAIL
+        - blueprints: blueprint_names_goes_here
+        - task      : extract
+        - descr     : with name "1"
       ...
     ValueError: extractor has to fail
-
-XXX: produce non html output test, currently html is default::
-
-    Traceback (most recent call last):
-    ...
-        data.extracted = extractor(self, data)
-        yafowil widget processing info:
-        - widget: MYFAIL
-        - task  : extract
-        - descr : with name "1"
-    ...
-    ValueError: extractor has to fail   
 
     >>> try:
     ...    testwidget()
     ... except Exception, e:
     ...    traceback.print_exc(file=sys.stdout)
     Traceback (most recent call last):
+    ...
+        yafowil widget processing info:
+        - path      : MYFAIL
+        - blueprints: blueprint_names_goes_here
+        - task      : render
+        - descr     : with name "1"
     ...
     ValueError: renderer has to fail        
     
@@ -761,16 +756,21 @@ TraceBack Supplment
 
 ::
 
-    >>> class Mock(object): dottedpath='test.path.abc'
+    >>> class Mock(object): 
+    ...     dottedpath='test.path.abc'
+    ...     blueprints='blue:prints:here'
     >>> mock = Mock()
-    >>> setattr(mock, 'dottedpath', 'test.path.abc')
     >>> from yafowil.base import TBSupplementWidget
     >>> suppl = TBSupplementWidget(mock, lambda x:x, 'testtask',
     ...                            'some description')
-    >>> suppl.getInfo()
-    u'<p>yafowil widget processing info:<ul><li>widget: <strong>test.path.abc</strong></li><li>task: <strong>testtask</strong></li><li>description: <strong>some description</strong></li></ul></p>'
+    >>> print suppl.getInfo()
+        yafowil widget processing info:
+        - path      : test.path.abc
+        - blueprints: blue:prints:here
+        - task      : testtask
+        - descr     : some description
 
-    >>> suppl.getInfo(html=0)
-    '    yafowil widget processing info:\n    - widget: test.path.abc\n    - task  : testtask\n    - descr : some description'
+    >>> suppl.getInfo(as_html=1)
+    u'<p>yafowil widget processing info:<ul><li>blueprints: <strong>blue:prints:here</strong></li><li>task: <strong>testtask</strong></li><li>description: <strong>some description</strong></li></ul></p>'
 
 

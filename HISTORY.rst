@@ -2,6 +2,16 @@
 History
 =======
 
+1.3.3dev
+--------
+
+- make TBSupplement compatible with both: ```zExceptions``` and 
+  ```zope.exceptions```. Major change: html output is no longer default and
+  the kwarg of getInfo is now ```as_html``` (was ```html```).
+  Also added blueprints to the supplement as info to make it easier to identify
+  the form part.
+  [jensens, 2012-06-07] 
+
 1.3.2
 -----
 
