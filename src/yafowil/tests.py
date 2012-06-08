@@ -1,5 +1,5 @@
 import unittest
-import doctest 
+import doctest
 from pprint import pprint
 from interlude import interact
 import lxml.etree as etree
@@ -31,13 +31,13 @@ def pxml(xml):
 def test_suite():
     return unittest.TestSuite([
         doctest.DocFileSuite(
-            file, 
+            filename,
             optionflags=optionflags,
             globs={'interact': interact,
                    'pprint': pprint,
                    'pxml': pxml},
-        ) for file in TESTFILES
+        ) for filename in TESTFILES
     ])
 
-if __name__ == '__main__':                                   #pragma NO COVERAGE
-    unittest.main(defaultTest='test_suite')                  #pragma NO COVERAGE
+if __name__ == '__main__':                                 # pragma NO COVERAGE
+    unittest.main(defaultTest='test_suite')                # pragma NO COVERAGE
