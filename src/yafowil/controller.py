@@ -1,13 +1,13 @@
 class Controller(object):
     """Form controller.
     """
-    
+
     def __init__(self, widget, request):
         """Initialize controller
-                    
+
         ``widget``
             yafowil.base.Widget tree.
-            
+
         ``request``
             native request
         """
@@ -16,7 +16,7 @@ class Controller(object):
         self.error = False
         self.next = None
         self.data = self.widget.extract(request)
-        self.request = self.data.request        
+        self.request = self.data.request
         self._error(self.data)
         for action in self.actions:
             if not self.triggered(action):
@@ -32,27 +32,29 @@ class Controller(object):
                 action.attrs['handler'](self.widget, self.data)
             if action.attrs.get('next'):
                 self.next = action.attrs['next'](self.request)
-    
+
     @property
     def rendered(self):
         if not self.performed:
             return self.widget(request=self.request)
         return self.widget(data=self.data)
-    
+
     @property
     def actions(self):
         result = []
+
         def collect_actions(level):
             for widget in level.values():
                 if widget.attrs.get('action'):
-                    result.append(widget)    
+                    result.append(widget)
                 collect_actions(widget)
+
         collect_actions(self.widget)
         return result
-    
+
     def triggered(self, action):
         return self.request.get('action.%s' % action.dottedpath)
-    
+
     def _error(self, data):
         if data.errors:
             self.error = True
