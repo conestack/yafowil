@@ -35,14 +35,14 @@ factory.doc['props']['error_class'] = \
 
 factory.defaults['error_class_default'] = 'error'
 factory.doc['props']['error_class_default'] = \
-"""Fallback CSS-class to put on in case of error if no specific class was 
-given.
+"""Fallback CSS-class to put on in case of error if no specific class was
+ given.
 """
 
 factory.defaults['autofocus'] = None
 factory.doc['props']['autofocus'] = \
-"""Whether this field gets the focus automatically or not (if browser supports 
-it).
+"""Whether this field gets the focus automatically or not (if browser supports
+ it).
 """
 
 factory.defaults['autocomplete'] = None
@@ -60,11 +60,11 @@ factory.doc['props']['required'] = \
 """Whether this value is required or not.
 """
 
-factory.defaults['required_message'] = u'Mandatory field was empty'          
+factory.defaults['required_message'] = u'Mandatory field was empty'
 factory.doc['props']['required_message'] = \
 """Message to be shown if required condition was not met.
-""" 
-            
+"""
+
 factory.defaults['required_class'] = None
 factory.doc['props']['required_class'] = \
 """CSS-class to put on in case if required condition was not met.
@@ -82,15 +82,15 @@ factory.doc['props']['disabled'] = \
 
 factory.defaults['required_class_default'] = 'required'
 factory.doc['props']['required_class_default'] = \
-"""CSS-class to apply if required condition was not met - if no specific class 
-was given.
+"""CSS-class to apply if required condition was not met - if no specific class
+ was given.
 """
 
 factory.defaults['template'] = '%s'
 factory.doc['props']['template'] = \
-"""Format string with pythons built-in string format template. If a callable 
-is given it will be used instead and is called with ``widget`` and ``data`` as 
-parameters.  
+"""Format string with pythons built-in string format template. If a callable
+ is given it will be used instead and is called with ``widget`` and ``data`` as
+ parameters.
 """
 
 
@@ -98,11 +98,11 @@ parameters.
 # generic
 ###############################################################################
 
- 
+
 def generic_extractor(widget, data):
     """Extract raw data from request by ``widget.dottedpath``.
     """
-    __managed_props = []     
+    __managed_props = []
     if widget.dottedpath not in data.request:
         return UNSET
     return data.request[widget.dottedpath]
@@ -110,18 +110,18 @@ def generic_extractor(widget, data):
 
 @managedprops('required', 'required_message')
 def generic_required_extractor(widget, data):
-    """Validate required. 
-    
-    If required is set and some value was extracted, 
+    """Validate required.
+
+    If required is set and some value was extracted,
     so ``data.extracted`` is not ``UNSET``, then we evaluate ``data.extracted``
     to boolean. Raise ``ExtractionError`` if result is ``False``.
-    
+
     Properties:
-    
+
     ``required``
         Define  value is required ot not. Either basestring instance or
         callable returning basestring is expected.
-    
+
     ``required_message``
         Default required message as basestring instance.
     """
@@ -137,7 +137,7 @@ def generic_required_extractor(widget, data):
     raise ExtractionError(widget.attrs['required_message'])
 
 
-@managedprops('type', 'size', 'disabled', 'autofocus', 'placeholder', 
+@managedprops('type', 'size', 'disabled', 'autofocus', 'placeholder',
               'autocomplete', *css_managed_props)
 def input_generic_renderer(widget, data):
     """Generic HTML ``input`` tag render.
@@ -146,7 +146,7 @@ def input_generic_renderer(widget, data):
         'type': widget.attrs['type'],
         'value': fetch_value(widget, data),
         'name_': widget.dottedpath,
-        'id': cssid(widget, 'input'),    
+        'id': cssid(widget, 'input'),
         'class_': cssclasses(widget, data),
         'size': widget.attrs.get('size'),
         'placeholder': widget.attrs.get('placeholder') or None,
@@ -192,8 +192,8 @@ def empty_display_renderer(widget, data):
 ###############################################################################
 
 factory.register(
-    'text', 
-    extractors=[generic_extractor, generic_required_extractor], 
+    'text',
+    extractors=[generic_extractor, generic_required_extractor],
     edit_renderers=[input_generic_renderer],
     display_renderers=[generic_display_renderer])
 
@@ -223,8 +223,8 @@ factory.doc['props']['text.disabled'] = \
 ###############################################################################
 
 factory.register(
-     'hidden', 
-     extractors=[generic_extractor], 
+     'hidden',
+     extractors=[generic_extractor],
      edit_renderers=[input_generic_renderer],
      display_renderers=[empty_display_renderer])
 
@@ -243,7 +243,7 @@ factory.defaults['hidden.class'] = 'hidden'
 
 
 ###############################################################################
-# proxy 
+# proxy
 ###############################################################################
 
 @managedprops(*css_managed_props)
@@ -260,15 +260,15 @@ def input_proxy_renderer(widget, data):
         'type': 'hidden',
         'value':  value,
         'name_': widget.__name__,
-        'id': cssid(widget, 'input'),    
-        'class_': cssclasses(widget, data),    
+        'id': cssid(widget, 'input'),
+        'class_': cssclasses(widget, data),
     }
     return tag('input', **input_attrs)
 
 
 factory.register(
-    'proxy', 
-    extractors=[generic_extractor], 
+    'proxy',
+    extractors=[generic_extractor],
     edit_renderers=[input_proxy_renderer],
     display_renderers=[empty_display_renderer])
 
@@ -287,18 +287,18 @@ def textarea_attributes(widget, data):
     return {
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),
-        'class_': cssclasses(widget, data),            
+        'class_': cssclasses(widget, data),
         'wrap': widget.attrs['wrap'],
         'cols': widget.attrs['cols'],
         'rows': widget.attrs['rows'],
         'readonly': widget.attrs['readonly'] and 'readonly',
         'placeholder': widget.attrs.get('placeholder') or None,
         'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
-        'required': widget.attrs.get('required') and 'required' or None,        
+        'required': widget.attrs.get('required') and 'required' or None,
     }
 
 
-@managedprops('wrap', 'cols', 'rows', 'readonly', 'autofocus', 'placeholder', 
+@managedprops('wrap', 'cols', 'rows', 'readonly', 'autofocus', 'placeholder',
               *css_managed_props)
 def textarea_renderer(widget, data):
     """Renders text area.
@@ -312,8 +312,8 @@ def textarea_renderer(widget, data):
 
 
 factory.register(
-    'textarea', 
-    extractors=[generic_extractor, generic_required_extractor], 
+    'textarea',
+    extractors=[generic_extractor, generic_required_extractor],
     edit_renderers=[textarea_renderer],
     display_renderers=[generic_display_renderer])
 
@@ -347,7 +347,7 @@ factory.doc['props']['textarea.readonly'] = \
 # lines
 ###############################################################################
 
-@managedprops('wrap', 'cols', 'rows', 'readonly', 'autofocus', 'placeholder', 
+@managedprops('wrap', 'cols', 'rows', 'readonly', 'autofocus', 'placeholder',
               *css_managed_props)
 def lines_renderer(widget, data):
     """Renders text area with list value as lines.
@@ -372,8 +372,10 @@ def lines_extractor(widget, data):
 
 
 factory.register(
-    'lines', 
-    extractors=[generic_extractor, generic_required_extractor, lines_extractor], 
+    'lines',
+    extractors=[generic_extractor,
+                generic_required_extractor,
+                lines_extractor],
     edit_renderers=[lines_renderer],
     display_renderers=[generic_display_renderer])
 
@@ -410,13 +412,13 @@ factory.doc['props']['lines.readonly'] = \
 @managedprops('minlength')
 def minlength_extractor(widget, data):
     """Validate minlength of a string input.
-    
+
     Only perform if ``minlength`` property is set.
-    
+
     Properties:
-    
+
     ``minlength``
-        Minimum length of string as int. 
+        Minimum length of string as int.
     """
     val = data.extracted
     if val is UNSET:
@@ -432,11 +434,11 @@ def minlength_extractor(widget, data):
 @managedprops('ascii')
 def ascii_extractor(widget, data):
     """Validate if a string is ASCII encoding.
-    
+
     Only perform if ``ascii`` property evaludates to True.
-    
+
     Properties:
-    
+
     ``ascii``
         Flag  ascii check should perform.
     """
@@ -467,21 +469,21 @@ PASSWORD_NOCHANGE_VALUE = '_NOCHANGE_'
 @managedprops('strength', 'weak_password_message')
 def password_extractor(widget, data):
     """Extract and validate password input.
-    
+
     If extracted password is unchanged, return ``UNSET``. Consider this when
     reading from password widgets!
-    
+
     This extractor provides a strength check. It only performs if ``strenght``
     property is set. Strength check is done by four rules:
         - input contains lowercase character
         - input contains uppercase character
         - input contains digit
         - input contains special character.
-    
+
     Properties:
-    
+
     ``strength``
-        Integer value <= 4. Define how many rules must apply to consider a 
+        Integer value <= 4. Define how many rules must apply to consider a
         password valid.
     """
     val = data.extracted
@@ -511,6 +513,7 @@ def _pwd_value(widget, data):
         return PASSWORD_NOCHANGE_VALUE
     return widget.attrs['default']
 
+
 @managedprops('size', 'disabled', 'placeholder', 'autofocus', 'required',
               *css_managed_props)
 def password_edit_renderer(widget, data):
@@ -522,16 +525,17 @@ def password_edit_renderer(widget, data):
         'type': 'password',
         'value':  value,
         'name_': widget.dottedpath,
-        'id': cssid(widget, 'input'),    
+        'id': cssid(widget, 'input'),
         'class_': cssclasses(widget, data),
         'size': widget.attrs.get('size'),
         'placeholder': widget.attrs.get('placeholder') or None,
-        'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,      
+        'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
         'disabled': widget.attrs.get('disabled'),
     }
     input_attrs['required'] = \
         widget.attrs.get('required') and 'required' or None
     return tag('input', **input_attrs)
+
 
 @managedprops('displayplaceholder')
 def password_display_renderer(widget, data):
@@ -542,7 +546,7 @@ def password_display_renderer(widget, data):
 
 
 factory.register(
-    'password', 
+    'password',
     extractors=[generic_extractor, generic_required_extractor,
                 minlength_extractor, ascii_extractor, password_extractor],
     edit_renderers=[password_edit_renderer],
@@ -587,9 +591,9 @@ factory.defaults['weak_password_message'] = u'Password too weak'
 factory.doc['props']['password.strength'] = \
 """Message shown if password is not strong enough.
 """
-factory.defaults['password.displayplaceholder'] = u'*'*8
+factory.defaults['password.displayplaceholder'] = u'*' * 8
 factory.doc['props']['password.displayplaceholder'] = \
-"""Placeholder shown in display mode if password was set. 
+"""Placeholder shown in display mode if password was set.
 """
 
 
@@ -603,12 +607,12 @@ def checkbox_extractor(widget, data):
     """
     if '%s-exists' % widget.dottedpath not in data.request:
         return UNSET
-    format = widget.attrs['format']
-    if format == 'bool':
+    fmt = widget.attrs['format']
+    if fmt == 'bool':
         return widget.dottedpath in data.request
-    elif format == 'string':
+    elif fmt == 'string':
         return data.request.get(widget.dottedpath, '')
-    raise ValueError, "Checkbox widget has invalid format '%s' set" % format
+    raise(ValueError, "Checkbox widget has invalid format '%s' set" % fmt)
 
 
 @managedprops('format', 'disabled', 'checked', *css_managed_props)
@@ -619,9 +623,9 @@ def checkbox_edit_renderer(widget, data):
         'type': 'checkbox',
         'value': value,
         'name_': widget.dottedpath,
-        'id': cssid(widget, 'input'),    
+        'id': cssid(widget, 'input'),
         'class_': cssclasses(widget, data),
-        'disabled': bool(widget.attrs.get('disabled')) and 'disabled' or None,            
+        'disabled': bool(widget.attrs.get('disabled')) and 'disabled' or None,
     }
     if widget.attrs['checked'] is not None:
         if widget.attrs['checked']:
@@ -635,7 +639,7 @@ def checkbox_edit_renderer(widget, data):
         'type': 'hidden',
         'value':  'checkboxexists',
         'name_': "%s-exists" % widget.dottedpath,
-        'id': cssid(widget, 'checkboxexists'),    
+        'id': cssid(widget, 'checkboxexists'),
     }
     exists_marker = tag('input', **input_attrs)
     return checkbox + exists_marker
@@ -660,8 +664,8 @@ def checkbox_display_renderer(widget, data):
 
 
 factory.register(
-    'checkbox', 
-    extractors=[checkbox_extractor, generic_required_extractor], 
+    'checkbox',
+    extractors=[checkbox_extractor, generic_required_extractor],
     edit_renderers=[checkbox_edit_renderer],
     display_renderers=[checkbox_display_renderer])
 
@@ -673,12 +677,12 @@ factory.defaults['checkbox.default'] = False
 
 factory.defaults['checkbox.format'] = 'bool'
 factory.doc['props']['checkbox.format'] = """\
-Data-type of the extracted value. One out of ``bool`` or ``string``. 
+Data-type of the extracted value. One out of ``bool`` or ``string``.
 """
 
 factory.defaults['checkbox.format'] = 'bool'
 factory.doc['props']['checkbox.format'] = """\
-Data-type of the extracted value. One out of ``bool`` or ``string``. 
+Data-type of the extracted value. One out of ``bool`` or ``string``.
 """
 
 factory.defaults['checkbox.disabled'] = False
@@ -691,11 +695,12 @@ factory.doc['props']['checkbox.checked'] = """\
 Set 'checked' attribute explicit. If not given, compute by value.
 """
 
-factory.defaults['checkbox.vocabulary'] = { True:'yes', False: 'no', 
-                                            UNSET: 'not set' }
+factory.defaults['checkbox.vocabulary'] = {True: 'yes',
+                                           False: 'no',
+                                           UNSET: 'not set'}
 factory.doc['props']['checkbox.vocabulary'] = """\
-In display mode and if ```bool``` is set to ```True``` this mapping will be used
-for display of the value. Expected keys are ```True```, ```False``` and 
+In display mode and if ```bool``` is set to ```True``` this mapping will be
+used for display of the value. Expected keys are ```True```, ```False``` and
 ```UNSET```.
 """
 
@@ -746,7 +751,7 @@ def select_exists_marker(widget, data):
     return tag('input', **attrs)
 
 
-@managedprops('format', 'vocabulary', 'multivalued', 'disabled', 
+@managedprops('format', 'vocabulary', 'multivalued', 'disabled',
               'listing_label_position', 'listing_tag', 'size',
               *css_managed_props)
 def select_edit_renderer(widget, data):
@@ -766,18 +771,18 @@ def select_edit_renderer(widget, data):
                 'id': cssid(widget, 'input', key),
             }
             if disabled and disabled is not True and key in disabled:
-                attrs['disabled'] = 'disabled'                 
-            optiontags.append(tag('option', term, **attrs))            
+                attrs['disabled'] = 'disabled'
+            optiontags.append(tag('option', term, **attrs))
         select_attrs = {
             'name_': widget.dottedpath,
             'id': cssid(widget, 'input'),
-            'class_': cssclasses(widget, data),                        
+            'class_': cssclasses(widget, data),
             'multiple': widget.attrs['multivalued'] and 'multiple' or None,
             'size': widget.attrs['size'] or None,
             'placeholder': widget.attrs.get('placeholder') or None,
             'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
-            'required': widget.attrs.get('required') and 'required' or None,            
-        }        
+            'required': widget.attrs.get('required') and 'required' or None,
+        }
         if disabled is True:
             select_attrs['disabled'] = 'disabled'
         rendered = tag('select', *optiontags, **select_attrs)
@@ -805,24 +810,26 @@ def select_edit_renderer(widget, data):
                 'value':  key,
                 'checked': (key in value) and 'checked' or None,
                 'name_': widget.dottedpath,
-                'id': cssid(widget, 'input', key),    
+                'id': cssid(widget, 'input', key),
                 'class_': cssclasses(widget, data),
             }
             if (disabled and disabled is not True and key in disabled) \
                or disabled is True:
-                attrs['disabled'] = 'disabled'                                 
-            
-            input = tag('input', **attrs)
+                attrs['disabled'] = 'disabled'
+
+            inputtag = tag('input', **attrs)
             if label_pos == 'inner':
-                item = tag('label', term, input, for_=attrs['id'])
+                item = tag('label', term, inputtag, for_=attrs['id'])
             elif label_pos == 'after':
-                item = input + tag('label', term, for_=attrs['id'])
+                item = inputtag + tag('label', term, for_=attrs['id'])
             else:
-                item = tag('label', term, for_=attrs['id']) + input
+                item = tag('label', term, for_=attrs['id']) + inputtag
             tags.append(tag(item_tag, item,
                             **{'id': cssid(widget, tagtype, key)}))
-        return select_exists_marker(widget, data) + \
-            tag(listing_tag, *tags, **{'id': cssid(widget, tagtype, 'wrapper')})
+        taglisting = tag(listing_tag,
+                         *tags,
+                         **{'id': cssid(widget, tagtype, 'wrapper')})
+        return select_exists_marker(widget, data) + taglisting
 
 
 @managedprops('template', 'class', 'multivalued')
@@ -839,19 +846,19 @@ def select_display_renderer(widget, data):
     for key in value:
         content += data.tag('li', vocab[key])
     return data.tag('ul', content, **attrs)
-        
+
 
 factory.register(
     'select',
-    extractors=[select_extractor, generic_required_extractor], 
+    extractors=[select_extractor, generic_required_extractor],
     edit_renderers=[select_edit_renderer],
     display_renderers=[select_display_renderer])
 
 factory.doc['blueprint']['select'] = """\
-Selection Blueprint. Single selection as dropdown or radio-buttons. Multiple 
-selection as selection-list or as checkboxes. 
+Selection Blueprint. Single selection as dropdown or radio-buttons. Multiple
+selection as selection-list or as checkboxes.
 """
-    
+
 factory.defaults['select.multivalued'] = None
 
 factory.defaults['select.size'] = None
@@ -875,14 +882,14 @@ position property.
 """
 
 factory.doc['props']['select.vocabulary'] = """\
-Vocabulary to be used for the selection list. Expects a dict-like or an iterable 
-or a callable which returns one of both first. An iterable can consist out of 
-strings or out of tuples with ``(key, value)``.   
+Vocabulary to be used for the selection list. Expects a dict-like or an
+iterable or a callable which returns one of both first. An iterable can consist
+out of strings or out of tuples with ``(key, value)``.
 """
 
 factory.doc['props']['select.disabled'] = """\
-Disables the whole widget or single selections. To disable the whole widget just
-set the value to 'True'. To disable single selection pass a iterable of keys to 
+Disables the whole widget or single selections. To disable the whole widget
+set the value to 'True'. To disable single selection pass a iterable of keys to
 disable, i.e. ``['foo', 'baz']``. Defaults to False.
 """
 
@@ -893,7 +900,7 @@ disable, i.e. ``['foo', 'baz']``. Defaults to False.
 
 def file_extractor(widget, data):
     """Return a dict with following keys:
-    
+
     mimetype
         Mimetype of file.
     headers
@@ -929,18 +936,18 @@ def file_extractor(widget, data):
     return value
 
 
-@managedprops('accept', 'placeholder', 'autofocus', 
+@managedprops('accept', 'placeholder', 'autofocus',
               'required', *css_managed_props)
 def input_file_edit_renderer(widget, data):
     tag = data.tag
     input_attrs = {
         'name_': widget.dottedpath,
         'id': cssid(widget, 'input'),
-        'class_': cssclasses(widget, data),            
+        'class_': cssclasses(widget, data),
         'type': 'file',
         'placeholder': widget.attrs.get('placeholder') or None,
         'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
-        'required': widget.attrs.get('required') and 'required' or None,        
+        'required': widget.attrs.get('required') and 'required' or None,
     }
     if widget.attrs.get('accept'):
         input_attrs['accept'] = widget.attrs['accept']
@@ -969,12 +976,12 @@ def file_options_renderer(widget, data):
             'value':  key,
             'checked': (key in value) and 'checked' or None,
             'name_': '%s-action' % widget.dottedpath,
-            'id': cssid(widget, 'input', key),    
-            'class_': cssclasses(widget, data),    
+            'id': cssid(widget, 'input', key),
+            'class_': cssclasses(widget, data),
         }
-        input = tag('input', **attrs)
+        taginput = tag('input', **attrs)
         text = tag('span', term)
-        tags.append(tag('div', input, text, 
+        tags.append(tag('div', taginput, text,
                         **{'id': cssid(widget, 'radio', key)}))
     return data.rendered + u''.join(tags)
 
@@ -1054,13 +1061,13 @@ Skips action and only perform next. One out of ``True`` or ``False``.
 """
 
 factory.doc['props']['submit.handler'] = """\
-Handler is a callable which get called if this action performs. It expects two 
+Handler is a callable which get called if this action performs. It expects two
 parameters: ``widget``, ``data``.
 """
 
 factory.doc['props']['submit.next'] = """\
 Next is a callable expected to return the web address. It expects a request as
-the only parameter. 
+the only parameter.
 """
 
 factory.defaults['text.disabled'] = False
@@ -1084,8 +1091,10 @@ def email_extractor(widget, data):
 
 
 factory.register(
-    'email', 
-    extractors=[generic_extractor, generic_required_extractor, email_extractor],
+    'email',
+    extractors=[generic_extractor,
+                generic_required_extractor,
+                email_extractor],
     edit_renderers=[input_generic_renderer],
     display_renderers=[generic_display_renderer])
 
@@ -1106,8 +1115,8 @@ factory.defaults['email.class'] = 'email'
 # url
 ###############################################################################
 
-URL_RE = u'^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:'+\
-         u'.?+=&%@!\-\/]))?$'
+URL_RE = u'^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:'
+URL_RE += u'.?+=&%@!\-\/]))?$'
 
 
 def url_extractor(widget, data):
@@ -1141,7 +1150,7 @@ factory.defaults['url.class'] = 'url'
 ###############################################################################
 
 factory.register(
-    'search', 
+    'search',
     extractors=[generic_extractor, generic_required_extractor],
     edit_renderers=[input_generic_renderer],
     display_renderers=[generic_display_renderer])
@@ -1170,6 +1179,7 @@ def _callable_attr(key, widget, data):
         return value(widget, data)
     return value
 
+
 def number_extractor(widget, data):
     val = data.extracted
     if val is UNSET or val == '':
@@ -1179,31 +1189,31 @@ def number_extractor(widget, data):
     elif widget.attrs.get('datatype') == 'float':
         convert = float
     else:
-        raise ValueError, 'Output datatype must be integer or float'
+        raise(ValueError, 'Output datatype must be integer or float')
     try:
         val = convert(val)
     except ValueError:
         raise ExtractionError(u'Input is not a valid number (%s).' % \
                               widget.attrs.get('datatype'))
-    if widget.attrs.get('min') and val <  _callable_attr('min', widget, data):
-            raise ExtractionError(u'Value has to be at minimum %s.' % 
+    if widget.attrs.get('min') and val < _callable_attr('min', widget, data):
+            raise ExtractionError(u'Value has to be at minimum %s.' %
                                   _callable_attr('min', widget, data))
     if widget.attrs.get('max') and val > _callable_attr('max', widget, data):
         raise ExtractionError(u'Value has to be at maximum %s.' %
                               _callable_attr('max', widget, data))
     if widget.attrs.get('step'):
-        step =  _callable_attr('step', widget, data)
-        min = _callable_attr('min', widget, data) or 0
-        if (val - min) % step:
+        step = _callable_attr('step', widget, data)
+        minimum = _callable_attr('min', widget, data) or 0
+        if (val - minimum) % step:
             msg = u'Value %s has to be in stepping of %s' % (val, step)
-            if min:
-                msg += ' based on a floor value of %s' % min
+            if minimum:
+                msg += ' based on a floor value of %s' % minimum
             raise ExtractionError(msg)
     return val
 
 
 factory.register(
-    'number', 
+    'number',
     extractors=[generic_extractor, generic_required_extractor,
                 number_extractor],
     edit_renderers=[input_generic_renderer],
@@ -1258,17 +1268,17 @@ def label_renderer(widget, data):
             label_attrs['for_'] = cssid(widget, 'input')
         if widget.attrs['title']:
             label_attrs['title'] = widget.attrs['title']
-    help = u''
+    taghelp = u''
     if widget.attrs['help']:
         help_attrs = {'class_': widget.attrs['help_class']}
-        help = tag('div', widget.attrs['help'], **help_attrs)
+        taghelp = tag('div', widget.attrs['help'], **help_attrs)
     pos = widget.attrs['position']
     rendered = data.rendered is not UNSET and data.rendered or u''
     if pos == 'inner':
-        return tag('label', label_text, help, rendered, **label_attrs)
+        return tag('label', label_text, taghelp, rendered, **label_attrs)
     elif pos == 'after':
-        return rendered + tag('label', label_text, help, **label_attrs)
-    return tag('label', label_text, help, **label_attrs) + rendered
+        return rendered + tag('label', label_text, taghelp, **label_attrs)
+    return tag('label', label_text, taghelp, **label_attrs) + rendered
 
 
 factory.register(
@@ -1282,9 +1292,9 @@ Label blueprint.
 
 factory.defaults['label.position'] = 'before'
 factory.doc['props']['label.position'] = """\
-Label can be rendered at 3 different positions: ``before`` or ``after`` the 
-prior rendered output or with ``inner`` it puts the prior rendered output inside
-the label tag.
+Label can be rendered at 3 different positions: ``before`` or ``after`` the
+prior rendered output or with ``inner`` it puts the prior rendered output
+inside the label tag.
 """
 
 factory.doc['props']['label.label'] = """\
@@ -1332,7 +1342,7 @@ factory.register(
     display_renderers=[field_renderer])
 
 factory.doc['blueprint']['field'] = """\
-Renders a div with an class field around the prior rendered output. This is 
+Renders a div with an class field around the prior rendered output. This is
 supposed to be used for styling and grouping purposes.
 """
 
