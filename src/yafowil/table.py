@@ -1,6 +1,5 @@
 from yafowil.base import factory
 from yafowil.compound import (
-    compound_extractor,
     compound_renderer,
     hybrid_extractor,
 )
