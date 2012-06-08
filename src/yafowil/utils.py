@@ -93,23 +93,23 @@ class Tag(object):
 
     def __call__(self, tag_name, *inners, **attributes):
         """Generates some xml/html tag.
-            
+
         ``tagname``
             name of a valid tag
-            
+
         ``inners``
             inner content of the tag. If empty a closed tag is generated
-        
+
         ``attributes``
             attributes of the tag, leading or trailing ``_`` underscores are 
             omitted from keywords.
-    
+
         Example::
-    
+
             >>> tag('p', 'Lorem Ipsum.', u'Hello World!', 
             ...     class_='fancy', id='2f5b8a234ff')
             <p class="fancy" id="2f5b8a234ff">Lorem Ipsum. Hello World.</p>
-        
+
         """
         cl = list()
         for key, value in attributes.items():
@@ -121,7 +121,8 @@ class Tag(object):
             cl.append((key.strip('_'), value))
         attributes = u''
         if cl:
-            attributes = u' %s' % u' '.join(sorted([u'%s="%s"' % _ for _ in cl]))
+            attributes = u' %s' % \
+                         u' '.join(sorted([u'%s="%s"' % _ for _ in cl]))
         cl = list()
         for inner in inners:
             inner = self.translate(inner)
@@ -161,14 +162,15 @@ class managedprops(object):
 
 def cssid(widget, prefix, postfix=None):
     path = widget.dottedpath.replace('.', '-')
-    id = "%s-%s" % (prefix, path)
+    cssid = "%s-%s" % (prefix, path)
     if postfix is not None:
-        id = '%s-%s' % (id, postfix)
-    return id
+        cssid = '%s-%s' % (cssid, postfix)
+    return cssid
 
 
 css_managed_props = ['class', 'error_class', 'error_class_default',
                      'required_class', 'required_class_default']
+
 
 def cssclasses(widget, data, classattr='class', additional=[]):
     _classes = list()
