@@ -496,7 +496,7 @@ Test the plans::
     >>> factory._expand_blueprints('#nonexisting')
     Traceback (most recent call last):
     ...
-    ValueError: Plan with name 'nonexisting' is not registered in factory
+    ValueError: Plan named 'nonexisting' is not registered in factory
 
 
     >>> factory.register_plan('test_plan2', 'alpha:#test_plan:beta')
@@ -567,7 +567,7 @@ string as well::
     >>> factory.renderers('inner')
     Traceback (most recent call last):
     ...
-    RuntimeError: Deprecated since 1.2, use either edit_renderers or display_renderers
+    RuntimeError: Deprecated since 1.2, use edit_renderers or display_renderers
     
 Colon seperated blueprint chain definition::
     
@@ -660,7 +660,7 @@ Case for (5): We have only some unprefixed default::
     ...     widget()
     ... except KeyError, e:
     ...     print e
-    'Property with key "id" is not given on widget "test" (no default).'
+    'Property with key "id" is not given on widget "test" (no default)'
 
 Case for (4): Unprefixed default::
 
@@ -771,6 +771,10 @@ TraceBack Supplment
         - descr     : some description
 
     >>> suppl.getInfo(as_html=1)
-    u'<p>yafowil widget processing info:<ul><li>blueprints: <strong>blue:prints:here</strong></li><li>task: <strong>testtask</strong></li><li>description: <strong>some description</strong></li></ul></p>'
-
+    u'<p>yafowil widget processing info:<ul><li>path: 
+    <strong>test.path.abc</strong></li><li>blueprints: 
+    <strong>blue:prints:here</strong></li><li>task: 
+    <strong>testtask</strong></li><li>description: <strong>some 
+    description</strong></li></ul></p>'
+    
 

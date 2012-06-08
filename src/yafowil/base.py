@@ -55,7 +55,7 @@ class RuntimeData(object):
             path = path.split('.')
         data = self.root
         if path[0] != data.__name__:
-            raise(KeyError, 'Invalid name of root element')
+            raise KeyError('Invalid name of root element')
         __traceback_info__ = 'fetch path: %s' % path
         for key in path[1:]:
             data = data[key]
@@ -171,7 +171,7 @@ class WidgetAttributes(NodeAttributes):
         if name in self.__parent__.defaults:
             return self.__parent__.defaults[name]
         msg = 'Property with key "%s" is not given on widget "%s" (no default)'
-        raise (KeyError, msg % (name, self.__parent__.dottedpath))
+        raise KeyError(msg % (name, self.__parent__.dottedpath))
 
     def get(self, key, default=None):
         try:
@@ -306,7 +306,7 @@ class Widget(object):
             needed.
         """
         if data is not None and request is not None:
-            raise(ValueError, "if data is passed in, don't pass in request!")
+            raise ValueError("if data is passed in, don't pass in request!")
         if data is None:
             data = RuntimeData(self.__name__)
             if request is not None:
@@ -320,9 +320,10 @@ class Widget(object):
         else:
             renderers = self.edit_renderers
         if not renderers:
-            raise(ValueError,
-                  "no renderers given for widget '%s' at mode '%s'" % \
-                  (self.dottedpath, data.mode))
+            raise ValueError (
+                "no renderers given for widget '%s' at mode '%s'" % \
+                (self.dottedpath, data.mode)
+            )
         self.lock()
         try:
             for ren_name, renderer in renderers:
@@ -376,7 +377,7 @@ class Widget(object):
     @property
     def dottedpath(self):
         if self.path[0] is None:
-            raise(ValueError, 'Root widget has no name! Pass it to factory.')
+            raise ValueError('Root widget has no name! Pass it to factory.')
         path = list()
         node = self
         while node is not None:
@@ -401,8 +402,8 @@ class Widget(object):
         else:
             data.mode = self.mode
         if data.mode not in ('edit', 'display', 'skip'):
-            raise(ValueError, "mode must be one out of 'edit', 'display', " + \
-                              "'skip', but '%s' was given " % data.mode)
+            raise ValueError("mode must be one out of 'edit', 'display', " + \
+                             "'skip', but '%s' was given " % data.mode)
         for ppname, pp in self.preprocessors:
             data.current_prefix = ppname
             __traceback_supplement__ = (TBSupplementWidget, self, pp,
@@ -429,7 +430,7 @@ class Factory(object):
     def _name_check(self, name):
         for chara in '*:#':
             if chara in name:
-                raise(ValueError, '"%s" as char not allowed as name.' % chara)
+                raise ValueError('"%s" as char not allowed as name.' % chara)
 
     def register(self, name, extractors=[], edit_renderers=[],
                  preprocessors=[], builders=[], display_renderers=[]):
@@ -549,8 +550,9 @@ class Factory(object):
         return self._blueprints[name][0]
 
     def renderers(self, name):
-        raise(RuntimeError,
-              'Deprecated since 1.2, use edit_renderers or display_renderers')
+        raise RuntimeError(
+            'Deprecated since 1.2, use edit_renderers or display_renderers'
+        )
 
     def edit_renderers(self, name):
         return self._blueprints[name][1]

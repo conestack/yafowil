@@ -612,7 +612,7 @@ def checkbox_extractor(widget, data):
         return widget.dottedpath in data.request
     elif fmt == 'string':
         return data.request.get(widget.dottedpath, '')
-    raise(ValueError, "Checkbox widget has invalid format '%s' set" % fmt)
+    raise ValueError("Checkbox widget has invalid format '%s' set" % fmt)
 
 
 @managedprops('format', 'disabled', 'checked', *css_managed_props)
@@ -1189,7 +1189,7 @@ def number_extractor(widget, data):
     elif widget.attrs.get('datatype') == 'float':
         convert = float
     else:
-        raise(ValueError, 'Output datatype must be integer or float')
+        raise ValueError('Output datatype must be integer or float')
     try:
         val = convert(val)
     except ValueError:
