@@ -60,8 +60,8 @@ def compound_renderer(widget, data):
 
 
 factory.register(
-    'compound', 
-    extractors=[compound_extractor], 
+    'compound',
+    extractors=[compound_extractor],
     edit_renderers=[compound_renderer],
     display_renderers=[compound_renderer])
 
@@ -72,8 +72,8 @@ node can contain sub-widgets.
 
 factory.defaults['structural'] = False
 factory.doc['props']['structural'] = """\
-If a compound is structural, it will be omitted in the dotted-path levels and 
-will not have an own runtime-data. 
+If a compound is structural, it will be omitted in the dotted-path levels and
+will not have an own runtime-data.
 """
 
 
@@ -118,12 +118,12 @@ def fieldset_renderer(widget, data):
     rendered = data.rendered
     if widget.attrs['legend']:
         rendered = data.tag('legend', widget.attrs['legend']) + rendered
-    return data.tag('fieldset', rendered, **fs_attrs)   
+    return data.tag('fieldset', rendered, **fs_attrs)
 
 
 factory.register(
-    'fieldset', 
-    extractors=factory.extractors('compound'), 
+    'fieldset',
+    extractors=factory.extractors('compound'),
     edit_renderers=factory.edit_renderers('compound') + [fieldset_renderer],
     display_renderers=factory.display_renderers('compound') + \
         [fieldset_renderer])
@@ -149,7 +149,7 @@ def form_edit_renderer(widget, data):
         'id': 'form-%s' % '-'.join(widget.path),
     }
     if callable(form_attrs['action']):
-        form_attrs['action'] =  form_attrs['action'](widget, data)
+        form_attrs['action'] = form_attrs['action'](widget, data)
     return data.tag('form', data.rendered, **form_attrs)
 
 
@@ -158,28 +158,28 @@ def form_display_renderer(widget, data):
 
 
 factory.register(
-    'form', 
-    extractors=factory.extractors('compound'), 
+    'form',
+    extractors=factory.extractors('compound'),
     edit_renderers=factory.edit_renderers('compound') + [form_edit_renderer],
     display_renderers=factory.display_renderers('compound') + \
         [form_display_renderer])
 
 factory.doc['blueprint']['form'] = """\
-A html-form element as a compound of widgets. 
+A html-form element as a compound of widgets.
 """
 
 factory.defaults['form.method'] = 'post'
 factory.doc['props']['form.method'] = """\
 One out of ``get`` or ``post``.
-""" 
+"""
 
 factory.doc['props']['form.action'] = """\
-Target web address (URL) to send the form to. 
-""" 
+Target web address (URL) to send the form to.
+"""
 
 factory.defaults['form.enctype'] = 'multipart/form-data'
 factory.doc['props']['form.enctype'] = """\
-Encryption type of the form. Only relevant for method ``post``. Expect one out 
+Encryption type of the form. Only relevant for method ``post``. Expect one out
 of ``application/x-www-form-urlencoded`` or ``multipart/form-data``.
 """
 
