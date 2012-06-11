@@ -37,6 +37,11 @@ def get_stylesheets(module_name, thirdparty=True):
     return _get_filepaths(module_name, 'stylesheets', thirdparty)
 
 
+def get_examples():
+    for ep in get_entry_points(ns='example'):
+        yield ep.load()()
+
+
 class Unset(object):
 
     def __nonzero__(self):
