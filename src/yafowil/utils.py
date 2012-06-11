@@ -41,12 +41,16 @@ def get_example(ns=None):
     for ep in get_entry_points(ns='example'):
         if ns is not None and ep.name != ns:
             continue
-        return ep.load()()
+        info = ep.load()()
+        info['plugin_name'] = ep.module_name
+        return info
 
 
 def get_examples():
     for ep in get_entry_points(ns='example'):
-        yield ep.load()()
+        info = ep.load()()
+        info['plugin_name'] = ep.module_name
+        yield info
 
 
 class Unset(object):
