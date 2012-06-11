@@ -13,11 +13,12 @@ def get_resource_dir():
     return os.path.join(os.path.dirname(__file__), 'resources')
 
 
-def get_css(thirdparty=True):
-    css = list()
-    if thirdparty:
-        css.append(os.path.join('css', 'bootstrap.min.css'))
-    return css
+def get_css():
+    return [{
+        'resource': os.path.join('css', 'bootstrap.min.css'),
+        'thirdparty': True,
+        'order': 10,
+    }]
 
 
 for ep in yafowil.utils.get_entry_points('register'):

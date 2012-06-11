@@ -22,19 +22,19 @@ def get_resource_directory(module_name):
         return ep.load()()
 
 
-def _get_filepaths(module_name, ns, thirdparty):
+def _get_filepaths(module_name, ns):
     for ep in get_entry_points(ns=ns):
         if ep.module_name == module_name:
-            return ep.load()(thirdparty=thirdparty)
+            return ep.load()()
     return []
 
 
-def get_javascripts(module_name, thirdparty=True):
-    return _get_filepaths(module_name, 'javascripts', thirdparty)
+def get_javascripts(module_name):
+    return _get_filepaths(module_name, 'javascripts')
 
 
-def get_stylesheets(module_name, thirdparty=True):
-    return _get_filepaths(module_name, 'stylesheets', thirdparty)
+def get_stylesheets(module_name):
+    return _get_filepaths(module_name, 'stylesheets')
 
 
 def get_example(module_name=None):
