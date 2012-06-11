@@ -37,8 +37,10 @@ def get_stylesheets(module_name, thirdparty=True):
     return _get_filepaths(module_name, 'stylesheets', thirdparty)
 
 
-def get_examples():
+def get_example(ns=None):
     for ep in get_entry_points(ns='example'):
+        if ns is not None and ep.name != ns:
+            continue
         yield ep.load()()
 
 
