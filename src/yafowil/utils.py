@@ -41,6 +41,11 @@ def get_example(ns=None):
     for ep in get_entry_points(ns='example'):
         if ns is not None and ep.name != ns:
             continue
+        return ep.load()()
+
+
+def get_examples():
+    for ep in get_entry_points(ns='example'):
         yield ep.load()()
 
 
