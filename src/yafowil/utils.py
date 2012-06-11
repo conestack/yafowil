@@ -37,19 +37,19 @@ def get_stylesheets(module_name, thirdparty=True):
     return _get_filepaths(module_name, 'stylesheets', thirdparty)
 
 
-def get_example(ns=None):
+def get_example(module_name=None):
     for ep in get_entry_points(ns='example'):
-        if ns is not None and ep.name != ns:
+        if ep.dist.project_name != module_name:
             continue
         info = ep.load()()
-        info['plugin_name'] = ep.dist.projectname
+        info['plugin_name'] = ep.dist.project_name
         return info
 
 
 def get_examples():
     for ep in get_entry_points(ns='example'):
         info = ep.load()()
-        info['plugin_name'] = ep.dist.projectname
+        info['plugin_name'] = ep.dist.project_name
         yield info
 
 
