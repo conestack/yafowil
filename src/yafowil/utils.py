@@ -42,14 +42,14 @@ def get_example(ns=None):
         if ns is not None and ep.name != ns:
             continue
         info = ep.load()()
-        info['plugin_name'] = ep.module_name
+        info['plugin_name'] = ep.dist.projectname
         return info
 
 
 def get_examples():
     for ep in get_entry_points(ns='example'):
         info = ep.load()()
-        info['plugin_name'] = ep.module_name
+        info['plugin_name'] = ep.dist.projectname
         yield info
 
 
@@ -117,12 +117,12 @@ class Tag(object):
             inner content of the tag. If empty a closed tag is generated
 
         ``attributes``
-            attributes of the tag, leading or trailing ``_`` underscores are 
+            attributes of the tag, leading or trailing ``_`` underscores are
             omitted from keywords.
 
         Example::
 
-            >>> tag('p', 'Lorem Ipsum.', u'Hello World!', 
+            >>> tag('p', 'Lorem Ipsum.', u'Hello World!',
             ...     class_='fancy', id='2f5b8a234ff')
             <p class="fancy" id="2f5b8a234ff">Lorem Ipsum. Hello World.</p>
 
