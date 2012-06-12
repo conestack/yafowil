@@ -1075,6 +1075,8 @@ factory.doc['props']['text.disabled'] = \
 """Flag  input field is disabled.
 """
 
+factory.defaults['submit.class'] = 'btn'
+
 
 ###############################################################################
 # email

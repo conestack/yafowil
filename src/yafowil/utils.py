@@ -37,20 +37,19 @@ def get_stylesheets(module_name):
     return _get_filepaths(module_name, 'stylesheets')
 
 
-def get_example(module_name=None):
+def get_example(example_name):
     for ep in get_entry_points(ns='example'):
-        if ep.dist.project_name != module_name:
+        if ep.dist.project_name != example_name:
             continue
         info = ep.load()()
-        info['plugin_name'] = ep.dist.project_name
         return info
 
 
-def get_examples():
+def get_example_names():
+    result = []
     for ep in get_entry_points(ns='example'):
-        info = ep.load()()
-        info['plugin_name'] = ep.dist.project_name
-        yield info
+        result.append(ep.dist.project_name)
+    return result
 
 
 class Unset(object):
