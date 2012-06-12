@@ -5,6 +5,9 @@ History
 1.3.3dev
 --------
 
+- provide bootstrap resources
+  [jensens, 2012-06-11]
+
 - pep8ify
   [jensens, 2012-06-08]
 
