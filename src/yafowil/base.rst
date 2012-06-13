@@ -486,22 +486,26 @@ Some basic name checks are done::
     
 Test the plans::
 
-    >>> factory.register_plan('test_plan', 'foo:*bar:baz')
+    >>> factory.register_plan('test_plan', 
+    ...                       'foo:*bar:baz', {'foo.newprop': 'abc'})
     >>> factory._plans
-    {'test_plan': 'foo:*bar:baz'}
+    {'test_plan': ('foo:*bar:baz', {'foo.newprop': 'abc'})}
     
-    >>> factory._expand_blueprints('#test_plan')
-    ['foo', '*bar', 'baz']
+    >>> factory._expand_blueprints('#test_plan', {'foo.newprop' : '123'})
+    (['foo', '*bar', 'baz'], {'foo.newprop': '123'})
 
-    >>> factory._expand_blueprints('#nonexisting')
+    >>> ex = factory._expand_blueprints('#test_plan', {'foo.newprop2' : '123'})
+    >>> pprint(ex)
+    (['foo', '*bar', 'baz'], {'foo.newprop': 'abc', 'foo.newprop2': '123'})
+
+    >>> factory._expand_blueprints('#nonexisting', {})
     Traceback (most recent call last):
     ...
     ValueError: Plan named 'nonexisting' is not registered in factory
 
-
-    >>> factory.register_plan('test_plan2', 'alpha:#test_plan:beta')
-    >>> factory._expand_blueprints('#test_plan2')
-    ['alpha', 'foo', '*bar', 'baz', 'beta']
+    >>> factory.register_plan('test_plan2', 'alpha:#test_plan:beta', {})
+    >>> factory._expand_blueprints('#test_plan2', {})
+    (['alpha', 'foo', '*bar', 'baz', 'beta'], {'foo.newprop': 'abc'})
 
 
 Widget tree manipulation

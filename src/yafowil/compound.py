@@ -168,6 +168,8 @@ factory.doc['blueprint']['form'] = """\
 A html-form element as a compound of widgets.
 """
 
+factory.defaults['form.class'] = 'well'
+
 factory.defaults['form.method'] = 'post'
 factory.doc['props']['form.method'] = """\
 One out of ``get`` or ``post``.

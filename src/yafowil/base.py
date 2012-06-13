@@ -443,11 +443,11 @@ class Factory(object):
     def register_global_preprocessors(self, preprocessors):
         self._global_preprocessors += preprocessors
 
-    def register_plan(self, name, blueprints):
+    def register_plan(self, name, blueprints, props):
         self._name_check(name)
-        self._plans[name] = blueprints
+        self._plans[name] = blueprints, props
 
-    def _expand_blueprints(self, blueprints):
+    def _expand_blueprints(self, blueprints, props):
         result = list()
         if isinstance(blueprints, basestring):
             blueprints = blueprints.split(':')
@@ -458,10 +458,15 @@ class Factory(object):
                     msg = "Plan named '%s' is not registered in factory" % \
                           plan_name
                     raise ValueError(msg)
-                result += self._expand_blueprints(self._plans[plan_name])
+                plan_chain, plan_props = self._plans[plan_name]
+                for key in plan_props:
+                    if key not in props:
+                        props[key] = plan_props[key]
+                expanded, props = self._expand_blueprints(plan_chain, props)
+                result += expanded
             else:
                 result.append(blueprint)
-        return result
+        return result, props
 
     def __call__(self, blueprints,
                  name=None,
@@ -510,7 +515,7 @@ class Factory(object):
         disp_renderers = list()
         preprocessors = list()
         builders = list()
-        blueprints = self._expand_blueprints(blueprints)
+        blueprints, props = self._expand_blueprints(blueprints, props)
         for blueprint in blueprints:
             if blueprint.startswith('*'):
                 part_name = blueprint[1:]

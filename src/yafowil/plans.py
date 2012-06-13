@@ -12,4 +12,4 @@ _PLANS = (
 )
 
 for name, blueprints in _PLANS:
-    factory.register_plan(name, blueprints)
+    factory.register_plan(name, blueprints, {})
