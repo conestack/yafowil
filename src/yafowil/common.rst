@@ -588,7 +588,7 @@ Multiple values on single valued selection fails::
       ...
     ValueError: Multiple values for single selection.
 
-Render single selection as radio buttons::
+Render single selection as radio inputs::
 
     >>> widget = factory(
     ...     'select',
@@ -628,7 +628,7 @@ Render single selection as radio buttons::
 With Radio
 ..........
 
-Render single selection as radio buttons, disables all::
+Render single selection as radio inputs, disables all::
 
     >>> widget.attrs['disabled'] = True
     >>> pxml('<div>'+widget()+'</div>')
@@ -655,7 +655,7 @@ Render single selection as radio buttons, disables all::
     </div>
     <BLANKLINE>
 
-Render single selection as radio buttons, disables some::
+Render single selection as radio inputs, disables some::
 
     >>> widget.attrs['disabled'] = ['one', 'three']
     >>> pxml('<div>'+widget()+'</div>')
@@ -1263,7 +1263,7 @@ Submit(action)
     ... }
     >>> widget = factory('submit', name='save', props=props)
     >>> widget()
-    u'<button class="btn" id="input-save" name="action.save" type="submit" value="Action name" />'
+    u'<input class="btn" id="input-save" name="action.save" type="submit" value="Action name" />'
 
     >>> props = {
     ...     'action': True,

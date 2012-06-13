@@ -442,7 +442,7 @@ Render an empty form::
     <form action="http://www.domain.tld/someform" class="well" enctype="multipart/form-data" id="form-myform" method="post" novalidate="novalidate">
       <label for="input-myform-someinput">Your Text</label>
       <input class="text" id="input-myform-someinput" name="myform.someinput" type="text" value=""/>
-      <button class="btn" id="input-myform-submit" name="action.myform.submit" type="submit" value="submit"/>
+      <input class="btn" id="input-myform-submit" name="action.myform.submit" type="submit" value="submit"/>
     </form>
     <BLANKLINE>
 

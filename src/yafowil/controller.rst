@@ -89,8 +89,8 @@ Render form with empty request::
     <form action="http://fubar.com" class="well" enctype="multipart/form-data" id="form-testform" method="post" novalidate="novalidate">
       <input class="text" id="input-testform-field1" name="testform.field1" type="text" value="hello world"/>
       <input class="required text" id="input-testform-field2" name="testform.field2" required="required" type="text" value=""/>
-      <button class="btn" id="input-testform-save" name="action.testform.save" type="submit" value="Save"/>
-      <button class="btn" id="input-testform-cancel" name="action.testform.cancel" type="submit" value="Cancel"/>
+      <input class="btn" id="input-testform-save" name="action.testform.save" type="submit" value="Save"/>
+      <input class="btn" id="input-testform-cancel" name="action.testform.cancel" type="submit" value="Cancel"/>
     </form>
     <BLANKLINE>
 
@@ -157,8 +157,8 @@ Render the form performed::
     <form action="http://fubar.com" class="well" enctype="multipart/form-data" id="form-testform" method="post" novalidate="novalidate">
       <input class="text" id="input-testform-field1" name="testform.field1" type="text" value="hello world"/>
       <input class="required text" id="input-testform-field2" name="testform.field2" required="required" type="text" value="1"/>
-      <button class="btn" id="input-testform-save" name="action.testform.save" type="submit" value="Save"/>
-      <button class="btn" id="input-testform-cancel" name="action.testform.cancel" type="submit" value="Cancel"/>
+      <input class="btn" id="input-testform-save" name="action.testform.save" type="submit" value="Save"/>
+      <input class="btn" id="input-testform-cancel" name="action.testform.cancel" type="submit" value="Cancel"/>
     </form>
     <BLANKLINE>
 
@@ -181,8 +181,8 @@ Render form not performed::
     <form action="http://fubar.com" class="well" enctype="multipart/form-data" id="form-testform" method="post" novalidate="novalidate">
       <input class="text" id="input-testform-field1" name="testform.field1" type="text" value="hello world"/>
       <input class="required text" id="input-testform-field2" name="testform.field2" required="required" type="text" value=""/>
-      <button class="btn" id="input-testform-save" name="action.testform.save" type="submit" value="Save"/>
-      <button class="btn" id="input-testform-cancel" name="action.testform.cancel" type="submit" value="Cancel"/>
+      <input class="btn" id="input-testform-save" name="action.testform.save" type="submit" value="Save"/>
+      <input class="btn" id="input-testform-cancel" name="action.testform.cancel" type="submit" value="Cancel"/>
     </form>
     <BLANKLINE>
 

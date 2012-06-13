@@ -1028,7 +1028,7 @@ def submit_renderer(widget, data):
         'type': 'submit',
         'value': widget.attrs.get('label', widget.__name__),
     }
-    return tag('button', **input_attrs)
+    return tag('input', **input_attrs)
 
 
 factory.register(
