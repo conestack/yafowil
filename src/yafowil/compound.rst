@@ -400,7 +400,7 @@ Test Form::
     ...                name = 'FORM',
     ...                props={'action': 'http://fubar.com'})
     >>> form()
-    u'<form action="http://fubar.com" enctype="multipart/form-data" id="form-FORM" method="post" novalidate="novalidate"></form>'
+    u'<form action="http://fubar.com" class="well" enctype="multipart/form-data" id="form-FORM" method="post" novalidate="novalidate"></form>'
 
 Form display renderer::
 
@@ -439,10 +439,10 @@ Create a form::
 Render an empty form::
 
     >>> pxml(form())
-    <form action="http://www.domain.tld/someform" enctype="multipart/form-data" id="form-myform" method="post" novalidate="novalidate">
+    <form action="http://www.domain.tld/someform" class="well" enctype="multipart/form-data" id="form-myform" method="post" novalidate="novalidate">
       <label for="input-myform-someinput">Your Text</label>
       <input class="text" id="input-myform-someinput" name="myform.someinput" type="text" value=""/>
-      <input id="input-myform-submit" name="action.myform.submit" type="submit" value="submit"/>
+      <button class="btn" id="input-myform-submit" name="action.myform.submit" type="submit" value="submit"/>
     </form>
     <BLANKLINE>
 
@@ -467,7 +467,7 @@ Form action property can be callable::
     ...         'action':action,
     ...     })
     >>> form()
-    u'<form action="actionfromcall" enctype="multipart/form-data" 
+    u'<form action="actionfromcall" class="well" enctype="multipart/form-data" 
     id="form-form" method="post" novalidate="novalidate"></form>'
     
 Create label for field in other compound::
@@ -484,7 +484,7 @@ Create label for field in other compound::
     ...         'for': 'field'})
     >>> form['field'] = factory('text')
     >>> form()
-    u'<form action="action" enctype="multipart/form-data" id="form-form" 
+    u'<form action="action" class="well" enctype="multipart/form-data" id="form-form" 
     method="post" novalidate="novalidate"><label 
     for="input-form-field">Foo</label><input 
     class="text" id="input-form-field" name="form.field" type="text" 

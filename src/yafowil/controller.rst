@@ -86,13 +86,16 @@ Render form with empty request::
 
     >>> data = form.extract(request)
     >>> pxml(form(data))
-    <form action="http://fubar.com" enctype="multipart/form-data" id="form-testform" method="post" novalidate="novalidate">
+    <form action="http://fubar.com" class="well" enctype="multipart/form-data" id="form-testform" method="post" novalidate="novalidate">
       <input class="text" id="input-testform-field1" name="testform.field1" type="text" value="hello world"/>
       <input class="required text" id="input-testform-field2" name="testform.field2" required="required" type="text" value=""/>
-      <input id="input-testform-save" name="action.testform.save" type="submit" value="Save"/>
-      <input id="input-testform-cancel" name="action.testform.cancel" type="submit" value="Cancel"/>
+      <button class="btn" id="input-testform-save" name="action.testform.save" type="submit" value="Save"/>
+      <button class="btn" id="input-testform-cancel" name="action.testform.cancel" type="submit" value="Cancel"/>
     </form>
     <BLANKLINE>
+
+
+
 
 Create controller for form::
 
@@ -151,13 +154,14 @@ Trigger save action with valid input::
 Render the form performed::
 
     >>> pxml(controller.rendered)
-    <form action="http://fubar.com" enctype="multipart/form-data" id="form-testform" method="post" novalidate="novalidate">
+    <form action="http://fubar.com" class="well" enctype="multipart/form-data" id="form-testform" method="post" novalidate="novalidate">
       <input class="text" id="input-testform-field1" name="testform.field1" type="text" value="hello world"/>
       <input class="required text" id="input-testform-field2" name="testform.field2" required="required" type="text" value="1"/>
-      <input id="input-testform-save" name="action.testform.save" type="submit" value="Save"/>
-      <input id="input-testform-cancel" name="action.testform.cancel" type="submit" value="Cancel"/>
+      <button class="btn" id="input-testform-save" name="action.testform.save" type="submit" value="Save"/>
+      <button class="btn" id="input-testform-cancel" name="action.testform.cancel" type="submit" value="Cancel"/>
     </form>
     <BLANKLINE>
+
 
 Trigger cancel action. performing is skipped::
 
@@ -174,13 +178,14 @@ Trigger cancel action. performing is skipped::
 Render form not performed::
 
     >>> pxml(controller.rendered)
-    <form action="http://fubar.com" enctype="multipart/form-data" id="form-testform" method="post" novalidate="novalidate">
+    <form action="http://fubar.com" class="well" enctype="multipart/form-data" id="form-testform" method="post" novalidate="novalidate">
       <input class="text" id="input-testform-field1" name="testform.field1" type="text" value="hello world"/>
       <input class="required text" id="input-testform-field2" name="testform.field2" required="required" type="text" value=""/>
-      <input id="input-testform-save" name="action.testform.save" type="submit" value="Save"/>
-      <input id="input-testform-cancel" name="action.testform.cancel" type="submit" value="Cancel"/>
+      <button class="btn" id="input-testform-save" name="action.testform.save" type="submit" value="Save"/>
+      <button class="btn" id="input-testform-cancel" name="action.testform.cancel" type="submit" value="Cancel"/>
     </form>
     <BLANKLINE>
+
 
 Try recursive lookup of actions::
 

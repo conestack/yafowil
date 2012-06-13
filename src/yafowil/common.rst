@@ -1263,7 +1263,7 @@ Submit(action)
     ... }
     >>> widget = factory('submit', name='save', props=props)
     >>> widget()
-    u'<input id="input-save" name="action.save" type="submit" value="Action name" />'
+    u'<button class="btn" id="input-save" name="action.save" type="submit" value="Action name" />'
 
     >>> props = {
     ...     'action': True,

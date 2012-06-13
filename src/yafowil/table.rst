@@ -79,7 +79,7 @@ form elements inside a table, providing pretty looking forms::
     >>> form['table']['row1'] = factory('tr')
     >>> form['table']['row1']['field1'] = factory('td:text', name='field1')
     >>> pxml(form())
-    <form action="myaction" enctype="multipart/form-data" id="form-myform" method="post" novalidate="novalidate">
+    <form action="myaction" class="well" enctype="multipart/form-data" id="form-myform" method="post" novalidate="novalidate">
       <table>
         <tr>
           <td>
@@ -89,6 +89,7 @@ form elements inside a table, providing pretty looking forms::
       </table>
     </form>
     <BLANKLINE>
+
     
 Build same table again but set some nodes structural. This is considered in
 ``Widget.dottedpath``::
@@ -107,7 +108,7 @@ Build same table again but set some nodes structural. This is considered in
     ...     }
     ... )
     >>> pxml(form())
-    <form action="mytableaction" enctype="multipart/form-data" id="form-mytableform" method="post" novalidate="novalidate">
+    <form action="mytableaction" class="well" enctype="multipart/form-data" id="form-mytableform" method="post" novalidate="novalidate">
       <table>
         <tr>
           <td>
@@ -129,7 +130,7 @@ Build same table again but set some nodes structural. This is considered in
       <RuntimeData mytableform.field1, value=<UNSET>, extracted='', 1 error(s) at ...>
     
     >>> pxml(form(data))
-    <form action="mytableaction" enctype="multipart/form-data" id="form-mytableform" method="post" novalidate="novalidate">
+    <form action="mytableaction" class="well" enctype="multipart/form-data" id="form-mytableform" method="post" novalidate="novalidate">
       <table>
         <tr>
           <td>
@@ -160,7 +161,7 @@ Create table with 'td' as compound::
     ...     }
     ... )
     >>> pxml(form())
-    <form action="mytableaction" enctype="multipart/form-data" id="form-mytableform" method="post" novalidate="novalidate">
+    <form action="mytableaction" class="well" enctype="multipart/form-data" id="form-mytableform" method="post" novalidate="novalidate">
       <table>
         <tr>
           <td>
@@ -170,6 +171,7 @@ Create table with 'td' as compound::
       </table>
     </form>
     <BLANKLINE>
+
     
     >>> data = form.extract({})
     >>> data.printtree()
@@ -182,7 +184,7 @@ Create table with 'td' as compound::
       <RuntimeData mytableform.field1, value=<UNSET>, extracted='', 1 error(s) at ...>
     
     >>> pxml(form(data))
-    <form action="mytableaction" enctype="multipart/form-data" id="form-mytableform" method="post" novalidate="novalidate">
+    <form action="mytableaction" class="well" enctype="multipart/form-data" id="form-mytableform" method="post" novalidate="novalidate">
       <table>
         <tr>
           <td>
