@@ -818,7 +818,9 @@ def select_edit_renderer(widget, data):
                 attrs['disabled'] = 'disabled'
 
             inputtag = tag('input', **attrs)
-            if label_pos == 'inner':
+            if label_pos == 'inner' or label_pos == 'inner-after':
+                item = tag('label', inputtag, term, for_=attrs['id'])
+            elif label_pos == 'inner-before':
                 item = tag('label', term, inputtag, for_=attrs['id'])
             elif label_pos == 'after':
                 item = inputtag + tag('label', term, for_=attrs['id'])
@@ -875,7 +877,7 @@ Desired rendering tag for selection if selection format is 'single'. Valid
 values are 'div' and 'ul'.
 """
 
-factory.defaults['select.listing_label_position'] = 'before'
+factory.defaults['select.listing_label_position'] = 'inner-after'
 factory.doc['props']['select.listing_label_position'] = """\
 Label position if format is 'single'. Behaves the same way as label widget
 position property.
