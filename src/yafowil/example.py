@@ -57,5 +57,5 @@ def get_example():
         'format': 'block',
         'multivalued': True,
     })
-    return [{'widget': text, 'doc': DOC_TEXT},
-            {'widget': select, 'doc': DOC_SELECT}]
+    return [{'widget': text, 'doc': DOC_TEXT, 'title': 'Text'},
+            {'widget': select, 'doc': DOC_SELECT, 'title': 'Select'}]
