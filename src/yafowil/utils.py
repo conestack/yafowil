@@ -69,7 +69,7 @@ class Unset(object):
 UNSET = Unset()
 
 
-def vocabulary(definition):
+def vocabulary(definition, sort_by_key=False):
     """Convert different kinds of input into a list of bi-tuples, both strings.
     """
     if callable(definition):
@@ -78,7 +78,8 @@ def vocabulary(definition):
         return [(definition, definition), ]
     # dict-like
     if hasattr(definition, '__getitem__') and hasattr(definition, 'keys'):
-        return [(_, definition[_]) for _ in definition.keys()]
+        keys = sort_by_key and sorted(definition.keys()) or definition.keys()
+        return [(_, definition[_]) for _ in keys]
 
     # iterable
     if hasattr(definition, '__iter__'):
@@ -96,7 +97,8 @@ def vocabulary(definition):
                 else:
                     # rare case, inner has one value only
                     new_vocab.append((entry[0], entry[0]))
-        return new_vocab
+        return sort_by_key and sorted(new_vocab, key=lambda tup: tup[0])\
+               or new_vocab
     return definition
 
 

@@ -62,6 +62,14 @@ Test the Vocabulary
     
     >>> vocabulary(None) is None
     True
+
+    Vocabulary returns a sorted list:
+    >>> vocabulary(['b', 'a', 'c'])
+    [('a', 'a'), ('b', 'b'), ('c', 'c')]
+
+    ... dictionaries are sorted by key:  
+    >>> vocabulary({'b':5, 'a':10, 'c':1})
+    [('a', 10), ('b', 5), ('c', 1)]
         
 Test Tag renderer
 -----------------
