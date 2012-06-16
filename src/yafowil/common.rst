@@ -600,7 +600,8 @@ Render single selection as radio inputs::
     ...             ('two', 'Two'),
     ...             ('three', 'Three'),
     ...             ('four', 'Four')],
-    ...         'format': 'single'})
+    ...         'format': 'single',
+    ...         'listing_label_position': 'before'})
     >>> pxml('<div>'+widget()+'</div>')
     <div>
       <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
