@@ -93,6 +93,12 @@ factory.doc['props']['template'] = \
  parameters.
 """
 
+factory.defaults['title'] = None
+factory.doc['props']['title'] = """\
+Optional help text to be rendered in the title attribute.
+"""
+
+
 
 ###############################################################################
 # generic
@@ -147,6 +153,7 @@ def input_attributes_common(widget, data):
         'placeholder': widget.attrs.get('placeholder') or None,
         'required': widget.attrs.get('required') and 'required' or None,
         'size': widget.attrs.get('size'),
+        'title': widget.attrs.get('title') or None,
         'type': widget.attrs.get('type') or None,
         'value': fetch_value(widget, data),
     }
@@ -1256,8 +1263,6 @@ def label_renderer(widget, data):
             label_attrs['for_'] = cssid(for_widget, 'input')
         else:
             label_attrs['for_'] = cssid(widget, 'input')
-        if widget.attrs['title']:
-            label_attrs['title'] = widget.attrs['title']
     taghelp = u''
     if widget.attrs['help']:
         help_attrs = {'class_': widget.attrs['help_class']}
@@ -1304,10 +1309,6 @@ the label.
 
 factory.defaults['label.help_class'] = 'help'
 
-factory.defaults['label.title'] = None
-factory.doc['props']['label.title'] = """\
-Optional help text to be rendered in the title attribute of the label.
-"""
 
 
 ###############################################################################

@@ -68,6 +68,19 @@ Text Input
     u'<div class="display-text" id="display-MYTEXT">Test Text</div>'
 
 
+Render with title attribute::
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='MYTEXT',
+    ...     value='ja ha!',
+    ...     props={
+    ...         'title': 'My awesome title'})
+    >>> widget()
+    u'<input class="text" id="input-MYTEXT" name="MYTEXT" title="My awesome title" type="text" value="ja ha!" />'
+
+
+
 Autofocus Text Input
 --------------------
 ::
