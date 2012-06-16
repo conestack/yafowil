@@ -761,10 +761,12 @@ def select_edit_renderer(widget, data):
         value = [value]
     if not widget.attrs['multivalued'] and len(value) > 1:
         raise ValueError(u"Multiple values for single selection.")
+    sort_by_key = widget.attrs.get('sort_by_key', False)
     disabled = widget.attrs.get('disabled', False)
     if widget.attrs['format'] == 'block':
         optiontags = []
-        for key, term in vocabulary(widget.attrs.get('vocabulary', [])):
+        for key, term in vocabulary(widget.attrs.get('vocabulary', []),
+                                    sort_by_key):
             attrs = {
                 'selected': (key in value) and 'selected' or None,
                 'value': key,
@@ -804,7 +806,8 @@ def select_edit_renderer(widget, data):
             tagtype = 'checkbox'
         else:
             tagtype = 'radio'
-        for key, term in vocabulary(widget.attrs.get('vocabulary', [])):
+        for key, term in vocabulary(widget.attrs.get('vocabulary', []),
+                                    sort_by_key):
             attrs = {
                 'type': tagtype,
                 'value':  key,
@@ -844,7 +847,8 @@ def select_display_renderer(widget, data):
         'class_': 'display-%s' % widget.attrs['class'] or 'generic'
     }
     content = u''
-    vocab = dict(vocabulary(widget.attrs.get('vocabulary', [])))
+    sort_by_key = widget.attrs.get('sort_by_key', False)
+    vocab = dict(vocabulary(widget.attrs.get('vocabulary', [])), sort_by_key)
     for key in value:
         content += data.tag('li', vocab[key])
     return data.tag('ul', content, **attrs)
@@ -887,6 +891,12 @@ factory.doc['props']['select.vocabulary'] = """\
 Vocabulary to be used for the selection list. Expects a dict-like or an
 iterable or a callable which returns one of both first. An iterable can consist
 out of strings or out of tuples with ``(key, value)``.
+"""
+factory.defaults['select.sort_by_key'] = False
+factory.doc['props']['select.listing_tag'] = """\
+If set to true, then the vocabulary will be sorted by it's key or the first
+element of the tuples' values. If False, the resulting vocabulary will be in
+the order of the original vocabulary definition. Values are True or False.
 """
 
 factory.doc['props']['select.disabled'] = """\
