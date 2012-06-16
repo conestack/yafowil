@@ -886,7 +886,8 @@ position property.
 factory.doc['props']['select.vocabulary'] = """\
 Vocabulary to be used for the selection list. Expects a dict-like or an
 iterable or a callable which returns one of both first. An iterable can consist
-out of strings or out of tuples with ``(key, value)``.
+out of strings or out of tuples with ``(key, value)``. The items in the result
+list are in the same order like the vocabulary.
 """
 
 factory.doc['props']['select.disabled'] = """\
