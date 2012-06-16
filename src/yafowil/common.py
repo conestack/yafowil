@@ -1013,7 +1013,7 @@ def submit_renderer(widget, data):
 
     input_attrs = input_attributes_common(widget, data)
     input_attrs['type'] = 'submit'
-    input_attrs['name'] = widget.attrs['action'] and\
+    input_attrs['name_'] = widget.attrs['action'] and\
                           'action.%s' % widget.dottedpath
     input_attrs['value'] = widget.attrs.get('label', widget.__name__)
     return tag('input', **input_attrs)
