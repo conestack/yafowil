@@ -78,7 +78,7 @@ def vocabulary(definition):
         return [(definition, definition), ]
     # dict-like
     if hasattr(definition, '__getitem__') and hasattr(definition, 'keys'):
-        return [(_, definition[_]) for _ in definition.keys()]
+        return [(_, definition[_]) for _ in sorted(definition.keys())]
 
     # iterable
     if hasattr(definition, '__iter__'):
@@ -96,7 +96,7 @@ def vocabulary(definition):
                 else:
                     # rare case, inner has one value only
                     new_vocab.append((entry[0], entry[0]))
-        return new_vocab
+        return sorted(new_vocab, key=lambda tup: tup[0])
     return definition
 
 
