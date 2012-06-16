@@ -29,7 +29,7 @@ def get_example():
     })
     text['intnumber'] = factory('label:error:number', props={
         'label': 'Number Input (int)',
-        'datatype': 'int',
+        'datatype': 'integer',
     })
     text['password'] = factory('label:error:password', props={
         'label': 'Password Input',
