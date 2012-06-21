@@ -486,9 +486,9 @@ Some basic name checks are done::
     
 Test the plans::
 
-    >>> factory.register_makro('test_plan', 
+    >>> factory.register_macro('test_plan', 
     ...                        'foo:*bar:baz', {'foo.newprop': 'abc'})
-    >>> factory._makros
+    >>> factory._macros
     {'test_plan': (['foo', '*bar', 'baz'], {'foo.newprop': 'abc'})}
     
     >>> factory._expand_blueprints('#test_plan', {'foo.newprop' : '123'})
@@ -503,7 +503,7 @@ Test the plans::
     ...
     ValueError: Plan named 'nonexisting' is not registered in factory
 
-    >>> factory.register_makro('test_plan2', 'alpha:#test_plan:beta', {})
+    >>> factory.register_macro('test_plan2', 'alpha:#test_plan:beta', {})
     >>> factory._expand_blueprints('#test_plan2', {})
     (['alpha', 'foo', '*bar', 'baz', 'beta'], {'foo.newprop': 'abc'})
 

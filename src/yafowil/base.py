@@ -420,7 +420,7 @@ class Factory(object):
     def __init__(self):
         self._blueprints = dict()
         self._global_preprocessors = list()
-        self._makros = dict()
+        self._macros = dict()
         self.defaults = dict()
         self.doc = {
             'props': dict(),
@@ -443,11 +443,11 @@ class Factory(object):
     def register_global_preprocessors(self, preprocessors):
         self._global_preprocessors += preprocessors
 
-    def register_makro(self, name, blueprints, props):
+    def register_macro(self, name, blueprints, props):
         self._name_check(name)
         if isinstance(blueprints, basestring):
             blueprints = blueprints.split(':')
-        self._makros[name] = blueprints, props
+        self._macros[name] = blueprints, props
 
     def _expand_blueprints(self, blueprints, props):
         result = list()
@@ -456,11 +456,11 @@ class Factory(object):
         for blueprint in blueprints:
             if blueprint.startswith('#'):
                 plan_name = blueprint[1:]
-                if plan_name not in self._makros:
+                if plan_name not in self._macros:
                     msg = "Plan named '%s' is not registered in factory" % \
                           plan_name
                     raise ValueError(msg)
-                plan_chain, plan_props = self._makros[plan_name]
+                plan_chain, plan_props = self._macros[plan_name]
                 for key in plan_props:
                     if key not in props:
                         props[key] = plan_props[key]
