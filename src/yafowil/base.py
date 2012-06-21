@@ -445,7 +445,6 @@ class Factory(object):
 
     def register_makro(self, name, blueprints, props):
         self._name_check(name)
-        import pdb;pdb.set_trace()
         if isinstance(blueprints, basestring):
             blueprints = blueprints.split(':')
         self._makros[name] = blueprints, props
@@ -530,10 +529,7 @@ class Factory(object):
                     ex, eren, pre, bui, dren = custom[part_name]
             else:
                 part_name = blueprint
-                try:
-                    ex, eren, pre, bui, dren = self._blueprints[part_name]
-                except:
-                    import pdb;pdb.set_trace()
+                ex, eren, pre, bui, dren = self._blueprints[part_name]
             extractors = [(part_name, _) for _ in ex] + extractors
             edit_renderers = [(part_name, _) for _ in eren] + edit_renderers
             disp_renderers = [(part_name, _) for _ in dren] + disp_renderers
