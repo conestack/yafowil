@@ -420,7 +420,7 @@ class Factory(object):
     def __init__(self):
         self._blueprints = dict()
         self._global_preprocessors = list()
-        self._plans = dict()
+        self._makros = dict()
         self.defaults = dict()
         self.doc = {
             'props': dict(),
@@ -443,9 +443,11 @@ class Factory(object):
     def register_global_preprocessors(self, preprocessors):
         self._global_preprocessors += preprocessors
 
-    def register_plan(self, name, blueprints, props):
+    def register_makro(self, name, blueprints, props):
         self._name_check(name)
-        self._plans[name] = blueprints, props
+        if isinstance(blueprints, basestring):
+            blueprints = blueprints.split(':')
+        self._makros[name] = blueprints, props
 
     def _expand_blueprints(self, blueprints, props):
         result = list()
@@ -454,11 +456,11 @@ class Factory(object):
         for blueprint in blueprints:
             if blueprint.startswith('#'):
                 plan_name = blueprint[1:]
-                if plan_name not in self._plans:
+                if plan_name not in self._makros:
                     msg = "Plan named '%s' is not registered in factory" % \
                           plan_name
                     raise ValueError(msg)
-                plan_chain, plan_props = self._plans[plan_name]
+                plan_chain, plan_props = self._makros[plan_name]
                 for key in plan_props:
                     if key not in props:
                         props[key] = plan_props[key]
@@ -527,7 +529,10 @@ class Factory(object):
                     ex, eren, pre, bui, dren = custom[part_name]
             else:
                 part_name = blueprint
-                ex, eren, pre, bui, dren = self._blueprints[part_name]
+                try:
+                    ex, eren, pre, bui, dren = self._blueprints[part_name]
+                except:
+                    import pdb;pdb.set_trace()
             extractors = [(part_name, _) for _ in ex] + extractors
             edit_renderers = [(part_name, _) for _ in eren] + edit_renderers
             disp_renderers = [(part_name, _) for _ in dren] + disp_renderers
