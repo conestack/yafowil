@@ -15,7 +15,6 @@ TESTFILES = [
     'compound.rst',
     'controller.rst',
     'table.rst',
-    'plans.rst',
 ]
 
 
