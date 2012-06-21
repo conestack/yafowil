@@ -37,6 +37,8 @@ Contributors
 
 - Robert Niederrreiter <rnix@squarewave.at>
 
+- Johannes Raggam <johannes@raggam.co.at>
+
 - Peter Holzer <peter.holzer@agitator.com>
 
 - Attila Olah

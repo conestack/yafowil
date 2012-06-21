@@ -42,8 +42,6 @@ setup(name='yafowil',
       entry_points = """
       [yafowil.plugin]
       register = yafowil.loader:register
-      resourcedir = yafowil.loader:get_resource_dir
-      stylesheets = yafowil.loader:get_css
       example = yafowil.example:get_example
       """,
 )
