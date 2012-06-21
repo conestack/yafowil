@@ -44,3 +44,5 @@ Contributors
 - Attila Olah
 
 - Christian Scholz aka MrTopf (initial discussion)
+
+- Johannes Raggam <net@programmatic.pro>
