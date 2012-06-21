@@ -14,6 +14,7 @@ from utils import (
     vocabulary,
 )
 
+
 ###############################################################################
 # common defaults
 ###############################################################################
@@ -83,14 +84,14 @@ factory.doc['props']['disabled'] = \
 factory.defaults['required_class_default'] = 'required'
 factory.doc['props']['required_class_default'] = \
 """CSS-class to apply if required condition was not met - if no specific class
- was given.
+was given.
 """
 
 factory.defaults['template'] = '%s'
 factory.doc['props']['template'] = \
 """Format string with pythons built-in string format template. If a callable
- is given it will be used instead and is called with ``widget`` and ``data`` as
- parameters.
+is given it will be used instead and is called with ``widget`` and ``data`` as
+parameters.
 """
 
 factory.defaults['title'] = None
@@ -99,11 +100,9 @@ Optional help text to be rendered in the title attribute.
 """
 
 
-
 ###############################################################################
 # generic
 ###############################################################################
-
 
 def generic_extractor(widget, data):
     """Extract raw data from request by ``widget.dottedpath``.
@@ -143,7 +142,7 @@ def generic_required_extractor(widget, data):
     raise ExtractionError(widget.attrs['required_message'])
 
 
-def input_attributes_common(widget, data):
+def input_attributes_common(widget, data, excludes=list()):
     input_attrs = {
         'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
         'class_': cssclasses(widget, data),
@@ -157,6 +156,8 @@ def input_attributes_common(widget, data):
         'type': widget.attrs.get('type') or None,
         'value': fetch_value(widget, data),
     }
+    for attr_name in excludes:
+        del input_attrs[attr_name]
     return input_attrs
 
 
@@ -583,7 +584,7 @@ factory.doc['props']['password.minlength'] = \
 
 factory.defaults['password.ascii'] = False
 factory.doc['props']['password.ascii'] = \
-"""Flag  ascii check should performed.
+"""Flag ascii check should performed.
 """
 
 factory.defaults['password.strength'] = -1
@@ -623,7 +624,6 @@ def checkbox_extractor(widget, data):
 @managedprops('format', 'disabled', 'checked', *css_managed_props)
 def checkbox_edit_renderer(widget, data):
     tag = data.tag
-
     input_attrs = input_attributes_common(widget, data)
     input_attrs['type'] = 'checkbox'
     if widget.attrs['checked'] is not None:
@@ -634,7 +634,6 @@ def checkbox_edit_renderer(widget, data):
     if widget.attrs['format'] == 'bool':
         input_attrs['value'] = ''
     checkbox = tag('input', **input_attrs)
-
     input_attrs = {
         'type': 'hidden',
         'value':  'checkboxexists',
@@ -655,7 +654,6 @@ def checkbox_display_renderer(widget, data):
     else:
         vocab = dict(vocabulary(widget.attrs.get('vocabulary', [])))
         content = vocab[bool(value)]
-
     attrs = {
         'id': cssid(widget, 'display'),
         'class_': 'display-%s' % widget.attrs['class'] or 'generic'
@@ -695,9 +693,11 @@ factory.doc['props']['checkbox.checked'] = """\
 Set 'checked' attribute explicit. If not given, compute by value.
 """
 
-factory.defaults['checkbox.vocabulary'] = {True: 'yes',
-                                           False: 'no',
-                                           UNSET: 'not set'}
+factory.defaults['checkbox.vocabulary'] = {
+    True: 'yes',
+    False: 'no',
+    UNSET: 'not set',
+}
 factory.doc['props']['checkbox.vocabulary'] = """\
 In display mode and if ```bool``` is set to ```True``` this mapping will be
 used for display of the value. Expected keys are ```True```, ```False``` and
@@ -816,7 +816,6 @@ def select_edit_renderer(widget, data):
             if (disabled and disabled is not True and key in disabled) \
                or disabled is True:
                 attrs['disabled'] = 'disabled'
-
             inputtag = tag('input', **attrs)
             if label_pos == 'inner' or label_pos == 'inner-after':
                 item = tag('label', inputtag, term, for_=attrs['id'])
@@ -943,7 +942,7 @@ def file_extractor(widget, data):
               'required', *css_managed_props)
 def input_file_edit_renderer(widget, data):
     tag = data.tag
-    input_attrs = input_attributes_common(widget, data)
+    input_attrs = input_attributes_common(widget, data, excludes=['value'])
     input_attrs['type'] = 'file'
     if widget.attrs.get('accept'):
         input_attrs['accept'] = widget.attrs['accept']
@@ -1017,7 +1016,6 @@ def submit_renderer(widget, data):
     if not expression:
         return u''
     tag = data.tag
-
     input_attrs = input_attributes_common(widget, data)
     input_attrs['type'] = 'submit'
     input_attrs['name_'] = widget.attrs['action'] and\
@@ -1069,8 +1067,6 @@ factory.defaults['text.disabled'] = False
 factory.doc['props']['text.disabled'] = \
 """Flag  input field is disabled.
 """
-
-factory.defaults['submit.class'] = 'btn'
 
 
 ###############################################################################
@@ -1263,6 +1259,8 @@ def label_renderer(widget, data):
             label_attrs['for_'] = cssid(for_widget, 'input')
         else:
             label_attrs['for_'] = cssid(widget, 'input')
+        if widget.attrs['title']:
+            label_attrs['title'] = widget.attrs['title']
     taghelp = u''
     if widget.attrs['help']:
         help_attrs = {'class_': widget.attrs['help_class']}

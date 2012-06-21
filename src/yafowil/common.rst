@@ -718,24 +718,21 @@ Render multi selection as checkboxes::
       <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
       <div id="checkbox-MYSELECT-wrapper">
         <div id="checkbox-MYSELECT-one">
-          <label for="input-MYSELECT-one">One</label>
-          <input checked="checked" class="select" id="input-MYSELECT-one" name="MYSELECT" type="checkbox" value="one"/>
+          <label for="input-MYSELECT-one"><input checked="checked" class="select" id="input-MYSELECT-one" name="MYSELECT" type="checkbox" value="one"/>One</label>
         </div>
         <div id="checkbox-MYSELECT-two">
-          <label for="input-MYSELECT-two">Two</label>
-          <input class="select" id="input-MYSELECT-two" name="MYSELECT" type="checkbox" value="two"/>
+          <label for="input-MYSELECT-two"><input class="select" id="input-MYSELECT-two" name="MYSELECT" type="checkbox" value="two"/>Two</label>
         </div>
         <div id="checkbox-MYSELECT-three">
-          <label for="input-MYSELECT-three">Three</label>
-          <input class="select" id="input-MYSELECT-three" name="MYSELECT" type="checkbox" value="three"/>
+          <label for="input-MYSELECT-three"><input class="select" id="input-MYSELECT-three" name="MYSELECT" type="checkbox" value="three"/>Three</label>
         </div>
         <div id="checkbox-MYSELECT-four">
-          <label for="input-MYSELECT-four">Four</label>
-          <input class="select" id="input-MYSELECT-four" name="MYSELECT" type="checkbox" value="four"/>
+          <label for="input-MYSELECT-four"><input class="select" id="input-MYSELECT-four" name="MYSELECT" type="checkbox" value="four"/>Four</label>
         </div>
       </div>
     </div>
     <BLANKLINE>
+
 
 Specials
 ........
@@ -760,20 +757,16 @@ Using 'ul' instead of 'div' for rendering radio or checkbox selections::
       <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
       <ul id="checkbox-MYSELECT-wrapper">
         <li id="checkbox-MYSELECT-one">
-          <label for="input-MYSELECT-one">One</label>
-          <input checked="checked" class="select" id="input-MYSELECT-one" name="MYSELECT" type="checkbox" value="one"/>
+          <label for="input-MYSELECT-one"><input checked="checked" class="select" id="input-MYSELECT-one" name="MYSELECT" type="checkbox" value="one"/>One</label>
         </li>
         <li id="checkbox-MYSELECT-two">
-          <label for="input-MYSELECT-two">Two</label>
-          <input class="select" id="input-MYSELECT-two" name="MYSELECT" type="checkbox" value="two"/>
+          <label for="input-MYSELECT-two"><input class="select" id="input-MYSELECT-two" name="MYSELECT" type="checkbox" value="two"/>Two</label>
         </li>
         <li id="checkbox-MYSELECT-three">
-          <label for="input-MYSELECT-three">Three</label>
-          <input class="select" id="input-MYSELECT-three" name="MYSELECT" type="checkbox" value="three"/>
+          <label for="input-MYSELECT-three"><input class="select" id="input-MYSELECT-three" name="MYSELECT" type="checkbox" value="three"/>Three</label>
         </li>
         <li id="checkbox-MYSELECT-four">
-          <label for="input-MYSELECT-four">Four</label>
-          <input class="select" id="input-MYSELECT-four" name="MYSELECT" type="checkbox" value="four"/>
+          <label for="input-MYSELECT-four"><input class="select" id="input-MYSELECT-four" name="MYSELECT" type="checkbox" value="four"/>Four</label>
         </li>
       </ul>
     </div>
@@ -810,7 +803,7 @@ Render single format selection with label after input::
     </div>
     <BLANKLINE>
 
-Render single format selection with input inside label::
+Render single format selection with input inside label before checkbox::
 
     >>> widget = factory(
     ...     'select',
@@ -824,7 +817,7 @@ Render single format selection with input inside label::
     ...         ],
     ...         'format': 'single',
     ...         'listing_tag': 'ul',
-    ...         'listing_label_position': 'inner'})
+    ...         'listing_label_position': 'inner-before'})
     >>> pxml('<div>'+widget()+'</div>')
     <div>
       <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
@@ -1183,7 +1176,12 @@ Extract ``new``::
 
 File with value preset::
 
-    >>> widget = factory('file', 'MYFILE', value={'file': StringIO('321')})
+    >>> widget = factory(
+    ...     'file',
+    ...     'MYFILE',
+    ...     value={
+    ...         'file': StringIO('321'),
+    ...     })
     >>> pxml('<div>' + widget() + '</div>')
     <div>
       <input id="input-MYFILE" name="MYFILE" type="file"/>
@@ -1277,7 +1275,7 @@ Submit(action)
     ... }
     >>> widget = factory('submit', name='save', props=props)
     >>> widget()
-    u'<input class="btn" id="input-save" name="action.save" type="submit" value="Action name" />'
+    u'<input id="input-save" name="action.save" type="submit" value="Action name" />'
 
     >>> props = {
     ...     'action': True,
@@ -1365,7 +1363,8 @@ Render with title attribute::
     ...     'label',
     ...     name='MYFILE', \
     ...     props={
-    ...         'title': 'My awesome title'})
+    ...         'title': 'My awesome title',
+    ...     })
     >>> widget()
     u'<label for="input-MYFILE" title="My awesome title">MYFILE</label>'
 
