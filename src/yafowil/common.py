@@ -93,6 +93,12 @@ factory.doc['props']['template'] = \
  parameters.
 """
 
+factory.defaults['title'] = None
+factory.doc['props']['title'] = """\
+Optional help text to be rendered in the title attribute.
+"""
+
+
 
 ###############################################################################
 # generic
@@ -137,29 +143,39 @@ def generic_required_extractor(widget, data):
     raise ExtractionError(widget.attrs['required_message'])
 
 
+def input_attributes_common(widget, data):
+    input_attrs = {
+        'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
+        'class_': cssclasses(widget, data),
+        'disabled': bool(widget.attrs.get('disabled')) and 'disabled' or None,
+        'id': cssid(widget, 'input'),
+        'name_': widget.dottedpath,
+        'placeholder': widget.attrs.get('placeholder') or None,
+        'required': widget.attrs.get('required') and 'required' or None,
+        'size': widget.attrs.get('size'),
+        'title': widget.attrs.get('title') or None,
+        'type': widget.attrs.get('type') or None,
+        'value': fetch_value(widget, data),
+    }
+    return input_attrs
+
+
+def input_attributes_full(widget, data):
+    input_attrs = input_attributes_common(widget, data)
+    input_attrs['autocomplete'] = widget.attrs.get('autocomplete')
+    if widget.attrs['type'] in ['range', 'number']:
+        input_attrs['min'] = widget.attrs.get('min') or None
+        input_attrs['max'] = widget.attrs.get('min') or None
+        input_attrs['step'] = widget.attrs.get('step') or None
+    return input_attrs
+
+
 @managedprops('type', 'size', 'disabled', 'autofocus', 'placeholder',
               'autocomplete', *css_managed_props)
 def input_generic_renderer(widget, data):
     """Generic HTML ``input`` tag render.
     """
-    input_attrs = {
-        'type': widget.attrs['type'],
-        'value': fetch_value(widget, data),
-        'name_': widget.dottedpath,
-        'id': cssid(widget, 'input'),
-        'class_': cssclasses(widget, data),
-        'size': widget.attrs.get('size'),
-        'placeholder': widget.attrs.get('placeholder') or None,
-        'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
-        'disabled': bool(widget.attrs.get('disabled')) and 'disabled' or None,
-        'autocomplete': widget.attrs.get('autocomplete'),
-    }
-    input_attrs['required'] = \
-        widget.attrs.get('required') and 'required' or None
-    if widget.attrs['type'] in ['range', 'number']:
-        input_attrs['min'] = widget.attrs.get('min') or None
-        input_attrs['max'] = widget.attrs.get('min') or None
-        input_attrs['step'] = widget.attrs.get('step') or None
+    input_attrs = input_attributes_full(widget, data)
     return data.tag('input', **input_attrs)
 
 
@@ -285,16 +301,16 @@ factory.defaults['proxy.class'] = None
 
 def textarea_attributes(widget, data):
     return {
-        'name_': widget.dottedpath,
-        'id': cssid(widget, 'input'),
-        'class_': cssclasses(widget, data),
-        'wrap': widget.attrs['wrap'],
-        'cols': widget.attrs['cols'],
-        'rows': widget.attrs['rows'],
-        'readonly': widget.attrs['readonly'] and 'readonly',
-        'placeholder': widget.attrs.get('placeholder') or None,
         'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
+        'class_': cssclasses(widget, data),
+        'cols': widget.attrs['cols'],
+        'id': cssid(widget, 'input'),
+        'name_': widget.dottedpath,
+        'placeholder': widget.attrs.get('placeholder') or None,
+        'readonly': widget.attrs['readonly'] and 'readonly',
         'required': widget.attrs.get('required') and 'required' or None,
+        'rows': widget.attrs['rows'],
+        'wrap': widget.attrs['wrap'],
     }
 
 
@@ -520,20 +536,9 @@ def password_edit_renderer(widget, data):
     """Render password widget.
     """
     tag = data.tag
-    value = _pwd_value(widget, data)
-    input_attrs = {
-        'type': 'password',
-        'value':  value,
-        'name_': widget.dottedpath,
-        'id': cssid(widget, 'input'),
-        'class_': cssclasses(widget, data),
-        'size': widget.attrs.get('size'),
-        'placeholder': widget.attrs.get('placeholder') or None,
-        'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
-        'disabled': widget.attrs.get('disabled'),
-    }
-    input_attrs['required'] = \
-        widget.attrs.get('required') and 'required' or None
+    input_attrs = input_attributes_common(widget, data)
+    input_attrs['type'] = 'password'
+    input_attrs['value'] = _pwd_value(widget, data)
     return tag('input', **input_attrs)
 
 
@@ -618,23 +623,18 @@ def checkbox_extractor(widget, data):
 @managedprops('format', 'disabled', 'checked', *css_managed_props)
 def checkbox_edit_renderer(widget, data):
     tag = data.tag
-    value = fetch_value(widget, data)
-    input_attrs = {
-        'type': 'checkbox',
-        'value': value,
-        'name_': widget.dottedpath,
-        'id': cssid(widget, 'input'),
-        'class_': cssclasses(widget, data),
-        'disabled': bool(widget.attrs.get('disabled')) and 'disabled' or None,
-    }
+
+    input_attrs = input_attributes_common(widget, data)
+    input_attrs['type'] = 'checkbox'
     if widget.attrs['checked'] is not None:
         if widget.attrs['checked']:
             input_attrs['checked'] = 'checked'
     else:
-        input_attrs['checked'] = value and 'checked' or None
+        input_attrs['checked'] = input_attrs['value'] and 'checked' or None
     if widget.attrs['format'] == 'bool':
         input_attrs['value'] = ''
     checkbox = tag('input', **input_attrs)
+
     input_attrs = {
         'type': 'hidden',
         'value':  'checkboxexists',
@@ -943,15 +943,8 @@ def file_extractor(widget, data):
               'required', *css_managed_props)
 def input_file_edit_renderer(widget, data):
     tag = data.tag
-    input_attrs = {
-        'name_': widget.dottedpath,
-        'id': cssid(widget, 'input'),
-        'class_': cssclasses(widget, data),
-        'type': 'file',
-        'placeholder': widget.attrs.get('placeholder') or None,
-        'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
-        'required': widget.attrs.get('required') and 'required' or None,
-    }
+    input_attrs = input_attributes_common(widget, data)
+    input_attrs['type'] = 'file'
     if widget.attrs.get('accept'):
         input_attrs['accept'] = widget.attrs['accept']
     return tag('input', **input_attrs)
@@ -1024,13 +1017,12 @@ def submit_renderer(widget, data):
     if not expression:
         return u''
     tag = data.tag
-    input_attrs = {
-        'name': widget.attrs['action'] and 'action.%s' % widget.dottedpath,
-        'id': cssid(widget, 'input'),
-        'class_': widget.attrs.get('class'),
-        'type': 'submit',
-        'value': widget.attrs.get('label', widget.__name__),
-    }
+
+    input_attrs = input_attributes_common(widget, data)
+    input_attrs['type'] = 'submit'
+    input_attrs['name_'] = widget.attrs['action'] and\
+                          'action.%s' % widget.dottedpath
+    input_attrs['value'] = widget.attrs.get('label', widget.__name__)
     return tag('input', **input_attrs)
 
 
@@ -1271,8 +1263,6 @@ def label_renderer(widget, data):
             label_attrs['for_'] = cssid(for_widget, 'input')
         else:
             label_attrs['for_'] = cssid(widget, 'input')
-        if widget.attrs['title']:
-            label_attrs['title'] = widget.attrs['title']
     taghelp = u''
     if widget.attrs['help']:
         help_attrs = {'class_': widget.attrs['help_class']}
@@ -1319,10 +1309,6 @@ the label.
 
 factory.defaults['label.help_class'] = 'help'
 
-factory.defaults['label.title'] = None
-factory.doc['props']['label.title'] = """\
-Optional help text to be rendered in the title attribute of the label.
-"""
 
 
 ###############################################################################
