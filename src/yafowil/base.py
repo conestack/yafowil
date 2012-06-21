@@ -445,6 +445,7 @@ class Factory(object):
 
     def register_makro(self, name, blueprints, props):
         self._name_check(name)
+        import pdb;pdb.set_trace()
         if isinstance(blueprints, basestring):
             blueprints = blueprints.split(':')
         self._makros[name] = blueprints, props
