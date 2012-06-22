@@ -866,7 +866,7 @@ def select_edit_renderer(widget, data):
                or disabled is True:
                 attrs['disabled'] = 'disabled'
             inputtag = tag('input', **input_attrs)
-            label_attrs = dict(for_=label_attrs['id'], _class=tagclass)
+            label_attrs = dict(for_=input_attrs['id'], _class=tagclass)
             item = generic_positional_rendering_helper('label', term,
                                                        label_attrs, inputtag,
                                                        label_pos, tag)
