@@ -796,6 +796,7 @@ def select_exists_marker(widget, data):
 
 @managedprops('format', 'vocabulary', 'multivalued', 'disabled',
               'listing_label_position', 'listing_tag', 'size',
+              'label_checkbox_class', 'label_radio_class',
               *css_managed_props)
 def select_edit_renderer(widget, data):
     tag = data.tag
@@ -848,10 +849,12 @@ def select_edit_renderer(widget, data):
         item_tag = listing_tag == 'div' and 'div' or 'li'
         if widget.attrs['multivalued']:
             tagtype = 'checkbox'
+            tagclass = widget.attrs['label_checkbox_class']
         else:
             tagtype = 'radio'
+            tagclass = widget.attrs['label_radio_class']
         for key, term in vocabulary(widget.attrs.get('vocabulary', [])):
-            attrs = {
+            input_attrs = {
                 'type': tagtype,
                 'value':  key,
                 'checked': (key in value) and 'checked' or None,
@@ -862,8 +865,8 @@ def select_edit_renderer(widget, data):
             if (disabled and disabled is not True and key in disabled) \
                or disabled is True:
                 attrs['disabled'] = 'disabled'
-            inputtag = tag('input', **attrs)
-            label_attrs = dict(for_=attrs['id'])
+            inputtag = tag('input', **input_attrs)
+            label_attrs = dict(for_=attrs['id'], _class=tagclass)
             item = generic_positional_rendering_helper('label', term,
                                                        label_attrs, inputtag,
                                                        label_pos, tag)
