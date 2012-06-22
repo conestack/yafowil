@@ -20,19 +20,24 @@ def get_example():
     text = factory('compound', name='yafowil-text')
     text['plain'] = factory('#field:text', props={
         'label': 'Text Input',
+        'help': 'Simple Text Field'
     })
     text['email'] = factory('#field:email', props={
         'label': 'E-Mail Input',
+        'help': 'E-Mail Address Field'
     })
     text['number'] = factory('#field:number', props={
         'label': 'Number Input (float)',
+        'help': 'Field for floating point number'
     })
     text['intnumber'] = factory('#field:number', props={
         'label': 'Number Input (int)',
         'datatype': 'integer',
+        'help': 'Field for integer'
     })
     text['password'] = factory('#field:password', props={
         'label': 'Password Input',
+        'help': 'Field for password'
     })
     select = factory('compound', name='yafowil-text')
     select['radiosingle'] = factory('#field:select', props={
