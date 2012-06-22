@@ -1303,17 +1303,12 @@ def label_renderer(widget, data):
             label_attrs['for_'] = cssid(widget, 'input')
         if widget.attrs['title']:
             label_attrs['title'] = widget.attrs['title']
-    taghelp = u''
-    if widget.attrs['help']:
-        # deprecated, use help blueprint instead
-        help_attrs = {'class_': widget.attrs['help_class']}
-        taghelp = tag('div', widget.attrs['help'], **help_attrs)
     pos = widget.attrs['position']
     if pos == 'inner':
         # deprecated, use explicit inner-after or inner-before
         pos = 'inner-before'
     rendered = data.rendered is not UNSET and data.rendered or u''
-    return generic_positional_rendering_helper('label', label_text + taghelp,
+    return generic_positional_rendering_helper('label', label_text,
                                                label_attrs, rendered, pos, tag)
 
 
