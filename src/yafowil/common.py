@@ -29,6 +29,11 @@ factory.doc['props']['class'] = \
 """Common CSS-class to put on.
 """
 
+factory.defaults['class_add'] = None
+factory.doc['props']['class_add'] = \
+"""Additional CSS-class to put on.
+"""
+
 factory.defaults['error_class'] = None
 factory.doc['props']['error_class'] = \
 """CSS-class to put on in case of error.
