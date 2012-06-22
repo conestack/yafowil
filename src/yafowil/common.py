@@ -204,6 +204,44 @@ def empty_display_renderer(widget, data):
     return data.rendered or u''
 
 
+def generic_positional_rendering_helper(tagname, message, attrs, rendered, pos,
+                                        tag):
+    """returns new tag with rendered content dependent on position
+
+    tagname
+        name of new tag, ie. div, p, label and so on
+
+    message
+        text included in new tag
+
+    attrs
+        attributes on new tag
+
+    rendered
+        prior rendered text
+
+    pos
+        position how to place the newtag relative to the prior rendered:
+        'before'='<newtag>message</newtag>rendered',
+        'after' ='<newtag>message</newtag>'
+        'inner-before'= <newtag>message rendered</newtag>
+        'inner-after'= <newtag>rendered message</newtag>
+    """
+    if pos not in ['before', 'after', 'inner-before', 'inner-after']:
+        raise ValueError('Invalid value for position "%s"' % pos)
+    if pos.startswith('inner'):
+        if pos.endswith('before'):
+            inner = message, rendered
+        else:
+            inner = rendered, message
+        return tag(tagname, *inner, **attrs)
+    else:
+        newtag = tag(tagname, message, **attrs)
+        if pos == 'before':
+            return newtag + rendered
+        return rendered + newtag
+
+
 ###############################################################################
 # text
 ###############################################################################
@@ -798,6 +836,9 @@ def select_edit_renderer(widget, data):
     else:
         tags = []
         label_pos = widget.attrs['listing_label_position']
+        if label_pos == 'inner':
+            # deprecated, use explicit inner-after or inner-before
+            label_pos = 'inner-after'
         listing_tag = widget.attrs['listing_tag']
         item_tag = listing_tag == 'div' and 'div' or 'li'
         if widget.attrs['multivalued']:
@@ -817,14 +858,10 @@ def select_edit_renderer(widget, data):
                or disabled is True:
                 attrs['disabled'] = 'disabled'
             inputtag = tag('input', **attrs)
-            if label_pos == 'inner' or label_pos == 'inner-after':
-                item = tag('label', inputtag, term, for_=attrs['id'])
-            elif label_pos == 'inner-before':
-                item = tag('label', term, inputtag, for_=attrs['id'])
-            elif label_pos == 'after':
-                item = inputtag + tag('label', term, for_=attrs['id'])
-            else:
-                item = tag('label', term, for_=attrs['id']) + inputtag
+            label_attrs = dict(for_=attrs['id'])
+            item = generic_positional_rendering_helper('label', term,
+                                                       label_attrs, inputtag,
+                                                       label_pos, tag)
             tags.append(tag(item_tag, item,
                             **{'id': cssid(widget, tagtype, key)}))
         taglisting = tag(listing_tag,
@@ -1235,10 +1272,10 @@ factory.defaults['number.required_class'] = 'required'
 
 factory.defaults['number.class'] = 'number'
 
-
 ###############################################################################
 # label
 ###############################################################################
+
 
 @managedprops('position', 'label', 'for', 'help', 'help_class',
               *css_managed_props)
@@ -1263,15 +1300,16 @@ def label_renderer(widget, data):
             label_attrs['title'] = widget.attrs['title']
     taghelp = u''
     if widget.attrs['help']:
+        # deprecated, use help blueprint instead
         help_attrs = {'class_': widget.attrs['help_class']}
         taghelp = tag('div', widget.attrs['help'], **help_attrs)
     pos = widget.attrs['position']
-    rendered = data.rendered is not UNSET and data.rendered or u''
     if pos == 'inner':
-        return tag('label', label_text, taghelp, rendered, **label_attrs)
-    elif pos == 'after':
-        return rendered + tag('label', label_text, taghelp, **label_attrs)
-    return tag('label', label_text, taghelp, **label_attrs) + rendered
+        # deprecated, use explicit inner-after or inner-before
+        pos = 'inner-before'
+    rendered = data.rendered is not UNSET and data.rendered or u''
+    return generic_positional_rendering_helper('label', label_text + taghelp,
+                                               label_attrs, rendered, pos, tag)
 
 
 factory.register(
@@ -1347,16 +1385,24 @@ Put the class given with this property on the div if an error happened.
 # error
 ###############################################################################
 
-@managedprops('message_class', 'error_class', 'error', *css_managed_props)
+@managedprops('tag', 'message_tag', 'message_class', 'position',
+              'render_empty', *css_managed_props)
 def error_renderer(widget, data):
-    if not data.errors:
+    if not data.errors and not widget.attrs.get('render_empty'):
         return data.rendered
     tag = data.tag
     msgs = u''
     for error in data.errors:
-        msgs += tag('div', error.message, class_=widget.attrs['message_class'])
-    return tag('div', msgs, data.rendered, class_=cssclasses(widget, data))
-
+        if widget.attrs.get('message_tag'):
+            msgs += tag(widget.attrs['message_tag'],
+                        error.message,
+                        class_=widget.attrs['message_class'])
+        else:
+            msgs += error.message
+    attrs = dict(class_=cssclasses(widget, data))
+    return generic_positional_rendering_helper(widget.attrs['tag'], msgs,
+                                               attrs, data.rendered,
+                                               widget.attrs['position'], tag)
 
 factory.register(
     'error',
@@ -1364,9 +1410,73 @@ factory.register(
     display_renderers=[empty_display_renderer])
 
 factory.doc['blueprint']['error'] = """\
-Renders a div with an errormessage around the prior rendered output.
+Renders a tag with an error-message and the prior rendered output.
 """
 
-factory.defaults['error.error_class'] = 'error'
-
+factory.defaults['error.class'] = 'error'
+factory.defaults['error.tag'] = 'div'
+factory.doc['props']['error.tag'] = """\
+HTML tag to use to enclose all error messages.
+"""
+factory.defaults['error.render_empty'] = False
+factory.doc['props']['error.tag'] = """\
+Render tag even if there is no error message.
+"""
+factory.defaults['error.message_tag'] = 'div'
+factory.doc['props']['error.message_class'] = """\
+HTML tag to use to enclose each error message.
+"""
 factory.defaults['error.message_class'] = 'errormessage'
+factory.doc['props']['error.message_class'] = """\
+CSS class to apply to inner message-tag.
+"""
+factory.defaults['error.position'] = 'inner-before'
+factory.doc['props']['error.position'] = """\
+Error can be rendered at 3 different positions: ``before``/ ``after`` the
+prior rendered output or with ``inner-before``/ ``inner-after``  it puts the
+prior rendered output inside the tag used for the error message (beofre or
+after the message.
+"""
+
+
+###############################################################################
+# help
+###############################################################################
+
+@managedprops('tag', 'help', 'position', 'render_empty', *css_managed_props)
+def help_renderer(widget, data):
+    if not widget.attrs.get('render_empty') and not widget.attrs.get('help'):
+        return data.rendered
+    tag = data.tag
+    attrs = dict(class_=cssclasses(widget, data))
+    return generic_positional_rendering_helper(widget.attrs['tag'],
+                                               widget.attrs['help'],
+                                               attrs, data.rendered,
+                                               widget.attrs['position'], tag)
+
+factory.register(
+    'help',
+    edit_renderers=[help_renderer],
+    display_renderers=[empty_display_renderer])
+
+factory.doc['blueprint']['help'] = """\
+Renders a tag with an help-message and the prior rendered output.
+"""
+
+factory.defaults['help.class'] = 'help'
+factory.defaults['help.tag'] = 'div'
+factory.doc['props']['help.tag'] = """\
+HTML tag to use to enclose all help messages.
+"""
+factory.defaults['help.render_empty'] = False
+factory.doc['props']['help.tag'] = """\
+Render tag even if there is no help message.
+"""
+factory.defaults['help.position'] = 'before'
+factory.doc['props']['help.position'] = """\
+Help can be rendered at 3 different positions: ``before``/ ``after`` the
+prior rendered output or with ``inner-before``/ ``inner-after``  it puts the
+prior rendered output inside the tag used for the help message (beofre or
+after the message.
+"""
+

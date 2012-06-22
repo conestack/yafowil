@@ -1587,6 +1587,22 @@ Chained password inside error inside field::
     ...                  mode='display')
     >>> widget()
     u'<div class="display-text" id="display-mydisplay">somevalue</div>'
+    
+    
+Help
+----
+
+Render some additional help text::
+
+    >>> widget = factory('field:help:text', name='helpexample',
+    ...                  props={'label': 'Help',
+    ...                         'help': 'Shout out loud here'})
+    >>> pxml(widget())
+    <div class="field" id="field-helpexample">
+      <div class="help">Shout out loud here</div>
+      <input class="text" id="input-helpexample" name="helpexample" type="text" value=""/>
+    </div>
+    <BLANKLINE>
 
 
 e-mail
