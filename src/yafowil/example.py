@@ -16,6 +16,7 @@ Selection Widgets
 Write me.
 """
 
+
 def get_example():
     text = factory('compound', name='yafowil-text')
     text['plain'] = factory('#field:text', props={
@@ -36,23 +37,27 @@ def get_example():
     })
     select = factory('compound', name='yafowil-text')
     select['radiosingle'] = factory('#field:select', props={
-        'label': 'Select (radio, single)',
+        'label': 'Select',
+        'help': 'single as radio buttons',
         'vocabulary': ['Python 2', 'Python 3'],
         'format': 'radio',
     })
     select['blocksingle'] = factory('#field:select', props={
-        'label': 'Select (block, single)',
+        'label': 'Select',
+        'help': 'single as dropdown (aka block)',
         'vocabulary': ['Python', 'Java', 'Perl', 'Erlang', 'C', 'C++', 'C#'],
         'format': 'block',
     })
     select['checkboxmultiple'] = factory('#field:select', props={
-        'label': 'Select (multiple, checkbox)',
+        'label': 'Select',
+        'help': 'multiple as checkboxes',
         'vocabulary': ['Python 2', 'Python 3'],
         'format': 'checkbox',
         'multivalued': True,
     })
     select['blockmultiple'] = factory('#field:select', props={
-        'label': 'Select (multiple, checkbox)',
+        'label': 'Select',
+        'help': 'multiple as block',
         'vocabulary': ['Python', 'Java', 'Perl', 'Erlang', 'C', 'C++', 'C#'],
         'format': 'block',
         'multivalued': True,
