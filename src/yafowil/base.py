@@ -421,6 +421,8 @@ class Factory(object):
         self._blueprints = dict()
         self._global_preprocessors = list()
         self._macros = dict()
+        self._themes = dict()
+        self.theme = 'default'
         self.defaults = dict()
         self.doc = {
             'props': dict(),
@@ -448,7 +450,20 @@ class Factory(object):
         if isinstance(blueprints, basestring):
             blueprints = blueprints.split(':')
         self._macros[name] = blueprints, props
-
+    
+    def register_theme(self, themename, widgetname, resourcedir, js=[], css=[]):
+        """Register theme for addon widget.
+        """
+        theme = self._themes.setdefault(themename, {})
+        widget_theme = theme.setdefault(widgetname, {})
+        widget_theme['resourcedir'] = resourcedir
+        widget_theme['js'] = js
+        widget_theme['css'] = css
+    
+    def resources_for(self, widgetname):
+        theme = self._themes.get(self.theme, self._themes.get('default', {}))
+        return theme.get(widgetname)
+    
     def _expand_blueprints(self, blueprints, props):
         result = list()
         if isinstance(blueprints, basestring):

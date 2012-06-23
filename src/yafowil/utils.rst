@@ -109,6 +109,7 @@ Test CSS Classes
     >>> widget.attrs['error_class'] = None
     >>> widget.attrs['error_class_default'] = 'error'
     >>> widget.attrs['class'] = None
+    >>> widget.attrs['class_add'] = None
     
     >>> class DummyData(object):
     ...     def __init__(self):

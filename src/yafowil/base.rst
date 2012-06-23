@@ -507,6 +507,73 @@ Test the plans::
     >>> factory._expand_blueprints('#test_plan2', {})
     (['alpha', 'foo', '*bar', 'baz', 'beta'], {'foo.newprop': 'abc'})
 
+Test theme registry.
+
+Theme to use::
+
+    >>> factory.theme
+    'default'
+
+Register addon widget resources for default theme::
+
+    >>> factory.register_theme('default', 'yafowil.widget.someaddon',
+    ...                        '/foo/bar/resources',
+    ...                        js=[{'resource': 'default/widget.js',
+    ...                             'thirdparty': False,
+    ...                             'order': 10,
+    ...                             'merge': False}],
+    ...                        css=[{'resource': 'default/widget.css',
+    ...                              'thirdparty': False,
+    ...                              'order': 10,
+    ...                              'merge': False}])
+
+Register addon widget resources for custom theme::
+
+    >>> factory.register_theme('custom', 'yafowil.widget.someaddon',
+    ...                        '/foo/bar/resources',
+    ...                        js=[{'resource': 'custom/widget.js',
+    ...                             'thirdparty': False,
+    ...                             'order': 10,
+    ...                             'merge': False}],
+    ...                        css=[{'resource': 'custom/widget.css',
+    ...                              'thirdparty': False,
+    ...                              'order': 10,
+    ...                              'merge': False}])
+
+Lookup resouces for addon widget::
+
+    >>> factory.resources_for('yafowil.widget.someaddon')
+    {'resourcedir': '/foo/bar/resources', 
+    'css': [{'merge': False, 'thirdparty': False, 
+    'resource': 'default/widget.css', 'order': 10}], 
+    'js': [{'merge': False, 'thirdparty': False, 
+    'resource': 'default/widget.js', 'order': 10}]}
+
+Set theme on factory::
+
+    >>> factory.theme = 'custom'
+    >>> factory.resources_for('yafowil.widget.someaddon')
+    {'resourcedir': '/foo/bar/resources', 
+    'css': [{'merge': False, 'thirdparty': False, 
+    'resource': 'custom/widget.css', 'order': 10}], 
+    'js': [{'merge': False, 'thirdparty': False, 
+    'resource': 'custom/widget.js', 'order': 10}]}
+
+If no resources found for theme name, return default resources::
+
+    >>> factory.theme = 'inexistent'
+    >>> factory.resources_for('yafowil.widget.someaddon')
+    {'resourcedir': '/foo/bar/resources', 
+    'css': [{'merge': False, 'thirdparty': False, 
+    'resource': 'default/widget.css', 'order': 10}], 
+    'js': [{'merge': False, 'thirdparty': False, 
+    'resource': 'default/widget.js', 'order': 10}]}
+
+If no resources registered at all for widget, None is returned::
+
+    >>> factory.theme = 'default'
+    >>> factory.resources_for('yafowil.widget.inexistent') is None
+    True
 
 Widget tree manipulation
 ------------------------
