@@ -1346,17 +1346,6 @@ Same with inner label::
     </div>
     <BLANKLINE>
 
-Render with help text::
-
-    >>> widget = factory(
-    ...     'label',
-    ...     name='MYFILE', \
-    ...     props={
-    ...         'help': 'Help!',
-    ...         'help_class': 'help'})
-    >>> widget()
-    u'<label for="input-MYFILE">MYFILE<div class="help">Help!</div></label>'
-
 Render with title attribute::
 
     >>> widget = factory(
