@@ -864,7 +864,7 @@ def select_edit_renderer(widget, data):
             }
             if (disabled and disabled is not True and key in disabled) \
                or disabled is True:
-                attrs['disabled'] = 'disabled'
+                input_attrs['disabled'] = 'disabled'
             inputtag = tag('input', **input_attrs)
             label_attrs = dict(for_=input_attrs['id'], _class=tagclass)
             item = generic_positional_rendering_helper('label', term,
@@ -914,6 +914,8 @@ factory.defaults['select.default'] = []
 factory.defaults['select.format'] = 'block'
 
 factory.defaults['select.class'] = 'select'
+factory.defaults['select.label_checkbox_class'] = None
+factory.defaults['select.label_radio_class'] = None
 
 factory.defaults['select.listing_tag'] = 'div'
 factory.doc['props']['select.listing_tag'] = """\
@@ -1339,15 +1341,6 @@ factory.defaults['label.for'] = None
 factory.doc['props']['label.for'] = """\
 Optional dottedpath of widget to be labled
 """
-
-factory.defaults['label.help'] = None
-factory.doc['props']['label.help'] = """\
-Optional help text (alternative description) to be rendered inside a div after
-the label.
-"""
-
-factory.defaults['label.help_class'] = 'help'
-
 
 
 ###############################################################################
