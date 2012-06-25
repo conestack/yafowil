@@ -12,7 +12,7 @@ def get_entry_points(ns=None):
 
 
 def get_plugin_names(ns=None):
-    return list(set([_.module_name for _ in get_entry_points(ns=ns)]))
+    return list(set([_.dist.project_name for _ in get_entry_points(ns=ns)]))
 
 
 def get_resource_directory(module_name):

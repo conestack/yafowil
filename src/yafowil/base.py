@@ -461,8 +461,12 @@ class Factory(object):
         widget_theme['css'] = css
     
     def resources_for(self, widgetname):
-        theme = self._themes.get(self.theme, self._themes.get('default', {}))
-        return theme.get(widgetname)
+        theme = self._themes.get(self.theme, {})
+        default = self._themes.get('default', {})
+        resources = theme.get(widgetname)
+        if not resources:
+            resources = default.get(widgetname)
+        return resources
     
     def _expand_blueprints(self, blueprints, props):
         result = list()

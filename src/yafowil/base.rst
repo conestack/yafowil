@@ -575,6 +575,7 @@ If no resources registered at all for widget, None is returned::
     >>> factory.resources_for('yafowil.widget.inexistent') is None
     True
 
+
 Widget tree manipulation
 ------------------------
 
