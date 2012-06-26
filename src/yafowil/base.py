@@ -1,3 +1,4 @@
+import copy
 from threading import RLock
 from plumber import plumber
 from node.parts import (
@@ -466,7 +467,8 @@ class Factory(object):
         resources = theme.get(widgetname)
         if not resources:
             resources = default.get(widgetname)
-        return resources
+        # return copy, some integrations might modify, resources are static
+        return copy.deepcopy(resources)
     
     def _expand_blueprints(self, blueprints, props):
         result = list()
