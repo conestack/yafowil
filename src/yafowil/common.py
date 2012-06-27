@@ -996,10 +996,41 @@ def input_file_edit_renderer(widget, data):
     return tag('input', **input_attrs)
 
 
+def convert_bytes(bytes):
+    bytes = float(bytes)
+    if bytes >= 1099511627776:
+        terabytes = bytes / 1099511627776
+        size = '%.2fT' % terabytes
+    elif bytes >= 1073741824:
+        gigabytes = bytes / 1073741824
+        size = '%.2fG' % gigabytes
+    elif bytes >= 1048576:
+        megabytes = bytes / 1048576
+        size = '%.2fM' % megabytes
+    elif bytes >= 1024:
+        kilobytes = bytes / 1024
+        size = '%.2fK' % kilobytes
+    else:
+        size = '%.2fb' % bytes
+    return size
+
+
 def input_file_display_renderer(widget, data):
     tag = data.tag
-    # XXX: Display file name, size, mimetype
-    return tag('div', 'DISPLAY FILE TODO')
+    value = data.value
+    if not value:
+        return tag('div', 'No file')
+    file = value['file']
+    size = convert_bytes(len(file.read()))
+    file.seek(0)
+    filename = value.get('filename', 'Unknown')
+    mimetype = value.get('mimetype', 'Unknown')
+    return tag('div',
+               tag('ul',
+                   tag('li', tag('strong', 'Filename: '), filename),
+                   tag('li', tag('strong', 'Mimetype: '), mimetype),
+                   tag('li', tag('strong', 'Size: '), size)),
+               class_=cssclasses(widget, data))
 
 
 @managedprops(*css_managed_props)

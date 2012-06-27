@@ -823,16 +823,32 @@ fetch value
     >>> fetch_value(widget_with_default, data_filled)
     'extractedvalue'        
 
-TraceBack Supplment
-===================
 
+TraceBack Supplment
+-------------------
 ::
 
+    >>> from yafowil.base import TBSupplementWidget
+    
+    >>> class NoNameMock(object):
+    ...     blueprints='blue:prints:here'
+    ...     @property
+    ...     def dottedpath(self):
+    ...          raise ValueError('fail')
+    >>> mock = NoNameMock()
+    >>> suppl = TBSupplementWidget(mock, lambda x:x, 'testtask',
+    ...                            'some description')
+    >>> print suppl.getInfo()
+    yafowil widget processing info:
+        - path      : (name not set)
+        - blueprints: blue:prints:here
+        - task      : testtask
+        - descr     : some description
+    
     >>> class Mock(object): 
     ...     dottedpath='test.path.abc'
     ...     blueprints='blue:prints:here'
     >>> mock = Mock()
-    >>> from yafowil.base import TBSupplementWidget
     >>> suppl = TBSupplementWidget(mock, lambda x:x, 'testtask',
     ...                            'some description')
     >>> print suppl.getInfo()

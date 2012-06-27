@@ -120,8 +120,8 @@ class TBSupplementWidget(object):
         self.manageable_object = func
         try:
             name = widget.dottedpath
-        except ValueError:                                 # pragma NO COVERAGE
-            name = '(name not set)'                        # pragma NO COVERAGE
+        except ValueError:
+            name = '(name not set)'
         self.func = func
         self.name = name
         self.blueprints = widget.blueprints

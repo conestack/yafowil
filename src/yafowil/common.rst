@@ -832,6 +832,28 @@ Render single format selection with input inside label before checkbox::
     </div>
     <BLANKLINE>
 
+Check BBB 'inner' for 'listing_label_position' which behaves like
+'inner-after'::
+
+    >>> widget = factory(
+    ...     'select',
+    ...     'MYSELECT',
+    ...     value='one',
+    ...     props={
+    ...         'vocabulary': [('one','One')],
+    ...         'format': 'single',
+    ...         'listing_label_position': 'inner'})
+    >>> pxml('<div>'+widget()+'</div>')
+    <div>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <div id="radio-MYSELECT-wrapper">
+        <div id="radio-MYSELECT-one">
+          <label for="input-MYSELECT-one"><input checked="checked" class="select" id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>One</label>
+        </div>
+      </div>
+    </div>
+    <BLANKLINE>
+
 Check selection required::
 
     >>> widget = factory(
@@ -1232,6 +1254,17 @@ Extract ``replace`` returns new value::
     >>> data.extracted['action']
     'replace'
 
+Extract empty ``replace`` results in ``kepp action``::
+
+    >>> request = {
+    ...     'MYFILE': '',
+    ...     'MYFILE-action': 'replace'
+    ... }
+    >>> data = widget.extract(request)
+    >>> data.extracted
+    {'action': 'keep', 
+    'file': <StringIO.StringIO instance at ...>}
+
 Extract ``delete`` returns UNSET::
 
     >>> request['MYFILE-action'] = 'delete'
@@ -1264,6 +1297,52 @@ Extract ``delete`` returns UNSET::
     >>> widget()
     u'<input accept="foo/bar" id="input-MYFILE" name="MYFILE"
     type="file" />'
+
+File display renderer::
+
+    >>> from yafowil.common import convert_bytes
+    >>> convert_bytes(1 * 1024 * 1024 * 1024 * 1024)
+    '1.00T'
+    
+    >>> convert_bytes(1 * 1024 * 1024 * 1024)
+    '1.00G'
+    
+    >>> convert_bytes(1 * 1024 * 1024)
+    '1.00M'
+    
+    >>> convert_bytes(1 * 1024)
+    '1.00K'
+    
+    >>> convert_bytes(1)
+    '1.00b'
+    
+    >>> widget = factory(
+    ...     'file',
+    ...     'MYFILE',
+    ...     mode='display')
+    >>> pxml(widget())
+    <div>No file</div>
+    <BLANKLINE>
+    
+    >>> value = {
+    ...     'file': StringIO('12345'),
+    ...     'mimetype': 'text/plain',
+    ...     'filename': 'foo.txt',
+    ... }
+    >>> widget = factory(
+    ...     'file',
+    ...     'MYFILE',
+    ...     value=value,
+    ...     mode='display')
+    >>> pxml(widget())
+    <div>
+      <ul>
+        <li><strong>Filename: </strong>foo.txt</li>
+        <li><strong>Mimetype: </strong>text/plain</li>
+        <li><strong>Size: </strong>5.00b</li>
+      </ul>
+    </div>
+    <BLANKLINE>
 
 
 Submit(action)
@@ -1346,6 +1425,16 @@ Same with inner label::
     </div>
     <BLANKLINE>
 
+Invalid position::
+
+    >>> widget = factory('label:file', name='MYFILE', \
+    ...                   props={'label': 'MY FILE',
+    ...                          'label.position': 'inexistent'})
+    >>> pxml(tag('div', widget()))
+    Traceback (most recent call last):
+      ...
+    ValueError: Invalid value for position "inexistent"
+
 Render with title attribute::
 
     >>> widget = factory(
@@ -1356,6 +1445,17 @@ Render with title attribute::
     ...     })
     >>> widget()
     u'<label for="input-MYFILE" title="My awesome title">MYFILE</label>'
+
+Label Text can be a callable::
+
+    >>> widget = factory(
+    ...     'label',
+    ...     name='MYFILE', \
+    ...     props={
+    ...         'label': lambda: 'Fooo',
+    ...     })
+    >>> widget()
+    u'<label for="input-MYFILE">Fooo</label>'
 
 
 Field
@@ -1553,7 +1653,6 @@ Chained password inside error inside field::
     >>> widget = factory('field:error:password', name='password',
     ...                  props={'label': 'Password',
     ...                         'required': 'No password given!'})
-
     >>> data = widget.extract({'password': ''})
     >>> pxml(widget(data=data))
     <div class="field" id="field-password">
@@ -1576,8 +1675,21 @@ Chained password inside error inside field::
     ...                  mode='display')
     >>> widget()
     u'<div class="display-text" id="display-mydisplay">somevalue</div>'
-    
-    
+
+Error wrapping in div element can be suppressed::
+
+    >>> widget = factory('field:error:password', name='password',
+    ...                  props={'label': 'Password',
+    ...                         'required': 'No password given!',
+    ...                         'message_tag': None})
+    >>> data = widget.extract({'password': ''})
+    >>> pxml(widget(data=data))
+    <div class="field" id="field-password">
+      <div class="error">No password given!<input class="password required" id="input-password" name="password" required="required" type="password" value=""/></div>
+    </div>
+    <BLANKLINE>
+
+
 Help
 ----
 
@@ -1589,6 +1701,18 @@ Render some additional help text::
     >>> pxml(widget())
     <div class="field" id="field-helpexample">
       <div class="help">Shout out loud here</div>
+      <input class="text" id="input-helpexample" name="helpexample" type="text" value=""/>
+    </div>
+    <BLANKLINE>
+
+Render empty (WHAT'S THIS GOOD FOR?)::
+
+    >>> widget = factory('field:help:text', name='helpexample',
+    ...                  props={'label': 'Help',
+    ...                         'help': False,
+    ...                         'render_empty': False})
+    >>> pxml(widget())
+    <div class="field" id="field-helpexample">
       <input class="text" id="input-helpexample" name="helpexample" type="text" value=""/>
     </div>
     <BLANKLINE>
