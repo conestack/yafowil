@@ -15,28 +15,6 @@ def get_plugin_names(ns=None):
     return list(set([_.dist.project_name for _ in get_entry_points(ns=ns)]))
 
 
-def get_resource_directory(module_name):
-    for ep in get_entry_points(ns='resourcedir'):
-        if ep.module_name != module_name:
-            continue
-        return ep.load()()
-
-
-def _get_filepaths(module_name, ns):
-    for ep in get_entry_points(ns=ns):
-        if ep.module_name == module_name:
-            return ep.load()()
-    return []
-
-
-def get_javascripts(module_name):
-    return _get_filepaths(module_name, 'javascripts')
-
-
-def get_stylesheets(module_name):
-    return _get_filepaths(module_name, 'stylesheets')
-
-
 def get_example(example_name):
     for ep in get_entry_points(ns='example'):
         if ep.dist.project_name != example_name:
