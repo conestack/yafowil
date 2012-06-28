@@ -1077,6 +1077,7 @@ Explanation:
 * five is disabled and not in value, but someone put it in the request. it
   should get removed.
 
+::
     >>> data = widget.extract(request)
     >>> data.printtree()
     <RuntimeData myselect, value=['one', 'two', 'four'],
