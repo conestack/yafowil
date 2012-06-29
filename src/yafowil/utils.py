@@ -179,7 +179,10 @@ def cssclasses(widget, data, classattr='class', additional=[]):
         else:
             _classes.append(attrs['required_class_default'])
     if attrs[classattr]:
-        _classes += attrs[classattr].split()
+        if callable(attrs[classattr]):
+            _classes += attrs[classattr](widget, data).split()
+        else:
+            _classes += attrs[classattr].split()
     if attrs['class_add']:
         if callable(attrs['class_add']):
             _classes += attrs['class_add'](widget, data).split()
