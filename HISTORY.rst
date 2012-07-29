@@ -5,7 +5,10 @@ History
 2.0dev
 ------
 
-- adopt to plumber 1.2
+- adopt to ``plumber`` 1.2.
+  [rnix, 2012-07-29]
+
+- adopt to ``node`` 0.9.8.
   [rnix, 2012-07-29]
 
 - pep8ify
