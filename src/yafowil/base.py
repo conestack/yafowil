@@ -1,7 +1,7 @@
 import copy
 from threading import RLock
 from plumber import plumber
-from node.parts import (
+from node.behaviors import (
     Adopt,
     Nodify,
     NodeChildValidate,

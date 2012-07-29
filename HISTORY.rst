@@ -5,6 +5,9 @@ History
 2.0dev
 ------
 
+- adopt to plumber 1.2
+  [rnix, 2012-07-29]
+
 - pep8ify
   [jensens, 2012-06-08]
 

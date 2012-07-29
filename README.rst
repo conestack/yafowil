@@ -15,12 +15,14 @@ subclassing needed any more; no specific schema-framework is necessary.
 Yafowil provides a factory where you can fetch your widgets instances from.
 Or you register your own.
 
+
 Detailed Documentation
 ======================
 
 If you're interested to dig deeper: The `detailed YAFOWIL documentation
 <http://yafowil.info>`_ is available. Read it and learn how to
 create your example application with YAFOWIL forms in 15 minutes.
+
 
 Source Code
 ===========
@@ -30,19 +32,18 @@ The sources are in a GIT DVCS with its main branches at
 
 We'd be happy to see many forks and pull-requests to make YAFOWIL even better.
 
+
 Contributors
 ============
 
-- Jens W. Klein <jk@kleinundpartner.at>
+- Jens W. Klein <jk [at] kleinundpartner [dot] at>
 
-- Robert Niederrreiter <rnix@squarewave.at>
+- Robert Niederrreiter <rnix [at] squarewavea [dot] t>
 
-- Johannes Raggam <johannes@raggam.co.at>
+- Johannes Raggam <johannes [at] raggam [dot] co [dot] at>
 
-- Peter Holzer <peter.holzer@agitator.com>
+- Peter Holzer <peter [dot] holzer [at] agitator [dot] com>
 
 - Attila Olah
 
 - Christian Scholz aka MrTopf (initial discussion)
-
-- Johannes Raggam <net@programmatic.pro>

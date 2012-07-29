@@ -97,8 +97,8 @@ Test CSS Classes
 
     >>> from plumber import plumber
     >>> from node.base import OrderedNode
-    >>> from node.parts import Nodespaces
-    >>> from node.parts import Attributes
+    >>> from node.behaviors import Nodespaces
+    >>> from node.behaviors import Attributes
     >>> class CSSTestNode(OrderedNode):
     ...     __metaclass__ = plumber
     ...     __plumbing__ = Nodespaces, Attributes
