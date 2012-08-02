@@ -452,7 +452,8 @@ class Factory(object):
             blueprints = blueprints.split(':')
         self._macros[name] = blueprints, props
     
-    def register_theme(self, themename, widgetname, resourcedir, js=[], css=[]):
+    def register_theme(self, themename, widgetname,
+                       resourcedir=None, js=[], css=[]):
         """Register theme for addon widget.
         """
         theme = self._themes.setdefault(themename, {})
@@ -461,14 +462,16 @@ class Factory(object):
         widget_theme['js'] = js
         widget_theme['css'] = css
     
-    def resources_for(self, widgetname):
+    def resources_for(self, widgetname, copy=True):
         theme = self._themes.get(self.theme, {})
         default = self._themes.get('default', {})
         resources = theme.get(widgetname)
         if not resources:
             resources = default.get(widgetname)
         # return copy, some integrations might modify, resources are static
-        return copy.deepcopy(resources)
+        if copy:
+            return copy.deepcopy(resources)
+        return resources
     
     def _expand_blueprints(self, blueprints, props):
         result = list()
