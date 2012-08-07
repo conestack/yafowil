@@ -462,14 +462,14 @@ class Factory(object):
         widget_theme['js'] = js
         widget_theme['css'] = css
     
-    def resources_for(self, widgetname, copy=True):
+    def resources_for(self, widgetname, copy_resources=True):
         theme = self._themes.get(self.theme, {})
         default = self._themes.get('default', {})
         resources = theme.get(widgetname)
         if not resources:
             resources = default.get(widgetname)
         # return copy, some integrations might modify, resources are static
-        if copy:
+        if copy_resources:
             return copy.deepcopy(resources)
         return resources
     
