@@ -214,15 +214,17 @@ def display_proxy_renderer(widget, data):
     
 
 @managedprops('template', 'class')
-def generic_display_renderer(widget, data):
+def generic_display_renderer(widget, data, value=None):
     """Generic display renderer to render a value.
     """
     if callable(widget.attrs['template']):
         content = widget.attrs['template'](widget, data)
-    else:
+    elif value is None:
         value = fetch_value(widget, data)
         if not value:
             value = u''
+        content = widget.attrs['template'] % value
+    else:
         content = widget.attrs['template'] % value
     attrs = {
         'id': cssid(widget, 'display'),
@@ -943,7 +945,11 @@ def select_edit_renderer(widget, data):
 def select_display_renderer(widget, data):
     value = fetch_value(widget, data)
     if not widget.attrs['multivalued'] or not value:
-        return generic_display_renderer(widget, data)
+        vocab = dict(vocabulary(widget.attrs.get('vocabulary', [])))
+        value = vocab.get(value, value)
+        if data.tag.translate:
+            value = data.tag.translate(value)
+        return generic_display_renderer(widget, data, value=value)
     attrs = {
         'id': cssid(widget, 'display'),
         'class_': 'display-%s' % widget.attrs['class'] or 'generic'
