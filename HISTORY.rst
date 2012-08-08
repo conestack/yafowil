@@ -5,6 +5,9 @@ History
 2.0dev
 ------
 
+- add generic ``tag`` blueprint.
+  [rnix, 2012-08-08]
+
 - adopt to ``plumber`` 1.2.
   [rnix, 2012-07-29]
 

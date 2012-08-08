@@ -248,6 +248,39 @@ def generic_positional_rendering_helper(tagname, message, attrs, rendered, pos,
 
 
 ###############################################################################
+# tag
+###############################################################################
+
+@managedprops('tag', 'text', 'class')
+def tag_renderer(widget, data):
+    """Renderer for HTML tags.
+    """
+    attrs = {
+        'id': cssid(widget, 'tag'),
+        'class_': cssclasses(widget, data),
+    }
+    return data.tag(widget.attrs['tag'], widget.attrs['text'], **attrs)
+
+
+factory.register(
+    'tag',
+    edit_renderers=[tag_renderer],
+    display_renderers=[tag_renderer])
+
+factory.doc['blueprint']['tag'] = \
+"""Render HTML tags with text. Useful for rendering headings etc.
+"""
+
+factory.doc['props']['tag.tag'] = \
+"""HTML tag name.
+"""
+
+factory.doc['props']['tag.text'] = \
+"""Tag contents.
+"""
+
+
+###############################################################################
 # text
 ###############################################################################
 
@@ -1506,4 +1539,3 @@ prior rendered output or with ``inner-before``/ ``inner-after``  it puts the
 prior rendered output inside the tag used for the help message (beofre or
 after the message.
 """
-
