@@ -104,6 +104,11 @@ factory.doc['props']['title'] = """\
 Optional help text to be rendered in the title attribute.
 """
 
+factory.defaults['display_proxy'] = False
+factory.doc['props']['display_proxy'] = """\
+If 'True' and widget mode 'display', widget value gets rendered as hidden input.
+"""
+
 
 ###############################################################################
 # generic
@@ -184,6 +189,18 @@ def input_generic_renderer(widget, data):
     input_attrs = input_attributes_full(widget, data)
     return data.tag('input', **input_attrs)
 
+
+@managedprops('display_proxy')
+def display_proxy_renderer(widget, data):
+    rendered = data.rendered
+    if widget.attrs['display_proxy']:
+        orgin_type = widget.attrs.get('type')
+        widget.attrs['type'] = 'hidden'
+        rendered += input_generic_renderer(widget, data)
+        if orgin_type:
+            widget.attrs['type'] = orgin_type
+    return rendered
+    
 
 @managedprops('template', 'class')
 def generic_display_renderer(widget, data):
@@ -288,7 +305,7 @@ factory.register(
     'text',
     extractors=[generic_extractor, generic_required_extractor],
     edit_renderers=[input_generic_renderer],
-    display_renderers=[generic_display_renderer])
+    display_renderers=[generic_display_renderer, display_proxy_renderer])
 
 factory.doc['blueprint']['text'] = \
 """Text input blueprint.
@@ -408,7 +425,7 @@ factory.register(
     'textarea',
     extractors=[generic_extractor, generic_required_extractor],
     edit_renderers=[textarea_renderer],
-    display_renderers=[generic_display_renderer])
+    display_renderers=[generic_display_renderer, display_proxy_renderer])
 
 factory.doc['blueprint']['textarea'] = \
 """HTML textarea blueprint.
@@ -470,7 +487,7 @@ factory.register(
                 generic_required_extractor,
                 lines_extractor],
     edit_renderers=[lines_renderer],
-    display_renderers=[generic_display_renderer])
+    display_renderers=[generic_display_renderer, display_proxy_renderer])
 
 factory.doc['blueprint']['lines'] = \
 """Lines blueprint. Renders a textarea and extracts lines as list.
@@ -1200,7 +1217,7 @@ factory.register(
                 generic_required_extractor,
                 email_extractor],
     edit_renderers=[input_generic_renderer],
-    display_renderers=[generic_display_renderer])
+    display_renderers=[generic_display_renderer, display_proxy_renderer])
 
 factory.doc['blueprint']['email'] = \
 """E-mail (HTML5) input blueprint.
@@ -1234,7 +1251,7 @@ factory.register(
     'url',
     extractors=[generic_extractor, generic_required_extractor, url_extractor],
     edit_renderers=[input_generic_renderer],
-    display_renderers=[generic_display_renderer])
+    display_renderers=[generic_display_renderer, display_proxy_renderer])
 
 factory.doc['blueprint']['url'] = \
 """URL aka web address (HTML5) input blueprint.
@@ -1257,7 +1274,7 @@ factory.register(
     'search',
     extractors=[generic_extractor, generic_required_extractor],
     edit_renderers=[input_generic_renderer],
-    display_renderers=[generic_display_renderer])
+    display_renderers=[generic_display_renderer, display_proxy_renderer])
 
 factory.doc['blueprint']['search'] = """\
 Search blueprint (HTML5).
@@ -1321,7 +1338,7 @@ factory.register(
     extractors=[generic_extractor, generic_required_extractor,
                 number_extractor],
     edit_renderers=[input_generic_renderer],
-    display_renderers=[generic_display_renderer])
+    display_renderers=[generic_display_renderer, display_proxy_renderer])
 
 factory.doc['blueprint']['number'] = """\
 Number blueprint (HTML5).

@@ -5,6 +5,9 @@ History
 2.0dev
 ------
 
+- introduce ``display_proxy`` property for mode ``display``.
+  [rnix, 2012-08-08]
+
 - add generic ``tag`` blueprint.
   [rnix, 2012-08-08]
 
