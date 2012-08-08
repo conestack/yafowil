@@ -510,7 +510,7 @@ Single Valued
 
     >>> widget.mode = 'display'
     >>> widget()
-    u'<div class="display-select" id="display-MYSELECT">one</div>'
+    u'<div class="display-select" id="display-MYSELECT">One</div>'
 
     >>> widget.mode = 'edit'
 

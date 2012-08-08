@@ -944,6 +944,8 @@ def select_edit_renderer(widget, data):
 @managedprops('template', 'class', 'multivalued')
 def select_display_renderer(widget, data):
     value = fetch_value(widget, data)
+    if type(value) in [types.ListType, types.TupleType] and not value:
+        value = u''
     if not widget.attrs['multivalued'] or not value:
         vocab = dict(vocabulary(widget.attrs.get('vocabulary', [])))
         value = vocab.get(value, value)
