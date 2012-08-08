@@ -1,4 +1,5 @@
 import re
+import types
 import logging
 from yafowil.base import (
     factory,
@@ -152,7 +153,9 @@ def generic_required_extractor(widget, data):
     raise ExtractionError(widget.attrs['required_message'])
 
 
-def input_attributes_common(widget, data, excludes=list()):
+def input_attributes_common(widget, data, excludes=list(), value=None):
+    if value is None:
+        value = fetch_value(widget, data)
     input_attrs = {
         'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
         'class_': cssclasses(widget, data),
@@ -164,15 +167,15 @@ def input_attributes_common(widget, data, excludes=list()):
         'size': widget.attrs.get('size'),
         'title': widget.attrs.get('title') or None,
         'type': widget.attrs.get('type') or None,
-        'value': fetch_value(widget, data),
+        'value': value,
     }
     for attr_name in excludes:
         del input_attrs[attr_name]
     return input_attrs
 
 
-def input_attributes_full(widget, data):
-    input_attrs = input_attributes_common(widget, data)
+def input_attributes_full(widget, data, value=None):
+    input_attrs = input_attributes_common(widget, data, value=value)
     input_attrs['autocomplete'] = widget.attrs.get('autocomplete')
     if widget.attrs['type'] in ['range', 'number']:
         input_attrs['min'] = widget.attrs.get('min') or None
@@ -196,7 +199,15 @@ def display_proxy_renderer(widget, data):
     if widget.attrs['display_proxy']:
         orgin_type = widget.attrs.get('type')
         widget.attrs['type'] = 'hidden'
-        rendered += input_generic_renderer(widget, data)
+        value = fetch_value(widget, data)
+        if type(value) in [types.ListType, types.TupleType] \
+          or widget.attrs.get('multivalued'):
+            # XXX: 'multivalued' comes from selection.
+            for val in value:
+                input_attrs = input_attributes_full(widget, data, value=value)
+                rendered += data.tag('input', **input_attrs)
+        else:
+            rendered += input_generic_renderer(widget, data)
         if orgin_type:
             widget.attrs['type'] = orgin_type
     return rendered
@@ -948,7 +959,7 @@ factory.register(
     'select',
     extractors=[select_extractor, generic_required_extractor],
     edit_renderers=[select_edit_renderer],
-    display_renderers=[select_display_renderer])
+    display_renderers=[select_display_renderer, display_proxy_renderer])
 
 factory.doc['blueprint']['select'] = """\
 Selection Blueprint. Single selection as dropdown or radio-buttons. Multiple
