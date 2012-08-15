@@ -210,8 +210,10 @@ def display_proxy_renderer(widget, data):
             rendered += input_generic_renderer(widget, data)
         if orgin_type:
             widget.attrs['type'] = orgin_type
+        else:
+            del widget.attrs['type']
     return rendered
-    
+
 
 @managedprops('template', 'class')
 def generic_display_renderer(widget, data, value=None):
@@ -764,6 +766,22 @@ def checkbox_display_renderer(widget, data):
         'id': cssid(widget, 'display'),
         'class_': 'display-%s' % widget.attrs['class'] or 'generic'
     }
+    if widget.attrs['display_proxy']:
+        widget.attrs['type'] = 'hidden'
+        if widget.attrs['format'] == 'string':
+            input_attrs = input_attributes_common(widget, data, value=value)
+            content += data.tag('input', **input_attrs)
+        elif bool(value):
+            input_attrs = input_attributes_common(widget, data, value='')
+            content += data.tag('input', **input_attrs)
+        del widget.attrs['type']
+        input_attrs = {
+            'type': 'hidden',
+            'value':  'checkboxexists',
+            'name_': "%s-exists" % widget.dottedpath,
+            'id': cssid(widget, 'checkboxexists'),
+        }
+        content += data.tag('input', **input_attrs)
     return data.tag('div', content, **attrs)
 
 
