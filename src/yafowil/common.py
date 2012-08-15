@@ -762,6 +762,8 @@ def checkbox_display_renderer(widget, data):
     else:
         vocab = dict(vocabulary(widget.attrs.get('vocabulary', [])))
         content = vocab[bool(value)]
+        if data.tag.translate:
+            content = data.tag.translate(content)
     attrs = {
         'id': cssid(widget, 'display'),
         'class_': 'display-%s' % widget.attrs['class'] or 'generic'
