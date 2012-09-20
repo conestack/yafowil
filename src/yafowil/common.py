@@ -1429,6 +1429,8 @@ def label_renderer(widget, data):
         if widget.attrs['title']:
             label_attrs['title'] = widget.attrs['title']
     pos = widget.attrs['position']
+    if callable(pos):
+        pos= pos(widget, data)
     if pos == 'inner':
         # deprecated, use explicit inner-after or inner-before
         pos = 'inner-before'
