@@ -353,8 +353,13 @@ class Widget(object):
         if parent is not None:
             parent[self.__name__] = data
         data = self._runpreprocessors(data)
-        if data.mode != 'edit':
+        # don't extract if skip mode
+        if data.mode == 'skip':
             return data
+        # dont't extract if display mode and no display proxy
+        if data.mode == 'display':
+            if not self.attrs.get('display_proxy'):
+                return data
         self.lock()
         try:
             for ex_name, extractor in self.extractors:
