@@ -5,6 +5,9 @@ History
 2.0dev
 ------
 
+- custom chains can be passed as dictionary to the factory.
+  [rnix, 2012-09-28]
+
 - introduce ``display_proxy`` property for mode ``display``.
   [rnix, 2012-08-08]
 

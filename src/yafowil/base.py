@@ -1,4 +1,5 @@
 import copy
+import types
 from threading import RLock
 from plumber import plumber
 from node.behaviors import (
@@ -550,12 +551,19 @@ class Factory(object):
         for blueprint in blueprints:
             if blueprint.startswith('*'):
                 part_name = blueprint[1:]
-                if len(custom[part_name]) < 5:
-                    # BBB:
-                    ex, eren, pre, bui = custom[part_name]
-                    dren = []
-                else:
-                    ex, eren, pre, bui, dren = custom[part_name]
+                if type(custom[part_name]) in (types.ListType, types.TupleType):
+                    if len(custom[part_name]) < 5:
+                        # BBB:
+                        ex, eren, pre, bui = custom[part_name]
+                        dren = []
+                    else:
+                        ex, eren, pre, bui, dren = custom[part_name]
+                else: # expect dict
+                    ex = custom[part_name].get('extractors', list())
+                    eren = custom[part_name].get('edit_renderers', list())
+                    pre = custom[part_name].get('preprocessors', list())
+                    bui = custom[part_name].get('builders', list())
+                    dren = custom[part_name].get('display_renderers', list())
             else:
                 part_name = blueprint
                 ex, eren, pre, bui, dren = self._blueprints[part_name]

@@ -662,8 +662,8 @@ Blueprint chain definition as list::
     u'<OUTER><INNER /></OUTER>'
     
 
-Inject custom specials blueprints into  chain
----------------------------------------------
+Inject custom specials blueprints into chain
+--------------------------------------------
 
 You may need an behavior just one time and just for one special widget. Here
 you can inject your custom special render or extractor into the chain::
@@ -674,10 +674,22 @@ you can inject your custom special render or extractor into the chain::
     >>> def special_extractor(widget, data):
     ...     return data.extracted + ['extracted special']
 
-    >>> widget = factory('outer:*special:inner', 
-    ...                  custom={'special': ([special_extractor], 
-    ...                                      [special_renderer], 
-    ...                                      [], [], [])})
+Inject as dict::
+
+    >>> widget = factory('outer:*special:inner', custom={
+    ...     'special': {'extractors': [special_extractor], 
+    ...                 'edit_renderers': [special_renderer]}})
+    >>> data = widget.extract({})
+    >>> data.extracted
+    ['extracted inner', 'extracted special', 'extracted outer']
+    
+    >>> widget(data)
+    u'<OUTER><SPECIAL><INNER /></SPECIAL></OUTER>'
+
+Inject as list::
+
+    >>> widget = factory('outer:*special:inner', custom={
+    ...    'special': ([special_extractor], [special_renderer], [], [], [])})
     >>> data = widget.extract({})
     >>> data.extracted
     ['extracted inner', 'extracted special', 'extracted outer']
