@@ -120,6 +120,54 @@ def password():
             'title': 'Password'}
 
 
+DOC_URL = """
+URL
+---
+
+URL field.
+
+.. code-block:: python
+
+    password = factory('#field:url', props={
+        'label': 'URL Input',
+        'help': 'Field for URL'})
+"""
+
+def url():
+    comp = factory('compound', name='yafowil-url')
+    comp['password'] = factory('#field:url', props={
+        'label': 'URL Input',
+        'help': 'Field for URL'})
+    return {'widget': comp,
+            'doc': DOC_URL,
+            'title': 'URL'}
+
+
+DOC_TEXTAREA = """
+Textarea
+--------
+
+Textarea field.
+
+.. code-block:: python
+
+    textarea = factory('#field:textarea', props={
+        'label': 'Textarea',
+        'help': 'Textarea field',
+        'rows': 5})
+"""
+
+def textarea():
+    comp = factory('compound', name='yafowil-textarea')
+    comp['textarea'] = factory('#field:textarea', props={
+        'label': 'Textarea',
+        'help': 'Textarea field',
+        'rows': 5})
+    return {'widget': comp,
+            'doc': DOC_TEXTAREA,
+            'title': 'Textarea'}
+
+
 DOC_RADIO = """\
 Radio buttons
 -------------
@@ -233,12 +281,5 @@ def block():
 
 
 def get_example():
-    return [plaintext(),
-            email(),
-            number(),
-            integer(),
-            password(),
-            radio(),
-            dropdown(),
-            checkbox(),
-            block()]
+    return [plaintext(), email(), number(), integer(), password(), url(),
+            textarea(), radio(), dropdown(), checkbox(), block()]
