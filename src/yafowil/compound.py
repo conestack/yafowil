@@ -108,6 +108,11 @@ factory.doc['blueprint']['div'] = """\
 Like ``compound`` blueprint but renders within '<div>' element.
 """
 
+factory.defaults['div.id'] = None
+factory.doc['props']['div.id'] = \
+"""HTML id attribute.
+"""
+
 
 @managedprops('legend', *css_managed_props)
 def fieldset_renderer(widget, data):
@@ -133,6 +138,9 @@ Renders a fieldset around the prior rendered output.
 """
 
 factory.defaults['fieldset.legend'] = False
+factory.doc['props']['fieldset.legend'] = \
+"""Content of legend tag if legend should be rendered.
+"""
 
 factory.defaults['fieldset.class'] = None
 

@@ -161,7 +161,7 @@ def cssid(widget, prefix, postfix=None):
     return cssid
 
 
-css_managed_props = ['class', 'error_class', 'error_class_default',
+css_managed_props = ['class', 'class_add', 'error_class', 'error_class_default',
                      'required_class', 'required_class_default']
 
 

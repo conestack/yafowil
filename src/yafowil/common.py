@@ -77,6 +77,11 @@ factory.doc['props']['required_class'] = \
 """CSS-class to put on in case if required condition was not met.
 """
 
+factory.defaults['type'] = None
+factory.doc['props']['type'] = \
+"""HTML type attribute.
+"""
+
 factory.defaults['size'] = None
 factory.doc['props']['size'] = \
 """Allowed input size.
@@ -1533,22 +1538,27 @@ Renders a tag with an error-message and the prior rendered output.
 """
 
 factory.defaults['error.class'] = 'error'
+
 factory.defaults['error.tag'] = 'div'
 factory.doc['props']['error.tag'] = """\
 HTML tag to use to enclose all error messages.
 """
+
 factory.defaults['error.render_empty'] = False
-factory.doc['props']['error.tag'] = """\
+factory.doc['props']['error.render_empty'] = """\
 Render tag even if there is no error message.
 """
+
 factory.defaults['error.message_tag'] = 'div'
-factory.doc['props']['error.message_class'] = """\
+factory.doc['props']['error.message_tag'] = """\
 HTML tag to use to enclose each error message.
 """
+
 factory.defaults['error.message_class'] = 'errormessage'
 factory.doc['props']['error.message_class'] = """\
 CSS class to apply to inner message-tag.
 """
+
 factory.defaults['error.position'] = 'inner-before'
 factory.doc['props']['error.position'] = """\
 Error can be rendered at 3 different positions: ``before``/ ``after`` the
@@ -1583,14 +1593,22 @@ Renders a tag with an help-message and the prior rendered output.
 """
 
 factory.defaults['help.class'] = 'help'
+
 factory.defaults['help.tag'] = 'div'
 factory.doc['props']['help.tag'] = """\
 HTML tag to use to enclose all help messages.
 """
+
+factory.defaults['help.help'] = 'div'
+factory.doc['props']['help.help'] = """\
+Help text.
+"""
+
 factory.defaults['help.render_empty'] = False
-factory.doc['props']['help.tag'] = """\
+factory.doc['props']['help.render_empty'] = """\
 Render tag even if there is no help message.
 """
+
 factory.defaults['help.position'] = 'before'
 factory.doc['props']['help.position'] = """\
 Help can be rendered at 3 different positions: ``before``/ ``after`` the
