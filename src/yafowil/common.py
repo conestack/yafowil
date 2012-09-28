@@ -418,6 +418,7 @@ def textarea_attributes(widget, data):
         'placeholder': widget.attrs.get('placeholder') or None,
         'readonly': widget.attrs['readonly'] and 'readonly',
         'required': widget.attrs.get('required') and 'required' or None,
+        'disabled': widget.attrs.get('disabled') and 'disabled' or None,
         'rows': widget.attrs['rows'],
         'wrap': widget.attrs['wrap'],
     }
@@ -1430,7 +1431,7 @@ def label_renderer(widget, data):
             label_attrs['title'] = widget.attrs['title']
     pos = widget.attrs['position']
     if callable(pos):
-        pos= pos(widget, data)
+        pos = pos(widget, data)
     if pos == 'inner':
         # deprecated, use explicit inner-after or inner-before
         pos = 'inner-before'
