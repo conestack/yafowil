@@ -470,7 +470,7 @@ factory.doc['props']['textarea.rows'] = \
 
 factory.defaults['textarea.readonly'] = None
 factory.doc['props']['textarea.readonly'] = \
-"""Flag  textarea is readonly.
+"""Flag textarea is readonly.
 """
 
 
@@ -532,7 +532,7 @@ factory.doc['props']['lines.rows'] = \
 
 factory.defaults['lines.readonly'] = None
 factory.doc['props']['lines.readonly'] = \
-"""Flag  textarea is readonly.
+"""Flag textarea is readonly.
 """
 
 
@@ -708,9 +708,10 @@ valid.
 """
 
 factory.defaults['weak_password_message'] = u'Password too weak'
-factory.doc['props']['password.strength'] = \
+factory.doc['props']['password.weak_password_message'] = \
 """Message shown if password is not strong enough.
 """
+
 factory.defaults['password.displayplaceholder'] = u'*' * 8
 factory.doc['props']['password.displayplaceholder'] = \
 """Placeholder shown in display mode if password was set.
@@ -810,11 +811,6 @@ factory.doc['props']['checkbox.format'] = """\
 Data-type of the extracted value. One out of ``bool`` or ``string``.
 """
 
-factory.defaults['checkbox.format'] = 'bool'
-factory.doc['props']['checkbox.format'] = """\
-Data-type of the extracted value. One out of ``bool`` or ``string``.
-"""
-
 factory.defaults['checkbox.disabled'] = False
 factory.doc['props']['checkbox.disabled'] = """\
 Flag whether checkbox is disabled.
@@ -830,6 +826,7 @@ factory.defaults['checkbox.vocabulary'] = {
     False: 'no',
     UNSET: 'not set',
 }
+
 factory.doc['props']['checkbox.vocabulary'] = """\
 In display mode and if ```bool``` is set to ```True``` this mapping will be
 used for display of the value. Expected keys are ```True```, ```False``` and
@@ -843,7 +840,7 @@ factory.defaults['checkbox.required_class'] = 'required'
 # selection
 ###############################################################################
 
-@managedprops('format', 'multivalued', 'disabled')
+@managedprops('multivalued', 'disabled')
 def select_extractor(widget, data):
     extracted = generic_extractor(widget, data)
     if extracted is UNSET \
@@ -1001,16 +998,34 @@ selection as selection-list or as checkboxes.
 """
 
 factory.defaults['select.multivalued'] = None
+factory.doc['props']['select.multivalued'] = """\
+Flag whether multiple items can be selected.
+"""
 
 factory.defaults['select.size'] = None
+factory.doc['props']['select.size'] = """\
+Size of input if multivalued and format 'block'.
+"""
 
 factory.defaults['select.default'] = []
 
 factory.defaults['select.format'] = 'block'
+factory.doc['props']['select.format'] = """\
+Every value except 'block' results in either a list of radio buttons or
+checkboxes depending on the 'multivalued' property.
+"""
 
 factory.defaults['select.class'] = 'select'
+
 factory.defaults['select.label_checkbox_class'] = None
+factory.doc['props']['select.label_checkbox_class'] = """\
+CSS class to render on checkbox labels.
+"""
+
 factory.defaults['select.label_radio_class'] = None
+factory.doc['props']['select.label_radio_class'] = """\
+CSS class to render on radio button labels.
+"""
 
 factory.defaults['select.listing_tag'] = 'div'
 factory.doc['props']['select.listing_tag'] = """\
@@ -1346,6 +1361,7 @@ def _callable_attr(key, widget, data):
     return value
 
 
+@managedprops('datatype', 'min', 'max', 'step')
 def number_extractor(widget, data):
     val = data.extracted
     if val is UNSET or val == '':
@@ -1399,22 +1415,30 @@ Output datatype, one out of ``integer`` or ``float``.
 factory.defaults['number.default'] = ''
 
 factory.defaults['number.min'] = None
+factory.doc['props']['number.min'] = """\
+Minimum value.
+"""
 
 factory.defaults['number.max'] = None
+factory.doc['props']['number.max'] = """\
+Maximum value.
+"""
 
 factory.defaults['number.step'] = None
+factory.doc['props']['number.step'] = """\
+Stepping value must be in.
+"""
 
 factory.defaults['number.required_class'] = 'required'
 
 factory.defaults['number.class'] = 'number'
 
+
 ###############################################################################
 # label
 ###############################################################################
 
-
-@managedprops('position', 'label', 'for', 'help', 'help_class',
-              *css_managed_props)
+@managedprops('position', 'label', 'for', *css_managed_props)
 def label_renderer(widget, data):
     tag = data.tag
     label_text = widget.attrs.get('label', widget.__name__)

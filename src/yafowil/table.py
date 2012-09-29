@@ -29,6 +29,10 @@ factory.doc['blueprint']['table'] = """\
 ``<table>`` compound widget for table creation.
 """
 
+factory.doc['props']['table.id'] = """\
+Value of table id attribute.
+"""
+
 
 def thead_renderer(widget, data):
     return data.tag('thead', data.rendered)
@@ -79,6 +83,10 @@ factory.doc['blueprint']['tr'] = """\
 ``<tr>`` compound widget for table creation.
 """
 
+factory.doc['props']['tr.id'] = """\
+Value of id attribute.
+"""
+
 
 @managedprops('id', 'rowspan', 'colspan', 'label', *css_managed_props)
 def th_renderer(widget, data):
@@ -101,6 +109,23 @@ factory.register(
 
 factory.doc['blueprint']['th'] = """\
 ``<th>`` compound widget for table creation.
+"""
+
+factory.doc['props']['th.id'] = """\
+Value of id attribute.
+"""
+
+factory.doc['props']['th.rowspan'] = """\
+Value of rowspan attribute.
+"""
+
+factory.doc['props']['th.colspan'] = """\
+Value of colspan attribute.
+"""
+
+factory.doc['props']['th.label'] = """\
+Explicit th content. If absent, rendered markup from downstream blueprint(s)
+is used.
 """
 
 
@@ -127,4 +152,16 @@ factory.register(
 
 factory.doc['blueprint']['td'] = """\
 ``<td>`` compound widget for table creation.
+"""
+
+factory.doc['props']['td.id'] = """\
+Value of id attribute.
+"""
+
+factory.doc['props']['td.rowspan'] = """\
+Value of rowspan attribute.
+"""
+
+factory.doc['props']['td.colspan'] = """\
+Value of colspan attribute.
 """
