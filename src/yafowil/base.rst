@@ -484,27 +484,27 @@ Some basic name checks are done::
     ...
     ValueError: "#" as char not allowed as name.
     
-Test the plans::
+Test the macros::
 
-    >>> factory.register_macro('test_plan', 
+    >>> factory.register_macro('test_macro',
     ...                        'foo:*bar:baz', {'foo.newprop': 'abc'})
     >>> factory._macros
-    {'test_plan': (['foo', '*bar', 'baz'], {'foo.newprop': 'abc'})}
+    {'test_macro': (['foo', '*bar', 'baz'], {'foo.newprop': 'abc'})}
     
-    >>> factory._expand_blueprints('#test_plan', {'foo.newprop' : '123'})
+    >>> factory._expand_blueprints('#test_macro', {'foo.newprop' : '123'})
     (['foo', '*bar', 'baz'], {'foo.newprop': '123'})
 
-    >>> ex = factory._expand_blueprints('#test_plan', {'foo.newprop2' : '123'})
+    >>> ex = factory._expand_blueprints('#test_macro', {'foo.newprop2' : '123'})
     >>> pprint(ex)
     (['foo', '*bar', 'baz'], {'foo.newprop': 'abc', 'foo.newprop2': '123'})
 
     >>> factory._expand_blueprints('#nonexisting', {})
     Traceback (most recent call last):
     ...
-    ValueError: Plan named 'nonexisting' is not registered in factory
+    ValueError: Macro named 'nonexisting' is not registered in factory
 
-    >>> factory.register_macro('test_plan2', 'alpha:#test_plan:beta', {})
-    >>> factory._expand_blueprints('#test_plan2', {})
+    >>> factory.register_macro('test_macro2', 'alpha:#test_macro:beta', {})
+    >>> factory._expand_blueprints('#test_macro2', {})
     (['alpha', 'foo', '*bar', 'baz', 'beta'], {'foo.newprop': 'abc'})
 
 Test theme registry.

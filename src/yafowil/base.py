@@ -485,16 +485,16 @@ class Factory(object):
             blueprints = blueprints.split(':')
         for blueprint in blueprints:
             if blueprint.startswith('#'):
-                plan_name = blueprint[1:]
-                if plan_name not in self._macros:
-                    msg = "Plan named '%s' is not registered in factory" % \
-                          plan_name
+                macro_name = blueprint[1:]
+                if macro_name not in self._macros:
+                    msg = "Macro named '%s' is not registered in factory" % \
+                          macro_name
                     raise ValueError(msg)
-                plan_chain, plan_props = self._macros[plan_name]
-                for key in plan_props:
+                macro_chain, macro_props = self._macros[macro_name]
+                for key in macro_props:
                     if key not in props:
-                        props[key] = plan_props[key]
-                expanded, props = self._expand_blueprints(plan_chain, props)
+                        props[key] = macro_props[key]
+                expanded, props = self._expand_blueprints(macro_chain, props)
                 result += expanded
             else:
                 result.append(blueprint)

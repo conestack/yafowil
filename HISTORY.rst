@@ -5,6 +5,9 @@ History
 2.0dev
 ------
 
+- renamed plans to macros.
+  [rnix, jensens]
+
 - custom chains can be passed as dictionary to the factory.
   [rnix, 2012-09-28]
 
