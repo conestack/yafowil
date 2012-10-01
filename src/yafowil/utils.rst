@@ -1,8 +1,6 @@
 Test entry_point support tools
 ------------------------------
-
 ::
-
     >>> from yafowil.utils import get_entry_points
     >>> get_entry_points()
     [...EntryPoint.parse('register = yafowil.loader:register')...]
@@ -18,11 +16,33 @@ Test entry_point support tools
     []
 
 
+Test examples lookup
+--------------------
+::
+    >>> from yafowil.utils import get_example_names
+    >>> sorted(get_example_names())
+    ['yafowil'...]
+    
+    >>> from yafowil.base import factory
+    >>> factory.register_macro('field', 'field:label:error', {})
+    
+    >>> from yafowil.utils import get_example
+    >>> get_example('inexistent')
+    
+    >>> examples = get_example('yafowil')
+    >>> examples[0]['doc']
+    "Plain Text\n----------..."
+    
+    >>> examples[0]['title']
+    'Plain Text'
+    
+    >>> examples[0]['widget']
+    <Widget object 'yafowil-plaintext' at ...>
+
+
 Test UNSET
 ----------
-
 ::
-
     >>> from yafowil.utils import UNSET
     >>> UNSET
     <UNSET>
@@ -36,11 +56,10 @@ Test UNSET
     >>> len(UNSET)
     0
 
+
 Test the Vocabulary
 -------------------
-
 ::
-
     >>> from yafowil.utils import vocabulary
     >>> vocabulary('foo')
     [('foo', 'foo')]
@@ -62,12 +81,11 @@ Test the Vocabulary
     
     >>> vocabulary(None) is None
     True
-        
+
+
 Test Tag renderer
 -----------------
-
 ::
-
     >>> from yafowil.utils import Tag
     >>> tag = Tag(lambda msg: msg)    
     >>> a = {'class': u'fancy', 'id': '2f5b8a234ff'}
@@ -90,11 +108,10 @@ deprecated test::
     >>> deprecated_tag('div', 'foo')
     u'<div>foo</div>'
 
+
 Test CSS Classes
 ----------------
-
 ::
-
     >>> from plumber import plumber
     >>> from node.base import OrderedNode
     >>> from node.behaviors import Nodespaces
@@ -141,8 +158,21 @@ Test CSS Classes
     >>> widget.attrs['class'] = 'foo bar'
     >>> print cssclasses(widget, data)
     bar error foo
+    
+    >>> widget.attrs['class'] = lambda w, d: 'baz'
+    >>> print cssclasses(widget, data)
+    baz error
+    
+    >>> widget.attrs['class_add'] = lambda w, d: 'addclass_from_callable'
+    >>> print cssclasses(widget, data)
+    addclass_from_callable baz error
+    
+    >>> widget.attrs['class_add'] = 'addclass'
+    >>> print cssclasses(widget, data)
+    addclass baz error
 
     >>> widget.attrs['class'] = None
+    >>> widget.attrs['class_add'] = None
     >>> widget.attrs['error_class'] = 'othererror'
     >>> print cssclasses(widget, data)
     othererror
@@ -175,12 +205,11 @@ Test CSS Classes
     
     >>> print cssclasses(widget, data, additional=['zika', 'akiz'])
     akiz bar error foo required zika
-    
+
+
 Test managedprops annotation
 ----------------------------
-
 ::
-
     >>> from yafowil.utils import managedprops
     >>> @managedprops('foo', 'bar')
     ... def somefunc(a, b, c):
