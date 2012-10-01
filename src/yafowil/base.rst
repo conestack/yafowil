@@ -575,6 +575,21 @@ If no resources registered at all for widget, None is returned::
     >>> factory.resources_for('yafowil.widget.inexistent') is None
     True
 
+Resources are returned as deepcopy of the original resources definition by
+default::
+
+    >>> resources = factory.resources_for('yafowil.widget.someaddon')
+    >>> resources is factory.resources_for('yafowil.widget.someaddon')
+    False
+
+Some might want the resource definitions as original instance::
+
+    >>> resources = factory.resources_for('yafowil.widget.someaddon',
+    ...                                   copy_resources=False)
+    >>> resources is factory.resources_for('yafowil.widget.someaddon',
+    ...                                    copy_resources=False)
+    True
+
 
 Widget tree manipulation
 ------------------------

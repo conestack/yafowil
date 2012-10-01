@@ -5,6 +5,7 @@ Common Blueprints
 
 This test creates widgets from ist blueprints with different properties.
 
+
 Prepare
 -------
 
@@ -225,6 +226,26 @@ Display mode of text widget uses ``generic_display_renderer``::
     u'<div class="display-text" id="display-DISPLAY"><TEMPLATE>lorem
     ipsum</TEMPLATE></div>'
 
+``display_proxy`` can be used if mode is 'display' to proxy the value in a
+hidden field::
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='DISPLAY',
+    ...     value='lorem ipsum',
+    ...     mode='display',
+    ...     props={'display_proxy': True})
+    >>> widget()
+    u'<div class="display-text" id="display-DISPLAY">lorem ipsum</div><input 
+    class="text" id="input-DISPLAY" name="DISPLAY" type="hidden" 
+    value="lorem ipsum" />'
+
+On widgets with display mode display_proxy property set, the data gets
+extracted::
+
+    >>> widget.extract(request={'DISPLAY': 'lorem ipsum'})
+    <RuntimeData DISPLAY, value='lorem ipsum', extracted='lorem ipsum' at ...>
+
 Skip mode renders empty string.::
 
     >>> widget = factory(
@@ -397,16 +418,101 @@ invalid format::
       ...
     ValueError: Checkbox widget has invalid format 'invalid' set
 
-display::
+Render in display mode::
 
-    >>> widget = factory(
-    ...     'checkbox',
-    ...     'MYCHECKBOX',
-    ...     value='',
-    ...     mode='display',
-    ...     props={'format': 'string'})
+    >>> widget = factory('checkbox', 'MYCHECKBOX', value=False, mode='display',
+    ...     props={
+    ...         'format': 'bool'})
+    >>> pxml('<div>' + widget() + '</div>')
+    <div>
+      <div class="display-None" id="display-MYCHECKBOX">no</div>
+    </div>
+    <BLANKLINE>
+    
+    >>> widget = factory('checkbox', 'MYCHECKBOX', value=True, mode='display',
+    ...     props={
+    ...         'format': 'bool'})
+    >>> pxml('<div>' + widget() + '</div>')
+    <div>
+      <div class="display-None" id="display-MYCHECKBOX">yes</div>
+    </div>
+    <BLANKLINE>
 
-    >> pxml('<div>'+widget()+'</div>')
+Display mode and display proxy bool format::
+
+    >>> widget = factory('checkbox', 'MYCHECKBOX', value=True, mode='display',
+    ...     props={
+    ...         'format': 'bool',
+    ...         'display_proxy': True})
+    >>> widget()
+    u'<div class="display-None" id="display-MYCHECKBOX">yes<input 
+    id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden" value="" /><input 
+    id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden" 
+    value="checkboxexists" /></div>'
+    
+    >>> data = widget.extract(request={'MYCHECKBOX-exists': 'checkboxexists'})
+    >>> data
+    <RuntimeData MYCHECKBOX, value=True, extracted=False at ...>
+    
+    >>> widget(data=data)
+    u'<div class="display-None" id="display-MYCHECKBOX">no<input 
+    id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden" 
+    value="checkboxexists" /></div>'
+    
+    >>> data = widget.extract(request={'MYCHECKBOX-exists': 'checkboxexists',
+    ...                                'MYCHECKBOX': ''})
+    >>> data
+    <RuntimeData MYCHECKBOX, value=True, extracted=True at ...>
+    
+    >>> widget(data=data)
+    u'<div class="display-None" id="display-MYCHECKBOX">yes<input 
+    id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden" value="" /><input 
+    id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden" 
+    value="checkboxexists" /></div>'
+
+Display mode and display proxy string format::
+
+    >>> widget = factory('checkbox', 'MYCHECKBOX', value='yes', mode='display',
+    ...     props={
+    ...         'format': 'string',
+    ...         'display_proxy': True})
+    >>> widget()
+    u'<div class="display-None" id="display-MYCHECKBOX">yes<input 
+    id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden" value="yes" /><input 
+    id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden" 
+    value="checkboxexists" /></div>'
+    
+    >>> data = widget.extract(request={'MYCHECKBOX-exists': 'checkboxexists'})
+    >>> data
+    <RuntimeData MYCHECKBOX, value='yes', extracted='' at ...>
+    
+    >>> widget(data=data)
+    u'<div class="display-None" id="display-MYCHECKBOX">no<input 
+    id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden" value="" /><input 
+    id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden" 
+    value="checkboxexists" /></div>'
+    
+    >>> data = widget.extract(request={'MYCHECKBOX-exists': 'checkboxexists',
+    ...                                'MYCHECKBOX': ''})
+    >>> data
+    <RuntimeData MYCHECKBOX, value='yes', extracted='' at ...>
+    
+    >>> widget(data=data)
+    u'<div class="display-None" id="display-MYCHECKBOX">no<input 
+    id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden" value="" /><input 
+    id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden" 
+    value="checkboxexists" /></div>'
+    
+    >>> data = widget.extract(request={'MYCHECKBOX-exists': 'checkboxexists',
+    ...                                'MYCHECKBOX': 'foo'})
+    >>> data
+    <RuntimeData MYCHECKBOX, value='yes', extracted='foo' at ...>
+    
+    >>> widget(data=data)
+    u'<div class="display-None" id="display-MYCHECKBOX">foo<input 
+    id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden" value="foo" /><input 
+    id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden" 
+    value="checkboxexists" /></div>'
 
 
 Textarea
@@ -447,7 +553,9 @@ Textarea
 
 Lines
 -----
-::
+
+Render empty::
+
     >>> widget = factory(
     ...     'lines',
     ...     'MYLINES',
@@ -458,6 +566,8 @@ Lines
     >>> widget()
     u'<textarea cols="40" id="input-MYLINES" name="MYLINES" rows="8"></textarea>'
 
+Render with preset value, expected as list::
+
     >>> widget = factory(
     ...     'lines',
     ...     'MYLINES',
@@ -465,30 +575,94 @@ Lines
     ...     props={
     ...         'label': 'Test Lines Widget',
     ...     })
-    >>> widget()
-    u'<textarea cols="40" id="input-MYLINES" name="MYLINES" rows="8">a\nb\nc</textarea>'
+    >>> pxml(widget())
+    <textarea cols="40" id="input-MYLINES" name="MYLINES" rows="8">a
+    b
+    c</textarea>
+    <BLANKLINE>
 
-    >>> data = widget.extract({'MYLINES': 'a\nb\nc'})
-    >>> data.extracted
-    ['a', 'b', 'c']
+Extract empty::
 
     >>> data = widget.extract({'MYLINES': ''})
     >>> data.extracted
     []
 
-    XXX
-    >> widget.mode = 'display'
-    >> widget()
+Extract with data::
 
+    >>> data = widget.extract({'MYLINES': 'a\nb'})
+    >>> data.extracted
+    ['a', 'b']
+
+Render with extracted data::
+
+    >>> pxml(widget(data=data))
+    <textarea cols="40" id="input-MYLINES" name="MYLINES" rows="8">a
+    b</textarea>
+    <BLANKLINE>
+
+Display mode with preset value::
+
+    >>> widget = factory(
+    ...     'lines',
+    ...     'MYLINES',
+    ...     value=['a', 'b', 'c'],
+    ...     mode='display',
+    ...     props={
+    ...         'label': 'Test Lines Widget',
+    ...     })
+    >>> pxml(widget())
+    <ul class="display-None" id="display-MYLINES">
+      <li>a</li>
+      <li>b</li>
+      <li>c</li>
+    </ul>
+    <BLANKLINE>
+
+Display mode with ``display_proxy``::
+
+    >>> widget = factory(
+    ...     'lines',
+    ...     'MYLINES',
+    ...     value=['a', 'b', 'c'],
+    ...     mode='display',
+    ...     props={
+    ...         'label': 'Test Lines Widget',
+    ...         'display_proxy': True,
+    ...     })
+    >>> pxml('<div>' + widget() + '</div>')
+    <div>
+      <ul class="display-None" id="display-MYLINES">
+        <li>a</li>
+        <li>b</li>
+        <li>c</li>
+      </ul>
+      <input id="input-MYLINES" name="MYLINES" type="hidden" value="a"/>
+      <input id="input-MYLINES" name="MYLINES" type="hidden" value="b"/>
+      <input id="input-MYLINES" name="MYLINES" type="hidden" value="c"/>
+    </div>
+    <BLANKLINE>
+    
+    >>> data = widget.extract({'MYLINES': 'a\nb'})
+    >>> data
+    <RuntimeData MYLINES, value=['a', 'b', 'c'], extracted=['a', 'b'] at ...>
+    
+    >>> pxml('<div>' + widget(data=data) + '</div>')
+    <div>
+      <ul class="display-None" id="display-MYLINES">
+        <li>a</li>
+        <li>b</li>
+      </ul>
+      <input id="input-MYLINES" name="MYLINES" type="hidden" value="a"/>
+      <input id="input-MYLINES" name="MYLINES" type="hidden" value="b"/>
+    </div>
+    <BLANKLINE>
 
 Selection
 ---------
 
 Single Valued
 .............
-
 ::
-
     >>> widget = factory(
     ...     'select',
     ...     'MYSELECT',
@@ -507,12 +681,6 @@ Single Valued
       <option id="input-MYSELECT-four" value="four">Four</option>
     </select>
     <BLANKLINE>
-
-    >>> widget.mode = 'display'
-    >>> widget()
-    u'<div class="display-select" id="display-MYSELECT">One</div>'
-
-    >>> widget.mode = 'edit'
 
     >>> data = widget.extract({'MYSELECT': 'two'})
     >>> pxml(widget(data=data))
@@ -547,12 +715,38 @@ Single valued with specific options disabled::
       <option disabled="disabled" id="input-MYSELECT-four" value="four">Four</option>
     </select>
     <BLANKLINE>
+    
+    >>> del widget.attrs['disabled']
+
+Single valued display mode::
+
+    >>> widget.mode = 'display'
+    >>> widget()
+    u'<div class="display-select" id="display-MYSELECT">One</div>'
+    
+    >>> widget.attrs['display_proxy'] = True
+    >>> widget()
+    u'<div class="display-select" id="display-MYSELECT">One</div><input 
+    class="select" id="input-MYSELECT" name="MYSELECT" 
+    type="hidden" value="one" />'
+    
+    >>> data = widget.extract(request={'MYSELECT': 'two'})
+    >>> data
+    <RuntimeData MYSELECT, value='one', extracted='two' at ...>
+    
+    >>> pxml('<div>' + widget(data=data) + '</div>')
+    <div>
+      <div class="display-select" id="display-MYSELECT">Two</div>
+      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" value="two"/>
+    </div>
+    <BLANKLINE>
+    
+    >>> del widget.attrs['display_proxy']
+    >>> widget.mode = 'edit'
 
 Multi valued
 ............
-
 ::
-
     >>> widget = factory(
     ...     'select',
     ...     'MYSELECT',
@@ -564,7 +758,7 @@ Multi valued
     ...             ('two', 'Two'),
     ...             ('three', 'Three'),
     ...             ('four', 'Four')]})
-    >>> pxml('<div>'+widget()+'</div>')
+    >>> pxml('<div>' + widget() + '</div>')
     <div>
       <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
       <select class="select" id="input-MYSELECT" multiple="multiple" name="MYSELECT">
@@ -576,12 +770,61 @@ Multi valued
     </div>
     <BLANKLINE>
 
+Extract multi valued selection and render widget with extracted data::
+
+    >>> data = widget.extract(request={'MYSELECT': ['one', 'four']})
+    >>> data
+    <RuntimeData MYSELECT, value=['one', 'two'], extracted=['one', 'four'] at ...>
+    
+    >>> pxml('<div>' + widget(data=data) + '</div>')
+    <div>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <select class="select" id="input-MYSELECT" multiple="multiple" name="MYSELECT">
+        <option id="input-MYSELECT-one" selected="selected" value="one">One</option>
+        <option id="input-MYSELECT-two" value="two">Two</option>
+        <option id="input-MYSELECT-three" value="three">Three</option>
+        <option id="input-MYSELECT-four" selected="selected" value="four">Four</option>
+      </select>
+    </div>
+    <BLANKLINE>
+
+Multi selection display mode::
+
     >>> widget.mode = 'display'
     >>> pxml(widget())
     <ul class="display-select" id="display-MYSELECT">
       <li>One</li>
       <li>Two</li>
     </ul>
+    <BLANKLINE>
+
+Multi selection display mode with display proxy::
+
+    >>> widget.attrs['display_proxy'] = True
+    >>> pxml('<div>' + widget() + '</div>')
+    <div>
+      <ul class="display-select" id="display-MYSELECT">
+        <li>One</li>
+        <li>Two</li>
+      </ul>
+      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" value="one"/>
+      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" value="two"/>
+    </div>
+    <BLANKLINE>
+
+Multi selection display mode with display proxy and extracted data::
+    
+    >>> data = widget.extract(request={'MYSELECT': ['one']})
+    >>> data
+    <RuntimeData MYSELECT, value=['one', 'two'], extracted=['one'] at ...>
+    
+    >>> pxml('<div>' + widget(data=data) + '</div>')
+    <div>
+      <ul class="display-select" id="display-MYSELECT">
+        <li>One</li>
+      </ul>
+      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" value="one"/>
+    </div>
     <BLANKLINE>
 
 Multiple values on single valued selection fails::
@@ -600,6 +843,9 @@ Multiple values on single valued selection fails::
     Traceback (most recent call last):
       ...
     ValueError: Multiple values for single selection.
+
+With Radio
+..........
 
 Render single selection as radio inputs::
 
@@ -638,9 +884,6 @@ Render single selection as radio inputs::
       </div>
     </div>
     <BLANKLINE>
-
-With Radio
-..........
 
 Render single selection as radio inputs, disables all::
 

@@ -207,9 +207,8 @@ def display_proxy_renderer(widget, data):
         value = fetch_value(widget, data)
         if type(value) in [types.ListType, types.TupleType] \
           or widget.attrs.get('multivalued'):
-            # XXX: 'multivalued' comes from selection.
             for val in value:
-                input_attrs = input_attributes_full(widget, data, value=value)
+                input_attrs = input_attributes_full(widget, data, value=val)
                 rendered += data.tag('input', **input_attrs)
         else:
             rendered += input_generic_renderer(widget, data)
@@ -478,9 +477,18 @@ factory.doc['props']['textarea.readonly'] = \
 # lines
 ###############################################################################
 
+def lines_extractor(widget, data):
+    """Extract textarea value as list of lines.
+    """
+    extracted = data.extracted
+    if not extracted:
+        return list()
+    return extracted.split('\n')
+
+
 @managedprops('wrap', 'cols', 'rows', 'readonly', 'autofocus', 'placeholder',
               *css_managed_props)
-def lines_renderer(widget, data):
+def lines_edit_renderer(widget, data):
     """Renders text area with list value as lines.
     """
     tag = data.tag
@@ -493,13 +501,18 @@ def lines_renderer(widget, data):
     return tag('textarea', value, **area_attrs)
 
 
-def lines_extractor(widget, data):
-    """Extract textarea value as list of lines.
-    """
-    extracted = data.extracted
-    if not extracted:
-        return list()
-    return extracted.split('\n')
+def lines_display_renderer(widget, data):
+    value = fetch_value(widget, data)
+    if type(value) in [types.ListType, types.TupleType] and not value:
+        value = u''
+    attrs = {
+        'id': cssid(widget, 'display'),
+        'class_': 'display-%s' % widget.attrs['class'] or 'generic'
+    }
+    content = u''
+    for line in value:
+        content += data.tag('li', line)
+    return data.tag('ul', content, **attrs)
 
 
 factory.register(
@@ -507,8 +520,8 @@ factory.register(
     extractors=[generic_extractor,
                 generic_required_extractor,
                 lines_extractor],
-    edit_renderers=[lines_renderer],
-    display_renderers=[generic_display_renderer, display_proxy_renderer])
+    edit_renderers=[lines_edit_renderer],
+    display_renderers=[lines_display_renderer, display_proxy_renderer])
 
 factory.doc['blueprint']['lines'] = \
 """Lines blueprint. Renders a textarea and extracts lines as list.
