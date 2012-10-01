@@ -1760,6 +1760,17 @@ Label Text can be a callable::
     >>> widget()
     u'<label for="input-MYFILE">Fooo</label>'
 
+Position can be callable::
+
+    >>> widget = factory(
+    ...     'label',
+    ...     name='MYFILE', \
+    ...     props={
+    ...         'label': 'Fooo',
+    ...         'position': lambda x, y: 'inner',
+    ...     })
+    >>> widget()
+    u'<label for="input-MYFILE">Fooo</label>'
 
 Field
 -----
