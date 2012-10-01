@@ -53,6 +53,17 @@ As well does skip mode::
     u''
 
 
+Generic tag
+-----------
+::
+    >>> widget = factory('tag', name='MYTAG', props={
+    ...     'tag': 'h3',
+    ...     'text': 'A Headline',
+    ...     'class': 'form_heading'})
+    >>> widget()
+    u'<h3 class="form_heading" id="tag-MYTAG">A Headline</h3>'
+
+
 Text Input
 ----------
 ::
@@ -556,25 +567,13 @@ Lines
 
 Render empty::
 
-    >>> widget = factory(
-    ...     'lines',
-    ...     'MYLINES',
-    ...     value=None,
-    ...     props={
-    ...         'label': 'Test Lines Widget',
-    ...     })
+    >>> widget = factory('lines', 'MYLINES', value=None)
     >>> widget()
     u'<textarea cols="40" id="input-MYLINES" name="MYLINES" rows="8"></textarea>'
 
 Render with preset value, expected as list::
 
-    >>> widget = factory(
-    ...     'lines',
-    ...     'MYLINES',
-    ...     value=['a', 'b', 'c'],
-    ...     props={
-    ...         'label': 'Test Lines Widget',
-    ...     })
+    >>> widget = factory('lines', 'MYLINES', value=['a', 'b', 'c'])
     >>> pxml(widget())
     <textarea cols="40" id="input-MYLINES" name="MYLINES" rows="8">a
     b
@@ -602,14 +601,8 @@ Render with extracted data::
 
 Display mode with preset value::
 
-    >>> widget = factory(
-    ...     'lines',
-    ...     'MYLINES',
-    ...     value=['a', 'b', 'c'],
-    ...     mode='display',
-    ...     props={
-    ...         'label': 'Test Lines Widget',
-    ...     })
+    >>> widget = factory('lines', 'MYLINES', value=['a', 'b', 'c'],
+    ...                  mode='display')
     >>> pxml(widget())
     <ul class="display-None" id="display-MYLINES">
       <li>a</li>
@@ -618,15 +611,17 @@ Display mode with preset value::
     </ul>
     <BLANKLINE>
 
+Display mode with empty preset value::
+
+    >>> widget = factory('lines', 'MYLINES', value=[], mode='display')
+    >>> pxml(widget())
+    <ul class="display-None" id="display-MYLINES"/>
+    <BLANKLINE>
+
 Display mode with ``display_proxy``::
 
-    >>> widget = factory(
-    ...     'lines',
-    ...     'MYLINES',
-    ...     value=['a', 'b', 'c'],
-    ...     mode='display',
-    ...     props={
-    ...         'label': 'Test Lines Widget',
+    >>> widget = factory('lines', 'MYLINES', value=['a', 'b', 'c'],
+    ...     mode='display', props={
     ...         'display_proxy': True,
     ...     })
     >>> pxml('<div>' + widget() + '</div>')
@@ -657,8 +652,10 @@ Display mode with ``display_proxy``::
     </div>
     <BLANKLINE>
 
+
 Selection
 ---------
+
 
 Single Valued
 .............
@@ -740,9 +737,128 @@ Single valued display mode::
       <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" value="two"/>
     </div>
     <BLANKLINE>
+
+
+With Radio
+..........
+
+Render single selection as radio inputs::
+
+    >>> widget = factory(
+    ...     'select',
+    ...     'MYSELECT',
+    ...     value='one',
+    ...     props={
+    ...         'vocabulary': [
+    ...             ('one','One'),
+    ...             ('two', 'Two'),
+    ...             ('three', 'Three'),
+    ...             ('four', 'Four')],
+    ...         'format': 'single',
+    ...         'listing_label_position': 'before'})
+    >>> pxml('<div>'+widget()+'</div>')
+    <div>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <div id="radio-MYSELECT-wrapper">
+        <div id="radio-MYSELECT-one">
+          <label for="input-MYSELECT-one">One</label>
+          <input checked="checked" class="select" id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>
+        </div>
+        <div id="radio-MYSELECT-two">
+          <label for="input-MYSELECT-two">Two</label>
+          <input class="select" id="input-MYSELECT-two" name="MYSELECT" type="radio" value="two"/>
+        </div>
+        <div id="radio-MYSELECT-three">
+          <label for="input-MYSELECT-three">Three</label>
+          <input class="select" id="input-MYSELECT-three" name="MYSELECT" type="radio" value="three"/>
+        </div>
+        <div id="radio-MYSELECT-four">
+          <label for="input-MYSELECT-four">Four</label>
+          <input class="select" id="input-MYSELECT-four" name="MYSELECT" type="radio" value="four"/>
+        </div>
+      </div>
+    </div>
+    <BLANKLINE>
+
+Render single selection as radio inputs, disables all::
+
+    >>> widget.attrs['disabled'] = True
+    >>> pxml('<div>'+widget()+'</div>')
+    <div>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <div id="radio-MYSELECT-wrapper">
+        <div id="radio-MYSELECT-one">
+          <label for="input-MYSELECT-one">One</label>
+          <input checked="checked" class="select" disabled="disabled" id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>
+        </div>
+        <div id="radio-MYSELECT-two">
+          <label for="input-MYSELECT-two">Two</label>
+          <input class="select" disabled="disabled" id="input-MYSELECT-two" name="MYSELECT" type="radio" value="two"/>
+        </div>
+        <div id="radio-MYSELECT-three">
+          <label for="input-MYSELECT-three">Three</label>
+          <input class="select" disabled="disabled" id="input-MYSELECT-three" name="MYSELECT" type="radio" value="three"/>
+        </div>
+        <div id="radio-MYSELECT-four">
+          <label for="input-MYSELECT-four">Four</label>
+          <input class="select" disabled="disabled" id="input-MYSELECT-four" name="MYSELECT" type="radio" value="four"/>
+        </div>
+      </div>
+    </div>
+    <BLANKLINE>
+
+Render single selection as radio inputs, disables some::
+
+    >>> widget.attrs['disabled'] = ['one', 'three']
+    >>> pxml('<div>'+widget()+'</div>')
+    <div>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <div id="radio-MYSELECT-wrapper">
+        <div id="radio-MYSELECT-one">
+          <label for="input-MYSELECT-one">One</label>
+          <input checked="checked" class="select" disabled="disabled" id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>
+        </div>
+        <div id="radio-MYSELECT-two">
+          <label for="input-MYSELECT-two">Two</label>
+          <input class="select" id="input-MYSELECT-two" name="MYSELECT" type="radio" value="two"/>
+        </div>
+        <div id="radio-MYSELECT-three">
+          <label for="input-MYSELECT-three">Three</label>
+          <input class="select" disabled="disabled" id="input-MYSELECT-three" name="MYSELECT" type="radio" value="three"/>
+        </div>
+        <div id="radio-MYSELECT-four">
+          <label for="input-MYSELECT-four">Four</label>
+          <input class="select" id="input-MYSELECT-four" name="MYSELECT" type="radio" value="four"/>
+        </div>
+      </div>
+    </div>
+    <BLANKLINE>
     
-    >>> del widget.attrs['display_proxy']
-    >>> widget.mode = 'edit'
+    >>> del widget.attrs['disabled']
+
+Radio single valued display mode::
+
+    >>> widget.mode = 'display'
+    >>> widget()
+    u'<div class="display-select" id="display-MYSELECT">One</div>'
+    
+    >>> widget.attrs['display_proxy'] = True
+    >>> widget()
+    u'<div class="display-select" id="display-MYSELECT">One</div><input 
+    class="select" id="input-MYSELECT" name="MYSELECT" 
+    type="hidden" value="one" />'
+    
+    >>> data = widget.extract(request={'MYSELECT': 'two'})
+    >>> data
+    <RuntimeData MYSELECT, value='one', extracted='two' at ...>
+    
+    >>> pxml('<div>' + widget(data=data) + '</div>')
+    <div>
+      <div class="display-select" id="display-MYSELECT">Two</div>
+      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" value="two"/>
+    </div>
+    <BLANKLINE>
+
 
 Multi valued
 ............
@@ -844,100 +960,6 @@ Multiple values on single valued selection fails::
       ...
     ValueError: Multiple values for single selection.
 
-With Radio
-..........
-
-Render single selection as radio inputs::
-
-    >>> widget = factory(
-    ...     'select',
-    ...     'MYSELECT',
-    ...     value='one',
-    ...     props={
-    ...         'vocabulary': [
-    ...             ('one','One'),
-    ...             ('two', 'Two'),
-    ...             ('three', 'Three'),
-    ...             ('four', 'Four')],
-    ...         'format': 'single',
-    ...         'listing_label_position': 'before'})
-    >>> pxml('<div>'+widget()+'</div>')
-    <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
-      <div id="radio-MYSELECT-wrapper">
-        <div id="radio-MYSELECT-one">
-          <label for="input-MYSELECT-one">One</label>
-          <input checked="checked" class="select" id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>
-        </div>
-        <div id="radio-MYSELECT-two">
-          <label for="input-MYSELECT-two">Two</label>
-          <input class="select" id="input-MYSELECT-two" name="MYSELECT" type="radio" value="two"/>
-        </div>
-        <div id="radio-MYSELECT-three">
-          <label for="input-MYSELECT-three">Three</label>
-          <input class="select" id="input-MYSELECT-three" name="MYSELECT" type="radio" value="three"/>
-        </div>
-        <div id="radio-MYSELECT-four">
-          <label for="input-MYSELECT-four">Four</label>
-          <input class="select" id="input-MYSELECT-four" name="MYSELECT" type="radio" value="four"/>
-        </div>
-      </div>
-    </div>
-    <BLANKLINE>
-
-Render single selection as radio inputs, disables all::
-
-    >>> widget.attrs['disabled'] = True
-    >>> pxml('<div>'+widget()+'</div>')
-    <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
-      <div id="radio-MYSELECT-wrapper">
-        <div id="radio-MYSELECT-one">
-          <label for="input-MYSELECT-one">One</label>
-          <input checked="checked" class="select" disabled="disabled" id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>
-        </div>
-        <div id="radio-MYSELECT-two">
-          <label for="input-MYSELECT-two">Two</label>
-          <input class="select" disabled="disabled" id="input-MYSELECT-two" name="MYSELECT" type="radio" value="two"/>
-        </div>
-        <div id="radio-MYSELECT-three">
-          <label for="input-MYSELECT-three">Three</label>
-          <input class="select" disabled="disabled" id="input-MYSELECT-three" name="MYSELECT" type="radio" value="three"/>
-        </div>
-        <div id="radio-MYSELECT-four">
-          <label for="input-MYSELECT-four">Four</label>
-          <input class="select" disabled="disabled" id="input-MYSELECT-four" name="MYSELECT" type="radio" value="four"/>
-        </div>
-      </div>
-    </div>
-    <BLANKLINE>
-
-Render single selection as radio inputs, disables some::
-
-    >>> widget.attrs['disabled'] = ['one', 'three']
-    >>> pxml('<div>'+widget()+'</div>')
-    <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
-      <div id="radio-MYSELECT-wrapper">
-        <div id="radio-MYSELECT-one">
-          <label for="input-MYSELECT-one">One</label>
-          <input checked="checked" class="select" disabled="disabled" id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>
-        </div>
-        <div id="radio-MYSELECT-two">
-          <label for="input-MYSELECT-two">Two</label>
-          <input class="select" id="input-MYSELECT-two" name="MYSELECT" type="radio" value="two"/>
-        </div>
-        <div id="radio-MYSELECT-three">
-          <label for="input-MYSELECT-three">Three</label>
-          <input class="select" disabled="disabled" id="input-MYSELECT-three" name="MYSELECT" type="radio" value="three"/>
-        </div>
-        <div id="radio-MYSELECT-four">
-          <label for="input-MYSELECT-four">Four</label>
-          <input class="select" id="input-MYSELECT-four" name="MYSELECT" type="radio" value="four"/>
-        </div>
-      </div>
-    </div>
-    <BLANKLINE>
 
 With Checkboxes
 ...............
@@ -956,7 +978,7 @@ Render multi selection as checkboxes::
     ...             ('three', 'Three'),
     ...             ('four', 'Four')],
     ...         'format': 'single'})
-    >>> pxml('<div>'+widget()+'</div>')
+    >>> pxml('<div>' + widget() + '</div>')
     <div>
       <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
       <div id="checkbox-MYSELECT-wrapper">
@@ -973,6 +995,44 @@ Render multi selection as checkboxes::
           <label for="input-MYSELECT-four"><input class="select" id="input-MYSELECT-four" name="MYSELECT" type="checkbox" value="four"/>Four</label>
         </div>
       </div>
+    </div>
+    <BLANKLINE>
+
+Checkbox multi selection display mode. Note, other as above, preset value for
+multivalued widget is set as string, which is treaten as one item selected and
+covered with the below tests::
+
+    >>> widget.mode = 'display'
+    >>> pxml(widget())
+    <ul class="display-select" id="display-MYSELECT">
+      <li>One</li>
+    </ul>
+    <BLANKLINE>
+
+Checkbox multi selection display mode with display proxy::
+
+    >>> widget.attrs['display_proxy'] = True
+    >>> pxml('<div>' + widget() + '</div>')
+    <div>
+      <ul class="display-select" id="display-MYSELECT">
+        <li>One</li>
+      </ul>
+      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" value="one"/>
+    </div>
+    <BLANKLINE>
+
+Checkbox multi selection display mode with display proxy and extracted data::
+    
+    >>> data = widget.extract(request={'MYSELECT': ['two']})
+    >>> data
+    <RuntimeData MYSELECT, value='one', extracted=['two'] at ...>
+    
+    >>> pxml('<div>' + widget(data=data) + '</div>')
+    <div>
+      <ul class="display-select" id="display-MYSELECT">
+        <li>Two</li>
+      </ul>
+      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" value="two"/>
     </div>
     <BLANKLINE>
 
@@ -1325,7 +1385,6 @@ Explanation:
     >>> data.printtree()
     <RuntimeData myselect, value=['one', 'two', 'four'],
     extracted=['one', 'two', 'four'] at ...>
-
 
 Single selection radio extraction::
 

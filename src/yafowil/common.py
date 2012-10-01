@@ -205,8 +205,10 @@ def display_proxy_renderer(widget, data):
         orgin_type = widget.attrs.get('type')
         widget.attrs['type'] = 'hidden'
         value = fetch_value(widget, data)
-        if type(value) in [types.ListType, types.TupleType] \
-          or widget.attrs.get('multivalued'):
+        multivalued = widget.attrs.get('multivalued')
+        if multivalued and isinstance(value, basestring):
+            value = [value]
+        if multivalued or type(value) in [types.ListType, types.TupleType]:
             for val in value:
                 input_attrs = input_attributes_full(widget, data, value=val)
                 rendered += data.tag('input', **input_attrs)
@@ -994,6 +996,8 @@ def select_display_renderer(widget, data):
     }
     content = u''
     vocab = dict(vocabulary(widget.attrs.get('vocabulary', [])))
+    if widget.attrs['multivalued'] and isinstance(value, basestring):
+        value = [value]
     for key in value:
         content += data.tag('li', vocab[key])
     return data.tag('ul', content, **attrs)
