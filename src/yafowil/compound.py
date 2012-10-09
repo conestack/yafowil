@@ -145,7 +145,7 @@ factory.doc['props']['fieldset.legend'] = \
 factory.defaults['fieldset.class'] = None
 
 
-@managedprops('action', 'method', 'enctype', *css_managed_props)
+@managedprops('action', 'method', 'enctype', 'novalidate', *css_managed_props)
 def form_edit_renderer(widget, data):
     form_attrs = {
         'action': widget.attrs['action'],
