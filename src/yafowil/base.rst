@@ -626,27 +626,35 @@ Sometimes we want to wrap inputs by UI candy, primary for usability reasons.
 This might be a label, some error output or div around. We dont want to register
 an amount of X possible widgets with an amount of Y possible wrappers. Therefore
 we can factor a widget in a chain defined colon-separated, i.e 'outer:inner' or
-'field:error:text'. Chaining works for all parts: edit_renderers, extractors,
-preprocessors and builders. Most inner and first executed is right (we prefix
-with wrappers)!. The chain can be defined as list instead of a colon seperated
-string as well::
+'field:error:text'. Chaining works for all parts: edit_renderers,
+display_renderes, extractors, preprocessors and builders. Most inner and first
+executed is right (we prefix with wrappers)!. The chain can be defined as list
+instead of a colon seperated string as well::
 
     >>> def inner_renderer(widget, data):
     ...     return u'<INNER />'
+
+    >>> def inner_display_renderer(widget, data):
+    ...     return u'<INNERDISPLAY />'
 
     >>> def inner_extractor(widget, data):
     ...     return ['extracted inner']
 
     >>> def outer_renderer(widget, data):
     ...     return u'<OUTER>%s</OUTER>' % data.rendered
+
+    >>> def outer_display_renderer(widget, data):
+    ...     return u'<OUTERDISPLAY>%s</OUTERDISPLAY>' % data.rendered
     
     >>> def outer_extractor(widget, data):
     ...     return data.extracted + ['extracted outer']
         
-    >>> factory.register('inner', [inner_extractor], [inner_renderer])
-    >>> factory.register('outer', [outer_extractor], [outer_renderer])    
+    >>> factory.register('inner', [inner_extractor], [inner_renderer], [], [], 
+    ...                  [inner_display_renderer])
+    >>> factory.register('outer', [outer_extractor], [outer_renderer], [], [],
+    ...                  [outer_display_renderer])
     >>> factory.display_renderers('inner')
-    [<function inner_renderer at ...>]
+    [<function inner_display_renderer at ...>]
 
     >>> factory.edit_renderers('inner')
     [<function inner_renderer at ...>]

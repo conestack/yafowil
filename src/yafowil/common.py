@@ -198,7 +198,8 @@ def input_generic_renderer(widget, data):
     return data.tag('input', **input_attrs)
 
 
-@managedprops('display_proxy')
+# multivalued is not documented, because its only valid for specific blueprints
+@managedprops('display_proxy', 'type')
 def display_proxy_renderer(widget, data):
     rendered = data.rendered
     if widget.attrs['display_proxy']:
@@ -289,7 +290,7 @@ def generic_positional_rendering_helper(tagname, message, attrs, rendered, pos,
 # tag
 ###############################################################################
 
-@managedprops('tag', 'text', 'class')
+@managedprops('tag', 'text', *css_managed_props)
 def tag_renderer(widget, data):
     """Renderer for HTML tags.
     """
@@ -329,7 +330,7 @@ factory.register(
     display_renderers=[generic_display_renderer, display_proxy_renderer])
 
 factory.doc['blueprint']['text'] = \
-"""Text input blueprint.
+"""One line text input blueprint.
 """
 
 factory.defaults['text.type'] = 'text'
@@ -404,7 +405,7 @@ factory.register(
     display_renderers=[empty_display_renderer])
 
 factory.doc['blueprint']['proxy'] = \
-"""Used to pass hidden arguments out of form namespace.
+"""Bypass arguments out of form namespace using a hidden field.
 """
 
 factory.defaults['proxy.class'] = None
@@ -419,19 +420,20 @@ def textarea_attributes(widget, data):
         'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
         'class_': cssclasses(widget, data),
         'cols': widget.attrs['cols'],
+        'disabled': widget.attrs.get('disabled') and 'disabled' or None,
         'id': cssid(widget, 'input'),
         'name_': widget.dottedpath,
         'placeholder': widget.attrs.get('placeholder') or None,
         'readonly': widget.attrs['readonly'] and 'readonly',
         'required': widget.attrs.get('required') and 'required' or None,
-        'disabled': widget.attrs.get('disabled') and 'disabled' or None,
         'rows': widget.attrs['rows'],
         'wrap': widget.attrs['wrap'],
     }
+textarea_managed_props = ['autofocus', 'cols', 'disabled', 'placeholder',
+                          'readonly', 'required', 'rows', 'wrap'] + \
+                          css_managed_props
 
-
-@managedprops('wrap', 'cols', 'rows', 'readonly', 'autofocus', 'placeholder',
-              *css_managed_props)
+@managedprops(*textarea_managed_props)
 def textarea_renderer(widget, data):
     """Renders text area.
     """
@@ -488,8 +490,7 @@ def lines_extractor(widget, data):
     return extracted.split('\n')
 
 
-@managedprops('wrap', 'cols', 'rows', 'readonly', 'autofocus', 'placeholder',
-              *css_managed_props)
+@managedprops(*textarea_managed_props)
 def lines_edit_renderer(widget, data):
     """Renders text area with list value as lines.
     """
@@ -503,6 +504,7 @@ def lines_edit_renderer(widget, data):
     return tag('textarea', value, **area_attrs)
 
 
+@managedprops(*css_managed_props)
 def lines_display_renderer(widget, data):
     value = fetch_value(widget, data)
     if type(value) in [types.ListType, types.TupleType] and not value:
@@ -774,7 +776,7 @@ def checkbox_edit_renderer(widget, data):
     return checkbox + exists_marker
 
 
-@managedprops('bool', 'vocabulary')
+@managedprops('format', 'vocabulary')
 def checkbox_display_renderer(widget, data):
     """Generic display renderer to render a value.
     """

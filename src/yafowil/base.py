@@ -602,7 +602,7 @@ class Factory(object):
         return self._blueprints[name][1]
 
     def display_renderers(self, name):
-        return self._blueprints[name][1]
+        return self._blueprints[name][4]
 
     def preprocessors(self, name):
         return self._global_preprocessors + self._blueprints[name][2]

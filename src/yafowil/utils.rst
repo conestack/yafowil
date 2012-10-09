@@ -1,6 +1,7 @@
 Test entry_point support tools
 ------------------------------
 ::
+    >>> import yafowil.loader
     >>> from yafowil.utils import get_entry_points
     >>> get_entry_points()
     [...EntryPoint.parse('register = yafowil.loader:register')...]

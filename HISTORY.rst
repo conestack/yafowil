@@ -5,6 +5,9 @@ History
 2.0dev
 ------
 
+- fixed bug in factory returned wrong renderes on call of display_renderers
+  [jensens, 2012-10-09]
+
 - renamed plans to macros.
   [rnix, jensens]
 
@@ -26,12 +29,12 @@ History
 - pep8ify
   [jensens, 2012-06-08]
 
-- make TBSupplement compatible with both: ```zExceptions``` and 
+- make TBSupplement compatible with both: ```zExceptions``` and
   ```zope.exceptions```. Major change: html output is no longer default and
   the kwarg of getInfo is now ```as_html``` (was ```html```).
   Also added blueprints to the supplement as info to make it easier to identify
   the form part.
-  [jensens, 2012-06-07] 
+  [jensens, 2012-06-07]
 
 1.3.2
 -----
@@ -60,13 +63,13 @@ History
 
 - Loading resources is done more explicit and in a pluggable way
   using entry-points. Thus yafowil extensions such as widgets
-  can define an entry point. 
-  [jensens, 2012-02-14] 
+  can define an entry point.
+  [jensens, 2012-02-14]
 
 - Add size attribute for ``select`` edit renderer.
   [jensens, 2012-01-20]
 
-- fix number extractor  
+- fix number extractor
   [jensens, 2012-01-20]
 
 - Add default css class for ``select`` blueprint.
