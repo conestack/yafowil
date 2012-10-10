@@ -1642,7 +1642,7 @@ factory.doc['props']['help.tag'] = """\
 HTML tag to use to enclose all help messages.
 """
 
-factory.defaults['help.help'] = 'div'
+factory.defaults['help.help'] = ''
 factory.doc['props']['help.help'] = """\
 Help text.
 """

@@ -5,6 +5,9 @@ History
 2.0
 ---
 
+- Fix default help text.
+  [rnix, 2012-10-10]
+
 - fixed bug in factory returned wrong renderes on call of display_renderers
   [jensens, 2012-10-09]
 
