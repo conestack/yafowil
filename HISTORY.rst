@@ -2,8 +2,8 @@
 History
 =======
 
-2.0dev
-------
+2.0
+---
 
 - fixed bug in factory returned wrong renderes on call of display_renderers
   [jensens, 2012-10-09]
