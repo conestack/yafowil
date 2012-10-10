@@ -20,7 +20,7 @@ Detailed Documentation
 ======================
 
 If you're interested to dig deeper: The `detailed YAFOWIL documentation
-<http://yafowil.info>`_ is available. Read it and learn how to
+<http://docs.yafowil.info>`_ is available. Read it and learn how to
 create your example application with YAFOWIL forms in 15 minutes.
 
 

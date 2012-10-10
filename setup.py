@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '2.0dev'
+version = '2.0'
 shortdesc = \
 'YAFOWIL - declarative, flexible html forms, framework independent.'
 longdesc = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
@@ -23,7 +23,7 @@ setup(name='yafowil',
       keywords='html input widgets form compound',
       author='BlueDynamics Alliance',
       author_email='dev@bluedynamics.com',
-      url=u'http://packages.python.org/yafowil',
+      url=u'http://pypi.python.org/pypi/yafowil',
       license='Simplified BSD',
       packages=find_packages('src'),
       package_dir = {'': 'src'},
