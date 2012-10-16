@@ -1,7 +1,8 @@
 **Yet Another Form WIdget Library**.
 
-YAFOWIL offers html-form creation and modification at runtime. Its light-weight
-and provides an extensible, reusable set of blueprints to build flexible forms.
+YAFOWIL offers html-form creation and modification at runtime. It is
+light-weight and provides an extensible, reusable set of blueprints to build 
+flexible forms.
 
 YAFOWIL is independent from any web-framework, but easy to use in your
 web-framework.
