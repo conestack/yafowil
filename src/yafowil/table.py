@@ -1,19 +1,20 @@
-from yafowil.base import factory
-from yafowil.compound import (
+from .base import factory
+from .compound import (
     compound_renderer,
     hybrid_extractor,
 )
-from yafowil.utils import (
+from .utils import (
     cssclasses,
     css_managed_props,
     managedprops,
+    attr_value,
 )
 
 
 @managedprops('id', *css_managed_props)
 def table_renderer(widget, data):
     attrs = {
-        'id': widget.attrs.get('id'),
+        'id': attr_value('id', widget, data),
         'class_': cssclasses(widget, data),
     }
     return data.tag('table', data.rendered, **attrs)
@@ -67,7 +68,7 @@ factory.doc['blueprint']['tbody'] = """\
 @managedprops('id', *css_managed_props)
 def tr_renderer(widget, data):
     attrs = {
-        'id': widget.attrs.get('id'),
+        'id': attr_value('id', widget, data),
         'class_': cssclasses(widget, data),
     }
     return data.tag('tr', data.rendered, **attrs)
@@ -91,12 +92,12 @@ Value of id attribute.
 @managedprops('id', 'rowspan', 'colspan', 'label', *css_managed_props)
 def th_renderer(widget, data):
     attrs = {
-        'id': widget.attrs.get('id'),
+        'id': attr_value('id', widget, data),
         'class_': cssclasses(widget, data),
-        'colspan': widget.attrs.get('colspan'),
-        'rowspan': widget.attrs.get('rowspan'),
+        'colspan': attr_value('colspan', widget, data),
+        'rowspan': attr_value('rowspan', widget, data),
     }
-    contents = widget.attrs.get('label')
+    contents = attr_value('label', widget, data)
     if not contents:
         contents = data.rendered
     return data.tag('th', contents, **attrs)
@@ -132,10 +133,10 @@ is used.
 @managedprops('id', 'rowspan', 'colspan', *css_managed_props)
 def td_renderer(widget, data):
     attrs = {
-        'id': widget.attrs.get('id'),
+        'id': attr_value('id', widget, data),
         'class_': cssclasses(widget, data),
-        'colspan': widget.attrs.get('colspan'),
-        'rowspan': widget.attrs.get('rowspan'),
+        'colspan': attr_value('colspan', widget, data),
+        'rowspan': attr_value('rowspan', widget, data),
     }
     if len(widget):
         rendered = compound_renderer(widget, data)

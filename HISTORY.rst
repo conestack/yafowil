@@ -5,8 +5,7 @@ History
 2.0.1dev
 --------
 
-- Use ``attr_value`` in ``input_attributes_common``,
-  ``input_attributes_full`` and ``textarea_attributes``.
+- Use ``attr_value`` wherever possible to lookup attribute values.
   [rnix, 2012-10-25]
 
 - Introduce ``attr_value`` utility.

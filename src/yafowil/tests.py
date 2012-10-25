@@ -4,9 +4,11 @@ from pprint import pprint
 from interlude import interact
 import lxml.etree as etree
 
+
 optionflags = doctest.NORMALIZE_WHITESPACE | \
               doctest.ELLIPSIS | \
               doctest.REPORT_ONLY_FIRST_FAILURE
+
 
 TESTFILES = [
     'utils.rst',
