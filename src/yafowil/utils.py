@@ -162,8 +162,6 @@ def cssid(widget, prefix, postfix=None):
     return cssid
 
 
-
-
 def attr_value(key, widget, data, default=None):
     attr = widget.attrs.get(key, default)
     if callable(attr):
