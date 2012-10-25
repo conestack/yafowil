@@ -1,13 +1,13 @@
 import re
 import types
-import logging
-from yafowil.base import (
+from .base import (
     factory,
     ExtractionError,
     fetch_value
 )
-from utils import (
+from .utils import (
     UNSET,
+    attr_value,
     cssclasses,
     css_managed_props,
     cssid,
@@ -161,17 +161,21 @@ def generic_required_extractor(widget, data):
 def input_attributes_common(widget, data, excludes=list(), value=None):
     if value is None:
         value = fetch_value(widget, data)
+    autofocus = attr_value('autofocus', widget, data) and 'autofocus' or None
+    disabled = attr_value('disabled', widget, data)
+    disabled = bool(disabled) and 'disabled' or None
+    required = attr_value('required', widget, data) and 'required' or None
     input_attrs = {
-        'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
+        'autofocus': autofocus,
         'class_': cssclasses(widget, data),
-        'disabled': bool(widget.attrs.get('disabled')) and 'disabled' or None,
+        'disabled': disabled,
         'id': cssid(widget, 'input'),
         'name_': widget.dottedpath,
-        'placeholder': widget.attrs.get('placeholder') or None,
-        'required': widget.attrs.get('required') and 'required' or None,
-        'size': widget.attrs.get('size'),
-        'title': widget.attrs.get('title') or None,
-        'type': widget.attrs.get('type') or None,
+        'placeholder': attr_value('placeholder', widget, data),
+        'required': required,
+        'size': attr_value('size', widget, data),
+        'title': attr_value('title', widget, data),
+        'type': attr_value('type', widget, data),
         'value': value,
     }
     for attr_name in excludes:
@@ -181,11 +185,12 @@ def input_attributes_common(widget, data, excludes=list(), value=None):
 
 def input_attributes_full(widget, data, value=None):
     input_attrs = input_attributes_common(widget, data, value=value)
-    input_attrs['autocomplete'] = widget.attrs.get('autocomplete')
+    input_attrs['autocomplete'] = attr_value(
+        'autocomplete', widget, data)
     if widget.attrs['type'] in ['range', 'number']:
-        input_attrs['min'] = widget.attrs.get('min') or None
-        input_attrs['max'] = widget.attrs.get('min') or None
-        input_attrs['step'] = widget.attrs.get('step') or None
+        input_attrs['min'] = attr_value('min', widget, data)
+        input_attrs['max'] = attr_value('max', widget, data)
+        input_attrs['step'] = attr_value('step', widget, data)
     return input_attrs
 
 
@@ -416,22 +421,30 @@ factory.defaults['proxy.class'] = None
 ###############################################################################
 
 def textarea_attributes(widget, data):
+    autofocus = attr_value('autofocus', widget, data) and 'autofocus' or None
+    disabled = attr_value('disabled', widget, data) and 'disabled' or None
+    readonly = attr_value('readonly', widget, data) and 'readonly' or None
+    required = attr_value('required', widget, data) and 'required' or None
     return {
-        'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
+        'autofocus': autofocus,
         'class_': cssclasses(widget, data),
         'cols': widget.attrs['cols'],
-        'disabled': widget.attrs.get('disabled') and 'disabled' or None,
+        'disabled': disabled,
         'id': cssid(widget, 'input'),
+        'title': attr_value('title', widget, data),
         'name_': widget.dottedpath,
-        'placeholder': widget.attrs.get('placeholder') or None,
-        'readonly': widget.attrs['readonly'] and 'readonly',
-        'required': widget.attrs.get('required') and 'required' or None,
-        'rows': widget.attrs['rows'],
-        'wrap': widget.attrs['wrap'],
+        'placeholder': attr_value('placeholder', widget, data),
+        'readonly': readonly,
+        'required': required,
+        'rows': attr_value('rows', widget, data),
+        'wrap': attr_value('wrap', widget, data),
     }
+
+
 textarea_managed_props = ['autofocus', 'cols', 'disabled', 'placeholder',
                           'readonly', 'required', 'rows', 'wrap'] + \
                           css_managed_props
+
 
 @managedprops(*textarea_managed_props)
 def textarea_renderer(widget, data):

@@ -2,6 +2,19 @@
 History
 =======
 
+2.0.1dev
+--------
+
+- Use ``attr_value`` in ``input_attributes_common``,
+  ``input_attributes_full`` and ``textarea_attributes``.
+  [rnix, 2012-10-25]
+
+- Introduce ``attr_value`` utility.
+  [rnix, 2012-10-25]
+
+- Textarea can have ``title`` attribute.
+  [rnix, 2012-10-25]
+
 2.0
 ---
 

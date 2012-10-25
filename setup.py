@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '2.0'
+version = '2.0.1dev'
 shortdesc = \
 'YAFOWIL - declarative, flexible html forms, framework independent.'
 longdesc = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
@@ -26,7 +26,7 @@ setup(name='yafowil',
       url=u'http://pypi.python.org/pypi/yafowil',
       license='Simplified BSD',
       packages=find_packages('src'),
-      package_dir = {'': 'src'},
+      package_dir={'': 'src'},
       namespace_packages=['yafowil'],
       include_package_data=True,
       zip_safe=True,
@@ -36,10 +36,10 @@ setup(name='yafowil',
       ],
       tests_require=tests_require,
       test_suite="yafowil.tests.test_suite",
-      extras_require = dict(
+      extras_require=dict(
           test=tests_require,
       ),
-      entry_points = """
+      entry_points="""
       [yafowil.plugin]
       register = yafowil.loader:register
       example = yafowil.example:get_example

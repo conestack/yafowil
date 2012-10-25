@@ -161,8 +161,16 @@ def cssid(widget, prefix, postfix=None):
     return cssid
 
 
-css_managed_props = ['class', 'class_add', 'error_class', 'error_class_default',
-                     'required_class', 'required_class_default']
+def attr_value(key, widget, data, default=None):
+    attr = widget.attrs.get(key, default)
+    if callable(attr):
+        return attr(widget, data)
+    return attr
+
+
+css_managed_props = ['class', 'class_add', 'error_class',
+                     'error_class_default', 'required_class',
+                     'required_class_default']
 
 
 def cssclasses(widget, data, classattr='class', additional=[]):
@@ -179,14 +187,8 @@ def cssclasses(widget, data, classattr='class', additional=[]):
         else:
             _classes.append(attrs['required_class_default'])
     if attrs[classattr]:
-        if callable(attrs[classattr]):
-            _classes += attrs[classattr](widget, data).split()
-        else:
-            _classes += attrs[classattr].split()
+        _classes += attr_value(classattr, widget, data).split()
     if attrs['class_add']:
-        if callable(attrs['class_add']):
-            _classes += attrs['class_add'](widget, data).split()
-        else:
-            _classes += attrs['class_add'].split()
+        _classes += attr_value('class_add', widget, data).split()
     _classes += additional
     return _classes and ' '.join(sorted(_classes)) or None
