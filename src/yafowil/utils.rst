@@ -1,6 +1,8 @@
 Test entry_point support tools
 ------------------------------
+
 ::
+
     >>> import yafowil.loader
     >>> from yafowil.utils import get_entry_points
     >>> get_entry_points()
@@ -19,7 +21,9 @@ Test entry_point support tools
 
 Test examples lookup
 --------------------
+
 ::
+
     >>> from yafowil.utils import get_example_names
     >>> sorted(get_example_names())
     ['yafowil'...]
@@ -43,7 +47,9 @@ Test examples lookup
 
 Test UNSET
 ----------
+
 ::
+
     >>> from yafowil.utils import UNSET
     >>> UNSET
     <UNSET>
@@ -60,7 +66,9 @@ Test UNSET
 
 Test the Vocabulary
 -------------------
+
 ::
+
     >>> from yafowil.utils import vocabulary
     >>> vocabulary('foo')
     [('foo', 'foo')]
@@ -86,7 +94,9 @@ Test the Vocabulary
 
 Test Tag renderer
 -----------------
+
 ::
+
     >>> from yafowil.utils import Tag
     >>> tag = Tag(lambda msg: msg)    
     >>> a = {'class': u'fancy', 'id': '2f5b8a234ff'}
@@ -112,7 +122,9 @@ deprecated test::
 
 Test CSS Classes
 ----------------
+
 ::
+
     >>> from plumber import plumber
     >>> from node.base import OrderedNode
     >>> from node.behaviors import Nodespaces
@@ -210,7 +222,9 @@ Test CSS Classes
 
 Test managedprops annotation
 ----------------------------
+
 ::
+
     >>> from yafowil.utils import managedprops
     >>> @managedprops('foo', 'bar')
     ... def somefunc(a, b, c):
@@ -219,3 +233,81 @@ Test managedprops annotation
     (1, 2, 3)
     >>> somefunc.__yafowil_managed_props__
     ('foo', 'bar')
+
+
+Test attr_value
+---------------
+
+::
+
+    >>> from node.base import AttributedNode
+    >>> from yafowil.utils import attr_value
+
+    >>> widget = AttributedNode()
+    >>> data = AttributedNode()
+
+    >>> widget.attrs['attr'] = 'value'
+    >>> attr_value('attr', widget, data)
+    'value'
+
+    >>> def func_callback(widget, data):
+    ...     return 'func_callback value'
+    >>> widget.attrs['attr'] = func_callback
+    >>> attr_value('attr', widget, data)
+    'func_callback value'
+
+    >>> def failing_func_callback(widget, data):
+    ...     raise Exception('failing_func_callback')
+    >>> widget.attrs['attr'] = failing_func_callback
+    >>> attr_value('attr', widget, data)
+    Traceback (most recent call last):
+      ...
+    Exception: failing_func_callback
+
+    >>> def bc_func_callback(widget, data):
+    ...     return 'bc_func_callback value'
+    >>> widget.attrs['attr'] = bc_func_callback
+    >>> attr_value('attr', widget, data)
+    'bc_func_callback value'
+
+    >>> def failing_bc_func_callback(widget, data):
+    ...     raise Exception('failing_bc_func_callback')
+    >>> widget.attrs['attr'] = failing_bc_func_callback
+    >>> attr_value('attr', widget, data)
+    Traceback (most recent call last):
+      ...
+    Exception: failing_bc_func_callback
+
+    >>> class FormContext(object):
+    ...     def instance_callback(self, widget, data):
+    ...         return 'instance_callback'
+    ... 
+    ...     def failing_instance_callback(self, widget, data):
+    ...         raise Exception('failing_instance_callback')
+    ... 
+    ...     def instance_bc_callback(self):
+    ...         return 'instance_bc_callback'
+    ... 
+    ...     def failing_instance_bc_callback(self, widget, data):
+    ...         raise Exception('failing_instance_bc_callback')
+
+    >>> context = FormContext()
+    >>> widget.attrs['attr'] = context.instance_callback
+    >>> attr_value('attr', widget, data)
+    'instance_callback'
+
+    >>> widget.attrs['attr'] = context.failing_instance_callback
+    >>> attr_value('attr', widget, data)
+    Traceback (most recent call last):
+      ...
+    Exception: failing_instance_callback
+
+    >>> widget.attrs['attr'] = context.instance_bc_callback
+    >>> attr_value('attr', widget, data)
+    'instance_bc_callback'
+
+    >>> widget.attrs['attr'] = context.failing_instance_bc_callback
+    >>> attr_value('attr', widget, data)
+    Traceback (most recent call last):
+      ...
+    Exception: failing_instance_bc_callback

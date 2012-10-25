@@ -1,4 +1,5 @@
 import logging
+import inspect
 from pkg_resources import iter_entry_points
 
 
@@ -161,15 +162,20 @@ def cssid(widget, prefix, postfix=None):
     return cssid
 
 
+
+
 def attr_value(key, widget, data, default=None):
     attr = widget.attrs.get(key, default)
     if callable(attr):
         try:
             return attr(widget, data)
-        except:  # B/C
-            logging.warn("Deprecated usage of callback attributes. Please use "
-                         "accept 'widget' and 'data' as arguments.")
-            return attr()
+        except Exception, e:  # B/C
+            spec = inspect.getargspec(attr)
+            if len(spec.args) <= 1 and not spec.keywords:
+                logging.warn("Deprecated usage of callback attributes. Please "
+                             "accept 'widget' and 'data' as arguments.")
+                return attr()
+            raise e
     return attr
 
 
