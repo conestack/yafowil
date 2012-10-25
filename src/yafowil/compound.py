@@ -1,11 +1,12 @@
 from odict import odict
-from yafowil.base import factory
-from yafowil.utils import (
+from .base import factory
+from .utils import (
     UNSET,
     cssid,
     cssclasses,
     css_managed_props,
     managedprops,
+    attr_value,
 )
 
 
@@ -15,11 +16,11 @@ def compound_extractor(widget, data):
     """
     for childname in widget:
         child = widget[childname]
-        if child.attrs.get('structural'):
+        if attr_value('structural', child, data):
             for structuralchildname in child:
                 structuralchild = child[structuralchildname]
                 if len(structuralchild) \
-                  and structuralchild.attrs.get('structural'):
+                  and attr_value('structural', structuralchild, data):
                     # call compound extractor if structural child has children
                     # which are as well structural compounds.
                     compound_extractor(structuralchild, data)
@@ -38,7 +39,7 @@ def compound_renderer(widget, data):
     result = u''
     for childname in widget:
         child = widget[childname]
-        if child.attrs.get('structural'):
+        if attr_value('structural', child, data):
             subdata = data
             if value is not UNSET and child.getter is UNSET:
                 child.getter = value
@@ -88,7 +89,7 @@ def hybrid_extractor(widget, data):
 @managedprops('id', *css_managed_props)
 def div_renderer(widget, data):
     attrs = {
-        'id': widget.attrs.get('id'),
+        'id': attr_value('id', widget, data),
         'class_': cssclasses(widget, data),
     }
     if len(widget):
@@ -121,8 +122,9 @@ def fieldset_renderer(widget, data):
         'class_': cssclasses(widget, data)
     }
     rendered = data.rendered
-    if widget.attrs['legend']:
-        rendered = data.tag('legend', widget.attrs['legend']) + rendered
+    legend = attr_value('legend', widget, data)
+    if legend:
+        rendered = data.tag('legend', legend) + rendered
     return data.tag('fieldset', rendered, **fs_attrs)
 
 
@@ -147,12 +149,14 @@ factory.defaults['fieldset.class'] = None
 
 @managedprops('action', 'method', 'enctype', 'novalidate', *css_managed_props)
 def form_edit_renderer(widget, data):
+    method = attr_value('method', widget, data)
+    enctype = method == 'post' and attr_value('enctype', widget, data) or None
+    noval = attr_value('novalidate', widget, data) and 'novalidate' or None
     form_attrs = {
-        'action': widget.attrs['action'],
-        'method': widget.attrs['method'],
-        'enctype': widget.attrs['method'] == 'post' and \
-                   widget.attrs['enctype'] or None,
-        'novalidate': widget.attrs['novalidate'] and 'novalidate' or None,
+        'action': attr_value('action', widget, data),
+        'method': method,
+        'enctype': enctype,
+        'novalidate': noval,
         'class_': cssclasses(widget, data),
         'id': 'form-%s' % '-'.join(widget.path),
     }

@@ -12,9 +12,10 @@ from node.behaviors import (
     Nodespaces,
     Order,
 )
-from yafowil.utils import (
+from .utils import (
     Tag,
     UNSET,
+    attr_value,
 )
 
 
@@ -359,6 +360,11 @@ class Widget(object):
             return data
         # dont't extract if display mode and no display proxy
         if data.mode == 'display':
+            # XXX: display_proxy cannot be called here, currently not possible
+            #      to use ``attr_value``, widget not available. this causes an
+            #      inconsistency with the use of display_proxy inside
+            #      blueprint callbacks. maybe display_proxy might be a special
+            #      case not accepting ``widget`` and ``data`` if callable.
             if not self.attrs.get('display_proxy'):
                 return data
         self.lock()
@@ -620,4 +626,4 @@ def fetch_value(widget, data):
         return data.extracted
     if data.value is not UNSET:
         return data.value
-    return widget.attrs['default']
+    return attr_value('default', widget, data)
