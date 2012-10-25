@@ -164,7 +164,12 @@ def cssid(widget, prefix, postfix=None):
 def attr_value(key, widget, data, default=None):
     attr = widget.attrs.get(key, default)
     if callable(attr):
-        return attr(widget, data)
+        try:
+            return attr(widget, data)
+        except:  # B/C
+            logging.warn("Deprecated usage of callback attributes. Please use "
+                         "accept 'widget' and 'data' as arguments.")
+            return attr()
     return attr
 
 

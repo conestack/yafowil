@@ -146,16 +146,14 @@ def generic_required_extractor(widget, data):
     ``required_message``
         Default required message as basestring instance.
     """
-    required = widget.attrs.get('required')
-    if callable(required):
-        required = required(widget, data)
+    required = attr_value('required', widget, data)
     if not required \
        or bool(data.extracted) \
        or data.extracted is UNSET:
         return data.extracted
     if isinstance(required, basestring):
         raise ExtractionError(required)
-    raise ExtractionError(widget.attrs['required_message'])
+    raise ExtractionError(attr_value('required_message', widget, data))
 
 
 def input_attributes_common(widget, data, excludes=list(), value=None):
@@ -187,7 +185,7 @@ def input_attributes_full(widget, data, value=None):
     input_attrs = input_attributes_common(widget, data, value=value)
     input_attrs['autocomplete'] = attr_value(
         'autocomplete', widget, data)
-    if widget.attrs['type'] in ['range', 'number']:
+    if attr_value('type', widget, data) in ['range', 'number']:
         input_attrs['min'] = attr_value('min', widget, data)
         input_attrs['max'] = attr_value('max', widget, data)
         input_attrs['step'] = attr_value('step', widget, data)
@@ -207,11 +205,11 @@ def input_generic_renderer(widget, data):
 @managedprops('display_proxy', 'type')
 def display_proxy_renderer(widget, data):
     rendered = data.rendered
-    if widget.attrs['display_proxy']:
-        orgin_type = widget.attrs.get('type')
+    if attr_value('display_proxy', widget, data):
+        orgin_type = attr_value('type', widget, data)
         widget.attrs['type'] = 'hidden'
         value = fetch_value(widget, data)
-        multivalued = widget.attrs.get('multivalued')
+        multivalued = attr_value('multivalued', widget, data)
         if multivalued and isinstance(value, basestring):
             value = [value]
         if multivalued or type(value) in [types.ListType, types.TupleType]:
@@ -242,7 +240,7 @@ def generic_display_renderer(widget, data, value=None):
         content = widget.attrs['template'] % value
     attrs = {
         'id': cssid(widget, 'display'),
-        'class_': 'display-%s' % widget.attrs['class'] or 'generic'
+        'class_': 'display-%s' % attr_value('class', widget, data) or 'generic'
     }
     return data.tag('div', content, **attrs)
 
@@ -303,7 +301,9 @@ def tag_renderer(widget, data):
         'id': cssid(widget, 'tag'),
         'class_': cssclasses(widget, data),
     }
-    return data.tag(widget.attrs['tag'], widget.attrs['text'], **attrs)
+    tag = attr_value('tag', widget, data)
+    text = attr_value('text', widget, data)
+    return data.tag(tag, text, **attrs)
 
 
 factory.register(
@@ -428,7 +428,7 @@ def textarea_attributes(widget, data):
     return {
         'autofocus': autofocus,
         'class_': cssclasses(widget, data),
-        'cols': widget.attrs['cols'],
+        'cols': attr_value('cols', widget, data),
         'disabled': disabled,
         'id': cssid(widget, 'input'),
         'title': attr_value('title', widget, data),
@@ -524,7 +524,7 @@ def lines_display_renderer(widget, data):
         value = u''
     attrs = {
         'id': cssid(widget, 'display'),
-        'class_': 'display-%s' % widget.attrs['class'] or 'generic'
+        'class_': 'display-%s' % attr_value('class', widget, data) or 'generic'
     }
     content = u''
     for line in value:
@@ -584,7 +584,7 @@ def minlength_extractor(widget, data):
     val = data.extracted
     if val is UNSET:
         return val
-    minlength = widget.attrs.get('minlength', -1)
+    minlength = attr_value('minlength', widget, data, -1)
     if minlength != -1:
         if len(val) < minlength:
             message = u'Input must have at least %i characters.' % minlength
@@ -606,7 +606,7 @@ def ascii_extractor(widget, data):
     val = data.extracted
     if val is UNSET:
         return val
-    if not widget.attrs.get('ascii', False):
+    if not attr_value('ascii', widget, data, False):
         return val
     try:
         str(val)
@@ -652,7 +652,7 @@ def password_extractor(widget, data):
         return UNSET
     if val is UNSET:
         return val
-    required_strength = widget.attrs.get('strength', 0)
+    required_strength = attr_value('strength', widget, data, 0)
     if required_strength <= 0:
         return val
     if required_strength > len(RE_PASSWORD_ALL):
@@ -662,7 +662,8 @@ def password_extractor(widget, data):
         if re.match(reg_exp, val):
             strength += 1
     if strength < required_strength:
-        raise ExtractionError(widget.attrs.get('weak_password_message'))
+        error = attr_value('weak_password_message', widget, data)
+        raise ExtractionError(error)
     return val
 
 
@@ -672,7 +673,7 @@ def _pwd_value(widget, data):
     if data.value is not UNSET \
       and data.value is not None:
         return PASSWORD_NOCHANGE_VALUE
-    return widget.attrs['default']
+    return attr_value('default', widget, data)
 
 
 @managedprops('size', 'disabled', 'placeholder', 'autofocus', 'required',
@@ -691,7 +692,7 @@ def password_edit_renderer(widget, data):
 def password_display_renderer(widget, data):
     value = _pwd_value(widget, data)
     if value == PASSWORD_NOCHANGE_VALUE:
-        return widget.attrs['displayplaceholder']
+        return attr_value('displayplaceholder', widget, data)
     return u''
 
 
@@ -758,7 +759,7 @@ def checkbox_extractor(widget, data):
     """
     if '%s-exists' % widget.dottedpath not in data.request:
         return UNSET
-    fmt = widget.attrs['format']
+    fmt = attr_value('format', widget, data)
     if fmt == 'bool':
         return widget.dottedpath in data.request
     elif fmt == 'string':
@@ -771,12 +772,13 @@ def checkbox_edit_renderer(widget, data):
     tag = data.tag
     input_attrs = input_attributes_common(widget, data)
     input_attrs['type'] = 'checkbox'
-    if widget.attrs['checked'] is not None:
-        if widget.attrs['checked']:
+    checked = attr_value('checked', widget, data)
+    if checked is not None:
+        if checked:
             input_attrs['checked'] = 'checked'
     else:
         input_attrs['checked'] = input_attrs['value'] and 'checked' or None
-    if widget.attrs['format'] == 'bool':
+    if attr_value('format', widget, data) == 'bool':
         input_attrs['value'] = ''
     checkbox = tag('input', **input_attrs)
     input_attrs = {
@@ -794,20 +796,21 @@ def checkbox_display_renderer(widget, data):
     """Generic display renderer to render a value.
     """
     value = fetch_value(widget, data)
-    if widget.attrs['format'] == 'string' and bool(value):
+    format = attr_value('format', widget, data)
+    if format == 'string' and bool(value):
         content = value
     else:
-        vocab = dict(vocabulary(widget.attrs.get('vocabulary', [])))
+        vocab = dict(vocabulary(attr_value('vocabulary', widget, data, [])))
         content = vocab[bool(value)]
         if data.tag.translate:
             content = data.tag.translate(content)
     attrs = {
         'id': cssid(widget, 'display'),
-        'class_': 'display-%s' % widget.attrs['class'] or 'generic'
+        'class_': 'display-%s' % attr_value('class', widget, data) or 'generic'
     }
-    if widget.attrs['display_proxy']:
+    if attr_value('display_proxy', widget, data):
         widget.attrs['type'] = 'hidden'
-        if widget.attrs['format'] == 'string':
+        if format == 'string':
             input_attrs = input_attributes_common(widget, data, value=value)
             content += data.tag('input', **input_attrs)
         elif bool(value):
@@ -873,20 +876,21 @@ factory.defaults['checkbox.required_class'] = 'required'
 @managedprops('multivalued', 'disabled')
 def select_extractor(widget, data):
     extracted = generic_extractor(widget, data)
+    multivalued = attr_value('multivalued', widget, data)
     if extracted is UNSET \
        and '%s-exists' % widget.dottedpath in data.request:
-        if widget.attrs['multivalued']:
+        if multivalued:
             extracted = []
         else:
             extracted = ''
     if extracted is UNSET:
         return extracted
-    if widget.attrs['multivalued'] and isinstance(extracted, basestring):
+    if multivalued and isinstance(extracted, basestring):
         extracted = [extracted]
     disabled = widget.attrs.get('disabled', False)
     if not disabled:
         return extracted
-    if not widget.attrs['multivalued']:
+    if not multivalued:
         return data.value
     disabled_items = disabled is True and data.value or disabled
     if isinstance(disabled_items, basestring):
@@ -917,14 +921,16 @@ def select_exists_marker(widget, data):
 def select_edit_renderer(widget, data):
     tag = data.tag
     value = fetch_value(widget, data)
+    multivalued = attr_value('multivalued', widget, data)
     if isinstance(value, basestring) or not hasattr(value, '__iter__'):
         value = [value]
-    if not widget.attrs['multivalued'] and len(value) > 1:
+    if not multivalued and len(value) > 1:
         raise ValueError(u"Multiple values for single selection.")
-    disabled = widget.attrs.get('disabled', False)
-    if widget.attrs['format'] == 'block':
+    disabled = attr_value('disabled', widget, data, False)
+    if attr_value('format', widget, data) == 'block':
         optiontags = []
-        for key, term in vocabulary(widget.attrs.get('vocabulary', [])):
+        vocab = attr_value('vocabulary', widget, data, [])
+        for key, term in vocabulary(vocab):
             attrs = {
                 'selected': (key in value) and 'selected' or None,
                 'value': key,
@@ -933,20 +939,23 @@ def select_edit_renderer(widget, data):
             if disabled and disabled is not True and key in disabled:
                 attrs['disabled'] = 'disabled'
             optiontags.append(tag('option', term, **attrs))
+        autofocus = \
+            attr_value('autofocus', widget, data) and 'autofocus' or None
+        required = attr_value('required', widget, data) and 'required' or None
         select_attrs = {
             'name_': widget.dottedpath,
             'id': cssid(widget, 'input'),
             'class_': cssclasses(widget, data),
-            'multiple': widget.attrs['multivalued'] and 'multiple' or None,
-            'size': widget.attrs['size'] or None,
-            'placeholder': widget.attrs.get('placeholder') or None,
-            'autofocus': widget.attrs.get('autofocus') and 'autofocus' or None,
-            'required': widget.attrs.get('required') and 'required' or None,
+            'multiple': multivalued and 'multiple' or None,
+            'size': attr_value('size', widget, data) or None,
+            'placeholder': attr_value('placeholder', widget, data) or None,
+            'autofocus': autofocus,
+            'required': required,
         }
         if disabled is True:
             select_attrs['disabled'] = 'disabled'
         rendered = tag('select', *optiontags, **select_attrs)
-        if widget.attrs['multivalued']:
+        if multivalued:
             attrs = {
                 'type': 'hidden',
                 'value':  'exists',
@@ -957,19 +966,20 @@ def select_edit_renderer(widget, data):
         return rendered
     else:
         tags = []
-        label_pos = widget.attrs['listing_label_position']
+        label_pos = attr_value('listing_label_position', widget, data)
         if label_pos == 'inner':
             # deprecated, use explicit inner-after or inner-before
             label_pos = 'inner-after'
-        listing_tag = widget.attrs['listing_tag']
+        listing_tag = attr_value('listing_tag', widget, data)
         item_tag = listing_tag == 'div' and 'div' or 'li'
-        if widget.attrs['multivalued']:
+        if multivalued:
             tagtype = 'checkbox'
-            tagclass = widget.attrs['label_checkbox_class']
+            tagclass = attr_value('label_checkbox_class', widget, data)
         else:
             tagtype = 'radio'
-            tagclass = widget.attrs['label_radio_class']
-        for key, term in vocabulary(widget.attrs.get('vocabulary', [])):
+            tagclass = attr_value('label_checkbox_class', widget, data)
+        vocab = attr_value('vocabulary', widget, data, [])
+        for key, term in vocabulary(vocab):
             input_attrs = {
                 'type': tagtype,
                 'value':  key,
@@ -999,19 +1009,19 @@ def select_display_renderer(widget, data):
     value = fetch_value(widget, data)
     if type(value) in [types.ListType, types.TupleType] and not value:
         value = u''
-    if not widget.attrs['multivalued'] or not value:
-        vocab = dict(vocabulary(widget.attrs.get('vocabulary', [])))
+    multivalued = attr_value('multivalued', widget, data)
+    vocab = dict(attr_value('vocabulary', widget, data, []))
+    if not multivalued or not value:
         value = vocab.get(value, value)
         if data.tag.translate:
             value = data.tag.translate(value)
         return generic_display_renderer(widget, data, value=value)
     attrs = {
         'id': cssid(widget, 'display'),
-        'class_': 'display-%s' % widget.attrs['class'] or 'generic'
+        'class_': 'display-%s' % attr_value('class', widget, data) or 'generic'
     }
     content = u''
-    vocab = dict(vocabulary(widget.attrs.get('vocabulary', [])))
-    if widget.attrs['multivalued'] and isinstance(value, basestring):
+    if multivalued and isinstance(value, basestring):
         value = [value]
     for key in value:
         content += data.tag('li', vocab[key])
@@ -1133,8 +1143,8 @@ def input_file_edit_renderer(widget, data):
     tag = data.tag
     input_attrs = input_attributes_common(widget, data, excludes=['value'])
     input_attrs['type'] = 'file'
-    if widget.attrs.get('accept'):
-        input_attrs['accept'] = widget.attrs['accept']
+    if attr_value('accept', widget, data):
+        input_attrs['accept'] = attr_value('accept', widget, data)
     return tag('input', **input_attrs)
 
 
@@ -1185,7 +1195,8 @@ def file_options_renderer(widget, data):
     else:
         value = ['keep']
     tags = []
-    for key, term in vocabulary(widget.attrs.get('vocabulary', [])):
+    vocab = attr_value('vocabulary', widget, data, [])
+    for key, term in vocabulary(vocab):
         attrs = {
             'type': 'radio',
             'value':  key,
@@ -1230,17 +1241,15 @@ factory.defaults['file.vocabulary'] = [
 @managedprops('label', 'class', 'action', 'handler',
               'next', 'skip', 'expression')
 def submit_renderer(widget, data):
-    expression = widget.attrs['expression']
-    if callable(expression):
-        expression = expression()
+    expression = attr_value('expression', widget, data)
     if not expression:
         return u''
     tag = data.tag
     input_attrs = input_attributes_common(widget, data)
     input_attrs['type'] = 'submit'
-    input_attrs['name_'] = widget.attrs['action'] and\
+    input_attrs['name_'] = attr_value('action', widget, data) and \
                           'action.%s' % widget.dottedpath
-    input_attrs['value'] = widget.attrs.get('label', widget.__name__)
+    input_attrs['value'] = attr_value('label', widget, data, widget.name)
     return tag('input', **input_attrs)
 
 
@@ -1385,44 +1394,37 @@ factory.defaults['search.class'] = 'search'
 # number
 ###############################################################################
 
-def _callable_attr(key, widget, data):
-    # helper, make me generic
-    value = widget.attrs.get(key)
-    if callable(value):
-        return value(widget, data)
-    return value
-
-
 @managedprops('datatype', 'min', 'max', 'step')
 def number_extractor(widget, data):
     val = data.extracted
     if val is UNSET or val == '':
         return val
-    if widget.attrs.get('datatype') == 'integer':
+    datatype = attr_value('datatype', widget, data)
+    if datatype == 'integer':
         convert = int
-    elif widget.attrs.get('datatype') == 'float':
+    elif datatype == 'float':
         convert = float
     else:
         raise ValueError('Output datatype must be integer or float')
     try:
         val = convert(val)
     except ValueError:
-        raise ExtractionError(u'Input is not a valid number (%s).' % \
-                              widget.attrs.get('datatype'))
-    if widget.attrs.get('min') and val < _callable_attr('min', widget, data):
-            raise ExtractionError(u'Value has to be at minimum %s.' %
-                                  _callable_attr('min', widget, data))
-    if widget.attrs.get('max') and val > _callable_attr('max', widget, data):
-        raise ExtractionError(u'Value has to be at maximum %s.' %
-                              _callable_attr('max', widget, data))
-    if widget.attrs.get('step'):
-        step = _callable_attr('step', widget, data)
-        minimum = _callable_attr('min', widget, data) or 0
+        error = u'Input is not a valid number (%s).' % datatype
+        raise ExtractionError(error)
+    min = attr_value('min', widget, data)
+    if min and val < min:
+            raise ExtractionError(u'Value has to be at minimum %s.' % min)
+    max = attr_value('max', widget, data)
+    if max and val > max:
+        raise ExtractionError(u'Value has to be at maximum %s.' % max)
+    step = attr_value('step', widget, data)
+    if step:
+        minimum = min or 0
         if (val - minimum) % step:
-            msg = u'Value %s has to be in stepping of %s' % (val, step)
+            error = u'Value %s has to be in stepping of %s' % (val, step)
             if minimum:
-                msg += ' based on a floor value of %s' % minimum
-            raise ExtractionError(msg)
+                error += ' based on a floor value of %s' % minimum
+            raise ExtractionError(error)
     return val
 
 
@@ -1473,14 +1475,12 @@ factory.defaults['number.class'] = 'number'
 @managedprops('position', 'label', 'for', *css_managed_props)
 def label_renderer(widget, data):
     tag = data.tag
-    label_text = widget.attrs.get('label', widget.__name__)
-    if callable(label_text):
-        label_text = label_text()
+    label_text = attr_value('label', widget, data, widget.name)
     label_attrs = {
         'class_': cssclasses(widget, data)
     }
     if data.mode == 'edit':
-        for_path = widget.attrs['for']
+        for_path = attr_value('for', widget, data)
         if for_path:
             for_widget = widget.root
             for name in for_path.split('.'):
@@ -1488,11 +1488,10 @@ def label_renderer(widget, data):
             label_attrs['for_'] = cssid(for_widget, 'input')
         else:
             label_attrs['for_'] = cssid(widget, 'input')
-        if widget.attrs['title']:
-            label_attrs['title'] = widget.attrs['title']
-    pos = widget.attrs['position']
-    if callable(pos):
-        pos = pos(widget, data)
+        title = attr_value('title', widget, data)
+        if title:
+            label_attrs['title'] = title
+    pos = attr_value('position', widget, data)
     if pos == 'inner':
         # deprecated, use explicit inner-after or inner-before
         pos = 'inner-before'
@@ -1538,8 +1537,9 @@ def field_renderer(widget, data):
         'id': cssid(widget, 'field'),
         'class_': cssclasses(widget, data)
     }
-    if widget.attrs['witherror'] and data.errors:
-        div_attrs['class_'] += u' %s' % widget.attrs['witherror']
+    witherror = attr_value('witherror', widget, data)
+    if witherror and data.errors:
+        div_attrs['class_'] += u' %s' % witherror
     return tag('div', data.rendered, **div_attrs)
 
 
@@ -1568,21 +1568,23 @@ Put the class given with this property on the div if an error happened.
 @managedprops('tag', 'message_tag', 'message_class', 'position',
               'render_empty', *css_managed_props)
 def error_renderer(widget, data):
-    if not data.errors and not widget.attrs.get('render_empty'):
+    if not data.errors and not attr_value('render_empty', widget, data):
         return data.rendered
     tag = data.tag
     msgs = u''
     for error in data.errors:
-        if widget.attrs.get('message_tag'):
-            msgs += tag(widget.attrs['message_tag'],
-                        error.message,
-                        class_=widget.attrs['message_class'])
+        message_tag = attr_value('message_tag', widget, data)
+        if message_tag:
+            msgs += tag(message_tag, error.message,
+                        class_=attr_value('message_class', widget, data))
         else:
             msgs += error.message
     attrs = dict(class_=cssclasses(widget, data))
-    return generic_positional_rendering_helper(widget.attrs['tag'], msgs,
+    elem_tag = attr_value('tag', widget, data)
+    position = attr_value('position', widget, data)
+    return generic_positional_rendering_helper(elem_tag, msgs,
                                                attrs, data.rendered,
-                                               widget.attrs['position'], tag)
+                                               position, tag)
 
 factory.register(
     'error',
@@ -1630,14 +1632,16 @@ after the message.
 
 @managedprops('tag', 'help', 'position', 'render_empty', *css_managed_props)
 def help_renderer(widget, data):
-    if not widget.attrs.get('render_empty') and not widget.attrs.get('help'):
+    render_empty = attr_value('render_empty', widget, data)
+    help = attr_value('help', widget, data)
+    if not render_empty and not help:
         return data.rendered
     tag = data.tag
     attrs = dict(class_=cssclasses(widget, data))
-    return generic_positional_rendering_helper(widget.attrs['tag'],
-                                               widget.attrs['help'],
-                                               attrs, data.rendered,
-                                               widget.attrs['position'], tag)
+    elem_tag = attr_value('tag', widget, data)
+    position = attr_value('position', widget, data)
+    return generic_positional_rendering_helper(elem_tag, help, attrs,
+                                               data.rendered, position, tag)
 
 factory.register(
     'help',
