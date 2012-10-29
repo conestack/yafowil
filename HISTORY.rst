@@ -2,8 +2,8 @@
 History
 =======
 
-2.0.1dev
---------
+2.0.1
+-----
 
 - Use ``attr_value`` wherever possible to lookup attribute values.
   [rnix, 2012-10-25]
