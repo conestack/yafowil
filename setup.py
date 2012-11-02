@@ -1,5 +1,9 @@
-from setuptools import setup, find_packages
 import os
+from setuptools import (
+    setup,
+    find_packages,
+)
+
 
 version = '2.0.1'
 shortdesc = \
@@ -9,16 +13,17 @@ longdesc += open(os.path.join(os.path.dirname(__file__), 'HISTORY.rst')).read()
 longdesc += open(os.path.join(os.path.dirname(__file__), 'LICENSE.rst')).read()
 tests_require = ['interlude', 'lxml']
 
+
 setup(name='yafowil',
       version=version,
       description=shortdesc,
       long_description=longdesc,
       classifiers=[
-            'Operating System :: OS Independent',
-            'Programming Language :: Python',
-            'Topic :: Software Development',
-            'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
-            'License :: OSI Approved :: BSD License',
+          'Operating System :: OS Independent',
+          'Programming Language :: Python',
+          'Topic :: Software Development',
+          'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
+          'License :: OSI Approved :: BSD License',
       ],
       keywords='html input widgets form compound',
       author='BlueDynamics Alliance',
@@ -43,5 +48,4 @@ setup(name='yafowil',
       [yafowil.plugin]
       register = yafowil.loader:register
       example = yafowil.example:get_example
-      """,
-)
+      """)
