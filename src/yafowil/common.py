@@ -87,6 +87,11 @@ factory.doc['props']['size'] = \
 """Allowed input size.
 """
 
+factory.defaults['maxlength'] = None
+factory.doc['props']['maxlength'] = \
+"""Input maxlength.
+"""
+
 factory.defaults['disabled'] = None
 factory.doc['props']['disabled'] = \
 """Disables input.
@@ -112,7 +117,8 @@ Optional help text to be rendered in the title attribute.
 
 factory.defaults['display_proxy'] = False
 factory.doc['props']['display_proxy'] = """\
-If 'True' and widget mode 'display', widget value gets rendered as hidden input.
+If 'True' and widget mode 'display', widget value gets rendered as hidden
+input.
 """
 
 
@@ -172,6 +178,7 @@ def input_attributes_common(widget, data, excludes=list(), value=None):
         'placeholder': attr_value('placeholder', widget, data),
         'required': required,
         'size': attr_value('size', widget, data),
+        'maxlength': attr_value('maxlength', widget, data),
         'title': attr_value('title', widget, data),
         'type': attr_value('type', widget, data),
         'value': value,
