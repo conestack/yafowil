@@ -394,8 +394,7 @@ class Widget(object):
         path = list()
         node = self
         while node is not None:
-            if not node.properties.get('structural'):
-                path.append(node.__name__)
+            path.append(node.__name__)
             node = node.__parent__
         path.reverse()
         return '.'.join(path)
