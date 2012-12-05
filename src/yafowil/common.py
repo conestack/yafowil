@@ -454,11 +454,12 @@ textarea_managed_props = ['autofocus', 'cols', 'disabled', 'placeholder',
 
 
 @managedprops(*textarea_managed_props)
-def textarea_renderer(widget, data):
+def textarea_renderer(widget, data, **custom_attrs):
     """Renders text area.
     """
     tag = data.tag
     area_attrs = textarea_attributes(widget, data)
+    area_attrs.update(custom_attrs)
     value = fetch_value(widget, data)
     if value is None:
         value = ''

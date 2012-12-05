@@ -5,6 +5,13 @@ History
 2.0.2dev
 --------
 
+- Add helper function for creating a data-attributes dictionary from a list of
+  attribute-keys which can be passed to tag-renderer.
+  [thet, 2012-12-05]
+
+- Allow custom attributes on textarea_renderer.
+  [thet, 2012-12-05]
+
 - Consider ``maxlength`` in ``input_attributes_common``.
   [rnix, 2012-11-03]
 

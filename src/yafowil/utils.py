@@ -177,6 +177,36 @@ def attr_value(key, widget, data, default=None):
     return attr
 
 
+def data_attrs_helper(widget, data, attrs):
+    """Creates a dictionary of data-attributes from a list of attribute-keys,
+    ready to inject to a tag-renderer as expanded keyword arguments.
+
+    :param widget: The yafowil widget.
+    :param data: The data object.
+    :param attrs: A list of data-attributes-keys to be used to generate the
+                  data attributes dictionary.
+    :type attrs: list
+    :returns: Dictionary with keys as data-attribute-names, prefixed with
+              'data-' and values from the widget.
+    :rtype: dictionary
+
+    The items in the list are the keys of the attributes for the target tag.
+    Each key is prepended with 'data-'. The values are fetched from properties
+    set on the widget. If a value is None, it isn't set. False and True values
+    are converted to 'false' and 'true' strings. jQuery's data-method converts
+    them to Javascript datatypes.
+
+    """
+    data_attrs = {}
+    for key in attrs:
+        val = attr_value(key, widget, data)
+        if val is None: continue
+        if val is True: val = 'true' # js-ify
+        if val is False: val = 'false' # js-ify
+        data_attrs['data-%s' % key] = val
+    return data_attrs
+
+
 css_managed_props = ['class', 'class_add', 'error_class',
                      'error_class_default', 'required_class',
                      'required_class_default']

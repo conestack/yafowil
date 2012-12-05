@@ -27,20 +27,20 @@ Test examples lookup
     >>> from yafowil.utils import get_example_names
     >>> sorted(get_example_names())
     ['yafowil'...]
-    
+
     >>> from yafowil.base import factory
     >>> factory.register_macro('field', 'field:label:error', {})
-    
+
     >>> from yafowil.utils import get_example
     >>> get_example('inexistent')
-    
+
     >>> examples = get_example('yafowil')
     >>> examples[0]['doc']
     "Plain Text\n----------..."
-    
+
     >>> examples[0]['title']
     'Plain Text'
-    
+
     >>> examples[0]['widget']
     <Widget object 'yafowil-plaintext' at ...>
 
@@ -53,7 +53,7 @@ Test UNSET
     >>> from yafowil.utils import UNSET
     >>> UNSET
     <UNSET>
-    
+
     >>> str(UNSET)
     ''
 
@@ -81,13 +81,13 @@ Test the Vocabulary
 
     >>> vocabulary([('key', 'value'), ('key2', 'value2', 'v2.3'), ('key3',)])
     [('key', 'value'), ('key2', 'value2'), ('key3', 'key3')]
-    
+
     >>> def callme():
     ...     return 'bar'
-    
+
     >>> vocabulary(callme)
     [('bar', 'bar')]
-    
+
     >>> vocabulary(None) is None
     True
 
@@ -98,21 +98,21 @@ Test Tag renderer
 ::
 
     >>> from yafowil.utils import Tag
-    >>> tag = Tag(lambda msg: msg)    
+    >>> tag = Tag(lambda msg: msg)
     >>> a = {'class': u'fancy', 'id': '2f5b8a234ff'}
-    >>> tag('p', 'Lorem Ipsum. ', u'Hello World!', 
+    >>> tag('p', 'Lorem Ipsum. ', u'Hello World!',
     ...     class_='fancy', id='2f5b8a234ff')
-    u'<p class="fancy" id="2f5b8a234ff">Lorem Ipsum. Hello World!</p>' 
-    
+    u'<p class="fancy" id="2f5b8a234ff">Lorem Ipsum. Hello World!</p>'
+
     >>> tag('dummy', name='foo')
      u'<dummy name="foo" />'
-     
+
     >>> tag('dummy', name=None)
     u'<dummy />'
-    
+
     >>> tag('dummy', name=UNSET)
     u'<dummy />'
-     
+
 deprecated test::
 
     >>> from yafowil.utils import tag as deprecated_tag
@@ -140,12 +140,12 @@ Test CSS Classes
     >>> widget.attrs['error_class_default'] = 'error'
     >>> widget.attrs['class'] = None
     >>> widget.attrs['class_add'] = None
-    
+
     >>> class DummyData(object):
     ...     def __init__(self):
     ...         self.errors = []
     >>> data = DummyData()
-    
+
     >>> from yafowil.utils import cssclasses
     >>> print cssclasses(widget, data)
     None
@@ -153,12 +153,12 @@ Test CSS Classes
     >>> widget.attrs['class'] = 'foo bar'
     >>> print cssclasses(widget, data)
     bar foo
-    
+
     >>> widget.attrs['class'] = None
     >>> widget.attrs['required'] = True
     >>> print cssclasses(widget, data)
     None
-    
+
     >>> widget.required = False
     >>> data.errors = True
     >>> print cssclasses(widget, data)
@@ -171,15 +171,15 @@ Test CSS Classes
     >>> widget.attrs['class'] = 'foo bar'
     >>> print cssclasses(widget, data)
     bar error foo
-    
+
     >>> widget.attrs['class'] = lambda w, d: 'baz'
     >>> print cssclasses(widget, data)
     baz error
-    
+
     >>> widget.attrs['class_add'] = lambda w, d: 'addclass_from_callable'
     >>> print cssclasses(widget, data)
     addclass_from_callable baz error
-    
+
     >>> widget.attrs['class_add'] = 'addclass'
     >>> print cssclasses(widget, data)
     addclass baz error
@@ -193,7 +193,7 @@ Test CSS Classes
     >>> data.errors = False
     >>> print cssclasses(widget, data)
     None
-    
+
     >>> widget.attrs['required'] = True
     >>> print cssclasses(widget, data)
     None
@@ -215,7 +215,7 @@ Test CSS Classes
     >>> widget.attrs['class'] = 'foo bar'
     >>> print cssclasses(widget, data)
     bar error foo required
-    
+
     >>> print cssclasses(widget, data, additional=['zika', 'akiz'])
     akiz bar error foo required zika
 
@@ -281,13 +281,13 @@ Test attr_value
     >>> class FormContext(object):
     ...     def instance_callback(self, widget, data):
     ...         return 'instance_callback'
-    ... 
+    ...
     ...     def failing_instance_callback(self, widget, data):
     ...         raise Exception('failing_instance_callback')
-    ... 
+    ...
     ...     def instance_bc_callback(self):
     ...         return 'instance_bc_callback'
-    ... 
+    ...
     ...     def failing_instance_bc_callback(self, widget, data):
     ...         raise Exception('failing_instance_bc_callback')
 
@@ -311,3 +311,35 @@ Test attr_value
     Traceback (most recent call last):
       ...
     Exception: failing_instance_bc_callback
+
+
+Test data_attrs_helper
+----------------------
+
+::
+
+    >>> from node.base import AttributedNode
+    >>> from yafowil.utils import data_attrs_helper
+
+    >>> widget = AttributedNode()
+    >>> data = AttributedNode()
+
+    >>> widget.attrs['testattr1'] = 'value'
+    >>> widget.attrs['testattr2'] = True
+    >>> widget.attrs['testattr3'] = False
+    >>> widget.attrs['testattr4'] = None
+
+    >>> data_attrs_keys = ['testattr1', 'testattr2', 'testattr3', 'testattr4']
+    >>> data_attrs = data_attrs_helper(widget, data, data_attrs_keys)
+
+    >>> data_attrs['data-testattr1']
+    'value'
+
+    >>> data_attrs['data-testattr2']
+    'true'
+
+    >>> data_attrs['data-testattr3']
+    'false'
+
+    >>> 'data-testattr4' in data_attrs
+    False
