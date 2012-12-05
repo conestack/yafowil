@@ -2,8 +2,8 @@
 History
 =======
 
-2.0.2dev
---------
+2.0.2
+-----
 
 - Add helper function for creating a data-attributes dictionary from a list of
   attribute-keys which can be passed to tag-renderer.
