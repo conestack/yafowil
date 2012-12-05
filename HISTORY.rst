@@ -2,8 +2,8 @@
 History
 =======
 
-2.0.2dev
---------
+2.0.2
+-----
 
 - Consider ``maxlength`` in ``input_attributes_common``.
   [rnix, 2012-11-03]
