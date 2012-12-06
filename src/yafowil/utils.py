@@ -3,6 +3,20 @@ import inspect
 from pkg_resources import iter_entry_points
 
 
+class NullMessageFactory(object):
+    """Dummy message factory.
+    """
+
+    def __call__(self, name, default=None, mapping=dict()):
+        if default is None:
+            return name
+        return default
+
+
+def get_message_factory(domain):
+    return NullMessageFactory()
+
+
 def get_entry_points(ns=None):
     entry_points = []
     for ep in iter_entry_points('yafowil.plugin'):

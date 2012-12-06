@@ -13,7 +13,11 @@ from .utils import (
     cssid,
     managedprops,
     vocabulary,
+    get_message_factory,
 )
+
+
+_ = get_message_factory('yafowil')
 
 
 ###############################################################################
@@ -595,7 +599,9 @@ def minlength_extractor(widget, data):
     minlength = attr_value('minlength', widget, data, -1)
     if minlength != -1:
         if len(val) < minlength:
-            message = u'Input must have at least %i characters.' % minlength
+            message = _(u'invalid_input_length',
+                        u'Input must have at least ${minlength} characters.',
+                        mapping={'minlength': minlength})
             raise ExtractionError(message)
     return val
 

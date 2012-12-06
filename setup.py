@@ -44,6 +44,11 @@ setup(name='yafowil',
       extras_require=dict(
           test=tests_require,
       ),
+      message_extractors={
+          '.': [
+              ('**.py', 'lingua_python', None),
+          ]
+      },
       entry_points="""
       [yafowil.plugin]
       register = yafowil.loader:register
