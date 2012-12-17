@@ -926,7 +926,7 @@ def select_exists_marker(widget, data):
               'listing_label_position', 'listing_tag', 'size',
               'label_checkbox_class', 'label_radio_class',
               *css_managed_props)
-def select_edit_renderer(widget, data):
+def select_edit_renderer(widget, data, **custom_attrs):
     tag = data.tag
     value = fetch_value(widget, data)
     multivalued = attr_value('multivalued', widget, data)
@@ -960,6 +960,7 @@ def select_edit_renderer(widget, data):
             'autofocus': autofocus,
             'required': required,
         }
+        select_attrs.update(custom_attrs)
         if disabled is True:
             select_attrs['disabled'] = 'disabled'
         rendered = tag('select', *optiontags, **select_attrs)
@@ -1006,9 +1007,11 @@ def select_edit_renderer(widget, data):
                                                        label_pos, tag)
             tags.append(tag(item_tag, item,
                             **{'id': cssid(widget, tagtype, key)}))
+        wrapper_attrs = {'id': cssid(widget, tagtype, 'wrapper')}
+        wrapper_attrs.update(custom_attrs)
         taglisting = tag(listing_tag,
                          *tags,
-                         **{'id': cssid(widget, tagtype, 'wrapper')})
+                         **wrapper_attrs)
         return select_exists_marker(widget, data) + taglisting
 
 
