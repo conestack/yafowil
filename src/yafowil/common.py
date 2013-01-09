@@ -201,10 +201,11 @@ def input_attributes_full(widget, data, value=None):
 
 @managedprops('type', 'size', 'disabled', 'autofocus', 'placeholder',
               'autocomplete', *css_managed_props)
-def input_generic_renderer(widget, data):
+def input_generic_renderer(widget, data, **custom_attrs):
     """Generic HTML ``input`` tag render.
     """
     input_attrs = input_attributes_full(widget, data)
+    input_attrs.update(custom_attrs)
     return data.tag('input', **input_attrs)
 
 
