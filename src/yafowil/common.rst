@@ -943,6 +943,22 @@ Multi selection display mode with display proxy and extracted data::
     </div>
     <BLANKLINE>
 
+Multi selection display with empty values list::
+
+    >>> widget = factory(
+    ...     'select',
+    ...     'MYSELECT',
+    ...     value=[],
+    ...     props={
+    ...         'vocabulary': [],
+    ...         'multivalued': True},
+    ...     mode='display')
+    >>> pxml('<div>' + widget() + '</div>')
+    <div>
+      <div class="display-select" id="display-MYSELECT"/>
+    </div>
+    <BLANKLINE>
+
 Multiple values on single valued selection fails::
 
     >>> widget = factory(
