@@ -160,8 +160,6 @@ def form_edit_renderer(widget, data):
         'class_': cssclasses(widget, data),
         'id': 'form-%s' % '-'.join(widget.path),
     }
-    if callable(form_attrs['action']):
-        form_attrs['action'] = form_attrs['action'](widget, data)
     return data.tag('form', data.rendered, **form_attrs)
 
 

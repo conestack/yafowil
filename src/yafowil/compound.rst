@@ -402,6 +402,17 @@ Test Form::
     >>> form()
     u'<form action="http://fubar.com" enctype="multipart/form-data" id="form-FORM" method="post" novalidate="novalidate"></form>'
 
+Form action as callable::
+
+    >>> def action(widget, data):
+    ...     return 'http://fubar.com'
+
+    >>> form = factory('form',
+    ...                name = 'FORM',
+    ...                props={'action': action})
+    >>> form()
+    u'<form action="http://fubar.com" enctype="multipart/form-data" id="form-FORM" method="post" novalidate="novalidate"></form>'
+
 Form display renderer::
 
     >>> form = factory('form',
