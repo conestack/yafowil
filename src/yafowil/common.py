@@ -1425,7 +1425,7 @@ def number_extractor(widget, data):
         raise ExtractionError(error)
     min = attr_value('min', widget, data)
     if min and val < min:
-            raise ExtractionError(u'Value has to be at minimum %s.' % min)
+        raise ExtractionError(u'Value has to be at minimum %s.' % min)
     max = attr_value('max', widget, data)
     if max and val > max:
         raise ExtractionError(u'Value has to be at maximum %s.' % max)
