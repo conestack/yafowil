@@ -1,6 +1,7 @@
 import logging
 import inspect
 from pkg_resources import iter_entry_points
+from node.utils import UNSET # B/C
 
 
 def get_entry_points(ns=None):
@@ -29,23 +30,6 @@ def get_example_names():
     for ep in get_entry_points(ns='example'):
         result.append(ep.dist.project_name)
     return result
-
-
-class Unset(object):
-
-    def __nonzero__(self):
-        return False
-
-    def __str__(self):
-        return ''
-
-    def __len__(self):
-        return 0
-
-    def __repr__(self):
-        return '<UNSET>'
-
-UNSET = Unset()
 
 
 def vocabulary(definition):

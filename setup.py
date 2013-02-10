@@ -37,7 +37,7 @@ setup(name='yafowil',
       zip_safe=True,
       install_requires=[
           'setuptools',
-          'node>=0.9.8',
+          'node>0.9.10',
       ],
       tests_require=tests_require,
       test_suite="yafowil.tests.test_suite",

@@ -5,6 +5,10 @@ History
 2.0.3dev
 --------
 
+- Import ``node.utils.UNSET`` in ``yafowil.utils`` instead of providing own
+  unset marker class and instance.
+  [rnix, 2013-02-10]
+
 - Add helper function for creating a data-attributes dictionary from a list of
   attribute-keys which can be passed to tag-renderer.
   [thet, 2012-12-05]
