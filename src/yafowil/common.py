@@ -1,12 +1,12 @@
 import re
 import types
+from node.utils import UNSET
 from .base import (
     factory,
     ExtractionError,
     fetch_value
 )
 from .utils import (
-    UNSET,
     attr_value,
     cssclasses,
     css_managed_props,

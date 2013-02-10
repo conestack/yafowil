@@ -1,7 +1,7 @@
 import logging
 import inspect
 from pkg_resources import iter_entry_points
-from node.utils import UNSET # B/C
+from node.utils import UNSET
 
 
 def get_entry_points(ns=None):

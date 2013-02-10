@@ -12,9 +12,9 @@ from node.behaviors import (
     Nodespaces,
     Order,
 )
+from node.utils import UNSET
 from .utils import (
     Tag,
-    UNSET,
     attr_value,
 )
 

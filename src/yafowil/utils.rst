@@ -2,7 +2,6 @@ Test entry_point support tools
 ------------------------------
 
 ::
-
     >>> import yafowil.loader
     >>> from yafowil.utils import get_entry_points
     >>> get_entry_points()
@@ -23,7 +22,6 @@ Test examples lookup
 --------------------
 
 ::
-
     >>> from yafowil.utils import get_example_names
     >>> sorted(get_example_names())
     ['yafowil'...]
@@ -45,30 +43,10 @@ Test examples lookup
     <Widget object 'yafowil-plaintext' at ...>
 
 
-Test UNSET
-----------
-
-::
-
-    >>> from yafowil.utils import UNSET
-    >>> UNSET
-    <UNSET>
-
-    >>> str(UNSET)
-    ''
-
-    >>> bool(UNSET)
-    False
-
-    >>> len(UNSET)
-    0
-
-
 Test the Vocabulary
 -------------------
 
 ::
-
     >>> from yafowil.utils import vocabulary
     >>> vocabulary('foo')
     [('foo', 'foo')]
@@ -96,7 +74,7 @@ Test Tag renderer
 -----------------
 
 ::
-
+    >>> from node.utils import UNSET
     >>> from yafowil.utils import Tag
     >>> tag = Tag(lambda msg: msg)
     >>> a = {'class': u'fancy', 'id': '2f5b8a234ff'}
@@ -124,7 +102,6 @@ Test CSS Classes
 ----------------
 
 ::
-
     >>> from plumber import plumber
     >>> from node.base import OrderedNode
     >>> from node.behaviors import Nodespaces
@@ -224,7 +201,6 @@ Test managedprops annotation
 ----------------------------
 
 ::
-
     >>> from yafowil.utils import managedprops
     >>> @managedprops('foo', 'bar')
     ... def somefunc(a, b, c):
@@ -239,7 +215,6 @@ Test attr_value
 ---------------
 
 ::
-
     >>> from node.base import AttributedNode
     >>> from yafowil.utils import attr_value
 
@@ -317,7 +292,6 @@ Test data_attrs_helper
 ----------------------
 
 ::
-
     >>> from node.base import AttributedNode
     >>> from yafowil.utils import data_attrs_helper
 

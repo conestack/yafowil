@@ -1,7 +1,7 @@
 from odict import odict
+from node.utils import UNSET
 from .base import factory
 from .utils import (
-    UNSET,
     cssid,
     cssclasses,
     css_managed_props,
