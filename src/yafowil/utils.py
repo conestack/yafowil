@@ -99,6 +99,12 @@ class Tag(object):
                 value = str(value).decode(self.encoding)
             cl.append((key.strip('_'), value))
         attributes = u''
+
+        # NOTE: data attributes are enclosed in single quotes, since this makes
+        # passing json lists possible.  jQuery only recognizes JSON lists in
+        # data attributes as such, if they are enclosed in single quotes,
+        # because the JSON standard requires string values to be enclosed in
+        # double quotes.
         if cl:
             attributes = u' %s' % \
                          u' '.join(sorted(['data' in _[0] and u"%s='%s'" % _
@@ -165,8 +171,9 @@ def attr_value(key, widget, data, default=None):
 
 
 def data_attrs_helper(widget, data, attrs):
-    """Creates a dictionary of data-attributes from a list of attribute-keys,
-    ready to inject to a tag-renderer as expanded keyword arguments.
+    """Creates a dictionary of JSON encoded data-attributes from a list of
+    attribute-keys, ready to inject to a tag-renderer as expanded keyword
+    arguments.
 
     :param widget: The yafowil widget.
     :param data: The data object.
@@ -179,17 +186,31 @@ def data_attrs_helper(widget, data, attrs):
 
     The items in the list are the keys of the attributes for the target tag.
     Each key is prepended with 'data-'. The values are fetched from properties
-    set on the widget. If a value is None, it isn't set. False and True values
-    are converted to 'false' and 'true' strings. jQuery's data-method converts
-    them to Javascript datatypes.
+    set on the widget. If a value is None, it isn't set. Other values are JSON
+    encoded, which includes strings, booleans, lists, dicts.
+
+    .. note::
+      For camelCase attribute names, they should be split on word boundaries
+      and made lowercase (camel-case). Since jQuery 1.6, the keys are converted
+      to camelCase again after getting them with .data().
+
+    .. note::
+      The Tag class encloses data-attribute values in single quotes, since the
+      JSON standard requires strings to be enclosed in double-quotes.  jQuery
+      requires this or .data() can't create lists or arrays out of
+      data-attribute values.
 
     """
     data_attrs = {}
     for key in attrs:
         val = attr_value(key, widget, data)
         if val is None: continue
-        val = json.dumps(val) # js-ify
-        data_attrs['data-%s' % key] = val
+        ret = json.dumps(val) # js-ify
+        if isinstance(val, basestring):
+            ret = ret.strip('"') # for strings, remove leading and trailing
+                                 # double quote, since they are not needed for
+                                 # data-attributes
+        data_attrs['data-%s' % key] = ret
     return data_attrs
 
 
