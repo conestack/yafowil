@@ -306,8 +306,9 @@ Test data_attrs_helper
     >>> widget.attrs['testattr6'] = {'key1': 'item1', 'key2': 'item2', 'key3': 'item3'}
     >>> widget.attrs['testattr7'] = 1234
     >>> widget.attrs['testattr8'] = 1234.5678
+    >>> widget.attrs['camelAttrName'] = 'camelValue'
 
-    >>> data_attrs_keys = ['testattr1', 'testattr2', 'testattr3', 'testattr4', 'testattr5', 'testattr6', 'testattr7', 'testattr8']
+    >>> data_attrs_keys = ['testattr1', 'testattr2', 'testattr3', 'testattr4', 'testattr5', 'testattr6', 'testattr7', 'testattr8', 'camelAttrName']
     >>> data_attrs = data_attrs_helper(widget, data, data_attrs_keys)
 
     >>> data_attrs['data-testattr1']
@@ -334,10 +335,13 @@ Test data_attrs_helper
     >>> data_attrs['data-testattr8']
     '1234.5678'
 
+    >>> data_attrs['data-camel-attr-name']
+    'camelValue'
+
 
     Test with Tag renderer
 
     >>> from yafowil.utils import Tag
     >>> tag = Tag(lambda msg: msg)
     >>> tag('dummy', name='foo', **data_attrs)
-    u'<dummy data-testattr1=\'value\' data-testattr2=\'true\' data-testattr3=\'false\' data-testattr5=\'["item1", "item2", "item3"]\' data-testattr6=\'{"key3": "item3", "key2": "item2", "key1": "item1"}\' data-testattr7=\'1234\' data-testattr8=\'1234.5678\' name="foo" />'
+    u'<dummy data-camel-attr-name=\'camelValue\' data-testattr1=\'value\' data-testattr2=\'true\' data-testattr3=\'false\' data-testattr5=\'["item1", "item2", "item3"]\' data-testattr6=\'{"key3": "item3", "key2": "item2", "key1": "item1"}\' data-testattr7=\'1234\' data-testattr8=\'1234.5678\' name="foo" />'

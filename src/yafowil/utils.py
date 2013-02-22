@@ -1,6 +1,7 @@
-import logging
 import inspect
 import json
+import logging
+import re
 from pkg_resources import iter_entry_points
 from node.utils import UNSET
 
@@ -190,9 +191,9 @@ def data_attrs_helper(widget, data, attrs):
     encoded, which includes strings, booleans, lists, dicts.
 
     .. note::
-      For camelCase attribute names, they should be split on word boundaries
-      and made lowercase (camel-case). Since jQuery 1.6, the keys are converted
-      to camelCase again after getting them with .data().
+      For camelCase attribute names are automatically split on word boundaries
+      and made lowercase (e.g. camel-case). Since jQuery 1.6, the keys are
+      converted to camelCase again after getting them with .data().
 
     .. note::
       The Tag class encloses data-attribute values in single quotes, since the
@@ -210,6 +211,8 @@ def data_attrs_helper(widget, data, attrs):
             ret = ret.strip('"') # for strings, remove leading and trailing
                                  # double quote, since they are not needed for
                                  # data-attributes
+        # replace camelCase with camel-case
+        key = re.sub("([a-z])([A-Z])","\g<1>-\g<2>", key).lower()
         data_attrs['data-%s' % key] = ret
     return data_attrs
 

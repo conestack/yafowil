@@ -7,18 +7,9 @@ History
 
 - Use json.dumps for data atrribute values to convert Python types to JSON.
   Enclose data-attribute values in single quotes to meet the JSON requirements.
+  Convert camelCase data attribute names into camel-case. Since jQuery 1.6 they
+  are automatically converted back to camelCase after calling .data().
   [thet]
-
-.. note::
-  For camelCase attribute names, they should be split on word boundaries
-  and made lowercase (camel-case). Since jQuery 1.6, the keys are converted
-  to camelCase again after getting them with .data().
-
-.. note::
-  The Tag class encloses data-attribute values in single quotes, since the
-  JSON standard requires strings to be enclosed in double-quotes.  jQuery
-  requires this or .data() can't create lists or arrays out of
-  data-attribute values.
 
 - Import ``node.utils.UNSET`` in ``yafowil.utils`` instead of providing own
   unset marker class and instance.
