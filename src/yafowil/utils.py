@@ -101,7 +101,9 @@ class Tag(object):
         attributes = u''
         if cl:
             attributes = u' %s' % \
-                         u' '.join(sorted([u"%s='%s'" % _ for _ in cl]))
+                         u' '.join(sorted(['data' in _[0] and u"%s='%s'" % _
+                                                           or u'%s="%s"' % _
+                                                          for _ in cl]))
         cl = list()
         for inner in inners:
             inner = self.translate(inner)
