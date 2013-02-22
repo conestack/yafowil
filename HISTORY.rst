@@ -2,8 +2,8 @@
 History
 =======
 
-2.0.3dev
---------
+2.1dev
+------
 
 - Use json.dumps for data atrribute values to convert Python types to JSON.
   Enclose data-attribute values in single quotes to meet the JSON requirements.
