@@ -1,5 +1,6 @@
 import logging
 import inspect
+import json
 from pkg_resources import iter_entry_points
 from node.utils import UNSET
 
@@ -100,7 +101,7 @@ class Tag(object):
         attributes = u''
         if cl:
             attributes = u' %s' % \
-                         u' '.join(sorted([u'%s="%s"' % _ for _ in cl]))
+                         u' '.join(sorted([u"%s='%s'" % _ for _ in cl]))
         cl = list()
         for inner in inners:
             inner = self.translate(inner)
@@ -185,8 +186,7 @@ def data_attrs_helper(widget, data, attrs):
     for key in attrs:
         val = attr_value(key, widget, data)
         if val is None: continue
-        if val is True: val = 'true' # js-ify
-        if val is False: val = 'false' # js-ify
+        val = json.dumps(val) # js-ify
         data_attrs['data-%s' % key] = val
     return data_attrs
 
