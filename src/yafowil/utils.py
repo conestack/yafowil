@@ -212,6 +212,7 @@ def data_attrs_helper(widget, data, attrs):
                                  # double quote, since they are not needed for
                                  # data-attributes
         # replace camelCase with camel-case
+        # XXX: why? -rnix
         key = re.sub("([a-z])([A-Z])","\g<1>-\g<2>", key).lower()
         data_attrs['data-%s' % key] = ret
     return data_attrs
