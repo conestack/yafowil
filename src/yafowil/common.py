@@ -791,7 +791,10 @@ def checkbox_edit_renderer(widget, data):
         input_attrs['value'] = ''
     with_label = attr_value('with_label', widget, data)
     if with_label:
-        label = tag('label', '&nbsp;', for_=cssid(widget, 'input'))
+        label = tag('label',
+                    '&nbsp;',
+                    for_=cssid(widget, 'input'),
+                    class_='checkbox_label')
         checkbox = tag('input', **input_attrs) + label
     else:
         checkbox = tag('input', **input_attrs)
