@@ -789,7 +789,12 @@ def checkbox_edit_renderer(widget, data):
         input_attrs['checked'] = input_attrs['value'] and 'checked' or None
     if attr_value('format', widget, data) == 'bool':
         input_attrs['value'] = ''
-    checkbox = tag('input', **input_attrs)
+    with_label = attr_value('with_label', widget, data)
+    if with_label:
+        label = tag('label', '&nbsp;', for_=cssid(widget, 'input'))
+        checkbox = tag('input', **input_attrs) + label
+    else:
+        checkbox = tag('input', **input_attrs)
     input_attrs = {
         'type': 'hidden',
         'value':  'checkboxexists',
@@ -873,6 +878,24 @@ factory.doc['props']['checkbox.vocabulary'] = """\
 In display mode and if ```bool``` is set to ```True``` this mapping will be
 used for display of the value. Expected keys are ```True```, ```False``` and
 ```UNSET```.
+"""
+
+factory.defaults['checkbox.with_label'] = False
+factory.doc['props']['checkbox.with_label'] = """\
+Render empty label tag after visible checkbox in order to make checkbox UI
+customizable via CSS like so::
+
+    input.large_checkbox {
+        display: none;
+    }
+    input.large_checkbox + label {
+        width: 59px;
+        height: 60px;
+        background: url('/checkbox_large.png');
+    }
+    input.large_checkbox:checked + label {
+        background: url('/checkbox_large_selected.png');
+    }
 """
 
 factory.defaults['checkbox.required_class'] = 'required'

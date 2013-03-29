@@ -5,6 +5,10 @@ History
 2.1dev
 ------
 
+- Introduce ``with_label`` property for ``checkbox`` blueprint. Useful for
+  cross browser compatible checkbox CSS.
+  [rnix, 2013-03-29]
+
 - Use json.dumps for data atrribute values to convert Python types to JSON.
   Enclose data-attribute values in single quotes to meet the JSON requirements.
   Convert camelCase data attribute names into camel-case. Since jQuery 1.6 they
