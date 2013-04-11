@@ -52,6 +52,17 @@ As well does skip mode::
     >>> widget()
     u''
 
+Generic HTML5 Data::
+
+    >>> widget = factory(
+    ...     'hidden',
+    ...     name='MYHIDDEN',
+    ...     value='Test Hidden',
+    ...     props={'data':{'foo': 'bar'}})
+    >>> widget()
+    u'<input class="hidden" data-foo=\'bar\' id="input-MYHIDDEN" 
+    name="MYHIDDEN" type="hidden" value="Test Hidden" />'
+
 
 Generic tag
 -----------
@@ -91,6 +102,19 @@ Render with title attribute::
     >>> widget()
     u'<input class="text" id="input-MYTEXT" name="MYTEXT" title="My awesome title" type="text" value="ja ha!" />'
 
+
+Generic HTML5 Data::
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='MYTEXT',
+    ...     value='ja ha!',
+    ...     props={
+    ...         'title': 'My awesome title',
+    ...         'data': {'foo': 'bar'}})
+    >>> widget()
+    u'<input class="text" data-foo=\'bar\' id="input-MYTEXT" 
+    name="MYTEXT" title="My awesome title" type="text" value="ja ha!" />'
 
 
 Autofocus Text Input
@@ -525,6 +549,19 @@ Display mode and display proxy string format::
     id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden" 
     value="checkboxexists" /></div>'
 
+Generic HTML5 Data::
+
+    >>> widget = factory(
+    ...     'checkbox',
+    ...     'MYCHECKBOX',
+    ...     value='Test Checkbox',
+    ...     props={'data': {'foo': 'bar'}})
+    >>> widget()
+    u'<input checked="checked" data-foo=\'bar\' id="input-MYCHECKBOX" 
+    name="MYCHECKBOX" type="checkbox" value="" /><input 
+    id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden" 
+    value="checkboxexists" />'
+
 
 Textarea
 --------
@@ -532,34 +569,27 @@ Textarea
     >>> widget = factory(
     ...     'textarea',
     ...     'MYTEXTAREA',
-    ...     value=None,
-    ...     props={
-    ...         'label': 'Test Textarea Widget',
-    ...         'id': {
-    ...             'label': 'TestLabelId'
-    ...         },
-    ...     })
-
+    ...     value=None)
     >>> widget()
-    u'<textarea cols="80" id="input-MYTEXTAREA" name="MYTEXTAREA" rows="25"></textarea>'
-
-    >>> widget.mode = 'display'
-    >>> widget()
-    u'<div class="display-None" id="display-MYTEXTAREA"></div>'
+    u'<textarea cols="80" id="input-MYTEXTAREA" 
+    name="MYTEXTAREA" rows="25"></textarea>'
 
     >>> widget = factory(
     ...     'textarea',
     ...     'MYTEXTAREA',
-    ...     value='Test Textarea',
+    ...     value=None,
     ...     props={
-    ...         'label': 'Test Textarea Widget',
-    ...         'id': {
-    ...             'label': 'TestLabelId'
+    ...         'data': {
+    ...             'foo': 'bar'
     ...         },
     ...     })
     >>> widget()
-    u'<textarea cols="80" id="input-MYTEXTAREA" name="MYTEXTAREA"
-    rows="25">Test Textarea</textarea>'
+    u'<textarea cols="80" data-foo=\'bar\' id="input-MYTEXTAREA" 
+    name="MYTEXTAREA" rows="25"></textarea>'
+
+    >>> widget.mode = 'display'
+    >>> widget()
+    u'<div class="display-None" data-foo=\'bar\' id="display-MYTEXTAREA"></div>'
 
 
 Lines
@@ -652,6 +682,27 @@ Display mode with ``display_proxy``::
     </div>
     <BLANKLINE>
 
+Generic HTML5 Data::
+
+    >>> widget = factory('lines', 'MYLINES', value=['a', 'b', 'c'],
+    ...                  props={'data': {'foo': 'bar'}})
+    >>> pxml(widget())
+    <textarea cols="40" data-foo="bar" id="input-MYLINES" 
+    name="MYLINES" rows="8">a
+    b
+    c</textarea>
+    <BLANKLINE>
+
+    >>> widget = factory('lines', 'MYLINES', value=['a', 'b', 'c'],
+    ...                  props={'data': {'foo': 'bar'}}, mode='display')
+    >>> pxml(widget())
+    <ul class="display-None" data-foo="bar" id="display-MYLINES">
+      <li>a</li>
+      <li>b</li>
+      <li>c</li>
+    </ul>
+    <BLANKLINE>
+
 
 Selection
 ---------
@@ -659,6 +710,7 @@ Selection
 
 Single Valued
 .............
+
 ::
     >>> widget = factory(
     ...     'select',
@@ -736,6 +788,35 @@ Single valued display mode::
       <div class="display-select" id="display-MYSELECT">Two</div>
       <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" value="two"/>
     </div>
+    <BLANKLINE>
+
+Generic HTML5 Data::
+
+    >>> widget = factory(
+    ...     'select',
+    ...     'MYSELECT',
+    ...     value='one',
+    ...     props={
+    ...         'data': {'foo': 'bar'},
+    ...         'vocabulary': [
+    ...             ('one','One')]})
+    >>> pxml(widget())
+    <select class="select" data-foo="bar" id="input-MYSELECT" name="MYSELECT">
+      <option id="input-MYSELECT-one" selected="selected" value="one">One</option>
+    </select>
+    <BLANKLINE>
+
+    >>> widget = factory(
+    ...     'select',
+    ...     'MYSELECT',
+    ...     value='one',
+    ...     props={
+    ...         'data': {'foo': 'bar'},
+    ...         'vocabulary': [
+    ...             ('one','One')]},
+    ...     mode='display')
+    >>> pxml(widget())
+    <div class="display-select" data-foo="bar" id="display-MYSELECT">One</div>
     <BLANKLINE>
 
 
@@ -859,6 +940,47 @@ Radio single valued display mode::
     </div>
     <BLANKLINE>
 
+Generic HTML5 Data::
+
+    >>> widget = factory(
+    ...     'select',
+    ...     'MYSELECT',
+    ...     value='one',
+    ...     props={
+    ...         'vocabulary': [
+    ...             ('one','One')],
+    ...         'format': 'single',
+    ...         'listing_label_position': 'before',
+    ...         'data': {'foo': 'bar'}})
+    >>> pxml('<div>'+widget()+'</div>')
+    <div>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <div data-foo="bar" id="radio-MYSELECT-wrapper">
+        <div id="radio-MYSELECT-one">
+          <label for="input-MYSELECT-one">One</label>
+          <input checked="checked" class="select" id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>
+        </div>
+      </div>
+    </div>
+    <BLANKLINE>
+
+    >>> widget = factory(
+    ...     'select',
+    ...     'MYSELECT',
+    ...     value='one',
+    ...     props={
+    ...         'vocabulary': [
+    ...             ('one','One')],
+    ...         'format': 'single',
+    ...         'listing_label_position': 'before',
+    ...         'data': {'foo': 'bar'}},
+    ...     mode='display')
+    >>> pxml('<div>'+widget()+'</div>')
+    <div>
+      <div class="display-select" data-foo="bar" id="display-MYSELECT">One</div>
+    </div>
+    <BLANKLINE>
+
 
 Multi valued
 ............
@@ -976,6 +1098,36 @@ Multiple values on single valued selection fails::
       ...
     ValueError: Multiple values for single selection.
 
+Generic HTML5 Data::
+
+    >>> widget = factory(
+    ...     'select',
+    ...     'MYSELECT',
+    ...     value=['one', 'two'],
+    ...     props={
+    ...         'multivalued': True,
+    ...         'data': {'foo': 'bar'},
+    ...         'vocabulary': [
+    ...             ('one','One'),
+    ...             ('two', 'Two')]})
+    >>> pxml('<div>' + widget() + '</div>')
+    <div>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <select class="select" data-foo="bar" id="input-MYSELECT" multiple="multiple" name="MYSELECT">
+        <option id="input-MYSELECT-one" selected="selected" value="one">One</option>
+        <option id="input-MYSELECT-two" selected="selected" value="two">Two</option>
+      </select>
+    </div>
+    <BLANKLINE>
+
+    >>> widget.mode = 'display'
+    >>> pxml(widget())
+    <ul class="display-select" data-foo="bar" id="display-MYSELECT">
+      <li>One</li>
+      <li>Two</li>
+    </ul>
+    <BLANKLINE>
+
 
 With Checkboxes
 ...............
@@ -1050,6 +1202,36 @@ Checkbox multi selection display mode with display proxy and extracted data::
       </ul>
       <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" value="two"/>
     </div>
+    <BLANKLINE>
+
+Generic HTML5 Data::
+
+    >>> widget = factory(
+    ...     'select',
+    ...     'MYSELECT',
+    ...     value='one',
+    ...     props={
+    ...         'multivalued': True,
+    ...         'data': {'foo': 'bar'},
+    ...         'vocabulary': [
+    ...             ('one','One')],
+    ...         'format': 'single'})
+    >>> pxml('<div>' + widget() + '</div>')
+    <div>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <div data-foo="bar" id="checkbox-MYSELECT-wrapper">
+        <div id="checkbox-MYSELECT-one">
+          <label for="input-MYSELECT-one"><input checked="checked" class="select" id="input-MYSELECT-one" name="MYSELECT" type="checkbox" value="one"/>One</label>
+        </div>
+      </div>
+    </div>
+    <BLANKLINE>
+
+    >>> widget.mode = 'display'
+    >>> pxml(widget())
+    <ul class="display-select" data-foo="bar" id="display-MYSELECT">
+      <li>One</li>
+    </ul>
     <BLANKLINE>
 
 
@@ -1663,6 +1845,19 @@ File display renderer::
     </div>
     <BLANKLINE>
 
+Generic HTML5 Data::
+
+    >>> widget = factory('file', 'MYFILE', props={
+    ...     'accept': 'foo/bar',
+    ...     'data': {'foo': 'bar'}})
+    >>> widget()
+    u'<input accept="foo/bar" data-foo=\'bar\' 
+    id="input-MYFILE" name="MYFILE" type="file" />'
+
+    >>> widget.mode = 'display'
+    >>> widget()
+    u"<div data-foo='bar'>No file</div>"
+
 
 Submit(action)
 --------------
@@ -1692,6 +1887,18 @@ Submit(action)
     >>> widget = factory('submit', name='save', props=props)
     >>> widget()
     u''
+
+Generic HTML5 Data::
+
+    >>> props = {
+    ...     'action': True,
+    ...     'label': 'Action name',
+    ...     'data': {'foo': 'bar'},
+    ... }
+    >>> widget = factory('submit', name='save', props=props)
+    >>> widget()
+    u'<input data-foo=\'bar\' id="input-save" name="action.save" 
+    type="submit" value="Action name" />'
 
 
 Proxy

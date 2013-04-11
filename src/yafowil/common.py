@@ -8,6 +8,7 @@ from .base import (
 )
 from .utils import (
     attr_value,
+    generic_html5_attrs,
     cssclasses,
     css_managed_props,
     cssid,
@@ -115,6 +116,11 @@ factory.doc['props']['title'] = """\
 Optional help text to be rendered in the title attribute.
 """
 
+factory.defaults['data'] = dict()
+factory.doc['props']['data'] = \
+"""Additional data rendered as HTML5 data attributes on DOM Element.
+"""
+
 factory.defaults['display_proxy'] = False
 factory.doc['props']['display_proxy'] = """\
 If 'True' and widget mode 'display', widget value gets rendered as hidden
@@ -183,6 +189,7 @@ def input_attributes_common(widget, data, excludes=list(), value=None):
         'type': attr_value('type', widget, data),
         'value': value,
     }
+    input_attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
     for attr_name in excludes:
         del input_attrs[attr_name]
     return input_attrs
@@ -250,6 +257,7 @@ def generic_display_renderer(widget, data, value=None):
         'id': cssid(widget, 'display'),
         'class_': 'display-%s' % attr_value('class', widget, data) or 'generic'
     }
+    attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
     return data.tag('div', content, **attrs)
 
 
@@ -433,7 +441,7 @@ def textarea_attributes(widget, data):
     disabled = attr_value('disabled', widget, data) and 'disabled' or None
     readonly = attr_value('readonly', widget, data) and 'readonly' or None
     required = attr_value('required', widget, data) and 'required' or None
-    return {
+    ta_attrs = {
         'autofocus': autofocus,
         'class_': cssclasses(widget, data),
         'cols': attr_value('cols', widget, data),
@@ -447,6 +455,8 @@ def textarea_attributes(widget, data):
         'rows': attr_value('rows', widget, data),
         'wrap': attr_value('wrap', widget, data),
     }
+    ta_attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
+    return ta_attrs
 
 
 textarea_managed_props = ['autofocus', 'cols', 'disabled', 'placeholder',
@@ -535,6 +545,7 @@ def lines_display_renderer(widget, data):
         'id': cssid(widget, 'display'),
         'class_': 'display-%s' % attr_value('class', widget, data) or 'generic'
     }
+    attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
     content = u''
     for line in value:
         content += data.tag('li', line)
@@ -987,6 +998,9 @@ def select_edit_renderer(widget, data, **custom_attrs):
             'autofocus': autofocus,
             'required': required,
         }
+        select_attrs.update(
+            generic_html5_attrs(
+                attr_value('data', widget, data)))
         select_attrs.update(custom_attrs)
         if disabled is True:
             select_attrs['disabled'] = 'disabled'
@@ -1035,6 +1049,9 @@ def select_edit_renderer(widget, data, **custom_attrs):
             tags.append(tag(item_tag, item,
                             **{'id': cssid(widget, tagtype, key)}))
         wrapper_attrs = {'id': cssid(widget, tagtype, 'wrapper')}
+        wrapper_attrs.update(
+            generic_html5_attrs(
+                attr_value('data', widget, data)))
         wrapper_attrs.update(custom_attrs)
         taglisting = tag(listing_tag,
                          *tags,
@@ -1058,6 +1075,7 @@ def select_display_renderer(widget, data):
         'id': cssid(widget, 'display'),
         'class_': 'display-%s' % attr_value('class', widget, data) or 'generic'
     }
+    attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
     content = u''
     if multivalued and isinstance(value, basestring):
         value = [value]
@@ -1208,8 +1226,12 @@ def convert_bytes(bytes):
 def input_file_display_renderer(widget, data):
     tag = data.tag
     value = data.value
+    attrs = {
+        'class': cssclasses(widget, data),
+    }
+    attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
     if not value:
-        return tag('div', 'No file')
+        return tag('div', 'No file', **attrs)
     file = value['file']
     size = convert_bytes(len(file.read()))
     file.seek(0)
@@ -1220,7 +1242,7 @@ def input_file_display_renderer(widget, data):
                    tag('li', tag('strong', 'Filename: '), filename),
                    tag('li', tag('strong', 'Mimetype: '), mimetype),
                    tag('li', tag('strong', 'Size: '), size)),
-               class_=cssclasses(widget, data))
+               **attrs)
 
 
 @managedprops(*css_managed_props)

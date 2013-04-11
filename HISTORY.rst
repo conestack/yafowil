@@ -5,6 +5,12 @@ History
 2.1dev
 ------
 
+- Blueprints accept ``data`` property for generic HTML5 data attributes.
+  [rnix, 2013-04-11]
+
+- Introduce ``yafowil.utils.generic_html5_attrs`` helper function.
+  [rnix, 2013-04-11]
+
 - Introduce ``with_label`` property for ``checkbox`` blueprint. Useful for
   cross browser compatible checkbox CSS.
   [rnix, 2013-03-29]

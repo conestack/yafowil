@@ -288,6 +288,15 @@ Test attr_value
     Exception: failing_instance_bc_callback
 
 
+Test generic_html5_attrs
+------------------------
+
+::
+    >>> from yafowil.utils import generic_html5_attrs
+    >>> generic_html5_attrs({'foo': 'bar', 'baz': ['bam'], 'nada': None})
+    {'data-baz': '["bam"]', 'data-foo': 'bar'}
+
+
 Test data_attrs_helper
 ----------------------
 
