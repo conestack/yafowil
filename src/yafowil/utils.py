@@ -174,7 +174,7 @@ def attr_value(key, widget, data, default=None):
 def generic_html5_attrs(data_dict):
     data_attrs = {}
     for key, val in data_dict.items():
-        if val is None:
+        if val is None or val is UNSET:
             continue
         ret = json.dumps(val) # js-ify
         if isinstance(val, basestring):
