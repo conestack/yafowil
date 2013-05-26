@@ -208,7 +208,7 @@ def input_attributes_full(widget, data, value=None):
 
 @managedprops('type', 'size', 'disabled', 'autofocus', 'placeholder',
               'autocomplete', *css_managed_props)
-def input_generic_renderer(widget, data, **custom_attrs):
+def input_generic_renderer(widget, data, custom_attrs={}):
     """Generic HTML ``input`` tag render.
     """
     input_attrs = input_attributes_full(widget, data)
@@ -465,7 +465,7 @@ textarea_managed_props = ['autofocus', 'cols', 'disabled', 'placeholder',
 
 
 @managedprops(*textarea_managed_props)
-def textarea_renderer(widget, data, **custom_attrs):
+def textarea_renderer(widget, data, custom_attrs={}):
     """Renders text area.
     """
     tag = data.tag
@@ -964,7 +964,7 @@ def select_exists_marker(widget, data):
               'listing_label_position', 'listing_tag', 'size',
               'label_checkbox_class', 'label_radio_class',
               *css_managed_props)
-def select_edit_renderer(widget, data, **custom_attrs):
+def select_edit_renderer(widget, data, custom_attrs={}):
     tag = data.tag
     value = fetch_value(widget, data)
     multivalued = attr_value('multivalued', widget, data)

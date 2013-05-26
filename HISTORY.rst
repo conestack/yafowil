@@ -29,8 +29,8 @@ History
   attribute-keys which can be passed to tag-renderer.
   [thet, 2012-12-05]
 
-- Allow custom attributes on textarea_renderer, select_edit_renderer and
-  input_generic_renderer.
+- Allow passing of a custom html attributes dictionary to textarea_renderer,
+  select_edit_renderer and input_generic_renderer.
   [thet]
 
 2.0.2
