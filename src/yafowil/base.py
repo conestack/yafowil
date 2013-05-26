@@ -463,7 +463,7 @@ class Factory(object):
         if isinstance(blueprints, basestring):
             blueprints = blueprints.split(':')
         self._macros[name] = blueprints, props
-    
+
     def register_theme(self, themename, widgetname,
                        resourcedir=None, js=[], css=[]):
         """Register theme for addon widget.
@@ -473,7 +473,7 @@ class Factory(object):
         widget_theme['resourcedir'] = resourcedir
         widget_theme['js'] = js
         widget_theme['css'] = css
-    
+
     def resources_for(self, widgetname, copy_resources=True):
         theme = self._themes.get(self.theme, {})
         default = self._themes.get('default', {})
@@ -484,7 +484,7 @@ class Factory(object):
         if copy_resources:
             return copy.deepcopy(resources)
         return resources
-    
+
     def _expand_blueprints(self, blueprints, props):
         result = list()
         if isinstance(blueprints, basestring):
@@ -564,7 +564,7 @@ class Factory(object):
                         dren = []
                     else:
                         ex, eren, pre, bui, dren = custom[part_name]
-                else: # expect dict
+                else:  # expect dict
                     ex = custom[part_name].get('extractors', list())
                     eren = custom[part_name].get('edit_renderers', list())
                     pre = custom[part_name].get('preprocessors', list())

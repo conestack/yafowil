@@ -175,13 +175,13 @@ def generic_html5_attrs(data_dict):
     data_attrs = {}
     #if not data_dict: return data_attrs  # don't fail on empty data_dict
     for key, val in data_dict.items():
-        if val is None:
+        if val is None or val is UNSET:
             continue
-        ret = json.dumps(val) # js-ify
+        ret = json.dumps(val)  # js-ify
         if isinstance(val, basestring):
-            ret = ret.strip('"') # for strings, remove leading and trailing
-                                 # double quote, since they are not needed for
-                                 # data-attributes
+            ret = ret.strip('"')  # for strings, remove leading and trailing
+                                  # double quote, since they are not needed for
+                                  # data-attributes
         # replace camelCase with camel-case
         key = re.sub("([a-z])([A-Z])","\g<1>-\g<2>", key).lower()
         data_attrs['data-%s' % key] = ret
@@ -225,9 +225,9 @@ def data_attrs_helper(widget, data, attrs):
         if val is None: continue
         ret = json.dumps(val) # js-ify
         if isinstance(val, basestring):
-            ret = ret.strip('"') # for strings, remove leading and trailing
-                                 # double quote, since they are not needed for
-                                 # data-attributes
+            ret = ret.strip('"')  # for strings, remove leading and trailing
+                                  # double quote, since they are not needed for
+                                  # data-attributes
         # replace camelCase with camel-case
         key = re.sub("([a-z])([A-Z])","\g<1>-\g<2>", key).lower()
         data_attrs['data-%s' % key] = ret
