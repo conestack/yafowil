@@ -30,7 +30,8 @@ History
   [thet, 2012-12-05]
 
 - Allow passing of a custom html attributes dictionary to textarea_renderer,
-  select_edit_renderer and input_generic_renderer.
+  select_edit_renderer and input_generic_renderer. A dictionary is used instead
+  of passing them as function parameters to avoid namespace conflicts.
   [thet]
 
 2.0.2
