@@ -173,7 +173,7 @@ def attr_value(key, widget, data, default=None):
 
 def generic_html5_attrs(data_dict):
     data_attrs = {}
-    #if not data_dict: return data_attrs  # don't fail on empty data_dict
+    if not data_dict: return data_attrs  # don't fail on empty data_dict
     for key, val in data_dict.items():
         if val is None or val is UNSET:
             continue
