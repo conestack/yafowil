@@ -149,6 +149,8 @@ class managedprops(object):
 
 
 def cssid(widget, prefix, postfix=None):
+    if widget.attrs.get('structural', False):
+        return None
     path = widget.dottedpath.replace('.', '-')
     cssid = "%s-%s" % (prefix, path)
     if postfix is not None:

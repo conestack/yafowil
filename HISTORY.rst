@@ -5,6 +5,10 @@ History
 2.1dev
 ------
 
+- Don't generate an id attribute for structural widgets. Fixes #6, where the
+  same id for all structural elements in a form was generated.
+  [thet, 2013-05-27]
+
 - Blueprints accept ``data`` property for generic HTML5 data attributes.
   [rnix, 2013-04-11]
 
