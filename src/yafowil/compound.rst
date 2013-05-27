@@ -382,6 +382,15 @@ Fieldset
     </fieldset>
     <BLANKLINE>
 
+Structural fieldset renders without id attribute::
+
+    >>> compound = factory('fieldset', 
+    ...                    'COMPOUND',
+    ...                    props={'structural': True})
+    >>> pxml(compound())
+    <fieldset/>
+    <BLANKLINE>
+ 
 Fieldset display renderers are the same as fieldset edit renderers::
 
     >>> compound = factory('fieldset', 
