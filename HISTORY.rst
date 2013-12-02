@@ -5,6 +5,9 @@ History
 2.1dev
 ------
 
+- Float number input seperator may also be comma.
+  [rnix, 2013-12-02]
+
 - Don't generate an id attribute for structural widgets. Fixes #6, where the
   same id for all structural elements in a form was generated.
   [thet, 2013-05-27]

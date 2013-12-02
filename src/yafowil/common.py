@@ -1467,7 +1467,7 @@ def number_extractor(widget, data):
     else:
         raise ValueError('Output datatype must be integer or float')
     try:
-        val = convert(val)
+        val = convert(val.replace(',', '.'))
     except ValueError:
         error = u'Input is not a valid number (%s).' % datatype
         raise ExtractionError(error)

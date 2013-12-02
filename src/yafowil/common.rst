@@ -2341,6 +2341,10 @@ Default behaviour::
     >>> data.errors
     []
 
+    >>> data = widget.extract({'NUMBER': '10,0'})
+    >>> data.errors
+    []
+
     >>> widget = factory(
     ...     'number',
     ...     name='NUMBER',
