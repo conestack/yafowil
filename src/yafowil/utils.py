@@ -44,7 +44,6 @@ def vocabulary(definition):
     # dict-like
     if hasattr(definition, '__getitem__') and hasattr(definition, 'keys'):
         return [(_, definition[_]) for _ in definition.keys()]
-
     # iterable
     if hasattr(definition, '__iter__'):
         new_vocab = []
@@ -100,17 +99,16 @@ class Tag(object):
                 value = str(value).decode(self.encoding)
             cl.append((key.strip('_'), value))
         attributes = u''
-
         # NOTE: data attributes are enclosed in single quotes, since this makes
-        # passing json lists possible.  jQuery only recognizes JSON lists in
+        # passing json lists possible. jQuery only recognizes JSON lists in
         # data attributes as such, if they are enclosed in single quotes,
         # because the JSON standard requires string values to be enclosed in
         # double quotes.
         if cl:
-            attributes = u' %s' % \
-                         u' '.join(sorted(['data-' in _[0] and u"%s='%s'" % _
-                                                            or u'%s="%s"' % _
-                                                           for _ in cl]))
+            attributes = ['data-' in _[0] and u"%s='%s'" % _ \
+                                          or u'%s="%s"' % _ \
+                                          for _ in cl]
+            attributes = u' %s' % u' '.join(sorted(attributes))
         cl = list()
         for inner in inners:
             inner = self.translate(inner)
@@ -181,9 +179,9 @@ def generic_html5_attrs(data_dict):
             continue
         ret = json.dumps(val)  # js-ify
         if isinstance(val, basestring):
-            ret = ret.strip('"')  # for strings, remove leading and trailing
-                                  # double quote, since they are not needed for
-                                  # data-attributes
+            # for strings, remove leading and trailing double quote, since
+            # they are not needed for data-attributes
+            ret = ret.strip('"')
         # replace camelCase with camel-case
         key = re.sub("([a-z])([A-Z])","\g<1>-\g<2>", key).lower()
         data_attrs['data-%s' % key] = ret
@@ -227,9 +225,9 @@ def data_attrs_helper(widget, data, attrs):
         if val is None: continue
         ret = json.dumps(val) # js-ify
         if isinstance(val, basestring):
-            ret = ret.strip('"')  # for strings, remove leading and trailing
-                                  # double quote, since they are not needed for
-                                  # data-attributes
+            # for strings, remove leading and trailing double quote, since
+            # they are not needed for data-attributes
+            ret = ret.strip('"')
         # replace camelCase with camel-case
         key = re.sub("([a-z])([A-Z])","\g<1>-\g<2>", key).lower()
         data_attrs['data-%s' % key] = ret
