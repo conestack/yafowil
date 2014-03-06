@@ -317,6 +317,7 @@ def tag_renderer(widget, data):
         'id': cssid(widget, 'tag'),
         'class_': cssclasses(widget, data),
     }
+    attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
     tag = attr_value('tag', widget, data)
     text = attr_value('text', widget, data)
     return data.tag(tag, text, **attrs)
