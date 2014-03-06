@@ -23,6 +23,7 @@ Hidden
 ------
 
 ::
+
     >>> from yafowil.base import factory
     >>> widget = factory(
     ...     'hidden',
@@ -66,7 +67,9 @@ Generic HTML5 Data::
 
 Generic tag
 -----------
+
 ::
+
     >>> widget = factory('tag', name='MYTAG', props={
     ...     'tag': 'h3',
     ...     'text': 'A Headline',
@@ -87,7 +90,9 @@ Skip tag::
 
 Text Input
 ----------
+
 ::
+
     >>> widget = factory(
     ...     'text',
     ...     name='MYTEXT',
@@ -100,7 +105,6 @@ Text Input
     >>> widget()
     u'<div class="display-text" id="display-MYTEXT">Test Text</div>'
 
-
 Render with title attribute::
 
     >>> widget = factory(
@@ -111,7 +115,6 @@ Render with title attribute::
     ...         'title': 'My awesome title'})
     >>> widget()
     u'<input class="text" id="input-MYTEXT" name="MYTEXT" title="My awesome title" type="text" value="ja ha!" />'
-
 
 Generic HTML5 Data::
 
@@ -129,7 +132,9 @@ Generic HTML5 Data::
 
 Autofocus Text Input
 --------------------
+
 ::
+
     >>> widget = factory(
     ...     'text',
     ...     name='AUTOFOCUS',
@@ -143,7 +148,9 @@ Autofocus Text Input
 
 Placeholder Text Input
 ----------------------
+
 ::
+
     >>> widget = factory(
     ...     'text',
     ...     name='PLACEHOLDER',
@@ -157,7 +164,9 @@ Placeholder Text Input
 
 Required Input
 --------------
+
 ::
+
     >>> widget = factory(
     ...     'text',
     ...     name='REQUIRED',
@@ -309,23 +318,24 @@ A boolean checkbox widget (default)::
 
     >>> widget = factory('checkbox', 'MYCHECKBOX')
     >>> widget()
-    u'<input id="input-MYCHECKBOX" name="MYCHECKBOX"
-    type="checkbox" value="" /><input id="checkboxexists-MYCHECKBOX"
+    u'<input class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" 
+    type="checkbox" value="" /><input id="checkboxexists-MYCHECKBOX" 
     name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />'
 
     >>> widget.mode = 'display'
     >>> widget()
-    u'<div class="display-None" id="display-MYCHECKBOX">no</div>'
+    u'<div class="display-checkbox" id="display-MYCHECKBOX">no</div>'
 
     >>> widget = factory('checkbox', 'MYCHECKBOX', value='True')
     >>> widget()
-    u'<input checked="checked" id="input-MYCHECKBOX" name="MYCHECKBOX"
-    type="checkbox" value="" /><input id="checkboxexists-MYCHECKBOX"
-    name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />'
+    u'<input checked="checked" class="checkbox" id="input-MYCHECKBOX" 
+    name="MYCHECKBOX" type="checkbox" value="" /><input 
+    id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
+    type="hidden" value="checkboxexists" />'
 
     >>> widget.mode = 'display'
     >>> widget()
-    u'<div class="display-None" id="display-MYCHECKBOX">yes</div>'
+    u'<div class="display-checkbox" id="display-MYCHECKBOX">yes</div>'
 
 A checkbox widget with a value or an empty string::
 
@@ -336,14 +346,16 @@ A checkbox widget with a value or an empty string::
     ...     props={'format': 'string'})
     >>> pxml('<div>'+widget()+'</div>')
     <div>
-      <input id="input-MYCHECKBOX" name="MYCHECKBOX" type="checkbox" value=""/>
-      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists"
+      <input class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" 
+      type="checkbox" value=""/>
+      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
       type="hidden" value="checkboxexists"/>
     </div>
+    <BLANKLINE>
 
     >>> widget.mode = 'display'
     >>> widget()
-    u'<div class="display-None" id="display-MYCHECKBOX">no</div>'
+    u'<div class="display-checkbox" id="display-MYCHECKBOX">no</div>'
 
     >>> widget = factory(
     ...     'checkbox',
@@ -352,16 +364,16 @@ A checkbox widget with a value or an empty string::
     ...     props={'format': 'string'})
     >>> pxml('<div>'+widget()+'</div>')
     <div>
-      <input checked="checked" id="input-MYCHECKBOX" name="MYCHECKBOX"
-      type="checkbox" value="Test Checkbox"/>
-      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists"
+      <input checked="checked" class="checkbox" id="input-MYCHECKBOX" 
+      name="MYCHECKBOX" type="checkbox" value="Test Checkbox"/>
+      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
       type="hidden" value="checkboxexists"/>
     </div>
     <BLANKLINE>
 
     >>> widget.mode = 'display'
     >>> widget()
-    u'<div class="display-None" id="display-MYCHECKBOX">Test Checkbox</div>'
+    u'<div class="display-checkbox" id="display-MYCHECKBOX">Test Checkbox</div>'
 
     >>> widget.mode = 'edit'
 
@@ -377,9 +389,9 @@ Checkbox with manually set 'checked' attribute::
     ...     })
     >>> pxml('<div>'+widget()+'</div>')
     <div>
-      <input checked="checked" id="input-MYCHECKBOX" name="MYCHECKBOX"
-      type="checkbox" value=""/>
-      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists"
+      <input checked="checked" class="checkbox" id="input-MYCHECKBOX" 
+      name="MYCHECKBOX" type="checkbox" value=""/>
+      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
       type="hidden" value="checkboxexists"/>
     </div>
     <BLANKLINE>
@@ -394,9 +406,9 @@ Checkbox with manually set 'checked' attribute::
     ...     })
     >>> pxml('<div>'+widget()+'</div>')
     <div>
-      <input id="input-MYCHECKBOX" name="MYCHECKBOX" type="checkbox"
-      value="Test Checkbox"/>
-      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists"
+      <input class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" 
+      type="checkbox" value="Test Checkbox"/>
+      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
       type="hidden" value="checkboxexists"/>
     </div>
     <BLANKLINE>
@@ -470,16 +482,16 @@ Render in display mode::
     ...         'format': 'bool'})
     >>> pxml('<div>' + widget() + '</div>')
     <div>
-      <div class="display-None" id="display-MYCHECKBOX">no</div>
+      <div class="display-checkbox" id="display-MYCHECKBOX">no</div>
     </div>
     <BLANKLINE>
-    
+
     >>> widget = factory('checkbox', 'MYCHECKBOX', value=True, mode='display',
     ...     props={
     ...         'format': 'bool'})
     >>> pxml('<div>' + widget() + '</div>')
     <div>
-      <div class="display-None" id="display-MYCHECKBOX">yes</div>
+      <div class="display-checkbox" id="display-MYCHECKBOX">yes</div>
     </div>
     <BLANKLINE>
 
@@ -490,30 +502,30 @@ Display mode and display proxy bool format::
     ...         'format': 'bool',
     ...         'display_proxy': True})
     >>> widget()
-    u'<div class="display-None" id="display-MYCHECKBOX">yes<input 
-    id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden" value="" /><input 
-    id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden" 
-    value="checkboxexists" /></div>'
-    
+    u'<div class="display-checkbox" id="display-MYCHECKBOX">yes<input 
+    class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden" 
+    value="" /><input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
+    type="hidden" value="checkboxexists" /></div>'
+
     >>> data = widget.extract(request={'MYCHECKBOX-exists': 'checkboxexists'})
     >>> data
     <RuntimeData MYCHECKBOX, value=True, extracted=False at ...>
-    
+
     >>> widget(data=data)
-    u'<div class="display-None" id="display-MYCHECKBOX">no<input 
+    u'<div class="display-checkbox" id="display-MYCHECKBOX">no<input 
     id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden" 
     value="checkboxexists" /></div>'
-    
+
     >>> data = widget.extract(request={'MYCHECKBOX-exists': 'checkboxexists',
     ...                                'MYCHECKBOX': ''})
     >>> data
     <RuntimeData MYCHECKBOX, value=True, extracted=True at ...>
-    
+
     >>> widget(data=data)
-    u'<div class="display-None" id="display-MYCHECKBOX">yes<input 
-    id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden" value="" /><input 
-    id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden" 
-    value="checkboxexists" /></div>'
+    u'<div class="display-checkbox" id="display-MYCHECKBOX">yes<input 
+    class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" 
+    type="hidden" value="" /><input id="checkboxexists-MYCHECKBOX" 
+    name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" /></div>'
 
 Display mode and display proxy string format::
 
@@ -522,42 +534,42 @@ Display mode and display proxy string format::
     ...         'format': 'string',
     ...         'display_proxy': True})
     >>> widget()
-    u'<div class="display-None" id="display-MYCHECKBOX">yes<input 
-    id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden" value="yes" /><input 
-    id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden" 
-    value="checkboxexists" /></div>'
-    
+    u'<div class="display-checkbox" id="display-MYCHECKBOX">yes<input 
+    class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" 
+    type="hidden" value="yes" /><input id="checkboxexists-MYCHECKBOX" 
+    name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" /></div>'
+
     >>> data = widget.extract(request={'MYCHECKBOX-exists': 'checkboxexists'})
     >>> data
     <RuntimeData MYCHECKBOX, value='yes', extracted='' at ...>
-    
+
     >>> widget(data=data)
-    u'<div class="display-None" id="display-MYCHECKBOX">no<input 
-    id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden" value="" /><input 
-    id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden" 
-    value="checkboxexists" /></div>'
-    
+    u'<div class="display-checkbox" id="display-MYCHECKBOX">no<input 
+    class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden" 
+    value="" /><input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
+    type="hidden" value="checkboxexists" /></div>'
+
     >>> data = widget.extract(request={'MYCHECKBOX-exists': 'checkboxexists',
     ...                                'MYCHECKBOX': ''})
     >>> data
     <RuntimeData MYCHECKBOX, value='yes', extracted='' at ...>
-    
+
     >>> widget(data=data)
-    u'<div class="display-None" id="display-MYCHECKBOX">no<input 
-    id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden" value="" /><input 
-    id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden" 
-    value="checkboxexists" /></div>'
-    
+    u'<div class="display-checkbox" id="display-MYCHECKBOX">no<input 
+    class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden" 
+    value="" /><input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
+    type="hidden" value="checkboxexists" /></div>'
+
     >>> data = widget.extract(request={'MYCHECKBOX-exists': 'checkboxexists',
     ...                                'MYCHECKBOX': 'foo'})
     >>> data
     <RuntimeData MYCHECKBOX, value='yes', extracted='foo' at ...>
-    
+
     >>> widget(data=data)
-    u'<div class="display-None" id="display-MYCHECKBOX">foo<input 
-    id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden" value="foo" /><input 
-    id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden" 
-    value="checkboxexists" /></div>'
+    u'<div class="display-checkbox" id="display-MYCHECKBOX">foo<input 
+    class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" 
+    type="hidden" value="foo" /><input id="checkboxexists-MYCHECKBOX" 
+    name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" /></div>'
 
 Generic HTML5 Data::
 
@@ -567,21 +579,23 @@ Generic HTML5 Data::
     ...     value='Test Checkbox',
     ...     props={'data': {'foo': 'bar'}})
     >>> widget()
-    u'<input checked="checked" data-foo=\'bar\' id="input-MYCHECKBOX" 
-    name="MYCHECKBOX" type="checkbox" value="" /><input 
+    u'<input checked="checked" class="checkbox" data-foo=\'bar\' 
+    id="input-MYCHECKBOX" name="MYCHECKBOX" type="checkbox" value="" /><input 
     id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden" 
     value="checkboxexists" />'
 
 
 Textarea
 --------
+
 ::
+
     >>> widget = factory(
     ...     'textarea',
     ...     'MYTEXTAREA',
     ...     value=None)
     >>> widget()
-    u'<textarea cols="80" id="input-MYTEXTAREA" 
+    u'<textarea class="textarea" cols="80" id="input-MYTEXTAREA" 
     name="MYTEXTAREA" rows="25"></textarea>'
 
     >>> widget = factory(
@@ -594,12 +608,13 @@ Textarea
     ...         },
     ...     })
     >>> widget()
-    u'<textarea cols="80" data-foo=\'bar\' id="input-MYTEXTAREA" 
-    name="MYTEXTAREA" rows="25"></textarea>'
+    u'<textarea class="textarea" cols="80" data-foo=\'bar\' 
+    id="input-MYTEXTAREA" name="MYTEXTAREA" rows="25"></textarea>'
 
     >>> widget.mode = 'display'
     >>> widget()
-    u'<div class="display-None" data-foo=\'bar\' id="display-MYTEXTAREA"></div>'
+    u'<div class="display-textarea" data-foo=\'bar\' 
+    id="display-MYTEXTAREA"></div>'
 
 
 Lines
@@ -676,11 +691,11 @@ Display mode with ``display_proxy``::
       <input id="input-MYLINES" name="MYLINES" type="hidden" value="c"/>
     </div>
     <BLANKLINE>
-    
+
     >>> data = widget.extract({'MYLINES': 'a\nb'})
     >>> data
     <RuntimeData MYLINES, value=['a', 'b', 'c'], extracted=['a', 'b'] at ...>
-    
+
     >>> pxml('<div>' + widget(data=data) + '</div>')
     <div>
       <ul class="display-None" id="display-MYLINES">
@@ -722,6 +737,7 @@ Single Valued
 .............
 
 ::
+
     >>> widget = factory(
     ...     'select',
     ...     'MYSELECT',
@@ -774,7 +790,7 @@ Single valued with specific options disabled::
       <option disabled="disabled" id="input-MYSELECT-four" value="four">Four</option>
     </select>
     <BLANKLINE>
-    
+
     >>> del widget.attrs['disabled']
 
 Single valued display mode::
@@ -782,17 +798,17 @@ Single valued display mode::
     >>> widget.mode = 'display'
     >>> widget()
     u'<div class="display-select" id="display-MYSELECT">One</div>'
-    
+
     >>> widget.attrs['display_proxy'] = True
     >>> widget()
     u'<div class="display-select" id="display-MYSELECT">One</div><input 
     class="select" id="input-MYSELECT" name="MYSELECT" 
     type="hidden" value="one" />'
-    
+
     >>> data = widget.extract(request={'MYSELECT': 'two'})
     >>> data
     <RuntimeData MYSELECT, value='one', extracted='two' at ...>
-    
+
     >>> pxml('<div>' + widget(data=data) + '</div>')
     <div>
       <div class="display-select" id="display-MYSELECT">Two</div>
@@ -924,7 +940,7 @@ Render single selection as radio inputs, disables some::
       </div>
     </div>
     <BLANKLINE>
-    
+
     >>> del widget.attrs['disabled']
 
 Radio single valued display mode::
@@ -932,17 +948,17 @@ Radio single valued display mode::
     >>> widget.mode = 'display'
     >>> widget()
     u'<div class="display-select" id="display-MYSELECT">One</div>'
-    
+
     >>> widget.attrs['display_proxy'] = True
     >>> widget()
     u'<div class="display-select" id="display-MYSELECT">One</div><input 
     class="select" id="input-MYSELECT" name="MYSELECT" 
     type="hidden" value="one" />'
-    
+
     >>> data = widget.extract(request={'MYSELECT': 'two'})
     >>> data
     <RuntimeData MYSELECT, value='one', extracted='two' at ...>
-    
+
     >>> pxml('<div>' + widget(data=data) + '</div>')
     <div>
       <div class="display-select" id="display-MYSELECT">Two</div>
@@ -994,7 +1010,9 @@ Generic HTML5 Data::
 
 Multi valued
 ............
+
 ::
+
     >>> widget = factory(
     ...     'select',
     ...     'MYSELECT',
@@ -1023,7 +1041,7 @@ Extract multi valued selection and render widget with extracted data::
     >>> data = widget.extract(request={'MYSELECT': ['one', 'four']})
     >>> data
     <RuntimeData MYSELECT, value=['one', 'two'], extracted=['one', 'four'] at ...>
-    
+
     >>> pxml('<div>' + widget(data=data) + '</div>')
     <div>
       <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
@@ -1061,11 +1079,11 @@ Multi selection display mode with display proxy::
     <BLANKLINE>
 
 Multi selection display mode with display proxy and extracted data::
-    
+
     >>> data = widget.extract(request={'MYSELECT': ['one']})
     >>> data
     <RuntimeData MYSELECT, value=['one', 'two'], extracted=['one'] at ...>
-    
+
     >>> pxml('<div>' + widget(data=data) + '</div>')
     <div>
       <ul class="display-select" id="display-MYSELECT">
@@ -1200,7 +1218,7 @@ Checkbox multi selection display mode with display proxy::
     <BLANKLINE>
 
 Checkbox multi selection display mode with display proxy and extracted data::
-    
+
     >>> data = widget.extract(request={'MYSELECT': ['two']})
     >>> data
     <RuntimeData MYSELECT, value='one', extracted=['two'] at ...>
@@ -1580,6 +1598,7 @@ Multiselection, partly disabled, non-empty request::
     ... }
 
 Explanation:
+
 * one is a simple value as usal,
 * two is disabled and in value, so it should be kept in.
 * three is disabled and not in value, so it should kept out,
@@ -1589,6 +1608,7 @@ Explanation:
   should get removed.
 
 ::
+
     >>> data = widget.extract(request)
     >>> data.printtree()
     <RuntimeData myselect, value=['one', 'two', 'four'],
@@ -1676,7 +1696,9 @@ Select values::
 
 File
 ----
+
 ::
+
     >>> widget = factory('file', 'MYFILE')
     >>> widget()
     u'<input id="input-MYFILE" name="MYFILE" type="file" />'
@@ -1814,19 +1836,19 @@ File display renderer::
     >>> from yafowil.common import convert_bytes
     >>> convert_bytes(1 * 1024 * 1024 * 1024 * 1024)
     '1.00T'
-    
+
     >>> convert_bytes(1 * 1024 * 1024 * 1024)
     '1.00G'
-    
+
     >>> convert_bytes(1 * 1024 * 1024)
     '1.00M'
-    
+
     >>> convert_bytes(1 * 1024)
     '1.00K'
-    
+
     >>> convert_bytes(1)
     '1.00b'
-    
+
     >>> widget = factory(
     ...     'file',
     ...     'MYFILE',
@@ -1834,7 +1856,7 @@ File display renderer::
     >>> pxml(widget())
     <div>No file</div>
     <BLANKLINE>
-    
+
     >>> value = {
     ...     'file': StringIO('12345'),
     ...     'mimetype': 'text/plain',
@@ -1871,7 +1893,9 @@ Generic HTML5 Data::
 
 Submit(action)
 --------------
+
 ::
+
     >>> props = {
     ...     'action': True,
     ...     'label': 'Action name',
@@ -2004,6 +2028,7 @@ Position can be callable::
     ...     })
     >>> widget()
     u'<label for="input-MYFILE">Fooo</label>'
+
 
 Field
 -----
@@ -2269,6 +2294,7 @@ e-mail
 ------
 
 ::
+
     >>> widget = factory(
     ...     'email',
     ...     name='email')
@@ -2292,6 +2318,7 @@ URL
 ---
 
 ::
+
     >>> widget = factory(
     ...     'url',
     ...     name='url')
