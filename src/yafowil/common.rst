@@ -74,6 +74,16 @@ Generic tag
     >>> widget()
     u'<h3 class="form_heading" id="tag-MYTAG">A Headline</h3>'
 
+Skip tag::
+
+    >>> widget = factory('tag', name='MYTAG',
+    ...     props={
+    ...         'tag': 'h3',
+    ...         'text': 'A Headline',
+    ...         'class': 'form_heading'},
+    ...     mode='skip')
+    >>> widget()
+    u''
 
 Text Input
 ----------
