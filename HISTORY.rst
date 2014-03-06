@@ -5,6 +5,12 @@ History
 2.1dev
 ------
 
+- Use ``generic_html5_attrs`` in ``tag_renderer``.
+  [jensens, 2013-03-06]
+
+- Add default CSS class for ``checkbox`` and ``textarea`` blueprints.
+  [rnix, 2013-03-06]
+
 - Float number input seperator may also be comma.
   [rnix, 2013-12-02]
 

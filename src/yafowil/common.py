@@ -494,6 +494,8 @@ factory.doc['props']['textarea.wrap'] = \
 """Either ``soft``, ``hard``, ``virtual``, ``physical`` or  ``off``.
 """
 
+factory.defaults['textarea.class'] = 'textarea'
+
 factory.defaults['textarea.cols'] = 80
 factory.doc['props']['textarea.cols'] = \
 """Number of characters.
@@ -872,6 +874,8 @@ factory.defaults['checkbox.format'] = 'bool'
 factory.doc['props']['checkbox.format'] = """\
 Data-type of the extracted value. One out of ``bool`` or ``string``.
 """
+
+factory.defaults['checkbox.class'] = 'checkbox'
 
 factory.defaults['checkbox.disabled'] = False
 factory.doc['props']['checkbox.disabled'] = """\
