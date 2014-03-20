@@ -1463,7 +1463,7 @@ factory.defaults['search.class'] = 'search'
 def number_extractor(widget, data):
     val = data.extracted
     if val is UNSET or val == '':
-        return val
+        return UNSET
     datatype = attr_value('datatype', widget, data)
     if datatype == 'integer':
         convert = int
