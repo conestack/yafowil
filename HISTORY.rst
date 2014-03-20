@@ -5,6 +5,10 @@ History
 2.1dev
 ------
 
+- Return ``UNSET`` in number extractor if received extracted value is empty
+  string.
+  [rnix, 2014-03-20]
+
 - Use ``generic_html5_attrs`` in ``tag_renderer``.
   [jensens, 2013-03-06]
 
