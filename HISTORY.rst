@@ -5,6 +5,10 @@ History
 2.1dev
 ------
 
+- Re-add ``yafowil.utils.Unset`` class (import from ``node.utils``) for
+  backward compatibility reasons.
+  [rnix, 2014-04-30]
+
 - Return ``UNSET`` in number extractor if received extracted value is empty
   string.
   [rnix, 2014-03-20]
