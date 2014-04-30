@@ -337,6 +337,15 @@ A boolean checkbox widget (default)::
     >>> widget()
     u'<div class="display-checkbox" id="display-MYCHECKBOX">Yes</div>'
 
+A checkbox with label::
+
+    >>> widget = factory('checkbox', 'MYCHECKBOX', props={'with_label': True})
+    >>> widget()
+    u'<input class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" 
+    type="checkbox" value="" /><label class="checkbox_label" 
+    for="input-MYCHECKBOX">&nbsp;</label><input id="checkboxexists-MYCHECKBOX" 
+    name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />'
+
 A checkbox widget with a value or an empty string::
 
     >>> widget = factory(
