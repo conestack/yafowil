@@ -41,6 +41,11 @@ setup(name='yafowil',
       ],
       tests_require=tests_require,
       test_suite="yafowil.tests.test_suite",
+      message_extractors = {
+          '.': [
+              ('**.py', 'lingua_python', None),
+          ]
+      },
       extras_require=dict(
           test=tests_require,
       ),

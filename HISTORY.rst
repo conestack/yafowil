@@ -5,6 +5,13 @@ History
 2.1dev
 ------
 
+- Add translations.
+  [rnix, 2014-04-30]
+
+- Add ``yafowil.tsf`` module, which is used to create yafowil related
+  translation string factory.
+  [rnix, 2014-04-30]
+
 - Re-add ``yafowil.utils.Unset`` class (import from ``node.utils``) for
   backward compatibility reasons.
   [rnix, 2014-04-30]

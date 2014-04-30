@@ -11,6 +11,7 @@ optionflags = doctest.NORMALIZE_WHITESPACE | \
 
 
 TESTFILES = [
+    'tsf.rst',
     'utils.rst',
     'base.rst',
     'common.rst',

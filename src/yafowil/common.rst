@@ -324,7 +324,7 @@ A boolean checkbox widget (default)::
 
     >>> widget.mode = 'display'
     >>> widget()
-    u'<div class="display-checkbox" id="display-MYCHECKBOX">no</div>'
+    u'<div class="display-checkbox" id="display-MYCHECKBOX">No</div>'
 
     >>> widget = factory('checkbox', 'MYCHECKBOX', value='True')
     >>> widget()
@@ -335,7 +335,7 @@ A boolean checkbox widget (default)::
 
     >>> widget.mode = 'display'
     >>> widget()
-    u'<div class="display-checkbox" id="display-MYCHECKBOX">yes</div>'
+    u'<div class="display-checkbox" id="display-MYCHECKBOX">Yes</div>'
 
 A checkbox widget with a value or an empty string::
 
@@ -355,7 +355,7 @@ A checkbox widget with a value or an empty string::
 
     >>> widget.mode = 'display'
     >>> widget()
-    u'<div class="display-checkbox" id="display-MYCHECKBOX">no</div>'
+    u'<div class="display-checkbox" id="display-MYCHECKBOX">No</div>'
 
     >>> widget = factory(
     ...     'checkbox',
@@ -482,7 +482,7 @@ Render in display mode::
     ...         'format': 'bool'})
     >>> pxml('<div>' + widget() + '</div>')
     <div>
-      <div class="display-checkbox" id="display-MYCHECKBOX">no</div>
+      <div class="display-checkbox" id="display-MYCHECKBOX">No</div>
     </div>
     <BLANKLINE>
 
@@ -491,7 +491,7 @@ Render in display mode::
     ...         'format': 'bool'})
     >>> pxml('<div>' + widget() + '</div>')
     <div>
-      <div class="display-checkbox" id="display-MYCHECKBOX">yes</div>
+      <div class="display-checkbox" id="display-MYCHECKBOX">Yes</div>
     </div>
     <BLANKLINE>
 
@@ -502,7 +502,7 @@ Display mode and display proxy bool format::
     ...         'format': 'bool',
     ...         'display_proxy': True})
     >>> widget()
-    u'<div class="display-checkbox" id="display-MYCHECKBOX">yes<input 
+    u'<div class="display-checkbox" id="display-MYCHECKBOX">Yes<input 
     class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden" 
     value="" /><input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
     type="hidden" value="checkboxexists" /></div>'
@@ -512,7 +512,7 @@ Display mode and display proxy bool format::
     <RuntimeData MYCHECKBOX, value=True, extracted=False at ...>
 
     >>> widget(data=data)
-    u'<div class="display-checkbox" id="display-MYCHECKBOX">no<input 
+    u'<div class="display-checkbox" id="display-MYCHECKBOX">No<input 
     id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden" 
     value="checkboxexists" /></div>'
 
@@ -522,7 +522,7 @@ Display mode and display proxy bool format::
     <RuntimeData MYCHECKBOX, value=True, extracted=True at ...>
 
     >>> widget(data=data)
-    u'<div class="display-checkbox" id="display-MYCHECKBOX">yes<input 
+    u'<div class="display-checkbox" id="display-MYCHECKBOX">Yes<input 
     class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" 
     type="hidden" value="" /><input id="checkboxexists-MYCHECKBOX" 
     name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" /></div>'
@@ -544,7 +544,7 @@ Display mode and display proxy string format::
     <RuntimeData MYCHECKBOX, value='yes', extracted='' at ...>
 
     >>> widget(data=data)
-    u'<div class="display-checkbox" id="display-MYCHECKBOX">no<input 
+    u'<div class="display-checkbox" id="display-MYCHECKBOX">No<input 
     class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden" 
     value="" /><input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
     type="hidden" value="checkboxexists" /></div>'
@@ -555,7 +555,7 @@ Display mode and display proxy string format::
     <RuntimeData MYCHECKBOX, value='yes', extracted='' at ...>
 
     >>> widget(data=data)
-    u'<div class="display-checkbox" id="display-MYCHECKBOX">no<input 
+    u'<div class="display-checkbox" id="display-MYCHECKBOX">No<input 
     class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden" 
     value="" /><input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
     type="hidden" value="checkboxexists" /></div>'
@@ -2368,7 +2368,7 @@ Default behaviour::
 
     >>> data = widget.extract({'NUMBER': 'abc'})
     >>> data.errors
-    [ExtractionError('Input is not a valid number (float).',)]
+    [ExtractionError('Input is not a valid floating point.',)]
 
     >>> data = widget.extract({'NUMBER': '10'})
     >>> data.errors
@@ -2400,7 +2400,7 @@ With integer datatype::
 
     >>> data = widget.extract({'NUMBER': '10.0'})
     >>> data.errors
-    [ExtractionError('Input is not a valid number (integer).',)]
+    [ExtractionError('Input is not a valid integer.',)]
 
 With min set::
 

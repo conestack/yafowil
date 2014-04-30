@@ -15,6 +15,7 @@ from .utils import (
     managedprops,
     vocabulary,
 )
+from .tsf import _
 
 
 ###############################################################################
@@ -68,7 +69,8 @@ factory.doc['props']['required'] = \
 """Whether this value is required or not.
 """
 
-factory.defaults['required_message'] = u'Mandatory field was empty'
+factory.defaults['required_message'] = _('required_message',
+                                         default=u'Mandatory field was empty')
 factory.doc['props']['required_message'] = \
 """Message to be shown if required condition was not met.
 """
@@ -610,7 +612,9 @@ def minlength_extractor(widget, data):
     minlength = attr_value('minlength', widget, data, -1)
     if minlength != -1:
         if len(val) < minlength:
-            message = u'Input must have at least %i characters.' % minlength
+            message = _('minlength_extraction_error',
+                        default=u'Input must have at least ${len} characters.',
+                        mapping={'len': minlength})
             raise ExtractionError(message)
     return val
 
@@ -634,7 +638,9 @@ def ascii_extractor(widget, data):
     try:
         str(val)
     except UnicodeEncodeError:
-        raise ExtractionError(u'Input contains illegal characters.')
+        message = _(u'ascii_extractor_error',
+                    default=u'Input contains illegal characters.')
+        raise ExtractionError(message)
     return val
 
 
@@ -761,7 +767,8 @@ factory.doc['props']['password.strength'] = \
 valid.
 """
 
-factory.defaults['weak_password_message'] = u'Password too weak'
+factory.defaults['weak_password_message'] = _('weak_password_message',
+                                              default=u'Password too weak')
 factory.doc['props']['password.weak_password_message'] = \
 """Message shown if password is not strong enough.
 """
@@ -832,6 +839,7 @@ def checkbox_display_renderer(widget, data):
         content = value
     else:
         vocab = dict(vocabulary(attr_value('vocabulary', widget, data, [])))
+        # XXX: value might be 'True' Looks odd.
         content = vocab[bool(value)]
         if data.tag.translate:
             content = data.tag.translate(content)
@@ -888,9 +896,9 @@ Set 'checked' attribute explicit. If not given, compute by value.
 """
 
 factory.defaults['checkbox.vocabulary'] = {
-    True: 'yes',
-    False: 'no',
-    UNSET: 'not set',
+    True: _('yes', default=u'Yes'),
+    False: _('no', default=u'No'),
+    UNSET: _('unset', default=u'Unset'), # XXX: never used right now?
 }
 
 factory.doc['props']['checkbox.vocabulary'] = """\
@@ -1236,17 +1244,22 @@ def input_file_display_renderer(widget, data):
     }
     attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
     if not value:
-        return tag('div', 'No file', **attrs)
+        no_file_message = _('no_file', default=u'No file')
+        return tag('div', no_file_message, **attrs)
     file = value['file']
     size = convert_bytes(len(file.read()))
     file.seek(0)
-    filename = value.get('filename', 'Unknown')
-    mimetype = value.get('mimetype', 'Unknown')
+    unknown_message = _('unknown', default=u'Unknown')
+    filename_message = _('filename', default=u'Filename: ')
+    mimetype_message = _('mimetype', default=u'Mimetype: ')
+    size_message = _('size', default=u'Size: ')
+    filename = value.get('filename', unknown_message)
+    mimetype = value.get('mimetype', unknown_message)
     return tag('div',
                tag('ul',
-                   tag('li', tag('strong', 'Filename: '), filename),
-                   tag('li', tag('strong', 'Mimetype: '), mimetype),
-                   tag('li', tag('strong', 'Size: '), size)),
+                   tag('li', tag('strong', filename_message), filename),
+                   tag('li', tag('strong', mimetype_message), mimetype),
+                   tag('li', tag('strong', size_message), size)),
                **attrs)
 
 
@@ -1293,9 +1306,9 @@ Accepted mimetype.
 """
 
 factory.defaults['file.vocabulary'] = [
-    ('keep', u'Keep Existing file'),
-    ('replace', u'Replace existing file'),
-    ('delete', u'Delete existing file'),
+    ('keep', _('file_keep', default=u'Keep Existing file')),
+    ('replace', _('file_replace', default=u'Replace existing file')),
+    ('delete', _('file_delete', default=u'Delete existing file')),
 ]
 
 
@@ -1373,7 +1386,9 @@ EMAIL_RE = u'^[a-zA-Z0-9\._\-]+@[a-zA-Z0-9\._\-]+.[a-zA-Z0-9]{2,6}$'
 def email_extractor(widget, data):
     val = data.extracted
     if not re.match(EMAIL_RE, val is not UNSET and val or ''):
-        raise ExtractionError(u'Input not a valid email address.')
+        message = _('email_address_not_valid',
+                    default=u'Input not a valid email address.')
+        raise ExtractionError(message)
     return val
 
 
@@ -1409,7 +1424,9 @@ URL_RE += u'.?+=&%@!\-\/]))?$'
 def url_extractor(widget, data):
     val = data.extracted
     if not re.match(URL_RE, val is not UNSET and val or ''):
-        raise ExtractionError(u'Input not a valid web address.')
+        message = _('web_address_not_valid',
+                    default=u'Input not a valid web address.')
+        raise ExtractionError(message)
     return val
 
 
@@ -1474,22 +1491,52 @@ def number_extractor(widget, data):
     try:
         val = convert(val.replace(',', '.'))
     except ValueError:
-        error = u'Input is not a valid number (%s).' % datatype
-        raise ExtractionError(error)
+        message_datatype_float =  _('datatype_float',
+                                    default=u'floating point')
+        message_datatype_integer = _('datatype_integer', default=u'integer')
+        message = _('input_not_valid_number_datatype',
+                    default=u'Input is not a valid ${datatype}.',
+                    mapping={
+                        'datatype': datatype == 'float' and \
+                            message_datatype_float or \
+                            message_datatype_integer
+                    })
+        raise ExtractionError(message)
     min = attr_value('min', widget, data)
     if min and val < min:
-        raise ExtractionError(u'Value has to be at minimum %s.' % min)
+        message = _('input_number_minimum_value',
+                    default=u'Value has to be at minimum ${min}.',
+                    mapping={'min': min})
+        raise ExtractionError(message)
     max = attr_value('max', widget, data)
     if max and val > max:
-        raise ExtractionError(u'Value has to be at maximum %s.' % max)
+        message = _('input_number_maximum_value',
+                    default=u'Value has to be at maximum ${max}.',
+                    mapping={'max': max})
+        raise ExtractionError(message)
     step = attr_value('step', widget, data)
     if step:
         minimum = min or 0
         if (val - minimum) % step:
-            error = u'Value %s has to be in stepping of %s' % (val, step)
             if minimum:
-                error += ' based on a floor value of %s' % minimum
-            raise ExtractionError(error)
+                message = _(
+                    'input_number_step_and_minimum_value',
+                    default=u'Value ${val} has to be in stepping of ${step} '
+                            u'based on a floor value of ${minimum}',
+                    mapping={
+                        'val': val,
+                        'step': step,
+                        'minimum': minimum,
+                    })
+            else:
+                message = _(
+                    'input_number_step_value',
+                    default=u'Value ${val} has to be in stepping of ${step}',
+                    mapping={
+                        'val': val,
+                        'step': step,
+                    })
+            raise ExtractionError(message)
     return val
 
 
