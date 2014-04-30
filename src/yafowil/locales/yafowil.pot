@@ -1,13 +1,13 @@
 # Translations template for yafowil.
-# Copyright (C) 2014 BlueDynamics Alliance
+# Copyright (C) 2014 ORGANIZATION
 # This file is distributed under the same license as the yafowil project.
-# Robert Niederreiter <rnix@squarewave.at>, 2014.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: yafowil 2.1pre1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-04-30 17:45+0200\n"
+"POT-Creation-Date: 2014-04-30 17:49+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
