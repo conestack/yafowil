@@ -178,7 +178,11 @@ def generic_html5_attrs(data_dict):
     data_attrs = {}
     if not data_dict: return data_attrs  # don't fail on empty data_dict
     for key, val in data_dict.items():
-        if val is None or val is UNSET:
+        # check against None and UNSET separately to please coverage tests
+        # rnix, 2014-04-30
+        if val is None:
+            continue
+        if val is UNSET:
             continue
         ret = json.dumps(val)  # js-ify
         if isinstance(val, basestring):

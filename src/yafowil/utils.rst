@@ -293,7 +293,8 @@ Test generic_html5_attrs
 
 ::
     >>> from yafowil.utils import generic_html5_attrs
-    >>> generic_html5_attrs({'foo': 'bar', 'baz': ['bam'], 'nada': None})
+    >>> generic_html5_attrs(
+    ...     {'foo': 'bar', 'baz': ['bam'], 'nada': None, 'unset': UNSET})
     {'data-baz': '["bam"]', 'data-foo': 'bar'}
 
 
