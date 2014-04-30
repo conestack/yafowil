@@ -10,9 +10,9 @@ POT extraction::
 
     python setup.py extract_messages
 
-Translate::
+Initial catalog creations::
 
-    python setup.py init_catalog -l de
+    python setup.py init_catalog -l [en|de|...]
 
 Updating translation::
 
