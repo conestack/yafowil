@@ -1,17 +1,17 @@
-# English translations for yafowil.
+# Translations template for yafowil.
 # Copyright (C) 2014 ORGANIZATION
 # This file is distributed under the same license as the yafowil project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
 #
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: yafowil 2.1pre1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-04-30 17:49+0200\n"
-"PO-Revision-Date: 2014-04-30 17:34+0200\n"
+"POT-Creation-Date: 2014-05-01 08:41+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: en <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,97 +20,97 @@ msgstr ""
 #. Default: Mandatory field was empty
 #: src/yafowil/common.py:72
 msgid "required_message"
-msgstr "Mandatory field was empty"
+msgstr ""
 
 #. Default: Input must have at least ${len} characters.
 #: src/yafowil/common.py:615
 msgid "minlength_extraction_error"
-msgstr "Input must have at least ${len} characters."
+msgstr ""
 
 #. Default: Input contains illegal characters.
 #: src/yafowil/common.py:641
 msgid "ascii_extractor_error"
-msgstr "Input contains illegal characters."
+msgstr ""
 
 #. Default: Password too weak
 #: src/yafowil/common.py:770
 msgid "weak_password_message"
-msgstr "Password too weak"
+msgstr ""
 
 #. Default: Yes
 #: src/yafowil/common.py:899
 msgid "yes"
-msgstr "Yes"
+msgstr ""
 
 #. Default: No
 #: src/yafowil/common.py:900
 msgid "no"
-msgstr "No"
+msgstr ""
 
 #. Default: Unset
 #: src/yafowil/common.py:901
 msgid "unset"
-msgstr "Unset"
+msgstr ""
 
 #. Default: No file
 #: src/yafowil/common.py:1247
 msgid "no_file"
-msgstr "No file"
+msgstr ""
 
 #. Default: Unknown
 #: src/yafowil/common.py:1252
 msgid "unknown"
-msgstr "Unknown"
+msgstr ""
 
 #. Default: Filename:
 #: src/yafowil/common.py:1253
 msgid "filename"
-msgstr "Filename:"
+msgstr ""
 
 #. Default: Mimetype:
 #: src/yafowil/common.py:1254
 msgid "mimetype"
-msgstr "Mimetype:"
+msgstr ""
 
 #. Default: Size:
 #: src/yafowil/common.py:1255
 msgid "size"
-msgstr "Size:"
+msgstr ""
 
 #. Default: Keep Existing file
 #: src/yafowil/common.py:1309
 msgid "file_keep"
-msgstr "Keep Existing file"
+msgstr ""
 
 #. Default: Replace existing file
 #: src/yafowil/common.py:1310
 msgid "file_replace"
-msgstr "Replace existing file"
+msgstr ""
 
 #. Default: Delete existing file
 #: src/yafowil/common.py:1311
 msgid "file_delete"
-msgstr "Delete existing file"
+msgstr ""
 
 #. Default: Input not a valid email address.
 #: src/yafowil/common.py:1389
 msgid "email_address_not_valid"
-msgstr "Input not a valid email address."
+msgstr ""
 
 #. Default: Input not a valid web address.
 #: src/yafowil/common.py:1427
 msgid "web_address_not_valid"
-msgstr "Input not a valid web address."
+msgstr ""
 
 #. Default: floating point
 #: src/yafowil/common.py:1494
 msgid "datatype_float"
-msgstr "floating point"
+msgstr ""
 
 #. Default: integer
 #: src/yafowil/common.py:1496
 msgid "datatype_integer"
-msgstr "integer"
+msgstr ""
 
 #. Default: Input is not a valid ${datatype}.
 #: src/yafowil/common.py:1497
@@ -120,24 +120,21 @@ msgstr ""
 #. Default: Value has to be at minimum ${min}.
 #: src/yafowil/common.py:1507
 msgid "input_number_minimum_value"
-msgstr "Value has to be at minimum ${min}."
+msgstr ""
 
 #. Default: Value has to be at maximum ${max}.
 #: src/yafowil/common.py:1513
 msgid "input_number_maximum_value"
-msgstr "Value has to be at maximum ${max}."
+msgstr ""
 
-#. Default: Value ${val} has to be in stepping of ${step} based on a floor
-#. value of
+#. Default: Value ${val} has to be in stepping of ${step} based on a floor value of
 #. ${minimum}
 #: src/yafowil/common.py:1522
 msgid "input_number_step_and_minimum_value"
 msgstr ""
-"Value ${val} has to be in stepping of ${step} based on a floor value of "
-"${minimum}"
 
 #. Default: Value ${val} has to be in stepping of ${step}
 #: src/yafowil/common.py:1532
 msgid "input_number_step_value"
-msgstr "Value ${val} has to be in stepping of ${step}"
+msgstr ""
 
