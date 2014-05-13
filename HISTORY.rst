@@ -5,6 +5,10 @@ History
 2.1dev
 ------
 
+- Consider ``YAFOWIL_FORCE_DUMMY_TSF`` os.environ variable which can be used
+  to force dummy translation string factory when running tests.
+  [rnix, 2014-05-13]
+
 - Add translations.
   [rnix, 2014-04-30]
 

@@ -1,3 +1,6 @@
+import os
+
+
 class DummyTranslationStringFactory(object):
     """Dummy Translations string factory.
     """
@@ -15,13 +18,16 @@ class DummyTranslationStringFactory(object):
         return message
 
 
-try:
-    from pyramid.i18n import TranslationStringFactory as TSF
-except ImportError:
+if not os.environ.get('YAFOWIL_FORCE_DUMMY_TSF'):
     try:
-        from zope.i18nmessageid import MessageFactory as TSF
+        from pyramid.i18n import TranslationStringFactory as TSF
     except ImportError:
-        TSF = DummyTranslationStringFactory
+        try:
+            from zope.i18nmessageid import MessageFactory as TSF
+        except ImportError:
+            TSF = DummyTranslationStringFactory
+else:
+    TSF = DummyTranslationStringFactory
 
 
 _ = TSF('yafowil')
