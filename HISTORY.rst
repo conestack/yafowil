@@ -2,8 +2,8 @@
 History
 =======
 
-2.1dev
-------
+2.1 (2014-06-03)
+----------------
 
 - Consider ``YAFOWIL_FORCE_DUMMY_TSF`` os.environ variable which can be used
   to force dummy translation string factory when running tests.
