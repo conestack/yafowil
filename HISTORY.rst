@@ -2,10 +2,11 @@
 History
 =======
 
-2.2 (unreleased)
-----------------
+2.1.1 (2014-06-10)
+------------------
 
-- Nothing changed yet.
+- Package not ZIP safe.
+  [chaoflow, 2014-06-10]
 
 2.1 (2014-06-03)
 ----------------
