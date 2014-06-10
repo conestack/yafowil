@@ -34,7 +34,7 @@ setup(name='yafowil',
       package_dir={'': 'src'},
       namespace_packages=['yafowil'],
       include_package_data=True,
-      zip_safe=True,
+      zip_safe=False,
       install_requires=[
           'setuptools',
           'node>0.9.10',
