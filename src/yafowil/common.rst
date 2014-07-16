@@ -96,14 +96,14 @@ Text Input
     >>> widget = factory(
     ...     'text',
     ...     name='MYTEXT',
-    ...     value='Test Text')
+    ...     value='Test Text "Some Text"')
     >>> widget()
-    u'<input class="text" id="input-MYTEXT" name="MYTEXT" type="text"
-    value="Test Text" />'
+    u'<input class="text" id="input-MYTEXT" name="MYTEXT" type="text" 
+    value="Test Text &quot;Some Text&quot;" />'
 
     >>> widget.mode = 'display'
     >>> widget()
-    u'<div class="display-text" id="display-MYTEXT">Test Text</div>'
+    u'<div class="display-text" id="display-MYTEXT">Test Text "Some Text"</div>'
 
 Render with title attribute::
 

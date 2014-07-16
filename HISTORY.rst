@@ -2,10 +2,11 @@
 History
 =======
 
-2.2.dev0 (unreleased)
----------------------
+2.2.2.dev0 (unreleased)
+-----------------------
 
-- No changes yet.
+- Replace ``"`` with ``&quot`` for input values.
+  [rnix, 2014-07-16]
 
 2.1.1 (2014-06-10)
 ------------------

@@ -173,6 +173,8 @@ def generic_required_extractor(widget, data):
 def input_attributes_common(widget, data, excludes=list(), value=None):
     if value is None:
         value = fetch_value(widget, data)
+    if isinstance(value, basestring):
+        value = value.replace('"', '&quot;')
     autofocus = attr_value('autofocus', widget, data) and 'autofocus' or None
     disabled = attr_value('disabled', widget, data)
     disabled = bool(disabled) and 'disabled' or None
