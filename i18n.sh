@@ -1,18 +1,33 @@
 #!/bin/bash
 
 DOMAIN="yafowil"
-BASE_PATH=src/yafowil
+SEACH_PATH=src/yafowil
 LOCALES_PATH=src/yafowil/i18n/locales
 
-# extract messages
-pot-create $BASE_PATH -o $LOCALES_PATH/$DOMAIN.pot
+# create locales folder if not exists
+if [ ! -d "$LOCALES_PATH" ]; then
+    echo "Locales directory not exists, create"
+    mkdir -p $LOCALES_PATH
+fi
 
-# update translations
-for po in $LOCALES_PATH/*/LC_MESSAGES/$DOMAIN.po; do
-    msgmerge -o $po $po $LOCALES_PATH/$DOMAIN.pot
-done
+# no arguments, extract and update
+if [ $# -eq 0 ]; then
+    echo "Extract messages"
+    pot-create $SEACH_PATH -o $LOCALES_PATH/$DOMAIN.pot
 
-# compile catalogs
-for po in $LOCALES_PATH/*/LC_MESSAGES/*.po; do
-    msgfmt -o ${po%.*}.mo $po
-done
+    echo "Update translations"
+    for po in $LOCALES_PATH/*/LC_MESSAGES/$DOMAIN.po; do
+        msgmerge -o $po $po $LOCALES_PATH/$DOMAIN.pot
+    done
+
+    echo "Compile message catalogs"
+    for po in $LOCALES_PATH/*/LC_MESSAGES/*.po; do
+        msgfmt -o ${po%.*}.mo $po
+    done
+
+# first argument represents language identifier, create catalog
+else
+    cd $LOCALES_PATH
+    mkdir -p $1/LC_MESSAGES
+    msginit -i $DOMAIN.pot -o $1/LC_MESSAGES/$DOMAIN.po -l $1
+fi

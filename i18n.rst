@@ -7,7 +7,7 @@ Pre-requirements::
 
 Initial catalog creations::
 
-    ./i18n-init.sh de
+    ./i18n.sh de
 
 Updating translation and compile catalog::
 
