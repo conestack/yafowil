@@ -3,22 +3,12 @@ i18n
 
 Pre-requirements::
 
-    sudo pip install Babel
     sudo pip install lingua
-
-POT extraction::
-
-    python setup.py extract_messages
 
 Initial catalog creations::
 
-    python setup.py init_catalog -l [en|de|...]
+    ./i18n-init.sh de
 
-Updating translation::
+Updating translation and compile catalog::
 
-    python setup.py extract_messages
-    python setup.py update_catalog
-
-Compile catalog::
-
-    python setup.py compile_catalog
+    ./i18n.sh
