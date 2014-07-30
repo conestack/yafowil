@@ -14,5 +14,5 @@ done
 
 # compile catalogs
 for po in $LOCALES_PATH/*/LC_MESSAGES/*.po; do
-    msgfmt $po
+    msgfmt -o ${po%.*}.mo $po
 done
