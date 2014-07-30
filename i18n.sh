@@ -9,7 +9,7 @@ pot-create $BASE_PATH -o $LOCALES_PATH/$DOMAIN.pot
 
 # update translations
 for po in $LOCALES_PATH/*/LC_MESSAGES/$DOMAIN.po; do
-    msgmerge $po $LOCALES_PATH/$DOMAIN.pot
+    msgmerge -o $po $po $LOCALES_PATH/$DOMAIN.pot
 done
 
 # compile catalogs
