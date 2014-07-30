@@ -10,6 +10,12 @@ if [ ! -d "$LOCALES_PATH" ]; then
     mkdir -p $LOCALES_PATH
 fi
 
+# create pot if not exists
+if [ ! -f $LOCALES_PATH/$DOMAIN.pot ]; then
+	echo "Create pot file"
+	touch $LOCALES_PATH/$DOMAIN.pot
+fi
+
 # no arguments, extract and update
 if [ $# -eq 0 ]; then
     echo "Extract messages"
