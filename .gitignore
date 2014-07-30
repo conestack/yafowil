@@ -2,7 +2,6 @@
 *#*
 *.pyc
 *.pyo
-*.mo
 *.egg-info
 /develop-eggs/
 /parts/
