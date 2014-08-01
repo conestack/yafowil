@@ -2,8 +2,11 @@
 History
 =======
 
-2.2.2.dev0 (unreleased)
------------------------
+2.2.2 (unreleased)
+------------------
+
+- Use ``plumbing`` decorator instead of ``plumber`` metaclass.
+  [rnix, 2014-08-01]
 
 - Replace ``"`` with ``&quot`` for input values.
   [rnix, 2014-07-16]

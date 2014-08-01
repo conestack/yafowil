@@ -1,7 +1,7 @@
 import copy
 import types
 from threading import RLock
-from plumber import plumber
+from plumber import plumbing
 from node.behaviors import (
     Adopt,
     Nodify,
@@ -28,18 +28,16 @@ class RuntimeDataAttributes(NodeAttributes):
     __str__ = __repr__ = _dict__repr__
 
 
+@plumbing(
+    Nodespaces,
+    Attributes,
+    NodeChildValidate,
+    Adopt,
+    Nodify,
+    OdictStorage)
 class RuntimeData(object):
     """Holds Runtime data of widget.
     """
-    __metaclass__ = plumber
-    __plumbing__ = (
-        Nodespaces,
-        Attributes,
-        NodeChildValidate,
-        Adopt,
-        Nodify,
-        OdictStorage,
-    )
 
     def __init__(self, name=None, parent=None):
         self.__name__ = name
@@ -183,19 +181,17 @@ class WidgetAttributes(NodeAttributes):
             return default
 
 
+@plumbing(
+    Nodespaces,
+    Attributes,
+    NodeChildValidate,
+    Adopt,
+    Order,
+    Nodify,
+    OdictStorage)
 class Widget(object):
     """Base Widget Class
     """
-    __metaclass__ = plumber
-    __plumbing__ = (
-        Nodespaces,
-        Attributes,
-        NodeChildValidate,
-        Adopt,
-        Order,
-        Nodify,
-        OdictStorage,
-    )
 
     def __init__(self,
                  blueprints,

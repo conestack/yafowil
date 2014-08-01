@@ -102,13 +102,13 @@ Test CSS Classes
 ----------------
 
 ::
-    >>> from plumber import plumber
+    >>> from plumber import plumbing
     >>> from node.base import OrderedNode
     >>> from node.behaviors import Nodespaces
     >>> from node.behaviors import Attributes
-    >>> class CSSTestNode(OrderedNode):
-    ...     __metaclass__ = plumber
-    ...     __plumbing__ = Nodespaces, Attributes
+    >>> @plumbing(Nodespaces, Attributes)
+    ... class CSSTestNode(OrderedNode):
+    ...     pass
     >>> widget = CSSTestNode()
     >>> widget.attrs['required'] = False
     >>> widget.attrs['required_class'] = None
