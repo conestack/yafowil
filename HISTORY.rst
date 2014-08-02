@@ -2,8 +2,13 @@
 History
 =======
 
-2.2.2 (unreleased)
+2.1.2 (unreleased)
 ------------------
+
+- Introduce ``configure`` entry points. They are executed after ``register``
+  entry points and are supposed to be used for theme configuration (for which
+  it's important that all factory defaults are already set)
+  [rnix, 2014-08-02]
 
 - Use ``plumbing`` decorator instead of ``plumber`` metaclass.
   [rnix, 2014-08-01]
