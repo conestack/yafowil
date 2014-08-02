@@ -18,7 +18,7 @@ class DummyTranslationStringFactory(object):
         return message
 
 
-if not os.environ.get('YAFOWIL_FORCE_DUMMY_TSF'):
+if not os.environ.get('TESTRUN_MARKER'):
     try:
         from pyramid.i18n import TranslationStringFactory as TSF
     except ImportError:
