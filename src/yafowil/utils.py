@@ -263,5 +263,6 @@ def cssclasses(widget, data, classattr='class', additional=[]):
         _classes += attr_value(classattr, widget, data).split()
     if attrs['class_add']:
         _classes += attr_value('class_add', widget, data).split()
+    additional = [add for add in additional if add]
     _classes += additional
     return _classes and ' '.join(sorted(_classes)) or None

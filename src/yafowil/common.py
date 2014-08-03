@@ -1003,10 +1003,11 @@ def select_edit_renderer(widget, data, custom_attrs={}):
         autofocus = \
             attr_value('autofocus', widget, data) and 'autofocus' or None
         required = attr_value('required', widget, data) and 'required' or None
+        block_class = attr_value('block_class', widget, data)
         select_attrs = {
             'name_': widget.dottedpath,
             'id': cssid(widget, 'input'),
-            'class_': cssclasses(widget, data),
+            'class_': cssclasses(widget, data, additional=[block_class]),
             'multiple': multivalued and 'multiple' or None,
             'size': attr_value('size', widget, data) or None,
             'placeholder': attr_value('placeholder', widget, data) or None,
@@ -1039,10 +1040,18 @@ def select_edit_renderer(widget, data, custom_attrs={}):
         item_tag = listing_tag == 'div' and 'div' or 'li'
         if multivalued:
             tagtype = 'checkbox'
-            tagclass = attr_value('label_checkbox_class', widget, data)
+            wrapper_class = attr_value('checkbox_wrapper_class', widget, data)
+            label_class = attr_value('checkbox_label_class', widget, data)
+            # B/C deprecated as of yafowil 2.2
+            if not label_class:
+                label_class = attr_value('label_checkbox_class', widget, data)
         else:
             tagtype = 'radio'
-            tagclass = attr_value('label_checkbox_class', widget, data)
+            wrapper_class = attr_value('radio_wrapper_class', widget, data)
+            label_class = attr_value('radio_label_class', widget, data)
+            # B/C deprecated as of yafowil 2.2
+            if not label_class:
+                label_class = attr_value('label_radio_class', widget, data)
         vocab = attr_value('vocabulary', widget, data, [])
         for key, term in vocabulary(vocab):
             input_attrs = {
@@ -1057,12 +1066,15 @@ def select_edit_renderer(widget, data, custom_attrs={}):
                or disabled is True:
                 input_attrs['disabled'] = 'disabled'
             inputtag = tag('input', **input_attrs)
-            label_attrs = dict(for_=input_attrs['id'], _class=tagclass)
+            label_attrs = dict(for_=input_attrs['id'], _class=label_class)
             item = generic_positional_rendering_helper('label', term,
                                                        label_attrs, inputtag,
                                                        label_pos, tag)
-            tags.append(tag(item_tag, item,
-                            **{'id': cssid(widget, tagtype, key)}))
+            item_wrapper = tag(item_tag, item, **{
+                'id': cssid(widget, tagtype, key),
+                'class': wrapper_class,
+            })
+            tags.append(item_wrapper)
         wrapper_attrs = {'id': cssid(widget, tagtype, 'wrapper')}
         wrapper_attrs.update(
             generic_html5_attrs(
@@ -1130,14 +1142,45 @@ checkboxes depending on the 'multivalued' property.
 
 factory.defaults['select.class'] = 'select'
 
+factory.defaults['select.block_class'] = None
+factory.doc['props']['select.block_class'] = """\
+CSS class to render on selection if block format.
+"""
+
+factory.defaults['select.checkbox_wrapper_class'] = None
+factory.doc['props']['select.checkbox_wrapper_class'] = """\
+CSS class to render on checkbox wrapper.
+"""
+
+factory.defaults['select.checkbox_label_class'] = None
+factory.doc['props']['select.checkbox_label_class'] = """\
+CSS class to render on checkbox labels.
+"""
+
 factory.defaults['select.label_checkbox_class'] = None
 factory.doc['props']['select.label_checkbox_class'] = """\
 CSS class to render on checkbox labels.
+
+This property is deprecated and will be remove as of yafowil 2.2. Use
+``checkbox_label_class`` instead.
+"""
+
+factory.defaults['select.radio_wrapper_class'] = None
+factory.doc['props']['select.radio_wrapper_class'] = """\
+CSS class to render on radio button wrapper.
+"""
+
+factory.defaults['select.radio_label_class'] = None
+factory.doc['props']['select.radio_label_class'] = """\
+CSS class to render on radio button labels.
 """
 
 factory.defaults['select.label_radio_class'] = None
 factory.doc['props']['select.label_radio_class'] = """\
 CSS class to render on radio button labels.
+
+This property is deprecated and will be remove as of yafowil 2.2. Use
+``radio_label_class`` instead.
 """
 
 factory.defaults['select.listing_tag'] = 'div'
