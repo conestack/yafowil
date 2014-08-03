@@ -12,7 +12,8 @@ Simple plaintext widget.
     plaintext = factory('#field:text', props={
         'label': 'Plain Text Input',
         'required': 'Input is required',
-        'help': 'Simple Plain Text Field'})
+        'help': 'Simple Plain Text Field',
+    })
 """
 
 def plaintext():
@@ -20,10 +21,13 @@ def plaintext():
     comp['plain'] = factory('#field:text', props={
         'label': 'Plain Text Input',
         'required': 'Input is required',
-        'help': 'Simple Plain Text Field'})
-    return {'widget': comp,
-            'doc': DOC_PLAIN_TEXT,
-            'title': 'Plain Text'}
+        'help': 'Simple Plain Text Field',
+    })
+    return {
+        'widget': comp,
+        'doc': DOC_PLAIN_TEXT,
+        'title': 'Plain Text',
+    }
 
 
 DOC_EMAIL = """
@@ -36,17 +40,21 @@ Text input for email addresses.
 
     email = factory('#field:email', props={
         'label': 'E-Mail Input',
-        'help': 'E-Mail Address Field'})
+        'help': 'E-Mail Address Field',
+    })
 """
 
 def email():
     comp = factory('compound', name='yafowil-email')
     comp['email'] = factory('#field:email', props={
         'label': 'E-Mail Input',
-        'help': 'E-Mail Address Field'})
-    return {'widget': comp,
-            'doc': DOC_EMAIL,
-            'title': 'Email'}
+        'help': 'E-Mail Address Field',
+    })
+    return {
+        'widget': comp,
+        'doc': DOC_EMAIL,
+        'title': 'Email',
+    }
 
 
 DOC_NUMBER = """
@@ -59,17 +67,21 @@ Input field accepting floating point numbers.
 
     number = factory('#field:number', props={
         'label': 'Number Input (float)',
-        'help': 'Field for floating point number input'})
+        'help': 'Field for floating point number input',
+    })
 """
 
 def number():
     comp = factory('compound', name='yafowil-number')
     comp['number'] = factory('#field:number', props={
         'label': 'Number Input (float)',
-        'help': 'Field for floating point number input'})
-    return {'widget': comp,
-            'doc': DOC_NUMBER,
-            'title': 'Number'}
+        'help': 'Field for floating point number input',
+    })
+    return {
+        'widget': comp,
+        'doc': DOC_NUMBER,
+        'title': 'Number',
+    }
 
 
 DOC_INT = """
@@ -83,7 +95,8 @@ Input field accepting integer values.
     integer = factory('#field:number', props={
         'label': 'Number Input (int)',
         'datatype': 'integer',
-        'help': 'Field for integer input'})
+        'help': 'Field for integer input',
+    })
 """
 
 def integer():
@@ -91,10 +104,13 @@ def integer():
     comp['intnumber'] = factory('#field:number', props={
         'label': 'Number Input (int)',
         'datatype': 'integer',
-        'help': 'Field for integer input'})
-    return {'widget': comp,
-            'doc': DOC_INT,
-            'title': 'Integer'}
+        'help': 'Field for integer input',
+    })
+    return {
+        'widget': comp,
+        'doc': DOC_INT,
+        'title': 'Integer',
+    }
 
 
 DOC_PASSWORD = """
@@ -107,17 +123,21 @@ Password field.
 
     password = factory('#field:password', props={
         'label': 'Password Input',
-        'help': 'Field for password'})
+        'help': 'Field for password',
+    })
 """
 
 def password():
     comp = factory('compound', name='yafowil-password')
     comp['password'] = factory('#field:password', props={
         'label': 'Password Input',
-        'help': 'Field for password'})
-    return {'widget': comp,
-            'doc': DOC_PASSWORD,
-            'title': 'Password'}
+        'help': 'Field for password',
+    })
+    return {
+        'widget': comp,
+        'doc': DOC_PASSWORD,
+        'title': 'Password',
+    }
 
 
 DOC_URL = """
@@ -130,17 +150,21 @@ URL field.
 
     password = factory('#field:url', props={
         'label': 'URL Input',
-        'help': 'Field for URL'})
+        'help': 'Field for URL',
+    })
 """
 
 def url():
     comp = factory('compound', name='yafowil-url')
     comp['password'] = factory('#field:url', props={
         'label': 'URL Input',
-        'help': 'Field for URL'})
-    return {'widget': comp,
-            'doc': DOC_URL,
-            'title': 'URL'}
+        'help': 'Field for URL',
+    })
+    return {
+        'widget': comp,
+        'doc': DOC_URL,
+        'title': 'URL',
+    }
 
 
 DOC_TEXTAREA = """
@@ -154,7 +178,8 @@ Textarea field.
     textarea = factory('#field:textarea', props={
         'label': 'Textarea',
         'help': 'Textarea field',
-        'rows': 5})
+        'rows': 5,
+    })
 """
 
 def textarea():
@@ -162,10 +187,13 @@ def textarea():
     comp['textarea'] = factory('#field:textarea', props={
         'label': 'Textarea',
         'help': 'Textarea field',
-        'rows': 5})
-    return {'widget': comp,
-            'doc': DOC_TEXTAREA,
-            'title': 'Textarea'}
+        'rows': 5,
+    })
+    return {
+        'widget': comp,
+        'doc': DOC_TEXTAREA,
+        'title': 'Textarea',
+    }
 
 
 DOC_RADIO = """\
@@ -180,7 +208,8 @@ Selection with radio buttons.
         'label': 'Select',
         'help': 'Single selection as radio buttons',
         'vocabulary': ['Python 2', 'Python 3'],
-        'format': 'radio'})
+        'format': 'radio',
+    })
 """
 
 def radio():
@@ -189,10 +218,13 @@ def radio():
         'label': 'Select',
         'help': 'Single selection as radio buttons',
         'vocabulary': ['Python 2', 'Python 3'],
-        'format': 'radio'})
-    return {'widget': comp,
-            'doc': DOC_RADIO,
-            'title': 'Radio buttons'}
+        'format': 'radio',
+    })
+    return {
+        'widget': comp,
+        'doc': DOC_RADIO,
+        'title': 'Radio buttons',
+    }
 
 
 DOC_DROPDOWN = """
@@ -207,7 +239,8 @@ Single selection dropdown.
         'label': 'Select',
         'help': 'Single selection as dropdown',
         'vocabulary': ['Python', 'Java', 'Perl', 'Erlang', 'C', 'C++', 'C#'],
-        'format': 'block'})
+        'format': 'block',
+    })
 """
 
 def dropdown():
@@ -216,10 +249,13 @@ def dropdown():
         'label': 'Select',
         'help': 'Single selection as dropdown',
         'vocabulary': ['Python', 'Java', 'Perl', 'Erlang', 'C', 'C++', 'C#'],
-        'format': 'block'})
-    return {'widget': comp,
-            'doc': DOC_DROPDOWN,
-            'title': 'Selection Dropdown'}
+        'format': 'block',
+    })
+    return {
+        'widget': comp,
+        'doc': DOC_DROPDOWN,
+        'title': 'Selection Dropdown',
+    }
 
 
 DOC_CHECKBOX = """
@@ -235,7 +271,8 @@ Multi selection with checkboxes.
         'help': 'Multiple selection with checkboxes',
         'vocabulary': ['Python 2', 'Python 3'],
         'format': 'checkbox',
-        'multivalued': True})
+        'multivalued': True,
+    })
 """
 
 def checkbox():
@@ -245,10 +282,13 @@ def checkbox():
         'help': 'Multiple selection with checkboxes',
         'vocabulary': ['Python 2', 'Python 3'],
         'format': 'checkbox',
-        'multivalued': True})
-    return {'widget': comp,
-            'doc': DOC_CHECKBOX,
-            'title': 'Checkbox selection'}
+        'multivalued': True,
+    })
+    return {
+        'widget': comp,
+        'doc': DOC_CHECKBOX,
+        'title': 'Checkbox selection',
+    }
 
 
 DOC_BLOCK = """
@@ -264,7 +304,8 @@ Multi selection as block.
         'help': 'multiple as block',
         'vocabulary': ['Python', 'Java', 'Perl', 'Erlang', 'C', 'C++', 'C#'],
         'format': 'block',
-        'multivalued': True})
+        'multivalued': True,
+    })
 """
 
 def block():
@@ -274,10 +315,13 @@ def block():
         'help': 'multiple as block',
         'vocabulary': ['Python', 'Java', 'Perl', 'Erlang', 'C', 'C++', 'C#'],
         'format': 'block',
-        'multivalued': True})
-    return {'widget': comp,
-            'doc': DOC_BLOCK,
-            'title': 'Selection block'}
+        'multivalued': True,
+    })
+    return {
+        'widget': comp,
+        'doc': DOC_BLOCK,
+        'title': 'Selection block',
+    }
 
 
 def get_example():
