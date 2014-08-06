@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: yafowil 2.1pre1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-07-30 16:44+0200\n"
+"POT-Creation-Date: 2014-08-06 16:43+0200\n"
 "PO-Revision-Date: 2014-04-30 17:34+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -44,62 +44,62 @@ msgid "unset"
 msgstr "Unset"
 
 #. Default: Unknown
-#: src/yafowil/common.py:1254
+#: src/yafowil/common.py:1297
 msgid "unknown"
 msgstr "Unknown"
 
 #. Default: Filename: 
-#: src/yafowil/common.py:1255
+#: src/yafowil/common.py:1298
 msgid "filename"
 msgstr "Filename:"
 
 #. Default: Mimetype: 
-#: src/yafowil/common.py:1256
+#: src/yafowil/common.py:1299
 msgid "mimetype"
 msgstr "Mimetype:"
 
 #. Default: Size: 
-#: src/yafowil/common.py:1257
+#: src/yafowil/common.py:1300
 msgid "size"
 msgstr "Size:"
 
 #. Default: No file
-#: src/yafowil/common.py:1249
+#: src/yafowil/common.py:1292
 msgid "no_file"
 msgstr "No file"
 
 #. Default: Keep Existing file
-#: src/yafowil/common.py:1311
+#: src/yafowil/common.py:1354
 msgid "file_keep"
 msgstr "Keep Existing file"
 
 #. Default: Replace existing file
-#: src/yafowil/common.py:1312
+#: src/yafowil/common.py:1355
 msgid "file_replace"
 msgstr "Replace existing file"
 
 #. Default: Delete existing file
-#: src/yafowil/common.py:1313
+#: src/yafowil/common.py:1356
 msgid "file_delete"
 msgstr "Delete existing file"
 
 #. Default: Input not a valid email address.
-#: src/yafowil/common.py:1391
+#: src/yafowil/common.py:1434
 msgid "email_address_not_valid"
 msgstr "Input not a valid email address."
 
 #. Default: Input not a valid web address.
-#: src/yafowil/common.py:1429
+#: src/yafowil/common.py:1472
 msgid "web_address_not_valid"
 msgstr "Input not a valid web address."
 
 #. Default: Value has to be at minimum ${min}.
-#: src/yafowil/common.py:1509
+#: src/yafowil/common.py:1552
 msgid "input_number_minimum_value"
 msgstr "Value has to be at minimum ${min}."
 
 #. Default: Value has to be at maximum ${max}.
-#: src/yafowil/common.py:1515
+#: src/yafowil/common.py:1558
 msgid "input_number_maximum_value"
 msgstr "Value has to be at maximum ${max}."
 
@@ -114,29 +114,29 @@ msgid "ascii_extractor_error"
 msgstr "Input contains illegal characters."
 
 #. Default: floating point
-#: src/yafowil/common.py:1496
+#: src/yafowil/common.py:1539
 msgid "datatype_float"
 msgstr "floating point"
 
 #. Default: integer
-#: src/yafowil/common.py:1498
+#: src/yafowil/common.py:1541
 msgid "datatype_integer"
 msgstr "integer"
 
 #. Default: Input is not a valid ${datatype}.
-#: src/yafowil/common.py:1499
+#: src/yafowil/common.py:1542
 msgid "input_not_valid_number_datatype"
 msgstr ""
 
 #. Default: Value ${val} has to be in stepping of ${step} based on a floor
 #. value of ${minimum}
-#: src/yafowil/common.py:1524
+#: src/yafowil/common.py:1567
 msgid "input_number_step_and_minimum_value"
 msgstr ""
 "Value ${val} has to be in stepping of ${step} based on a floor value of "
 "${minimum}"
 
 #. Default: Value ${val} has to be in stepping of ${step}
-#: src/yafowil/common.py:1534
+#: src/yafowil/common.py:1577
 msgid "input_number_step_value"
 msgstr "Value ${val} has to be in stepping of ${step}"
