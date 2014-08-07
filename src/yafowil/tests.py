@@ -18,6 +18,7 @@ TESTFILES = [
     'compound.rst',
     'controller.rst',
     'table.rst',
+    'resources.rst',
 ]
 
 

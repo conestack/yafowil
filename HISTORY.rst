@@ -5,6 +5,10 @@ History
 2.1.2 (unreleased)
 ------------------
 
+- Introduce ``yafowil.resources.YafowilResources`` class which can be used
+  as base for resource publishing specific framework integration code.
+  [rnix, 2014-08-07]
+
 - Introduce ``configure`` entry points. They are executed after ``register``
   entry points and are supposed to be used for theme configuration (for which
   it's important that all factory defaults are already set)
@@ -16,11 +20,13 @@ History
 - Replace ``"`` with ``&quot`` for input values.
   [rnix, 2014-07-16]
 
+
 2.1.1 (2014-06-10)
 ------------------
 
 - Package not ZIP safe.
   [chaoflow, 2014-06-10]
+
 
 2.1 (2014-06-03)
 ----------------
@@ -86,11 +92,13 @@ History
   of passing them as function parameters to avoid namespace conflicts.
   [thet]
 
+
 2.0.2
 -----
 
 - Consider ``maxlength`` in ``input_attributes_common``.
   [rnix, 2012-11-03]
+
 
 2.0.1
 -----
@@ -103,6 +111,7 @@ History
 
 - Textarea can have ``title`` attribute.
   [rnix, 2012-10-25]
+
 
 2.0
 ---
@@ -141,6 +150,7 @@ History
   the form part.
   [jensens, 2012-06-07]
 
+
 1.3.2
 -----
 
@@ -157,11 +167,13 @@ History
 - Avoid rendering of value attribute in file blueprint.
   [rnix, 2012-04-21]
 
+
 1.3.1
 -----
 
 - Label property can be callable.
   [rnix, 2012-02-19]
+
 
 1.3
 ---
@@ -222,6 +234,7 @@ History
   compound and leaf widgets.
   [rnix, 2011-09-23]
 
+
 1.2
 ---
 
@@ -231,17 +244,20 @@ History
 - fix traceback test
   [rnix, 2011-09-15]
 
+
 1.1.3
 -----
 
 - traceback supplement now with html support. test for html part is missing for now.
   [jensens, 2011-09-01]
 
+
 1.1.2
 -----
 
 - traceback supplement is now better formatted.
   [jensens, 2011-08-30]
+
 
 1.1.1
 -----
@@ -250,6 +266,7 @@ History
   widget fail in display mode to show the value. Fixed: empty_display_renderer
   proxies now all previous rendered.
   [jensens, 2011-08-11]
+
 
 1.1
 ---
@@ -271,6 +288,7 @@ History
   display_renderer chain. Skip just renders an empty Unicode string.
   [jensens, 2011-07-07]
 
+
 1.0.4
 -----
 
@@ -285,6 +303,7 @@ History
 
 - return empty string in mode renderer if value is UNSET
   [rnix, 2011-05-23]
+
 
 1.0.3
 -----
@@ -314,11 +333,13 @@ History
 - textarea renderer - check value against None and render empty string instead
   [rnix, 2011-04-14]
 
+
 1.0.2
 -----
 
 - Add ``html5type`` property for email widget
   [rnix, 2011-03-16]
+
 
 1.0.1
 -----
@@ -326,12 +347,14 @@ History
 - Add ``html5required`` property
   [rnix, 2011-03-16]
 
+
 1.0
 ---
 
 - adopt to node 0.9 [rnix]
 
 - documentation [jensens, rnix]
+
 
 1.0-beta
 --------
