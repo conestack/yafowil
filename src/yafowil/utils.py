@@ -241,9 +241,11 @@ def data_attrs_helper(widget, data, attrs):
     return data_attrs
 
 
-css_managed_props = ['class', 'class_add', 'error_class',
-                     'error_class_default', 'required_class',
-                     'required_class_default']
+css_managed_props = [
+    'class', 'class_add',
+    'error_class', 'error_class_default',
+    'required_class', 'required_class_default',
+]
 
 
 def cssclasses(widget, data, classattr='class', additional=[]):

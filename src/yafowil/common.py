@@ -45,13 +45,13 @@ factory.doc['props']['error_class'] = \
 factory.defaults['error_class_default'] = 'error'
 factory.doc['props']['error_class_default'] = \
 """Fallback CSS-class to put on in case of error if no specific class was
- given.
+given.
 """
 
 factory.defaults['autofocus'] = None
 factory.doc['props']['autofocus'] = \
 """Whether this field gets the focus automatically or not (if browser supports
- it).
+it).
 """
 
 factory.defaults['autocomplete'] = None
@@ -69,8 +69,8 @@ factory.doc['props']['required'] = \
 """Whether this value is required or not.
 """
 
-factory.defaults['required_message'] = _('required_message',
-                                         default=u'Mandatory field was empty')
+factory.defaults['required_message'] = _(
+    'required_message', default=u'Mandatory field was empty')
 factory.doc['props']['required_message'] = \
 """Message to be shown if required condition was not met.
 """
@@ -210,8 +210,7 @@ def input_attributes_full(widget, data, value=None):
     return input_attrs
 
 
-@managedprops('type', 'size', 'disabled', 'autofocus', 'placeholder',
-              'autocomplete', *css_managed_props)
+@managedprops(*css_managed_props)
 def input_generic_renderer(widget, data, custom_attrs={}):
     """Generic HTML ``input`` tag render.
     """
@@ -221,7 +220,7 @@ def input_generic_renderer(widget, data, custom_attrs={}):
 
 
 # multivalued is not documented, because its only valid for specific blueprints
-@managedprops('display_proxy', 'type')
+@managedprops('display_proxy')
 def display_proxy_renderer(widget, data):
     rendered = data.rendered
     if attr_value('display_proxy', widget, data):
@@ -313,7 +312,7 @@ def generic_positional_rendering_helper(tagname, message, attrs, rendered, pos,
 # tag
 ###############################################################################
 
-@managedprops('tag', 'text', *css_managed_props)
+@managedprops('tag', 'text', 'data', *css_managed_props)
 def tag_renderer(widget, data):
     """Renderer for HTML tags.
     """
@@ -349,10 +348,16 @@ factory.doc['props']['tag.text'] = \
 # text
 ###############################################################################
 
+@managedprops('data', 'title', 'size', 'disabled', 'autofocus',
+              'placeholder', 'autocomplete', *css_managed_props)
+def text_edit_renderer(widget, data):
+    return input_generic_renderer(widget, data)
+
+
 factory.register(
     'text',
     extractors=[generic_extractor, generic_required_extractor],
-    edit_renderers=[input_generic_renderer],
+    edit_renderers=[text_edit_renderer],
     display_renderers=[generic_display_renderer, display_proxy_renderer])
 
 factory.doc['blueprint']['text'] = \
@@ -464,9 +469,10 @@ def textarea_attributes(widget, data):
     return ta_attrs
 
 
-textarea_managed_props = ['autofocus', 'cols', 'disabled', 'placeholder',
-                          'readonly', 'required', 'rows', 'wrap'] + \
-                          css_managed_props
+textarea_managed_props = [
+    'data', 'title', 'autofocus', 'cols', 'disabled',
+    'placeholder', 'readonly', 'required', 'rows', 'wrap',
+] + css_managed_props
 
 
 @managedprops(*textarea_managed_props)
@@ -543,7 +549,7 @@ def lines_edit_renderer(widget, data):
     return tag('textarea', value, **area_attrs)
 
 
-@managedprops(*css_managed_props)
+@managedprops('class', 'data')
 def lines_display_renderer(widget, data):
     value = fetch_value(widget, data)
     if type(value) in [types.ListType, types.TupleType] and not value:
@@ -707,8 +713,8 @@ def _pwd_value(widget, data):
     return attr_value('default', widget, data)
 
 
-@managedprops('size', 'disabled', 'placeholder', 'autofocus', 'required',
-              *css_managed_props)
+@managedprops('data', 'title', 'size', 'disabled', 'autofocus',
+              'placeholder', 'autocomplete', *css_managed_props)
 def password_edit_renderer(widget, data):
     """Render password widget.
     """
@@ -799,7 +805,8 @@ def checkbox_extractor(widget, data):
     raise ValueError("Checkbox widget has invalid format '%s' set" % fmt)
 
 
-@managedprops('format', 'disabled', 'checked', *css_managed_props)
+@managedprops('data', 'title', 'size', 'disabled', 'autofocus',
+              'format', 'disabled', 'checked', *css_managed_props)
 def checkbox_edit_renderer(widget, data):
     tag = data.tag
     input_attrs = input_attributes_common(widget, data)
@@ -831,13 +838,13 @@ def checkbox_edit_renderer(widget, data):
     return checkbox + exists_marker
 
 
-@managedprops('format', 'vocabulary')
+@managedprops('class', 'format', 'vocabulary', 'display_proxy')
 def checkbox_display_renderer(widget, data):
     """Generic display renderer to render a value.
     """
     value = fetch_value(widget, data)
-    format = attr_value('format', widget, data)
-    if format == 'string' and bool(value):
+    fmt = attr_value('format', widget, data)
+    if fmt == 'string' and bool(value):
         content = value
     else:
         vocab = dict(vocabulary(attr_value('vocabulary', widget, data, [])))
@@ -851,7 +858,7 @@ def checkbox_display_renderer(widget, data):
     }
     if attr_value('display_proxy', widget, data):
         widget.attrs['type'] = 'hidden'
-        if format == 'string':
+        if fmt == 'string':
             input_attrs = input_attributes_common(widget, data, value=value)
             content += data.tag('input', **input_attrs)
         elif bool(value):
@@ -975,9 +982,10 @@ def select_exists_marker(widget, data):
     return tag('input', **attrs)
 
 
-@managedprops('format', 'vocabulary', 'multivalued', 'disabled',
-              'listing_label_position', 'listing_tag', 'size',
-              'label_checkbox_class', 'label_radio_class',
+@managedprops('data', 'title', 'format', 'vocabulary', 'multivalued',
+              'disabled', 'listing_label_position', 'listing_tag', 'size',
+              'label_checkbox_class', 'label_radio_class', 'block_class',
+              'autofocus', 'placeholder',
               *css_managed_props)
 def select_edit_renderer(widget, data, custom_attrs={}):
     tag = data.tag
@@ -1007,6 +1015,7 @@ def select_edit_renderer(widget, data, custom_attrs={}):
         select_attrs = {
             'name_': widget.dottedpath,
             'id': cssid(widget, 'input'),
+            'title': attr_value('title', widget, data) or None,
             'class_': cssclasses(widget, data, additional=[block_class]),
             'multiple': multivalued and 'multiple' or None,
             'size': attr_value('size', widget, data) or None,
@@ -1086,7 +1095,7 @@ def select_edit_renderer(widget, data, custom_attrs={}):
         return select_exists_marker(widget, data) + taglisting
 
 
-@managedprops('template', 'class', 'multivalued')
+@managedprops('data', 'template', 'class', 'multivalued')
 def select_display_renderer(widget, data):
     value = fetch_value(widget, data)
     if type(value) in [types.ListType, types.TupleType] and not value:
