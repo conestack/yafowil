@@ -4,7 +4,7 @@ virtualenv:
   system_site_packages: true
 install:
   - travis_retry sudo apt-get update -qq
-  - travis_retry apt-get install -qq python-lxml
+  - travis_retry sudo apt-get install -qq python-lxml
   - python2.7 bootstrap.py 
   - ./bin/buildout -q
 script: ./bin/test && bin/code-analysis
