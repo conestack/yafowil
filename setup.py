@@ -38,6 +38,7 @@ setup(name='yafowil',
       install_requires=[
           'setuptools',
           'node>0.9.10',
+          'plumber>=1.3,',
       ],
       tests_require=tests_require,
       test_suite="yafowil.tests.test_suite",
