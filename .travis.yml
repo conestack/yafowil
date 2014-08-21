@@ -1,10 +1,8 @@
 language: python
 python: "2.7"
-virtualenv:
-  extra-search-dir: /usr/lib/python2.7/dist-packages/lxml
 install:
-  - travis_retry sudo apt-get update -qq
-  - travis_retry sudo apt-get install -qq python-lxml
+  - pip install wheel
+  - pip install --use-wheel lxml
   - python2.7 bootstrap.py 
   - ./bin/buildout -q
 script: ./bin/test && bin/code-analysis
