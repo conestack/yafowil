@@ -1,12 +1,10 @@
+# -*- coding: utf-8 -*-
 import inspect
 import json
 import logging
 import re
 from pkg_resources import iter_entry_points
-from node.utils import (
-    Unset,  # B/C
-    UNSET,
-)
+from node.utils import UNSET
 
 
 def get_entry_points(ns=None):
@@ -108,9 +106,8 @@ class Tag(object):
         # because the JSON standard requires string values to be enclosed in
         # double quotes.
         if cl:
-            attributes = ['data-' in _[0] and u"%s='%s'" % _ \
-                                          or u'%s="%s"' % _ \
-                                          for _ in cl]
+            attributes = ['data-' in _[0] and u"%s='%s'" % _ or u'%s="%s"' % _
+                          for _ in cl]
             attributes = u' %s' % u' '.join(sorted(attributes))
         cl = list()
         for inner in inners:
@@ -130,9 +127,9 @@ class Tag(object):
         }
 
 
-## Deprecation message
+# Deprecation message
 def _deprecated_null_localization(msg):
-    logging.warn("Deprecated usage of 'yafowil.utils.tag', please use the " + \
+    logging.warn("Deprecated usage of 'yafowil.utils.tag', please use the " +
                  "tag factory on RuntimeData instead.")
     return msg
 
@@ -176,7 +173,8 @@ def attr_value(key, widget, data, default=None):
 
 def generic_html5_attrs(data_dict):
     data_attrs = {}
-    if not data_dict: return data_attrs  # don't fail on empty data_dict
+    if not data_dict:
+        return data_attrs  # don't fail on empty data_dict
     for key, val in data_dict.items():
         # check against None and UNSET separately to please coverage tests
         # rnix, 2014-04-30
@@ -190,7 +188,7 @@ def generic_html5_attrs(data_dict):
             # they are not needed for data-attributes
             ret = ret.strip('"')
         # replace camelCase with camel-case
-        key = re.sub("([a-z])([A-Z])","\g<1>-\g<2>", key).lower()
+        key = re.sub("([a-z])([A-Z])", "\g<1>-\g<2>", key).lower()
         data_attrs['data-%s' % key] = ret
     return data_attrs
 
@@ -229,14 +227,15 @@ def data_attrs_helper(widget, data, attrs):
     data_attrs = {}
     for key in attrs:
         val = attr_value(key, widget, data)
-        if val is None: continue
-        ret = json.dumps(val) # js-ify
+        if val is None:
+            continue
+        ret = json.dumps(val)  # js-ify
         if isinstance(val, basestring):
             # for strings, remove leading and trailing double quote, since
             # they are not needed for data-attributes
             ret = ret.strip('"')
         # replace camelCase with camel-case
-        key = re.sub("([a-z])([A-Z])","\g<1>-\g<2>", key).lower()
+        key = re.sub("([a-z])([A-Z])", "\g<1>-\g<2>", key).lower()
         data_attrs['data-%s' % key] = ret
     return data_attrs
 

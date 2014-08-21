@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import re
 import types
 from node.utils import UNSET
@@ -23,92 +24,92 @@ from .tsf import _
 ###############################################################################
 
 factory.defaults['default'] = UNSET
-factory.doc['props']['default'] = \
-"""Default value.
+factory.doc['props']['default'] = """\
+Default value.
 """
 
 factory.defaults['class'] = None
-factory.doc['props']['class'] = \
-"""Common CSS-class to put on.
+factory.doc['props']['class'] = """\
+Common CSS-class to put on.
 """
 
 factory.defaults['class_add'] = None
-factory.doc['props']['class_add'] = \
-"""Additional CSS-class to put on.
+factory.doc['props']['class_add'] = """\
+Additional CSS-class to put on.
 """
 
 factory.defaults['error_class'] = None
-factory.doc['props']['error_class'] = \
-"""CSS-class to put on in case of error.
+factory.doc['props']['error_class'] = """\
+CSS-class to put on in case of error.
 """
 
 factory.defaults['error_class_default'] = 'error'
-factory.doc['props']['error_class_default'] = \
-"""Fallback CSS-class to put on in case of error if no specific class was
+factory.doc['props']['error_class_default'] = """\
+Fallback CSS-class to put on in case of error if no specific class was
 given.
 """
 
 factory.defaults['autofocus'] = None
-factory.doc['props']['autofocus'] = \
-"""Whether this field gets the focus automatically or not (if browser supports
+factory.doc['props']['autofocus'] = """\
+Whether this field gets the focus automatically or not (if browser supports
 it).
 """
 
 factory.defaults['autocomplete'] = None
-factory.doc['props']['autocomplete'] = \
-"""Switch autocomplete explizit to ``on`` or ``off``.
+factory.doc['props']['autocomplete'] = """\
+Switch autocomplete explizit to ``on`` or ``off``.
 """
 
 factory.defaults['placeholder'] = None
-factory.doc['props']['placeholder'] = \
-"""Whether this input has a placeholder value or not (if browser supports it).
+factory.doc['props']['placeholder'] = """\
+Whether this input has a placeholder value or not (if browser supports it).
 """
 
 factory.defaults['required'] = False
-factory.doc['props']['required'] = \
-"""Whether this value is required or not.
+factory.doc['props']['required'] = """\
+Whether this value is required or not.
 """
 
 factory.defaults['required_message'] = _(
     'required_message', default=u'Mandatory field was empty')
-factory.doc['props']['required_message'] = \
-"""Message to be shown if required condition was not met.
+factory.doc['props']['required_message'] = """\
+Message to be shown if required condition was not met.
 """
 
 factory.defaults['required_class'] = None
-factory.doc['props']['required_class'] = \
-"""CSS-class to put on in case if required condition was not met.
+factory.doc['props']['required_class'] = """\
+CSS-class to put on in case if required condition was not met.
 """
 
 factory.defaults['type'] = None
-factory.doc['props']['type'] = \
-"""HTML type attribute.
+factory.doc['props']['type'] = """\
+HTML type attribute.
 """
 
 factory.defaults['size'] = None
-factory.doc['props']['size'] = \
-"""Allowed input size.
+factory.doc['props']['size'] = """\
+Allowed input size.
 """
 
 factory.defaults['maxlength'] = None
-factory.doc['props']['maxlength'] = \
-"""Input maxlength.
+factory.doc['props']['maxlength'] = """\
+Input maxlength.
 """
 
 factory.defaults['disabled'] = None
-factory.doc['props']['disabled'] = \
-"""Disables input.
+factory.doc['props']['disabled'] = """\
+Disables input.
 """
 
 factory.defaults['required_class_default'] = 'required'
-factory.doc['props']['required_class_default'] = \
-"""CSS-class to apply if required condition was not met - if no specific class
+factory.doc['props']['required_class_default'] = """\
+CSS-class to apply if required condition was not met - if no specific class
 was given.
 """
 
 factory.defaults['template'] = '%s'
-factory.doc['props']['template'] = \
-"""Format string with pythons built-in string format template. If a callable
+factory.doc['props']['template'] = """\
+Format string with pythons built-in string format template. If a callable
 is given it will be used instead and is called with ``widget`` and ``data`` as
 parameters.
 """
@@ -119,8 +120,8 @@ Optional help text to be rendered in the title attribute.
 """
 
 factory.defaults['data'] = dict()
-factory.doc['props']['data'] = \
-"""Additional data rendered as HTML5 data attributes on DOM Element.
+factory.doc['props']['data'] = """\
+Additional data rendered as HTML5 data attributes on DOM Element.
 """
 
 factory.defaults['display_proxy'] = False
@@ -137,7 +138,7 @@ input.
 def generic_extractor(widget, data):
     """Extract raw data from request by ``widget.dottedpath``.
     """
-    __managed_props = []
+    __managed_props = []  # noqa
     if widget.dottedpath not in data.request:
         return UNSET
     return data.request[widget.dottedpath]
@@ -331,16 +332,16 @@ factory.register(
     edit_renderers=[tag_renderer],
     display_renderers=[tag_renderer])
 
-factory.doc['blueprint']['tag'] = \
-"""Render HTML tags with text. Useful for rendering headings etc.
+factory.doc['blueprint']['tag'] = """\
+Render HTML tags with text. Useful for rendering headings etc.
 """
 
-factory.doc['props']['tag.tag'] = \
-"""HTML tag name.
+factory.doc['props']['tag.tag'] = """\
+HTML tag name.
 """
 
-factory.doc['props']['tag.text'] = \
-"""Tag contents.
+factory.doc['props']['tag.text'] = """\
+Tag contents.
 """
 
 
@@ -360,13 +361,13 @@ factory.register(
     edit_renderers=[text_edit_renderer],
     display_renderers=[generic_display_renderer, display_proxy_renderer])
 
-factory.doc['blueprint']['text'] = \
-"""One line text input blueprint.
+factory.doc['blueprint']['text'] = """\
+One line text input blueprint.
 """
 
 factory.defaults['text.type'] = 'text'
-factory.doc['props']['text.type'] = \
-"""Type of input tag.
+factory.doc['props']['text.type'] = """\
+Type of input tag.
 """
 
 factory.defaults['text.required_class'] = 'required'
@@ -376,8 +377,8 @@ factory.defaults['text.default'] = ''
 factory.defaults['text.class'] = 'text'
 
 factory.defaults['text.disabled'] = False
-factory.doc['props']['text.disabled'] = \
-"""Flag  input field is disabled.
+factory.doc['props']['text.disabled'] = """\
+Flag  input field is disabled.
 """
 
 
@@ -386,18 +387,18 @@ factory.doc['props']['text.disabled'] = \
 ###############################################################################
 
 factory.register(
-     'hidden',
-     extractors=[generic_extractor],
-     edit_renderers=[input_generic_renderer],
-     display_renderers=[empty_display_renderer])
+    'hidden',
+    extractors=[generic_extractor],
+    edit_renderers=[input_generic_renderer],
+    display_renderers=[empty_display_renderer])
 
-factory.doc['blueprint']['hidden'] = \
-"""Hidden input blueprint.
+factory.doc['blueprint']['hidden'] = """\
+Hidden input blueprint.
 """
 
 factory.defaults['hidden.type'] = 'hidden'
-factory.doc['props']['hidden.type'] = \
-"""Type of input tag.
+factory.doc['props']['hidden.type'] = """\
+Type of input tag.
 """
 
 factory.defaults['hidden.default'] = ''
@@ -416,12 +417,11 @@ def input_proxy_renderer(widget, data):
     """
     tag = data.tag
     value = data.value
-    if data.request is not UNSET:
-        if data.request.get(widget.__name__):
-            value = data.request.get(widget.__name__)
+    if data.request is not UNSET and data.request.get(widget.__name__):
+        value = data.request.get(widget.__name__)
     input_attrs = {
         'type': 'hidden',
-        'value':  value,
+        'value': value,
         'name_': widget.__name__,
         'id': cssid(widget, 'input'),
         'class_': cssclasses(widget, data),
@@ -435,8 +435,8 @@ factory.register(
     edit_renderers=[input_proxy_renderer],
     display_renderers=[empty_display_renderer])
 
-factory.doc['blueprint']['proxy'] = \
-"""Bypass arguments out of form namespace using a hidden field.
+factory.doc['blueprint']['proxy'] = """\
+Bypass arguments out of form namespace using a hidden field.
 """
 
 factory.defaults['proxy.class'] = None
@@ -494,31 +494,31 @@ factory.register(
     edit_renderers=[textarea_renderer],
     display_renderers=[generic_display_renderer, display_proxy_renderer])
 
-factory.doc['blueprint']['textarea'] = \
-"""HTML textarea blueprint.
+factory.doc['blueprint']['textarea'] = """\
+HTML textarea blueprint.
 """
 
 factory.defaults['textarea.default'] = ''
 factory.defaults['textarea.wrap'] = None
-factory.doc['props']['textarea.wrap'] = \
-"""Either ``soft``, ``hard``, ``virtual``, ``physical`` or  ``off``.
+factory.doc['props']['textarea.wrap'] = """\
+Either ``soft``, ``hard``, ``virtual``, ``physical`` or  ``off``.
 """
 
 factory.defaults['textarea.class'] = 'textarea'
 
 factory.defaults['textarea.cols'] = 80
-factory.doc['props']['textarea.cols'] = \
-"""Number of characters.
+factory.doc['props']['textarea.cols'] = """\
+Number of characters.
 """
 
 factory.defaults['textarea.rows'] = 25
-factory.doc['props']['textarea.rows'] = \
-"""Number of lines.
+factory.doc['props']['textarea.rows'] = """\
+Number of lines.
 """
 
 factory.defaults['textarea.readonly'] = None
-factory.doc['props']['textarea.readonly'] = \
-"""Flag textarea is readonly.
+factory.doc['props']['textarea.readonly'] = """\
+Flag textarea is readonly.
 """
 
 
@@ -573,29 +573,29 @@ factory.register(
     edit_renderers=[lines_edit_renderer],
     display_renderers=[lines_display_renderer, display_proxy_renderer])
 
-factory.doc['blueprint']['lines'] = \
-"""Lines blueprint. Renders a textarea and extracts lines as list.
+factory.doc['blueprint']['lines'] = """\
+Lines blueprint. Renders a textarea and extracts lines as list.
 """
 
 factory.defaults['lines.default'] = ''
 factory.defaults['lines.wrap'] = None
-factory.doc['props']['lines.wrap'] = \
-"""Either ``soft``, ``hard``, ``virtual``, ``physical`` or  ``off``.
+factory.doc['props']['lines.wrap'] = """\
+Either ``soft``, ``hard``, ``virtual``, ``physical`` or  ``off``.
 """
 
 factory.defaults['lines.cols'] = 40
-factory.doc['props']['lines.cols'] = \
-"""Number of characters.
+factory.doc['props']['lines.cols'] = """\
+Number of characters.
 """
 
 factory.defaults['lines.rows'] = 8
-factory.doc['props']['lines.rows'] = \
-"""Number of lines.
+factory.doc['props']['lines.rows'] = """\
+Number of lines.
 """
 
 factory.defaults['lines.readonly'] = None
-factory.doc['props']['lines.readonly'] = \
-"""Flag textarea is readonly.
+factory.doc['props']['lines.readonly'] = """\
+Flag textarea is readonly.
 """
 
 
@@ -708,7 +708,7 @@ def _pwd_value(widget, data):
     if data.extracted is not UNSET:
         return data.extracted
     if data.value is not UNSET \
-      and data.value is not None:
+       and data.value is not None:
         return PASSWORD_NOCHANGE_VALUE
     return attr_value('default', widget, data)
 
@@ -740,8 +740,8 @@ factory.register(
     edit_renderers=[password_edit_renderer],
     display_renderers=[password_display_renderer])
 
-factory.doc['blueprint']['password'] = \
-"""Password blueprint.
+factory.doc['blueprint']['password'] = """\
+Password blueprint.
 
 The password is never rendered to markup, instead
 ``yafowil.common.PASSWORD_NOCHANGE_VALUE`` is set as ``value`` property on
@@ -756,34 +756,34 @@ factory.defaults['password.default'] = ''
 factory.defaults['password.class'] = 'password'
 
 factory.defaults['password.minlength'] = -1
-factory.doc['props']['password.size'] = \
-"""Maximum length of password.
+factory.doc['props']['password.size'] = """\
+Maximum length of password.
 """
 
-factory.doc['props']['password.minlength'] = \
-"""Minimum length of password.
+factory.doc['props']['password.minlength'] = """\
+Minimum length of password.
 """
 
 factory.defaults['password.ascii'] = False
-factory.doc['props']['password.ascii'] = \
-"""Flag ascii check should performed.
+factory.doc['props']['password.ascii'] = """\
+Flag ascii check should performed.
 """
 
 factory.defaults['password.strength'] = -1
-factory.doc['props']['password.strength'] = \
-"""Integer value <= 4. Define how many rules must apply to consider a password
+factory.doc['props']['password.strength'] = """\
+Integer value <= 4. Define how many rules must apply to consider a password
 valid.
 """
 
 factory.defaults['weak_password_message'] = _('weak_password_message',
                                               default=u'Password too weak')
-factory.doc['props']['password.weak_password_message'] = \
-"""Message shown if password is not strong enough.
+factory.doc['props']['password.weak_password_message'] = """\
+Message shown if password is not strong enough.
 """
 
 factory.defaults['password.displayplaceholder'] = u'*' * 8
-factory.doc['props']['password.displayplaceholder'] = \
-"""Placeholder shown in display mode if password was set.
+factory.doc['props']['password.displayplaceholder'] = """\
+Placeholder shown in display mode if password was set.
 """
 
 
@@ -830,7 +830,7 @@ def checkbox_edit_renderer(widget, data):
         checkbox = tag('input', **input_attrs)
     input_attrs = {
         'type': 'hidden',
-        'value':  'checkboxexists',
+        'value': 'checkboxexists',
         'name_': "%s-exists" % widget.dottedpath,
         'id': cssid(widget, 'checkboxexists'),
     }
@@ -867,7 +867,7 @@ def checkbox_display_renderer(widget, data):
         del widget.attrs['type']
         input_attrs = {
             'type': 'hidden',
-            'value':  'checkboxexists',
+            'value': 'checkboxexists',
             'name_': "%s-exists" % widget.dottedpath,
             'id': cssid(widget, 'checkboxexists'),
         }
@@ -907,7 +907,7 @@ Set 'checked' attribute explicit. If not given, compute by value.
 factory.defaults['checkbox.vocabulary'] = {
     True: _('yes', default=u'Yes'),
     False: _('no', default=u'No'),
-    UNSET: _('unset', default=u'Unset'), # XXX: never used right now?
+    UNSET: _('unset', default=u'Unset'),  # XXX: never used right now?
 }
 
 factory.doc['props']['checkbox.vocabulary'] = """\
@@ -975,7 +975,7 @@ def select_exists_marker(widget, data):
     tag = data.tag
     attrs = {
         'type': 'hidden',
-        'value':  'exists',
+        'value': 'exists',
         'name_': "%s-exists" % widget.dottedpath,
         'id': cssid(widget, 'exists'),
     }
@@ -1033,7 +1033,7 @@ def select_edit_renderer(widget, data, custom_attrs={}):
         if multivalued:
             attrs = {
                 'type': 'hidden',
-                'value':  'exists',
+                'value': 'exists',
                 'name_': "%s-exists" % widget.dottedpath,
                 'id': cssid(widget, 'exists'),
             }
@@ -1065,7 +1065,7 @@ def select_edit_renderer(widget, data, custom_attrs={}):
         for key, term in vocabulary(vocab):
             input_attrs = {
                 'type': tagtype,
-                'value':  key,
+                'value': key,
                 'checked': (key in value) and 'checked' or None,
                 'name_': widget.dottedpath,
                 'id': cssid(widget, 'input', key),
@@ -1331,7 +1331,7 @@ def file_options_renderer(widget, data):
     for key, term in vocabulary(vocab):
         attrs = {
             'type': 'radio',
-            'value':  key,
+            'value': key,
             'checked': (key in value) and 'checked' or None,
             'name_': '%s-action' % widget.dottedpath,
             'id': cssid(widget, 'input', key),
@@ -1380,7 +1380,7 @@ def submit_renderer(widget, data):
     input_attrs = input_attributes_common(widget, data)
     input_attrs['type'] = 'submit'
     input_attrs['name_'] = attr_value('action', widget, data) and \
-                          'action.%s' % widget.dottedpath
+        'action.%s' % widget.dottedpath
     input_attrs['value'] = attr_value('label', widget, data, widget.name)
     return tag('input', **input_attrs)
 
@@ -1425,8 +1425,8 @@ the only parameter.
 """
 
 factory.defaults['text.disabled'] = False
-factory.doc['props']['text.disabled'] = \
-"""Flag  input field is disabled.
+factory.doc['props']['text.disabled'] = """\
+Flag  input field is disabled.
 """
 
 
@@ -1454,8 +1454,8 @@ factory.register(
     edit_renderers=[input_generic_renderer],
     display_renderers=[generic_display_renderer, display_proxy_renderer])
 
-factory.doc['blueprint']['email'] = \
-"""E-mail (HTML5) input blueprint.
+factory.doc['blueprint']['email'] = """\
+Email (HTML5) input blueprint.
 """
 
 factory.defaults['email.type'] = 'email'
@@ -1490,8 +1490,8 @@ factory.register(
     edit_renderers=[input_generic_renderer],
     display_renderers=[generic_display_renderer, display_proxy_renderer])
 
-factory.doc['blueprint']['url'] = \
-"""URL aka web address (HTML5) input blueprint.
+factory.doc['blueprint']['url'] = """\
+URL aka web address (HTML5) input blueprint.
 """
 
 factory.defaults['url.type'] = 'url'
@@ -1545,14 +1545,14 @@ def number_extractor(widget, data):
     try:
         val = convert(val.replace(',', '.'))
     except ValueError:
-        message_datatype_float =  _('datatype_float',
-                                    default=u'floating point')
+        message_datatype_float = _('datatype_float',
+                                   default=u'floating point')
         message_datatype_integer = _('datatype_integer', default=u'integer')
         message = _('input_not_valid_number_datatype',
                     default=u'Input is not a valid ${datatype}.',
                     mapping={
-                        'datatype': datatype == 'float' and \
-                            message_datatype_float or \
+                        'datatype': datatype == 'float' and
+                            message_datatype_float or
                             message_datatype_integer
                     })
         raise ExtractionError(message)

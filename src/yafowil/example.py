@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from .base import factory
 
 
@@ -15,6 +16,7 @@ Simple plaintext widget.
         'help': 'Simple Plain Text Field',
     })
 """
+
 
 def plaintext():
     comp = factory('compound', name='yafowil-plaintext')
@@ -44,6 +46,7 @@ Text input for email addresses.
     })
 """
 
+
 def email():
     comp = factory('compound', name='yafowil-email')
     comp['email'] = factory('#field:email', props={
@@ -70,6 +73,7 @@ Input field accepting floating point numbers.
         'help': 'Field for floating point number input',
     })
 """
+
 
 def number():
     comp = factory('compound', name='yafowil-number')
@@ -99,6 +103,7 @@ Input field accepting integer values.
     })
 """
 
+
 def integer():
     comp = factory('compound', name='yafowil-integer')
     comp['intnumber'] = factory('#field:number', props={
@@ -127,6 +132,7 @@ Password field.
     })
 """
 
+
 def password():
     comp = factory('compound', name='yafowil-password')
     comp['password'] = factory('#field:password', props={
@@ -153,6 +159,7 @@ URL field.
         'help': 'Field for URL',
     })
 """
+
 
 def url():
     comp = factory('compound', name='yafowil-url')
@@ -181,6 +188,7 @@ Textarea field.
         'rows': 5,
     })
 """
+
 
 def textarea():
     comp = factory('compound', name='yafowil-textarea')
@@ -212,6 +220,7 @@ Selection with radio buttons.
     })
 """
 
+
 def radio():
     comp = factory('compound', name='yafowil-radio')
     comp['radio'] = factory('#field:select', props={
@@ -242,6 +251,7 @@ Single selection dropdown.
         'format': 'block',
     })
 """
+
 
 def dropdown():
     comp = factory('compound', name='yafowil-dropdown')
@@ -275,6 +285,7 @@ Multi selection with checkboxes.
     })
 """
 
+
 def checkbox():
     comp = factory('compound', name='yafowil-checkbox')
     comp['checkbox'] = factory('#field:select', props={
@@ -307,6 +318,7 @@ Multi selection as block.
         'multivalued': True,
     })
 """
+
 
 def block():
     comp = factory('compound', name='yafowil-block')

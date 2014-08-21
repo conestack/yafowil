@@ -3,7 +3,7 @@ python: "2.7"
 install:
   - python2.7 bootstrap.py 
   - ./bin/buildout -q
-script: ./bin/test
+script: ./bin/test && bin/code-analysis
 after_success:
   - bin/coverage.sh
   - pip install coveralls

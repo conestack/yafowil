@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import copy
 import types
 from threading import RLock
@@ -68,9 +69,9 @@ class RuntimeData(object):
 
     def __repr__(self):
         rep = "<RuntimeData %s, value=%s, extracted=%s" % (
-                 '.'.join([str(_) for _ in self.path]),
-                 repr(self.value),
-                 repr(self.extracted)
+            '.'.join([str(_) for _ in self.path]),
+            repr(self.value),
+            repr(self.extracted)
         )
         if self.errors:
             rep += ', %d error(s)' % len(self.errors)
@@ -145,7 +146,7 @@ class TBSupplementWidget(object):
         li += tag('li', 'blueprints: ', tag('strong', self.blueprints))
         li += tag('li', 'task: ', tag('strong', self.task))
         li += tag('li', 'description: ', tag('strong', self.descr))
-        return  tag('p', 'yafowil widget processing info:', tag('ul', li))
+        return tag('p', 'yafowil widget processing info:', tag('ul', li))
 
 
 class WidgetAttributes(NodeAttributes):
@@ -319,8 +320,8 @@ class Widget(object):
         else:
             renderers = self.edit_renderers
         if not renderers:
-            raise ValueError (
-                "no renderers given for widget '%s' at mode '%s'" % \
+            raise ValueError(
+                "no renderers given for widget '%s' at mode '%s'" %
                 (self.dottedpath, data.mode)
             )
         self.lock()
@@ -329,7 +330,7 @@ class Widget(object):
                 self.current_prefix = ren_name
                 __traceback_supplement__ = (TBSupplementWidget, self, renderer,
                                             'render',
-                                            "failed at '%s' in mode '%s'" % \
+                                            "failed at '%s' in mode '%s'" %
                                             (ren_name, data.mode))
                 data.rendered = renderer(self, data)
         finally:
@@ -411,7 +412,7 @@ class Widget(object):
         else:
             data.mode = self.mode
         if data.mode not in ('edit', 'display', 'skip'):
-            raise ValueError("mode must be one out of 'edit', 'display', " + \
+            raise ValueError("mode must be one out of 'edit', 'display', "
                              "'skip', but '%s' was given " % data.mode)
         for ppname, pp in self.preprocessors:
             data.current_prefix = ppname
@@ -449,7 +450,7 @@ class Factory(object):
         """
         self._name_check(name)
         self._blueprints[name] = (extractors, edit_renderers,
-                                 preprocessors, builders, display_renderers)
+                                  preprocessors, builders, display_renderers)
 
     def register_global_preprocessors(self, preprocessors):
         self._global_preprocessors += preprocessors
@@ -553,7 +554,8 @@ class Factory(object):
         for blueprint in blueprints:
             if blueprint.startswith('*'):
                 part_name = blueprint[1:]
-                if type(custom[part_name]) in (types.ListType, types.TupleType):
+                if type(custom[part_name]) in (types.ListType,
+                                               types.TupleType):
                     if len(custom[part_name]) < 5:
                         # BBB:
                         ex, eren, pre, bui = custom[part_name]

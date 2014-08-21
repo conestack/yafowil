@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from odict import odict
 from node.utils import UNSET
 from .base import factory
@@ -20,7 +21,7 @@ def compound_extractor(widget, data):
             for structuralchildname in child:
                 structuralchild = child[structuralchildname]
                 if len(structuralchild) \
-                  and attr_value('structural', structuralchild, data):
+                   and attr_value('structural', structuralchild, data):
                     # call compound extractor if structural child has children
                     # which are as well structural compounds.
                     compound_extractor(structuralchild, data)
@@ -110,8 +111,8 @@ Like ``compound`` blueprint but renders within '<div>' element.
 """
 
 factory.defaults['div.id'] = None
-factory.doc['props']['div.id'] = \
-"""HTML id attribute.
+factory.doc['props']['div.id'] = """\
+HTML id attribute.
 """
 
 
@@ -132,16 +133,17 @@ factory.register(
     'fieldset',
     extractors=factory.extractors('compound'),
     edit_renderers=factory.edit_renderers('compound') + [fieldset_renderer],
-    display_renderers=factory.display_renderers('compound') + \
-        [fieldset_renderer])
+    display_renderers=(factory.display_renderers('compound') +
+                       [fieldset_renderer])
+)
 
 factory.doc['blueprint']['fieldset'] = """\
 Renders a fieldset around the prior rendered output.
 """
 
 factory.defaults['fieldset.legend'] = False
-factory.doc['props']['fieldset.legend'] = \
-"""Content of legend tag if legend should be rendered.
+factory.doc['props']['fieldset.legend'] = """\
+Content of legend tag if legend should be rendered.
 """
 
 factory.defaults['fieldset.class'] = None
@@ -171,8 +173,9 @@ factory.register(
     'form',
     extractors=factory.extractors('compound'),
     edit_renderers=factory.edit_renderers('compound') + [form_edit_renderer],
-    display_renderers=factory.display_renderers('compound') + \
-        [form_display_renderer])
+    display_renderers=(factory.display_renderers('compound') +
+                       [form_display_renderer])
+)
 
 factory.doc['blueprint']['form'] = """\
 A html-form element as a compound of widgets.
@@ -194,6 +197,6 @@ of ``application/x-www-form-urlencoded`` or ``multipart/form-data``.
 """
 
 factory.defaults['form.novalidate'] = True
-factory.doc['props']['form.novalidate'] = \
-"""Flag whether HTML5 form validation should be suppressed.
+factory.doc['props']['form.novalidate'] = """\
+Flag whether HTML5 form validation should be suppressed.
 """
