@@ -1,5 +1,21 @@
 **Yet Another Form WIdget Library**.
 
+.. image:: https://pypip.in/v/yafowil/badge.png
+    :target: https://pypi.python.org/pypi/yafowil
+    :alt: Latest PyPI version
+
+.. image:: https://pypip.in/d/yafowil/badge.png
+    :target: https://pypi.python.org/pypi/yafowil
+    :alt: Number of PyPI downloads
+
+.. image:: https://secure.travis-ci.org/bluedynamics/yafowil.png
+    :target: http://travis-ci.org/#!/bluedynamics/yafowil
+
+.. image:: https://coveralls.io/repos/bluedynmaics/yafowil/badge.png?branch=master
+    :alt: Coverage
+    :target: https://coveralls.io/r/bluedynamics/yafowil
+
+
 YAFOWIL offers html-form creation and modification at runtime. It is
 light-weight and provides an extensible, reusable set of blueprints to build 
 flexible forms.
