@@ -1,7 +1,7 @@
 language: python
 python: "2.7"
 virtualenv:
-  system_site_packages: true
+  extra-search-dir: /usr/lib/python2.7/dist-packages/lxml
 install:
   - travis_retry sudo apt-get update -qq
   - travis_retry sudo apt-get install -qq python-lxml
