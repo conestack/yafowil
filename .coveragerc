@@ -4,3 +4,4 @@ omit =
     eggs/*
     */test*
     */.buildout/*
+    */lib/python2.7/site-packages/*
