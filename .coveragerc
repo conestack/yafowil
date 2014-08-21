@@ -1,0 +1,6 @@
+[report]
+omit =
+    parts/*
+    eggs/*
+    */test*
+    */.buildout/*
