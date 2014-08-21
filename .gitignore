@@ -10,6 +10,9 @@
 /downloads/
 /var/
 /dist/
+/lib/
+/local/
+/include/
 /.installed.cfg
 /.pydevproject
 /.project
