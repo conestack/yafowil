@@ -4,3 +4,8 @@ install:
   - python2.7 bootstrap.py 
   - ./bin/buildout -q
 script: ./bin/test
+after_success:
+  - bin/coverage.sh
+  - pip install coveralls
+  - coveralls
+
