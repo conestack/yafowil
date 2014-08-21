@@ -11,7 +11,7 @@
 .. image:: https://secure.travis-ci.org/bluedynamics/yafowil.png
     :target: http://travis-ci.org/#!/bluedynamics/yafowil
 
-.. image:: https://coveralls.io/repos/bluedynmaics/yafowil/badge.png?branch=master
+.. image:: https://coveralls.io/repos/bluedynamics/yafowil/badge.png
     :alt: Coverage
     :target: https://coveralls.io/r/bluedynamics/yafowil
 
