@@ -538,7 +538,7 @@ class Factory(object):
         ``custom``
             dict, where keys are matching to asterisk prefixed custom chains.
             each chains part is tuple with 4 lists of callables: extractors,
-            renderers, preprocessors, builders, display_renderers.
+            edit_renderers, preprocessors, builders, display_renderers.
 
         ``mode``
             either a callable (widget and runtime-data as argument) or string
