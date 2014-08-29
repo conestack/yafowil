@@ -26,8 +26,9 @@ def compound_extractor(widget, data):
                     # which are as well structural compounds.
                     compound_extractor(structuralchild, data)
                 else:
-                    # call extract on widget directly
-                    structuralchild.extract(data.request, parent=data)
+                    # call extract on widget directly if not structural
+                    if not attr_value('structural', structuralchild, data):
+                        structuralchild.extract(data.request, parent=data)
         else:
             child.extract(data.request, parent=data)
     return odict([(k, v.extracted) for k, v in data.items()])

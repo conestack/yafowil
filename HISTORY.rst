@@ -5,6 +5,10 @@ History
 2.1.2 (unreleased)
 ------------------
 
+- Fix ``compound_extractor`` case if structural child is structural as well
+  and skip extraction if so.
+  [rnix, 2014-08-29]
+
 - Introduce ``yafowil.resources.YafowilResources`` class which can be used
   as base for resource publishing specific framework integration code.
   [rnix, 2014-08-07]
