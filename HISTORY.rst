@@ -2,7 +2,7 @@
 History
 =======
 
-2.1.2 (unreleased)
+2.1.2 (2015-01-23)
 ------------------
 
 - Fix ``compound_extractor`` case if structural child is structural as well
