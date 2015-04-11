@@ -1439,7 +1439,9 @@ EMAIL_RE = u'^[a-zA-Z0-9\._\-]+@[a-zA-Z0-9\._\-]+.[a-zA-Z0-9]{2,6}$'
 
 def email_extractor(widget, data):
     val = data.extracted
-    if not re.match(EMAIL_RE, val is not UNSET and val or ''):
+    if not val:
+        return val
+    if not re.match(EMAIL_RE, val):
         message = _('email_address_not_valid',
                     default=u'Input not a valid email address.')
         raise ExtractionError(message)

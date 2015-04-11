@@ -2299,7 +2299,7 @@ Render empty (WHAT'S THIS GOOD FOR?)::
     <BLANKLINE>
 
 
-e-mail
+E-Mail
 ------
 
 ::
@@ -2310,6 +2310,10 @@ e-mail
     >>> pxml(widget())
     <input class="email" id="input-email" name="email" type="email" value=""/>
 
+    >>> data = widget.extract({'email': ''})
+    >>> data.errors
+    []
+
     >>> data = widget.extract({'email': 'foo@bar'})
     >>> data.errors
     [ExtractionError('Input not a valid email address.',)]
@@ -2317,6 +2321,19 @@ e-mail
     >>> data = widget.extract({'email': '@bar.com'})
     >>> data.errors
     [ExtractionError('Input not a valid email address.',)]
+
+    >>> data = widget.extract({'email': 'foo@bar.com'})
+    >>> data.errors
+    []
+
+    >>> widget = factory(
+    ...     'email',
+    ...     name='email',
+    ...     props={'required': 'E-Mail Address is required'})
+
+    >>> data = widget.extract({'email': ''})
+    >>> data.errors
+    [ExtractionError('E-Mail Address is required',)]
 
     >>> data = widget.extract({'email': 'foo@bar.com'})
     >>> data.errors

@@ -2,6 +2,14 @@
 History
 =======
 
+2.1.3 (unreleased)
+------------------
+
+- Fix email extractor. Must not raise ExtractionError if not required on empty
+  input.
+  [rnix, 2015-04-11]
+
+
 2.1.2 (2015-01-23)
 ------------------
 
