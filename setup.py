@@ -5,7 +5,7 @@ from setuptools import (
 )
 
 
-version = '2.1.3'
+version = '2.1.4.dev0'
 shortdesc = \
 'YAFOWIL - declarative, flexible html forms, framework independent.'
 longdesc = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
