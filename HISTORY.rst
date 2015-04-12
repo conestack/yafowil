@@ -2,7 +2,7 @@
 History
 =======
 
-2.1.3 (unreleased)
+2.1.3 (2015-04-12)
 ------------------
 
 - Fix email extractor. Must not raise ExtractionError if not required on empty
