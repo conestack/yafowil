@@ -1,22 +1,18 @@
 # -*- coding: utf-8 -*-
+from node.utils import UNSET
+from yafowil.base import ExtractionError
+from yafowil.base import factory
+from yafowil.base import fetch_value
+from yafowil.tsf import _
+from yafowil.utils import attr_value
+from yafowil.utils import css_managed_props
+from yafowil.utils import cssclasses
+from yafowil.utils import cssid
+from yafowil.utils import generic_html5_attrs
+from yafowil.utils import managedprops
+from yafowil.utils import vocabulary
 import re
 import types
-from node.utils import UNSET
-from .base import (
-    factory,
-    ExtractionError,
-    fetch_value
-)
-from .utils import (
-    attr_value,
-    generic_html5_attrs,
-    cssclasses,
-    css_managed_props,
-    cssid,
-    managedprops,
-    vocabulary,
-)
-from .tsf import _
 
 
 ###############################################################################

@@ -1,23 +1,19 @@
 # -*- coding: utf-8 -*-
+from node.behaviors import Adopt
+from node.behaviors import Attributes
+from node.behaviors import NodeAttributes
+from node.behaviors import NodeChildValidate
+from node.behaviors import Nodespaces
+from node.behaviors import Nodify
+from node.behaviors import OdictStorage
+from node.behaviors import Order
+from node.utils import UNSET
+from plumber import plumbing
+from threading import RLock
+from yafowil.utils import Tag
+from yafowil.utils import attr_value
 import copy
 import types
-from threading import RLock
-from plumber import plumbing
-from node.behaviors import (
-    Adopt,
-    Nodify,
-    NodeChildValidate,
-    OdictStorage,
-    Attributes,
-    NodeAttributes,
-    Nodespaces,
-    Order,
-)
-from node.utils import UNSET
-from .utils import (
-    Tag,
-    attr_value,
-)
 
 
 def _dict__repr__(self):

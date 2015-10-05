@@ -28,13 +28,13 @@ class YafowilResources(object):
                 plugin_name, resources['resourcedir'])
             for js in resources['js']:
                 if js['group'] in js_skip:
-                    continue
+                    continue                                 #pragma NO COVER
                 if not self._is_remote_resource(js['resource']):
                     js['resource'] = resource_base + '/' + js['resource']
                 all_js.append(js)
             for css in resources['css']:
                 if css['group'] in css_skip:
-                    continue
+                    continue                                 #pragma NO COVER
                 if not self._is_remote_resource(css['resource']):
                     css['resource'] = resource_base + '/' + css['resource']
                 all_css.append(css)

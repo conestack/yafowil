@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
-from odict import odict
 from node.utils import UNSET
-from .base import factory
-from .utils import (
-    cssid,
-    cssclasses,
-    css_managed_props,
-    managedprops,
-    attr_value,
-)
+from odict import odict
+from yafowil.base import factory
+from yafowil.utils import attr_value
+from yafowil.utils import css_managed_props
+from yafowil.utils import cssclasses
+from yafowil.utils import cssid
+from yafowil.utils import managedprops
 
 
 @managedprops('structural')

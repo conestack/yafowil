@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-import unittest
-import doctest
-from pprint import pprint
 from interlude import interact
+from pprint import pprint
+import doctest
 import lxml.etree as etree
+import unittest
 
 
 optionflags = \
@@ -45,5 +45,5 @@ def test_suite():
     ])
 
 
-if __name__ == '__main__':                                 # pragma NO COVERAGE
-    unittest.main(defaultTest='test_suite')                # pragma NO COVERAGE
+if __name__ == '__main__':                                  #pragma NO COVER
+    unittest.main(defaultTest='test_suite')                 #pragma NO COVER

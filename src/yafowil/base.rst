@@ -294,7 +294,8 @@ b.3) two extractors with request::
     
 A failing widget::
 
-    >>> import sys, traceback
+    >>> import sys
+    >>> import traceback
     >>> testwidget = Widget('blueprint_names_goes_here',
     ...                     [('1', fail_extractor)], 
     ...                     [('1', fail_edit_renderer)], 

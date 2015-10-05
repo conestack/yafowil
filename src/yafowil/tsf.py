@@ -27,7 +27,7 @@ if not os.environ.get('TESTRUN_MARKER'):
         except ImportError:
             TSF = DummyTranslationStringFactory
 else:
-    TSF = DummyTranslationStringFactory
+    TSF = DummyTranslationStringFactory                      #pragma NO COVER
 
 
 _ = TSF('yafowil')

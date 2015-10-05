@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
+from node.utils import UNSET
+from pkg_resources import iter_entry_points
 import inspect
 import json
 import logging
 import re
-from pkg_resources import iter_entry_points
-from node.utils import UNSET
 
 
 def get_entry_points(ns=None):

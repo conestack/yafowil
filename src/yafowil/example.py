@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .base import factory
+from yafowil.base import factory
 
 
 DOC_PLAIN_TEXT = """\

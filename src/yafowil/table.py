@@ -1,14 +1,10 @@
-from .base import factory
-from .compound import (
-    compound_renderer,
-    hybrid_extractor,
-)
-from .utils import (
-    cssclasses,
-    css_managed_props,
-    managedprops,
-    attr_value,
-)
+from yafowil.base import factory
+from yafowil.compound import compound_renderer
+from yafowil.compound import hybrid_extractor
+from yafowil.utils import attr_value
+from yafowil.utils import css_managed_props
+from yafowil.utils import cssclasses
+from yafowil.utils import managedprops
 
 
 @managedprops('id', *css_managed_props)
