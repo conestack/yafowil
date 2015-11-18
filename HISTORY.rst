@@ -5,8 +5,15 @@ History
 2.1.4 (unreleased)
 ------------------
 
-- ``number`` blueprint uses ``generic_datatype_extractor`` and returns ``None``
-  instead of ``UNSET`` on extraction if empty value found on request.
+- ``Widget.attrs`` can also be ``UNSET``. Fix behavior.
+  [rnix, 2015-11-18]
+
+- Change ``default`` value of ``select`` blueprint from ``list()`` to
+  ``UNSET``. This can represent both, an empty single valued and an empty
+  multi valued selection.
+  [rnix, 2015-11-18]
+
+- ``number`` blueprint uses ``generic_datatype_extractor``.
   [rnix, 2015-11-18]
 
 - Instroduce ``generic_datatype_extractor`` and add it to ``text`` blueprint.

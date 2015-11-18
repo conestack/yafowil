@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from node.utils import UNSET
 from pkg_resources import iter_entry_points
+from yafowil.tsf import _
 import inspect
 import json
 import logging
 import re
+import uuid
 
 
 def get_entry_points(ns=None):
@@ -267,3 +269,42 @@ def cssclasses(widget, data, classattr='class', additional=[]):
     additional = [add for add in additional if add]
     _classes += additional
     return _classes and ' '.join(sorted(_classes)) or None
+
+
+DATATYPE_CONVERTERS = {
+    'int': int,
+    'integer': int,  # B/C
+    'str': str,
+    'float': float,
+    'uuid': uuid.UUID
+}
+DATATYPE_PRECONVERTERS = {
+    'float': lambda x: x.replace(',', '.')
+}
+
+
+def convert_value_to_datatype(value, datatype, default=None):
+    if not datatype:
+        return value
+    if isinstance(value, basestring) and not value:
+        return default
+    if isinstance(value, DATATYPE_CONVERTERS[datatype]):
+        return value
+    if value is UNSET:
+        return value
+    preconverter = DATATYPE_PRECONVERTERS.get(datatype)
+    if preconverter:
+        value = preconverter(value)
+    converter = DATATYPE_CONVERTERS[datatype]
+    return converter(value)
+
+
+def convert_values_to_datatype(value, datatype, default=None):
+    if isinstance(value, list):
+        res = list()
+        for item in value:
+            converted = convert_value_to_datatype(
+                item, datatype, default=default)
+            res.append(converted)
+        return res
+    return convert_value_to_datatype(value, datatype, default=default)

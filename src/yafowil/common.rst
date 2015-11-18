@@ -340,11 +340,40 @@ Datatype given, UNSET gets returned if value not found on request::
     ([], <UNSET>)
 
 If empty value found on requets and datatype defined, no conversion happens,
-instead None is returned::
+instead ``default`` is returned::
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='DATATYPE',
+    ...     value='',
+    ...     props={
+    ...         'datatype': 'str',
+    ...         'default': 'EMPTYVALUE',
+    ...     }
+    ... )
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'DATATYPE': u''})
+    >>> data.errors, data.extracted
+    ([], 'EMPTYVALUE')
+
+    >>> widget.attrs['default'] = None
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
 
     >>> data = widget.extract({'DATATYPE': u''})
     >>> data.errors, data.extracted
     ([], None)
+
+    >>> from node.utils import UNSET
+    >>> widget.attrs['default'] = UNSET
+    >>> data = widget.extract({'DATATYPE': u''})
+
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
 
 If value is given, conversion happens::
 
@@ -963,6 +992,13 @@ Single value selection with int datatype set::
     3
 
     >>> pxml(widget(data=data))
+    <select class="select" id="input-MYSELECT" name="MYSELECT">
+      <option id="input-MYSELECT-1" value="1">One</option>
+      <option id="input-MYSELECT-2" value="2">Two</option>
+      <option id="input-MYSELECT-3" selected="selected" value="3">Three</option>
+      <option id="input-MYSELECT-4" value="4">Four</option>
+    </select>
+    <BLANKLINE>
 
 Generic HTML5 Data::
 
@@ -972,8 +1008,8 @@ Generic HTML5 Data::
     ...     value='one',
     ...     props={
     ...         'data': {'foo': 'bar'},
-    ...         'vocabulary': [
-    ...             ('one','One')]})
+    ...         'vocabulary': [('one','One')]
+    ...     })
     >>> pxml(widget())
     <select class="select" data-foo="bar" id="input-MYSELECT" name="MYSELECT">
       <option id="input-MYSELECT-one" selected="selected" value="one">One</option>
@@ -986,8 +1022,8 @@ Generic HTML5 Data::
     ...     value='one',
     ...     props={
     ...         'data': {'foo': 'bar'},
-    ...         'vocabulary': [
-    ...             ('one','One')]},
+    ...         'vocabulary': [('one','One')]
+    ...     },
     ...     mode='display')
     >>> pxml(widget())
     <div class="display-select" data-foo="bar" id="display-MYSELECT">One</div>
@@ -999,18 +1035,21 @@ With Radio
 
 Render single selection as radio inputs::
 
+    >>> vocab = [
+    ...     ('one','One'),
+    ...     ('two', 'Two'),
+    ...     ('three', 'Three'),
+    ...     ('four', 'Four')
+    ... ]
     >>> widget = factory(
     ...     'select',
     ...     'MYSELECT',
     ...     value='one',
     ...     props={
-    ...         'vocabulary': [
-    ...             ('one','One'),
-    ...             ('two', 'Two'),
-    ...             ('three', 'Three'),
-    ...             ('four', 'Four')],
+    ...         'vocabulary': vocab,
     ...         'format': 'single',
-    ...         'listing_label_position': 'before'})
+    ...         'listing_label_position': 'before'
+    ...     })
     >>> pxml('<div>'+widget()+'</div>')
     <div>
       <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
@@ -1114,6 +1153,69 @@ Radio single valued display mode::
     </div>
     <BLANKLINE>
 
+Radio single value selection with uuid datatype set::
+
+    >>> vocab = [
+    ...     ('3762033b-7118-4bad-89ed-7cb71f5ab6d1', 'One'),
+    ...     ('74ef603d-29d0-4016-a003-334719dde835', 'Two'),
+    ...     ('b1116392-4a80-496d-86f1-3a2c87e09c59', 'Three'),
+    ...     ('e09471dc-625d-463b-be03-438d7089ec13', 'Four')
+    ... ]
+    >>> widget = factory(
+    ...     'select',
+    ...     'MYSELECT',
+    ...     value='b1116392-4a80-496d-86f1-3a2c87e09c59',
+    ...     props={
+    ...         'vocabulary': vocab,
+    ...         'datatype': 'uuid',
+    ...         'format': 'single',
+    ...     })
+    >>> pxml('<div>'+widget()+'</div>')
+    <div>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <div id="radio-MYSELECT-wrapper">
+        <div id="radio-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1">
+          <label for="input-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1"><input class="select" id="input-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1" name="MYSELECT" type="radio" value="3762033b-7118-4bad-89ed-7cb71f5ab6d1"/>One</label>
+        </div>
+        <div id="radio-MYSELECT-74ef603d-29d0-4016-a003-334719dde835">
+          <label for="input-MYSELECT-74ef603d-29d0-4016-a003-334719dde835"><input class="select" id="input-MYSELECT-74ef603d-29d0-4016-a003-334719dde835" name="MYSELECT" type="radio" value="74ef603d-29d0-4016-a003-334719dde835"/>Two</label>
+        </div>
+        <div id="radio-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59">
+          <label for="input-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59"><input checked="checked" class="select" id="input-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59" name="MYSELECT" type="radio" value="b1116392-4a80-496d-86f1-3a2c87e09c59"/>Three</label>
+        </div>
+        <div id="radio-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13">
+          <label for="input-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13"><input class="select" id="input-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13" name="MYSELECT" type="radio" value="e09471dc-625d-463b-be03-438d7089ec13"/>Four</label>
+        </div>
+      </div>
+    </div>
+    <BLANKLINE>
+
+    >>> data = widget.extract({
+    ...     'MYSELECT': 'e09471dc-625d-463b-be03-438d7089ec13'
+    ... })
+    >>> data.extracted
+    UUID('e09471dc-625d-463b-be03-438d7089ec13')
+
+    >>> pxml('<div>'+widget(data=data)+'</div>')
+    <div>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <div id="radio-MYSELECT-wrapper">
+        <div id="radio-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1">
+          <label for="input-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1"><input class="select" id="input-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1" name="MYSELECT" type="radio" value="3762033b-7118-4bad-89ed-7cb71f5ab6d1"/>One</label>
+        </div>
+        <div id="radio-MYSELECT-74ef603d-29d0-4016-a003-334719dde835">
+          <label for="input-MYSELECT-74ef603d-29d0-4016-a003-334719dde835"><input class="select" id="input-MYSELECT-74ef603d-29d0-4016-a003-334719dde835" name="MYSELECT" type="radio" value="74ef603d-29d0-4016-a003-334719dde835"/>Two</label>
+        </div>
+        <div id="radio-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59">
+          <label for="input-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59"><input class="select" id="input-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59" name="MYSELECT" type="radio" value="b1116392-4a80-496d-86f1-3a2c87e09c59"/>Three</label>
+        </div>
+        <div id="radio-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13">
+          <label for="input-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13"><input checked="checked" class="select" id="input-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13" name="MYSELECT" type="radio" value="e09471dc-625d-463b-be03-438d7089ec13"/>Four</label>
+        </div>
+      </div>
+    </div>
+    <BLANKLINE>
+
 Generic HTML5 Data::
 
     >>> widget = factory(
@@ -1121,11 +1223,11 @@ Generic HTML5 Data::
     ...     'MYSELECT',
     ...     value='one',
     ...     props={
-    ...         'vocabulary': [
-    ...             ('one','One')],
+    ...         'vocabulary': [('one','One')],
     ...         'format': 'single',
     ...         'listing_label_position': 'before',
-    ...         'data': {'foo': 'bar'}})
+    ...         'data': {'foo': 'bar'}
+    ...     })
     >>> pxml('<div>'+widget()+'</div>')
     <div>
       <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
@@ -1143,11 +1245,11 @@ Generic HTML5 Data::
     ...     'MYSELECT',
     ...     value='one',
     ...     props={
-    ...         'vocabulary': [
-    ...             ('one','One')],
+    ...         'vocabulary': [('one','One')],
     ...         'format': 'single',
     ...         'listing_label_position': 'before',
-    ...         'data': {'foo': 'bar'}},
+    ...         'data': {'foo': 'bar'}
+    ...     },
     ...     mode='display')
     >>> pxml('<div>'+widget()+'</div>')
     <div>
@@ -1161,17 +1263,20 @@ Multi valued
 
 Default multi valued::
 
+    >>> vocab = [
+    ...     ('one','One'),
+    ...     ('two', 'Two'),
+    ...     ('three', 'Three'),
+    ...     ('four', 'Four')
+    ... ]
     >>> widget = factory(
     ...     'select',
     ...     'MYSELECT',
     ...     value=['one', 'two'],
     ...     props={
     ...         'multivalued': True,
-    ...         'vocabulary': [
-    ...             ('one','One'),
-    ...             ('two', 'Two'),
-    ...             ('three', 'Three'),
-    ...             ('four', 'Four')]})
+    ...         'vocabulary': vocab
+    ...     })
     >>> pxml('<div>' + widget() + '</div>')
     <div>
       <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
@@ -1249,7 +1354,8 @@ Multi selection display with empty values list::
     ...     value=[],
     ...     props={
     ...         'vocabulary': [],
-    ...         'multivalued': True},
+    ...         'multivalued': True
+    ...     },
     ...     mode='display')
     >>> pxml('<div>' + widget() + '</div>')
     <div>
@@ -1259,23 +1365,92 @@ Multi selection display with empty values list::
 
 Multiple values on single valued selection fails::
 
+    >>> vocab = [
+    ...     ('one','One'),
+    ...     ('two', 'Two'),
+    ...     ('three', 'Three'),
+    ...     ('four', 'Four')
+    ... ]
     >>> widget = factory(
     ...     'select',
     ...     'MYSELECT',
     ...     value=['one', 'two'],
     ...     props={
-    ...         'vocabulary': [
-    ...             ('one','One'),
-    ...             ('two', 'Two'),
-    ...             ('three', 'Three'),
-    ...             ('four', 'Four')]})
+    ...         'vocabulary': vocab
+    ...     })
     >>> pxml(widget())
     Traceback (most recent call last):
       ...
     ValueError: Multiple values for single selection.
 
+Multi value selection with float datatype set::
+
+    >>> vocab = [
+    ...     (1.0,'One'),
+    ...     (2.0, 'Two'),
+    ...     (3.0, 'Three'),
+    ...     (4.0, 'Four')
+    ... ]
+    >>> widget = factory(
+    ...     'select',
+    ...     'MYSELECT',
+    ...     value=[1.0, 2.0],
+    ...     props={
+    ...         'datatype': 'float',
+    ...         'multivalued': True,
+    ...         'vocabulary': vocab
+    ...     })
+    >>> pxml('<div>' + widget() + '</div>')
+    <div>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <select class="select" id="input-MYSELECT" multiple="multiple" name="MYSELECT">
+        <option id="input-MYSELECT-1.0" selected="selected" value="1.0">One</option>
+        <option id="input-MYSELECT-2.0" selected="selected" value="2.0">Two</option>
+        <option id="input-MYSELECT-3.0" value="3.0">Three</option>
+        <option id="input-MYSELECT-4.0" value="4.0">Four</option>
+      </select>
+    </div>
+    <BLANKLINE>
+
+    >>> request = {
+    ...     'MYSELECT': ['2.0', '3.0']
+    ... }
+    >>> data = widget.extract(request=request)
+    >>> data.extracted
+    [2.0, 3.0]
+
+    >>> pxml('<div>' + widget(data=data) + '</div>')
+    <div>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <select class="select" id="input-MYSELECT" multiple="multiple" name="MYSELECT">
+        <option id="input-MYSELECT-1.0" value="1.0">One</option>
+        <option id="input-MYSELECT-2.0" selected="selected" value="2.0">Two</option>
+        <option id="input-MYSELECT-3.0" selected="selected" value="3.0">Three</option>
+        <option id="input-MYSELECT-4.0" value="4.0">Four</option>
+      </select>
+    </div>
+    <BLANKLINE>
+
+    >>> request = {
+    ...     'MYSELECT': '4.0'
+    ... }
+    >>> data = widget.extract(request=request)
+    >>> data.extracted
+    [4.0]
+
+    >>> request = {
+    ...     'MYSELECT': ''
+    ... }
+    >>> data = widget.extract(request=request)
+    >>> data.extracted
+    [<UNSET>]
+
 Generic HTML5 Data::
 
+    >>> vocab = [
+    ...     ('one','One'),
+    ...     ('two', 'Two')
+    ... ]
     >>> widget = factory(
     ...     'select',
     ...     'MYSELECT',
@@ -1283,9 +1458,8 @@ Generic HTML5 Data::
     ...     props={
     ...         'multivalued': True,
     ...         'data': {'foo': 'bar'},
-    ...         'vocabulary': [
-    ...             ('one','One'),
-    ...             ('two', 'Two')]})
+    ...         'vocabulary': vocab
+    ...     })
     >>> pxml('<div>' + widget() + '</div>')
     <div>
       <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
@@ -1310,18 +1484,21 @@ With Checkboxes
 
 Render multi selection as checkboxes::
 
+    >>> vocab = [
+    ...     ('one','One'),
+    ...     ('two', 'Two'),
+    ...     ('three', 'Three'),
+    ...     ('four', 'Four')
+    ... ]
     >>> widget = factory(
     ...     'select',
     ...     'MYSELECT',
     ...     value='one',
     ...     props={
     ...         'multivalued': True,
-    ...         'vocabulary': [
-    ...             ('one','One'),
-    ...             ('two', 'Two'),
-    ...             ('three', 'Three'),
-    ...             ('four', 'Four')],
-    ...         'format': 'single'})
+    ...         'vocabulary': vocab,
+    ...         'format': 'single'
+    ...     })
     >>> pxml('<div>' + widget() + '</div>')
     <div>
       <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
@@ -1389,9 +1566,9 @@ Generic HTML5 Data::
     ...     props={
     ...         'multivalued': True,
     ...         'data': {'foo': 'bar'},
-    ...         'vocabulary': [
-    ...             ('one','One')],
-    ...         'format': 'single'})
+    ...         'vocabulary': [('one','One')],
+    ...         'format': 'single'
+    ...     })
     >>> pxml('<div>' + widget() + '</div>')
     <div>
       <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
@@ -1416,19 +1593,22 @@ Specials
 
 Using 'ul' instead of 'div' for rendering radio or checkbox selections::
 
+    >>> vocab = [
+    ...     ('one','One'),
+    ...     ('two', 'Two'),
+    ...     ('three', 'Three'),
+    ...     ('four', 'Four')
+    ... ]
     >>> widget = factory(
     ...     'select',
     ...     'MYSELECT',
     ...     value='one',
     ...     props={
     ...         'multivalued': True,
-    ...         'vocabulary': [
-    ...             ('one','One'),
-    ...             ('two', 'Two'),
-    ...             ('three', 'Three'),
-    ...             ('four', 'Four')],
+    ...         'vocabulary': vocab,
     ...         'format': 'single',
-    ...         'listing_tag': 'ul'})
+    ...         'listing_tag': 'ul'
+    ...     })
     >>> pxml('<div>'+widget()+'</div>')
     <div>
       <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
@@ -1463,7 +1643,8 @@ Render single format selection with label after input::
     ...         ],
     ...         'format': 'single',
     ...         'listing_tag': 'ul',
-    ...         'listing_label_position': 'after'})
+    ...         'listing_label_position': 'after'
+    ...     })
     >>> pxml('<div>'+widget()+'</div>')
     <div>
       <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
@@ -1494,7 +1675,8 @@ Render single format selection with input inside label before checkbox::
     ...         ],
     ...         'format': 'single',
     ...         'listing_tag': 'ul',
-    ...         'listing_label_position': 'inner-before'})
+    ...         'listing_label_position': 'inner-before'
+    ...     })
     >>> pxml('<div>'+widget()+'</div>')
     <div>
       <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
@@ -1519,7 +1701,8 @@ Check BBB 'inner' for 'listing_label_position' which behaves like
     ...     props={
     ...         'vocabulary': [('one','One')],
     ...         'format': 'single',
-    ...         'listing_label_position': 'inner'})
+    ...         'listing_label_position': 'inner'
+    ...     })
     >>> pxml('<div>'+widget()+'</div>')
     <div>
       <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
@@ -1533,16 +1716,19 @@ Check BBB 'inner' for 'listing_label_position' which behaves like
 
 Check selection required::
 
+    >>> vocab = [
+    ...     ('one','One'),
+    ...     ('two', 'Two'),
+    ...     ('three', 'Three'),
+    ...     ('four', 'Four')
+    ... ]
     >>> widget = factory(
     ...     'select',
     ...     'reqselect',
     ...     props={
     ...         'required': 'Selection required',
-    ...         'vocabulary': [
-    ...             ('one','One'),
-    ...             ('two', 'Two'),
-    ...             ('three', 'Three'),
-    ...             ('four', 'Four')]})
+    ...         'vocabulary': vocab
+    ...     })
     >>> pxml(widget())
     <select class="select" id="input-reqselect" name="reqselect" required="required">
       <option id="input-reqselect-one" value="one">One</option>
@@ -1556,17 +1742,20 @@ Check selection required::
     >>> data.printtree()
     <RuntimeData reqselect, value=<UNSET>, extracted='', 1 error(s) at ...>
 
+    >>> vocab = [
+    ...     ('one','One'),
+    ...     ('two', 'Two'),
+    ...     ('three', 'Three'),
+    ...     ('four', 'Four')
+    ... ]
     >>> widget = factory(
     ...     'select',
     ...     'reqselect',
     ...     props={
     ...         'required': 'Selection required',
     ...         'multivalued': True,
-    ...         'vocabulary': [
-    ...             ('one','One'),
-    ...             ('two', 'Two'),
-    ...             ('three', 'Three'),
-    ...             ('four', 'Four')]})
+    ...         'vocabulary': vocab
+    ...     })
     >>> pxml('<div>' + widget() + '</div>')
     <div>
       <input id="exists-reqselect" name="reqselect-exists" type="hidden" value="exists"/>
@@ -1591,7 +1780,8 @@ Single selection extraction without value::
     ...     props={
     ...         'vocabulary': [
     ...             ('one','One'),
-    ...             ('two', 'Two')]})
+    ...             ('two', 'Two')]
+    ...     })
 
     >>> request = {
     ...     'myselect': 'one',
@@ -1610,7 +1800,8 @@ Single selection extraction with value::
     ...     props={
     ...         'vocabulary': [
     ...             ('one','One'),
-    ...             ('two', 'Two')]})
+    ...             ('two', 'Two')]
+    ...     })
 
     >>> request = {
     ...     'myselect': 'one',
@@ -1644,10 +1835,11 @@ Single selection extraction required::
     ...         'required': True,
     ...         'vocabulary': [
     ...             ('one','One'),
-    ...             ('two', 'Two')]})
+    ...             ('two', 'Two')]
+    ...     })
 
     >>> request = {
-    ...     'myselect':'',
+    ...     'myselect': '',
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
@@ -1669,7 +1861,8 @@ Multiple selection extraction without value::
     ...         'multivalued': True,
     ...         'vocabulary': [
     ...             ('one','One'),
-    ...             ('two', 'Two')]})
+    ...             ('two', 'Two')]
+    ...     })
 
     >>> request = {
     ...     'myselect': ['one', 'two'],
@@ -1680,16 +1873,19 @@ Multiple selection extraction without value::
 
 Multiple selection extraction with value::
 
+    >>> vocab = [
+    ...     ('one','One'),
+    ...     ('two', 'Two'),
+    ...     ('three', 'Three')
+    ... ]
     >>> widget = factory(
     ...     'select',
     ...     'myselect',
     ...     value='three',
     ...     props={
     ...         'multivalued': True,
-    ...         'vocabulary': [
-    ...             ('one','One'),
-    ...             ('two', 'Two'),
-    ...             ('three', 'Three')]})
+    ...         'vocabulary': vocab
+    ...     })
 
     >>> request = {
     ...     'myselect': 'one',
@@ -1708,6 +1904,12 @@ Multiselection, completly disabled::
 
 Multiselection, partly disabled, empty request::
 
+    >>> vocab = [
+    ...     ('one','One'),
+    ...     ('two', 'Two'),
+    ...     ('three', 'Three'),
+    ...     ('four', 'Four')
+    ... ]
     >>> widget = factory(
     ...     'select',
     ...     'myselect',
@@ -1715,11 +1917,8 @@ Multiselection, partly disabled, empty request::
     ...     props={
     ...         'multivalued': True,
     ...         'disabled': ['two', 'three'],
-    ...         'vocabulary': [
-    ...             ('one','One'),
-    ...             ('two', 'Two'),
-    ...             ('three', 'Three'),
-    ...             ('four', 'Four')]})
+    ...         'vocabulary': vocab
+    ...     })
 
     >>> data = widget.extract({})
     >>> data.printtree()
@@ -1727,6 +1926,13 @@ Multiselection, partly disabled, empty request::
 
 Multiselection, partly disabled, non-empty request::
 
+    >>> vocab = [
+    ...     ('one','One'),
+    ...     ('two', 'Two'),
+    ...     ('three', 'Three'),
+    ...     ('four', 'Four'),
+    ...     ('five', 'Five')
+    ... ]
     >>> widget = factory(
     ...     'select',
     ...     'myselect',
@@ -1734,12 +1940,8 @@ Multiselection, partly disabled, non-empty request::
     ...     props={
     ...         'multivalued': True,
     ...         'disabled': ['two', 'three', 'four', 'five'],
-    ...         'vocabulary': [
-    ...             ('one','One'),
-    ...             ('two', 'Two'),
-    ...             ('three', 'Three'),
-    ...             ('four', 'Four'),
-    ...             ('five', 'Five')]})
+    ...         'vocabulary': vocab
+    ...     })
     >>> request = {
     ...     'myselect': ['one', 'two', 'five'],
     ...     'myselect-exists': True,
@@ -1764,15 +1966,18 @@ Check extraction::
 
 Single selection radio extraction::
 
+    >>> vocab = [
+    ...     ('one','One'),
+    ...     ('two', 'Two'),
+    ...     ('three', 'Three')
+    ... ]
     >>> widget = factory(
     ...     'select',
     ...     'myselect',
     ...     props={
     ...         'format': 'single',
-    ...         'vocabulary': [
-    ...             ('one','One'),
-    ...             ('two', 'Two'),
-    ...             ('three', 'Three')]})
+    ...         'vocabulary': vocab
+    ...     })
 
 No exists marker in request. Extracts to UNSET::
 
@@ -1803,16 +2008,19 @@ Select value::
 
 Multi selection radio extraction::
 
+    >>> vocab = [
+    ...     ('one','One'),
+    ...     ('two', 'Two'),
+    ...     ('three', 'Three')
+    ... ]
     >>> widget = factory(
     ...     'select',
     ...     'myselect',
     ...     props={
     ...         'multivalued': True,
     ...         'format': 'single',
-    ...         'vocabulary': [
-    ...             ('one','One'),
-    ...             ('two', 'Two'),
-    ...             ('three', 'Three')]})
+    ...         'vocabulary': vocab
+    ...     })
 
 No exists marker in request. Extracts to UNSET::
 
@@ -2563,7 +2771,7 @@ Extract not required and empty::
 
     >>> data = widget.extract({'NUMBER': ''})
     >>> data.errors, data.extracted
-    ([], None)
+    ([], <UNSET>)
 
 Extract invalid floating point input::
 

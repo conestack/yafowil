@@ -152,24 +152,22 @@ class WidgetAttributes(NodeAttributes):
     def __getitem__(self, name):
         prefixed = '%s.%s' % (self.__parent__.current_prefix or '', name)
         try:
-            value = NodeAttributes.__getitem__(self, prefixed)
+            return NodeAttributes.__getitem__(self, prefixed)
         except KeyError:
-            value = UNSET
-        if value is not UNSET:
-            return value
+            try:
+                return NodeAttributes.__getitem__(self, name)
+            except KeyError:
+                pass
         try:
-            value = NodeAttributes.__getitem__(self, name)
+            return self.__parent__.defaults[prefixed]
         except KeyError:
-            value = UNSET
-        if value is not UNSET:
-            return value
-        value = self.__parent__.defaults.get(prefixed, UNSET)
-        if value is not UNSET:
-            return value
-        if name in self.__parent__.defaults:
-            return self.__parent__.defaults[name]
-        msg = 'Property with key "%s" is not given on widget "%s" (no default)'
-        raise KeyError(msg % (name, self.__parent__.dottedpath))
+            try:
+                return self.__parent__.defaults[name]
+            except KeyError:
+                raise KeyError((
+                    'Property with key "{0}" is not given on '
+                    'widget "{1}" (no default)'
+                ).format(name, self.__parent__.dottedpath))
 
     def get(self, key, default=None):
         try:

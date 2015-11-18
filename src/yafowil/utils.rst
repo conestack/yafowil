@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
+
 Test entry_point support tools
 ------------------------------
 
 ::
+
     >>> import yafowil.loader
     >>> from yafowil.utils import get_entry_points
     >>> get_entry_points()
@@ -22,6 +25,7 @@ Test examples lookup
 --------------------
 
 ::
+
     >>> from yafowil.utils import get_example_names
     >>> sorted(get_example_names())
     ['yafowil'...]
@@ -47,6 +51,7 @@ Test the Vocabulary
 -------------------
 
 ::
+
     >>> from yafowil.utils import vocabulary
     >>> vocabulary('foo')
     [('foo', 'foo')]
@@ -74,6 +79,7 @@ Test Tag renderer
 -----------------
 
 ::
+
     >>> from node.utils import UNSET
     >>> from yafowil.utils import Tag
     >>> tag = Tag(lambda msg: msg)
@@ -102,6 +108,7 @@ Test CSS Classes
 ----------------
 
 ::
+
     >>> from plumber import plumbing
     >>> from node.base import OrderedNode
     >>> from node.behaviors import Nodespaces
@@ -201,6 +208,7 @@ Test managedprops annotation
 ----------------------------
 
 ::
+
     >>> from yafowil.utils import managedprops
     >>> @managedprops('foo', 'bar')
     ... def somefunc(a, b, c):
@@ -215,6 +223,7 @@ Test attr_value
 ---------------
 
 ::
+
     >>> from node.base import AttributedNode
     >>> from yafowil.utils import attr_value
 
@@ -292,6 +301,7 @@ Test generic_html5_attrs
 ------------------------
 
 ::
+
     >>> from yafowil.utils import generic_html5_attrs
     >>> generic_html5_attrs(
     ...     {'foo': 'bar', 'baz': ['bam'], 'nada': None, 'unset': UNSET})
@@ -302,6 +312,7 @@ Test data_attrs_helper
 ----------------------
 
 ::
+
     >>> from node.base import AttributedNode
     >>> from yafowil.utils import data_attrs_helper
 
@@ -355,3 +366,101 @@ Test data_attrs_helper
     >>> tag = Tag(lambda msg: msg)
     >>> tag('dummy', name='foo', **data_attrs)
     u'<dummy data-camel-attr-name=\'camelValue\' data-testattr1=\'value\' data-testattr2=\'true\' data-testattr3=\'false\' data-testattr5=\'["item1", "item2", "item3"]\' data-testattr6=\'{"key3": "item3", "key2": "item2", "key1": "item1"}\' data-testattr7=\'1234\' data-testattr8=\'1234.5678\' name="foo" />'
+
+
+Test convert_value_to_datatype
+------------------------------
+
+::
+
+    >>> from yafowil.utils import convert_value_to_datatype
+    >>> import uuid
+
+    >>> convert_value_to_datatype('', None)
+    ''
+
+    >>> convert_value_to_datatype('', 'str')
+    >>> convert_value_to_datatype('', 'str', default='')
+    ''
+
+    >>> convert_value_to_datatype(u'covertable unicode', 'str', default='')
+    'covertable unicode'
+
+    >>> convert_value_to_datatype(u'äöü', 'str', default='')
+    Traceback (most recent call last):
+      ...
+    UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-5: 
+    ordinal not in range(128)
+
+    >>> convert_value_to_datatype('', 'int', default=UNSET)
+    <UNSET>
+
+    >>> convert_value_to_datatype('1', 'int', default=UNSET)
+    1
+
+    >>> convert_value_to_datatype('1.0', 'int', default=UNSET)
+    Traceback (most recent call last):
+      ...
+    ValueError: invalid literal for int() with base 10: '1.0'
+
+    >>> convert_value_to_datatype('a', 'int', default=UNSET)
+    Traceback (most recent call last):
+      ...
+    ValueError: invalid literal for int() with base 10: 'a'
+
+    >>> convert_value_to_datatype('', 'float', default=None)
+    >>> convert_value_to_datatype('1.0', 'float', default=None)
+    1.0
+
+    >>> convert_value_to_datatype('1', 'float', default=None)
+    1.0
+
+    >>> convert_value_to_datatype('a', 'float', default=None)
+    Traceback (most recent call last):
+      ...
+    ValueError: could not convert string to float: a
+
+    >>> convert_value_to_datatype('', 'uuid', default=uuid.uuid4())
+    UUID('...')
+
+    >>> convert_value_to_datatype(str(uuid.uuid4()), 'uuid')
+    UUID('...')
+
+    >>> convert_value_to_datatype('a', 'uuid')
+    Traceback (most recent call last):
+      ...
+    ValueError: badly formed hexadecimal UUID string
+
+
+Test convert_values_to_datatype
+-------------------------------
+
+::
+
+    >>> from yafowil.utils import convert_values_to_datatype
+    >>> convert_values_to_datatype(UNSET, 'int', default=-1)
+    <UNSET>
+
+    >>> convert_values_to_datatype('', 'int', default=-1)
+    -1
+
+    >>> convert_values_to_datatype('-1', 'int', default=1)
+    -1
+
+    >>> convert_values_to_datatype('0', 'int', default=1)
+    0
+
+    >>> convert_values_to_datatype('', 'int', default=1)
+    1
+
+    >>> convert_values_to_datatype([''], 'int', default=-1)
+    [-1]
+
+    >>> convert_values_to_datatype(['-1'], 'int', default=1)
+    [-1]
+
+    >>> convert_values_to_datatype(['0'], 'int', default=1)
+    [0]
+
+    >>> convert_values_to_datatype([''], 'int', default=1)
+    [1]
