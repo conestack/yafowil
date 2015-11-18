@@ -5,7 +5,16 @@ History
 2.1.4 (unreleased)
 ------------------
 
-- No changes yet.
+- ``number`` blueprint uses ``generic_datatype_extractor`` and returns ``None``
+  instead of ``UNSET`` on extraction if empty value found on request.
+  [rnix, 2015-11-18]
+
+- Instroduce ``generic_datatype_extractor`` and add it to ``text`` blueprint.
+  [rnix, 2015-11-18]
+
+- Fix URL extractor. Must not raise ExtractionError if not required on empty
+  input.
+  [rnix, 2015-11-18]
 
 
 2.1.3 (2015-04-12)

@@ -22,7 +22,7 @@ Helper::
 Hidden
 ------
 
-::
+Hidden input widget::
 
     >>> from yafowil.base import factory
     >>> widget = factory(
@@ -68,7 +68,7 @@ Generic HTML5 Data::
 Generic tag
 -----------
 
-::
+Custom tag widget::
 
     >>> widget = factory('tag', name='MYTAG', props={
     ...     'tag': 'h3',
@@ -91,7 +91,7 @@ Skip tag::
 Text Input
 ----------
 
-::
+Regular text input::
 
     >>> widget = factory(
     ...     'text',
@@ -133,7 +133,7 @@ Generic HTML5 Data::
 Autofocus Text Input
 --------------------
 
-::
+Widget with autofocus property::
 
     >>> widget = factory(
     ...     'text',
@@ -149,7 +149,7 @@ Autofocus Text Input
 Placeholder Text Input
 ----------------------
 
-::
+Widget with placeholder property::
 
     >>> widget = factory(
     ...     'text',
@@ -165,7 +165,7 @@ Placeholder Text Input
 Required Input
 --------------
 
-::
+Widget with requires input::
 
     >>> widget = factory(
     ...     'text',
@@ -309,6 +309,108 @@ Skip mode renders empty string.::
     ...     mode='skip')
     >>> widget()
     u''
+
+
+Datatype extraction
+-------------------
+
+No datatype given, no datatype conversion happens at all::
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='DATATYPE',
+    ...     value=''
+    ... )
+    >>> data = widget.extract({'DATATYPE': u''})
+    >>> data.errors, data.extracted
+    ([], u'')
+
+Datatype given, UNSET gets returned if value not found on request::
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='DATATYPE',
+    ...     value='',
+    ...     props={
+    ...         'datatype': 'str',
+    ...     }
+    ... )
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+If empty value found on requets and datatype defined, no conversion happens,
+instead None is returned::
+
+    >>> data = widget.extract({'DATATYPE': u''})
+    >>> data.errors, data.extracted
+    ([], None)
+
+If value is given, conversion happens::
+
+    >>> data = widget.extract({'DATATYPE': u'hallo'})
+    >>> data.errors, data.extracted
+    ([], 'hallo')
+
+    >>> data = widget.extract({'DATATYPE': u'äöü'})
+    >>> data.errors
+    [ExtractionError('Input is not a valid string.',)]
+
+Integer datatype::
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='DATATYPE',
+    ...     value='',
+    ...     props={
+    ...         'datatype': 'int',
+    ...     }
+    ... )
+    >>> data = widget.extract({'DATATYPE': '1'})
+    >>> data.errors, data.extracted
+    ([], 1)
+
+    >>> data = widget.extract({'DATATYPE': 'a'})
+    >>> data.errors
+    [ExtractionError('Input is not a valid integer.',)]
+
+Float extraction::
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='DATATYPE',
+    ...     value='',
+    ...     props={
+    ...         'datatype': 'float',
+    ...     }
+    ... )
+    >>> data = widget.extract({'DATATYPE': '1.2'})
+    >>> data.errors, data.extracted
+    ([], 1.2)
+
+    >>> data = widget.extract({'DATATYPE': 'a'})
+    >>> data.errors
+    [ExtractionError('Input is not a valid floating point number.',)]
+
+UUID extraction::
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='DATATYPE',
+    ...     value='',
+    ...     props={
+    ...         'datatype': 'uuid',
+    ...     }
+    ... )
+    >>> data = widget.extract({
+    ...     'DATATYPE': '3b8449f3-0456-4baa-a670-3066b0fcbda0'
+    ... })
+    >>> data.errors, data.extracted
+    ([], UUID('3b8449f3-0456-4baa-a670-3066b0fcbda0'))
+
+    >>> data = widget.extract({'DATATYPE': 'a'})
+    >>> data.errors
+    [ExtractionError('Input is not a valid UUID.',)]
 
 
 Checkbox
@@ -597,7 +699,7 @@ Generic HTML5 Data::
 Textarea
 --------
 
-::
+Textarea widget::
 
     >>> widget = factory(
     ...     'textarea',
@@ -745,18 +847,21 @@ Selection
 Single Valued
 .............
 
-::
+Default single value selection::
 
+    >>> vocab = [
+    ...     ('one','One'),
+    ...     ('two', 'Two'),
+    ...     ('three', 'Three'),
+    ...     ('four', 'Four')
+    ... ]
     >>> widget = factory(
     ...     'select',
     ...     'MYSELECT',
     ...     value='one',
     ...     props={
-    ...         'vocabulary': [
-    ...             ('one','One'),
-    ...             ('two', 'Two'),
-    ...             ('three', 'Three'),
-    ...             ('four', 'Four')]})
+    ...         'vocabulary': vocab
+    ...     })
     >>> pxml(widget())
     <select class="select" id="input-MYSELECT" name="MYSELECT">
       <option id="input-MYSELECT-one" selected="selected" value="one">One</option>
@@ -767,6 +872,9 @@ Single Valued
     <BLANKLINE>
 
     >>> data = widget.extract({'MYSELECT': 'two'})
+    >>> data.extracted
+    'two'
+
     >>> pxml(widget(data=data))
     <select class="select" id="input-MYSELECT" name="MYSELECT">
       <option id="input-MYSELECT-one" value="one">One</option>
@@ -776,7 +884,7 @@ Single Valued
     </select>
     <BLANKLINE>
 
-Single valued set to completly disabled::
+Single value selection completly disabled::
 
     >>> widget.attrs['disabled'] = True
     >>> pxml(widget())
@@ -788,7 +896,7 @@ Single valued set to completly disabled::
     </select>
     <BLANKLINE>
 
-Single valued with specific options disabled::
+Single value selection with specific options disabled::
 
     >>> widget.attrs['disabled'] = ['two', 'four']
     >>> pxml(widget())
@@ -802,7 +910,7 @@ Single valued with specific options disabled::
 
     >>> del widget.attrs['disabled']
 
-Single valued display mode::
+Single value selection display mode::
 
     >>> widget.mode = 'display'
     >>> widget()
@@ -824,6 +932,37 @@ Single valued display mode::
       <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" value="two"/>
     </div>
     <BLANKLINE>
+
+Single value selection with int datatype set::
+
+    >>> vocab = [
+    ...     (1, 'One'),
+    ...     (2, 'Two'),
+    ...     (3, 'Three'),
+    ...     (4, 'Four')
+    ... ]
+    >>> widget = factory(
+    ...     'select',
+    ...     'MYSELECT',
+    ...     value=2,
+    ...     props={
+    ...         'vocabulary': vocab,
+    ...         'datatype': 'int'
+    ...     })
+    >>> pxml(widget())
+    <select class="select" id="input-MYSELECT" name="MYSELECT">
+      <option id="input-MYSELECT-1" value="1">One</option>
+      <option id="input-MYSELECT-2" selected="selected" value="2">Two</option>
+      <option id="input-MYSELECT-3" value="3">Three</option>
+      <option id="input-MYSELECT-4" value="4">Four</option>
+    </select>
+    <BLANKLINE>
+
+    >>> data = widget.extract({'MYSELECT': '3'})
+    >>> data.extracted
+    3
+
+    >>> pxml(widget(data=data))
 
 Generic HTML5 Data::
 
@@ -1020,7 +1159,7 @@ Generic HTML5 Data::
 Multi valued
 ............
 
-::
+Default multi valued::
 
     >>> widget = factory(
     ...     'select',
@@ -1616,7 +1755,7 @@ Explanation:
 * five is disabled and not in value, but someone put it in the request. it
   should get removed.
 
-::
+Check extraction::
 
     >>> data = widget.extract(request)
     >>> data.printtree()
@@ -1706,7 +1845,7 @@ Select values::
 File
 ----
 
-::
+Render file input::
 
     >>> widget = factory('file', 'MYFILE')
     >>> widget()
@@ -1903,7 +2042,7 @@ Generic HTML5 Data::
 Submit(action)
 --------------
 
-::
+Render submit button::
 
     >>> props = {
     ...     'action': True,
@@ -1912,6 +2051,8 @@ Submit(action)
     >>> widget = factory('submit', name='save', props=props)
     >>> widget()
     u'<input id="input-save" name="action.save" type="submit" value="Action name" />'
+
+If expression is or evaluates to False, skip rendering::
 
     >>> props = {
     ...     'action': True,
@@ -2302,7 +2443,7 @@ Render empty (WHAT'S THIS GOOD FOR?)::
 E-Mail
 ------
 
-::
+Render email input field::
 
     >>> widget = factory(
     ...     'email',
@@ -2310,9 +2451,13 @@ E-Mail
     >>> pxml(widget())
     <input class="email" id="input-email" name="email" type="email" value=""/>
 
+Extract not required and empty::
+
     >>> data = widget.extract({'email': ''})
     >>> data.errors
     []
+
+Extract invalid email input::
 
     >>> data = widget.extract({'email': 'foo@bar'})
     >>> data.errors
@@ -2322,9 +2467,13 @@ E-Mail
     >>> data.errors
     [ExtractionError('Input not a valid email address.',)]
 
+Extract valid email input::
+
     >>> data = widget.extract({'email': 'foo@bar.com'})
     >>> data.errors
     []
+
+Extract required email input::
 
     >>> widget = factory(
     ...     'email',
@@ -2343,13 +2492,21 @@ E-Mail
 URL
 ---
 
-::
+Render URL input field::
 
     >>> widget = factory(
     ...     'url',
     ...     name='url')
     >>> pxml(widget())
     <input class="url" id="input-url" name="url" type="url" value=""/>
+
+Extract not required and empty::
+
+    >>> data = widget.extract({'url': ''})
+    >>> data.errors
+    []
+
+Extract invalid URL input::
 
     >>> data = widget.extract({'url': 'htt:/bla'})
     >>> data.errors
@@ -2359,7 +2516,11 @@ URL
     >>> data.errors
     [ExtractionError('Input not a valid web address.',)]
 
-    >>> data = widget.extract({'url': 'http://www.foo.bar.com:8080/bla#fasel?blubber=bla&bla=fasel'})
+Extract value URL input::
+
+    >>> data = widget.extract({
+    ...     'url': 'http://www.foo.bar.com:8080/bla#fasel?blubber=bla&bla=fasel'
+    ... })
     >>> data.errors
     []
 
@@ -2378,35 +2539,53 @@ Display renderer::
     <div class="display-number" id="display-NUMBER">3</div>
     <BLANKLINE>
 
-Default behaviour::
+Render number input::
 
     >>> widget = factory(
     ...     'number',
     ...     name='NUMBER',
     ...     value=lambda w,d:3)
     >>> pxml(widget())
-    <input class="number" id="input-NUMBER" name="NUMBER" type="number" value="3"/>
+    <input class="number" id="input-NUMBER" 
+    name="NUMBER" type="number" value="3"/>
     <BLANKLINE>
 
+Extract unset::
+
     >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
     >>> data.printtree()
     <RuntimeData NUMBER, value=3, extracted=<UNSET> at ...>
 
+Extract not required and empty::
+
+    >>> data = widget.extract({'NUMBER': ''})
+    >>> data.errors, data.extracted
+    ([], None)
+
+Extract invalid floating point input::
+
     >>> data = widget.extract({'NUMBER': 'abc'})
     >>> data.errors
-    [ExtractionError('Input is not a valid floating point.',)]
+    [ExtractionError('Input is not a valid floating point number.',)]
+
+Extract valid floating point input::
 
     >>> data = widget.extract({'NUMBER': '10'})
-    >>> data.errors
-    []
+    >>> data.errors, data.extracted
+    ([], 10.0)
 
     >>> data = widget.extract({'NUMBER': '10.0'})
-    >>> data.errors
-    []
+    >>> data.errors, data.extracted
+    ([], 10.0)
 
     >>> data = widget.extract({'NUMBER': '10,0'})
-    >>> data.errors
-    []
+    >>> data.errors, data.extracted
+    ([], 10.0)
+
+Instanciate with invalid datatype::
 
     >>> widget = factory(
     ...     'number',
@@ -2415,9 +2594,9 @@ Default behaviour::
     >>> widget.extract({'NUMBER': '10.0'})
     Traceback (most recent call last):
       ...
-    ValueError: Output datatype must be integer or float
+    ValueError: Unknown datatype: "invalid"
 
-With integer datatype::
+Extract invalid integer input::
 
     >>> widget = factory(
     ...     'number',
@@ -2428,7 +2607,7 @@ With integer datatype::
     >>> data.errors
     [ExtractionError('Input is not a valid integer.',)]
 
-With min set::
+Extract with min value set::
 
     >>> widget = factory(
     ...     'number',
@@ -2447,7 +2626,7 @@ With min set::
     >>> data.errors
     []
 
-With max set::
+Extract with max value set::
 
     >>> widget = factory(
     ...     'number',
@@ -2466,7 +2645,7 @@ With max set::
     >>> data.errors
     [ExtractionError('Value has to be at maximum 10.',)]
 
-With step set::
+Extract with step set::
 
     >>> widget = factory(
     ...     'number',
@@ -2481,7 +2660,7 @@ With step set::
     >>> data.errors
     []
 
-With step and min set::
+Extract with step and min value set::
 
     >>> widget = factory(
     ...     'number',
@@ -2494,4 +2673,22 @@ With step and min set::
 
     >>> data = widget.extract({'NUMBER': '6'})
     >>> data.errors
-    [ExtractionError('Value 6.0 has to be in stepping of 2 based on a floor value of 3',)]
+    [ExtractionError('Value 6.0 has to be in stepping of 2 based on a 
+    floor value of 3',)]
+
+Extract 0 value::
+
+    >>> widget = factory(
+    ...     'number',
+    ...     name='NUMBER')
+    >>> data = widget.extract({'NUMBER': '0'})
+    >>> data.extracted
+    0.0
+
+    >>> widget = factory(
+    ...     'number',
+    ...     name='NUMBER',
+    ...     props={'datatype': 'int'})
+    >>> data = widget.extract({'NUMBER': '0'})
+    >>> data.extracted
+    0

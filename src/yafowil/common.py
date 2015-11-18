@@ -13,6 +13,7 @@ from yafowil.utils import managedprops
 from yafowil.utils import vocabulary
 import re
 import types
+import uuid
 
 
 ###############################################################################
@@ -165,6 +166,70 @@ def generic_required_extractor(widget, data):
     if isinstance(required, basestring):
         raise ExtractionError(required)
     raise ExtractionError(attr_value('required_message', widget, data))
+
+
+# no need for unicode here because it's default
+DATATYPES = {
+    'int': _('datatype_integer', default='integer'),
+    'integer': _('datatype_integer', default='integer'),  # B/C
+    'str': _('datatype_str', default='string'),
+    'float': _('datatype_float', default='floating point number'),
+    'uuid': _('datatype_uuid', default='UUID')
+}
+DATATYPE_CONVERTERS = {
+    'int': int,
+    'integer': int,  # B/C
+    'str': str,
+    'float': float,
+    'uuid': uuid.UUID
+}
+DATATYPE_PRECONVERTERS = {
+    'float': lambda x: x.replace(',', '.')
+}
+
+
+def convert_value_to_datatype(value, datatype):
+    if not datatype:
+        return value
+    preconverter = DATATYPE_PRECONVERTERS.get(datatype)
+    if preconverter:
+        value = preconverter(value)
+    converter = DATATYPE_CONVERTERS[datatype]
+    return converter(value)
+
+
+@managedprops('datatype')
+def generic_datatype_extractor(widget, data):
+    """Convert extracted value to ``datatype``.
+
+    If extracted value is ``UNSET`` return ``UNSET``.
+    If empty value has been extracted return ``None``.
+    Otherwise try to convert value to given ``datatype`` and return the
+    converted value or raise an ``ExtractionError``
+
+    Properties:
+
+    ``datatype``
+        Desired data type of extracted value. Either ``int``, ``float``,
+        ``str`` or ``uuid``
+    """
+    extracted = data.extracted
+    if extracted is UNSET:
+        return extracted
+    datatype = attr_value('datatype', widget, data)
+    if not datatype:
+        return extracted
+    if not extracted:
+        return None
+    try:
+        return convert_value_to_datatype(extracted, datatype)
+    except KeyError:
+        raise ValueError('Unknown datatype: "{0}"'.format(datatype))
+    except ValueError:
+        raise ExtractionError(_(
+            'generic_datatype_error',
+            default=u'Input is not a valid ${datatype}.',
+            mapping={'datatype': DATATYPES[datatype]}))
 
 
 def input_attributes_common(widget, data, excludes=list(), value=None):
@@ -353,9 +418,16 @@ def text_edit_renderer(widget, data):
 
 factory.register(
     'text',
-    extractors=[generic_extractor, generic_required_extractor],
+    extractors=[
+        generic_extractor,
+        generic_required_extractor,
+        generic_datatype_extractor,
+    ],
     edit_renderers=[text_edit_renderer],
-    display_renderers=[generic_display_renderer, display_proxy_renderer])
+    display_renderers=[
+        generic_display_renderer,
+        display_proxy_renderer
+    ])
 
 factory.doc['blueprint']['text'] = """\
 One line text input blueprint.
@@ -486,9 +558,15 @@ def textarea_renderer(widget, data, custom_attrs={}):
 
 factory.register(
     'textarea',
-    extractors=[generic_extractor, generic_required_extractor],
+    extractors=[
+        generic_extractor,
+        generic_required_extractor
+    ],
     edit_renderers=[textarea_renderer],
-    display_renderers=[generic_display_renderer, display_proxy_renderer])
+    display_renderers=[
+        generic_display_renderer,
+        display_proxy_renderer
+    ])
 
 factory.doc['blueprint']['textarea'] = """\
 HTML textarea blueprint.
@@ -563,11 +641,16 @@ def lines_display_renderer(widget, data):
 
 factory.register(
     'lines',
-    extractors=[generic_extractor,
-                generic_required_extractor,
-                lines_extractor],
+    extractors=[
+        generic_extractor,
+        generic_required_extractor,
+        lines_extractor
+    ],
     edit_renderers=[lines_edit_renderer],
-    display_renderers=[lines_display_renderer, display_proxy_renderer])
+    display_renderers=[
+        lines_display_renderer,
+        display_proxy_renderer
+    ])
 
 factory.doc['blueprint']['lines'] = """\
 Lines blueprint. Renders a textarea and extracts lines as list.
@@ -731,8 +814,13 @@ def password_display_renderer(widget, data):
 
 factory.register(
     'password',
-    extractors=[generic_extractor, generic_required_extractor,
-                minlength_extractor, ascii_extractor, password_extractor],
+    extractors=[
+        generic_extractor,
+        generic_required_extractor,
+        minlength_extractor,
+        ascii_extractor,
+        password_extractor
+    ],
     edit_renderers=[password_edit_renderer],
     display_renderers=[password_display_renderer])
 
@@ -873,7 +961,10 @@ def checkbox_display_renderer(widget, data):
 
 factory.register(
     'checkbox',
-    extractors=[checkbox_extractor, generic_required_extractor],
+    extractors=[
+        checkbox_extractor,
+        generic_required_extractor
+    ],
     edit_renderers=[checkbox_edit_renderer],
     display_renderers=[checkbox_display_renderer])
 
@@ -940,13 +1031,17 @@ factory.defaults['checkbox.required_class'] = 'required'
 @managedprops('multivalued', 'disabled')
 def select_extractor(widget, data):
     extracted = generic_extractor(widget, data)
+    datatype = attr_value('datatype', widget, data)
     multivalued = attr_value('multivalued', widget, data)
     if extracted is UNSET \
        and '%s-exists' % widget.dottedpath in data.request:
         if multivalued:
             extracted = []
         else:
-            extracted = ''
+            if datatype:
+                extracted = None
+            else:
+                extracted = ''
     if extracted is UNSET:
         return extracted
     if multivalued and isinstance(extracted, basestring):
@@ -981,7 +1076,7 @@ def select_exists_marker(widget, data):
 @managedprops('data', 'title', 'format', 'vocabulary', 'multivalued',
               'disabled', 'listing_label_position', 'listing_tag', 'size',
               'label_checkbox_class', 'label_radio_class', 'block_class',
-              'autofocus', 'placeholder',
+              'autofocus', 'placeholder', 'datatype',
               *css_managed_props)
 def select_edit_renderer(widget, data, custom_attrs={}):
     tag = data.tag
@@ -1118,9 +1213,15 @@ def select_display_renderer(widget, data):
 
 factory.register(
     'select',
-    extractors=[select_extractor, generic_required_extractor],
+    extractors=[
+        select_extractor,
+        generic_required_extractor
+    ],
     edit_renderers=[select_edit_renderer],
-    display_renderers=[select_display_renderer, display_proxy_renderer])
+    display_renderers=[
+        select_display_renderer,
+        display_proxy_renderer
+    ])
 
 factory.doc['blueprint']['select'] = """\
 Selection Blueprint. Single selection as dropdown or radio-buttons. Multiple
@@ -1213,6 +1314,12 @@ set the value to 'True'. To disable single selection pass a iterable of keys to
 disable, i.e. ``['foo', 'baz']``. Defaults to False.
 """
 
+factory.defaults['select.datatype'] = None
+factory.doc['props']['select.datatype'] = """\
+Output data type. If given, extracted values gets converted to desired data
+type. Preset value and vocabulary keys must also match defined data type.
+"""
+
 
 ###############################################################################
 # file
@@ -1267,22 +1374,22 @@ def input_file_edit_renderer(widget, data):
     return tag('input', **input_attrs)
 
 
-def convert_bytes(bytes):
-    bytes = float(bytes)
-    if bytes >= 1099511627776:
-        terabytes = bytes / 1099511627776
+def convert_bytes(value):
+    value = float(value)
+    if value >= 1099511627776:
+        terabytes = value / 1099511627776
         size = '%.2fT' % terabytes
-    elif bytes >= 1073741824:
-        gigabytes = bytes / 1073741824
+    elif value >= 1073741824:
+        gigabytes = value / 1073741824
         size = '%.2fG' % gigabytes
-    elif bytes >= 1048576:
-        megabytes = bytes / 1048576
+    elif value >= 1048576:
+        megabytes = value / 1048576
         size = '%.2fM' % megabytes
-    elif bytes >= 1024:
-        kilobytes = bytes / 1024
+    elif value >= 1024:
+        kilobytes = value / 1024
         size = '%.2fK' % kilobytes
     else:
-        size = '%.2fb' % bytes
+        size = '%.2fb' % value
     return size
 
 
@@ -1296,9 +1403,9 @@ def input_file_display_renderer(widget, data):
     if not value:
         no_file_message = _('no_file', default=u'No file')
         return tag('div', no_file_message, **attrs)
-    file = value['file']
-    size = convert_bytes(len(file.read()))
-    file.seek(0)
+    file_val = value['file']
+    size = convert_bytes(len(file_val.read()))
+    file_val.seek(0)
     unknown_message = _('unknown', default=u'Unknown')
     filename_message = _('filename', default=u'Filename: ')
     mimetype_message = _('mimetype', default=u'Mimetype: ')
@@ -1342,8 +1449,14 @@ def file_options_renderer(widget, data):
 
 factory.register(
     'file',
-    extractors=[file_extractor, generic_required_extractor],
-    edit_renderers=[input_file_edit_renderer, file_options_renderer],
+    extractors=[
+        file_extractor,
+        generic_required_extractor
+    ],
+    edit_renderers=[
+        input_file_edit_renderer,
+        file_options_renderer
+    ],
     display_renderers=[input_file_display_renderer])
 
 factory.doc['blueprint']['file'] = """\
@@ -1446,11 +1559,16 @@ def email_extractor(widget, data):
 
 factory.register(
     'email',
-    extractors=[generic_extractor,
-                generic_required_extractor,
-                email_extractor],
+    extractors=[
+        generic_extractor,
+        generic_required_extractor,
+        email_extractor
+    ],
     edit_renderers=[input_generic_renderer],
-    display_renderers=[generic_display_renderer, display_proxy_renderer])
+    display_renderers=[
+        generic_display_renderer,
+        display_proxy_renderer
+    ])
 
 factory.doc['blueprint']['email'] = """\
 Email (HTML5) input blueprint.
@@ -1475,6 +1593,8 @@ URL_RE += u'.?+=&%@!\-\/]))?$'
 
 def url_extractor(widget, data):
     val = data.extracted
+    if not val:
+        return val
     if not re.match(URL_RE, val is not UNSET and val or ''):
         message = _('web_address_not_valid',
                     default=u'Input not a valid web address.')
@@ -1484,9 +1604,16 @@ def url_extractor(widget, data):
 
 factory.register(
     'url',
-    extractors=[generic_extractor, generic_required_extractor, url_extractor],
+    extractors=[
+        generic_extractor,
+        generic_required_extractor,
+        url_extractor
+    ],
     edit_renderers=[input_generic_renderer],
-    display_renderers=[generic_display_renderer, display_proxy_renderer])
+    display_renderers=[
+        generic_display_renderer,
+        display_proxy_renderer
+    ])
 
 factory.doc['blueprint']['url'] = """\
 URL aka web address (HTML5) input blueprint.
@@ -1507,9 +1634,15 @@ factory.defaults['url.class'] = 'url'
 
 factory.register(
     'search',
-    extractors=[generic_extractor, generic_required_extractor],
+    extractors=[
+        generic_extractor,
+        generic_required_extractor
+    ],
     edit_renderers=[input_generic_renderer],
-    display_renderers=[generic_display_renderer, display_proxy_renderer])
+    display_renderers=[
+        generic_display_renderer,
+        display_proxy_renderer
+    ])
 
 factory.doc['blueprint']['search'] = """\
 Search blueprint (HTML5).
@@ -1531,44 +1664,23 @@ factory.defaults['search.class'] = 'search'
 @managedprops('datatype', 'min', 'max', 'step')
 def number_extractor(widget, data):
     val = data.extracted
-    if val is UNSET or val == '':
-        return UNSET
-    datatype = attr_value('datatype', widget, data)
-    if datatype == 'integer':
-        convert = int
-    elif datatype == 'float':
-        convert = float
-    else:
-        raise ValueError('Output datatype must be integer or float')
-    try:
-        val = convert(val.replace(',', '.'))
-    except ValueError:
-        message_datatype_float = _('datatype_float',
-                                   default=u'floating point')
-        message_datatype_integer = _('datatype_integer', default=u'integer')
-        message = _('input_not_valid_number_datatype',
-                    default=u'Input is not a valid ${datatype}.',
-                    mapping={
-                        'datatype': datatype == 'float' and
-                            message_datatype_float or
-                            message_datatype_integer
-                    })
-        raise ExtractionError(message)
-    min = attr_value('min', widget, data)
-    if min and val < min:
+    if val is UNSET or val is None:
+        return val
+    min_val = attr_value('min', widget, data)
+    if min_val and val < min_val:
         message = _('input_number_minimum_value',
                     default=u'Value has to be at minimum ${min}.',
-                    mapping={'min': min})
+                    mapping={'min': min_val})
         raise ExtractionError(message)
-    max = attr_value('max', widget, data)
-    if max and val > max:
+    max_val = attr_value('max', widget, data)
+    if max_val and val > max_val:
         message = _('input_number_maximum_value',
                     default=u'Value has to be at maximum ${max}.',
-                    mapping={'max': max})
+                    mapping={'max': max_val})
         raise ExtractionError(message)
     step = attr_value('step', widget, data)
     if step:
-        minimum = min or 0
+        minimum = min_val or 0
         if (val - minimum) % step:
             if minimum:
                 message = _(
@@ -1594,10 +1706,17 @@ def number_extractor(widget, data):
 
 factory.register(
     'number',
-    extractors=[generic_extractor, generic_required_extractor,
-                number_extractor],
+    extractors=[
+        generic_extractor,
+        generic_required_extractor,
+        generic_datatype_extractor,
+        number_extractor
+    ],
     edit_renderers=[input_generic_renderer],
-    display_renderers=[generic_display_renderer, display_proxy_renderer])
+    display_renderers=[
+        generic_display_renderer,
+        display_proxy_renderer
+    ])
 
 factory.doc['blueprint']['number'] = """\
 Number blueprint (HTML5).
@@ -1607,7 +1726,10 @@ factory.defaults['number.type'] = 'number'
 
 factory.defaults['number.datatype'] = 'float'
 factory.doc['props']['number.datatype'] = """\
-Output datatype, one out of ``integer`` or ``float``.
+Output datatype, one out of ``int`` or ``float``, defaults to
+``float``.
+
+B/C ``integer`` value still provided, but should not be used any more.
 """
 
 factory.defaults['number.default'] = ''
@@ -1797,15 +1919,16 @@ after the message.
 @managedprops('tag', 'help', 'position', 'render_empty', *css_managed_props)
 def help_renderer(widget, data):
     render_empty = attr_value('render_empty', widget, data)
-    help = attr_value('help', widget, data)
-    if not render_empty and not help:
+    help_val = attr_value('help', widget, data)
+    if not render_empty and not help_val:
         return data.rendered
     tag = data.tag
     attrs = dict(class_=cssclasses(widget, data))
     elem_tag = attr_value('tag', widget, data)
     position = attr_value('position', widget, data)
-    return generic_positional_rendering_helper(elem_tag, help, attrs,
-                                               data.rendered, position, tag)
+    return generic_positional_rendering_helper(
+        elem_tag, help_val, attrs, data.rendered, position, tag)
+
 
 factory.register(
     'help',
