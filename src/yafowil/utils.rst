@@ -379,9 +379,15 @@ Test convert_value_to_datatype
     >>> convert_value_to_datatype('', None)
     ''
 
+    >>> convert_value_to_datatype(UNSET, None)
+    <UNSET>
+
     >>> convert_value_to_datatype('', 'str')
     >>> convert_value_to_datatype('', 'str', default='')
     ''
+
+    >>> convert_value_to_datatype(UNSET, 'str', default='')
+    <UNSET>
 
     >>> convert_value_to_datatype(u'covertable unicode', 'str', default='')
     'covertable unicode'

@@ -18,6 +18,8 @@ Helper::
     >>> from yafowil.utils import Tag
     >>> tag = Tag(lambda msg: msg)
 
+    >>> def wrapped_pxml(value):
+    ...     pxml(u'<div>' + value + u'</div>')
 
 Hidden
 ------
@@ -59,7 +61,11 @@ Generic HTML5 Data::
     ...     'hidden',
     ...     name='MYHIDDEN',
     ...     value='Test Hidden',
-    ...     props={'data':{'foo': 'bar'}})
+    ...     props={
+    ...         'data':{
+    ...             'foo': 'bar'
+    ...         }
+    ...     })
     >>> widget()
     u'<input class="hidden" data-foo=\'bar\' id="input-MYHIDDEN" 
     name="MYHIDDEN" type="hidden" value="Test Hidden" />'
@@ -70,23 +76,31 @@ Generic tag
 
 Custom tag widget::
 
-    >>> widget = factory('tag', name='MYTAG', props={
-    ...     'tag': 'h3',
-    ...     'text': 'A Headline',
-    ...     'class': 'form_heading'})
+    >>> widget = factory(
+    ...     'tag',
+    ...     name='MYTAG',
+    ...     props={
+    ...         'tag': 'h3',
+    ...         'text': 'A Headline',
+    ...         'class': 'form_heading'
+    ...     })
     >>> widget()
     u'<h3 class="form_heading" id="tag-MYTAG">A Headline</h3>'
 
 Skip tag::
 
-    >>> widget = factory('tag', name='MYTAG',
+    >>> widget = factory(
+    ...     'tag',
+    ...     name='MYTAG',
     ...     props={
     ...         'tag': 'h3',
     ...         'text': 'A Headline',
-    ...         'class': 'form_heading'},
+    ...         'class': 'form_heading'
+    ...     },
     ...     mode='skip')
     >>> widget()
     u''
+
 
 Text Input
 ----------
@@ -112,9 +126,11 @@ Render with title attribute::
     ...     name='MYTEXT',
     ...     value='ja ha!',
     ...     props={
-    ...         'title': 'My awesome title'})
+    ...         'title': 'My awesome title'
+    ...     })
     >>> widget()
-    u'<input class="text" id="input-MYTEXT" name="MYTEXT" title="My awesome title" type="text" value="ja ha!" />'
+    u'<input class="text" id="input-MYTEXT" name="MYTEXT" 
+    title="My awesome title" type="text" value="ja ha!" />'
 
 Generic HTML5 Data::
 
@@ -124,11 +140,30 @@ Generic HTML5 Data::
     ...     value='ja ha!',
     ...     props={
     ...         'title': 'My awesome title',
-    ...         'data': {'foo': 'bar'}})
+    ...         'data': {'foo': 'bar'}
+    ...     })
     >>> widget()
     u'<input class="text" data-foo=\'bar\' id="input-MYTEXT" 
     name="MYTEXT" title="My awesome title" type="text" value="ja ha!" />'
 
+Default values::
+
+    >>> data = widget.extract(request={})
+    >>> data.extracted
+    <UNSET>
+
+    >>> data = widget.extract(request={'MYTEXT': ''})
+    >>> data.extracted
+    ''
+
+    >>> widget.attrs['default'] = 'hallo'
+    >>> data = widget.extract(request={})
+    >>> data.extracted
+    <UNSET>
+
+    >>> data = widget.extract(request={'MYTEXT': ''})
+    >>> data.extracted
+    ''
 
 Autofocus Text Input
 --------------------
@@ -140,7 +175,8 @@ Widget with autofocus property::
     ...     name='AUTOFOCUS',
     ...     value='',
     ...     props={
-    ...         'autofocus': True})
+    ...         'autofocus': True
+    ...     })
     >>> widget()
     u'<input autofocus="autofocus" class="text" id="input-AUTOFOCUS"
     name="AUTOFOCUS" type="text" value="" />'
@@ -156,7 +192,8 @@ Widget with placeholder property::
     ...     name='PLACEHOLDER',
     ...     value='',
     ...     props={
-    ...         'placeholder': 'This is a placeholder.'})
+    ...         'placeholder': 'This is a placeholder.'
+    ...     })
     >>> widget()
     u'<input class="text" id="input-PLACEHOLDER" name="PLACEHOLDER"
     placeholder="This is a placeholder." type="text" value="" />'
@@ -173,7 +210,8 @@ Widget with requires input::
     ...     value='',
     ...     props={
     ...         'required': True,
-    ...         'error_class': True})
+    ...         'error_class': True
+    ...     })
     >>> widget()
     u'<input class="required text" id="input-REQUIRED" name="REQUIRED"
     required="required" type="text" value="" />'
@@ -201,7 +239,8 @@ With getter value set, empty request, no error expected::
     ...     value='Test Text',
     ...     props={
     ...         'required': True,
-    ...         'error_class': True})
+    ...         'error_class': True
+    ...     })
     >>> data = widget.extract({})
     >>> data
     <RuntimeData REQUIRED, value='Test Text', extracted=<UNSET> at ...>
@@ -227,7 +266,8 @@ Create a custom error message::
     ...     name='REQUIRED',
     ...     value='',
     ...     props={
-    ...         'required': 'You fool, fill in a value!'})
+    ...         'required': 'You fool, fill in a value!'
+    ...     })
     >>> data = widget.extract({'REQUIRED': ''})
     >>> data
     <RuntimeData REQUIRED, value='', extracted='', 1 error(s) at ...>
@@ -244,7 +284,8 @@ Create a custom error message::
     ...     name='REQUIRED',
     ...     value='',
     ...     props={
-    ...         'required': required_callback})
+    ...         'required': required_callback
+    ...     })
     >>> data = widget.extract({'REQUIRED': ''})
     >>> data.errors
     [ExtractionError('Foooo',)]
@@ -264,9 +305,11 @@ Display mode of text widget uses ``generic_display_renderer``::
     ...     name='DISPLAY',
     ...     value=123.4567890,
     ...     mode='display',
-    ...     props=dict(template='%0.3f'))
+    ...     props={
+    ...         'template': '%0.3f'
+    ...     })
     >>> widget()
-        u'<div class="display-text" id="display-DISPLAY">123.457</div>'
+    u'<div class="display-text" id="display-DISPLAY">123.457</div>'
 
     >>> def mytemplate(widget, data):
     ...     return '<TEMPLATE>%s</TEMPLATE>' % data.value
@@ -275,10 +318,14 @@ Display mode of text widget uses ``generic_display_renderer``::
     ...     name='DISPLAY',
     ...     value='lorem ipsum',
     ...     mode='display',
-    ...     props=dict(template=mytemplate))
-    >>> widget()
-    u'<div class="display-text" id="display-DISPLAY"><TEMPLATE>lorem
-    ipsum</TEMPLATE></div>'
+    ...     props={
+    ...         'template': mytemplate
+    ...     })
+    >>> pxml(widget())
+    <div class="display-text" id="display-DISPLAY">
+      <TEMPLATE>lorem ipsum</TEMPLATE>
+    </div>
+    <BLANKLINE>
 
 ``display_proxy`` can be used if mode is 'display' to proxy the value in a
 hidden field::
@@ -288,11 +335,16 @@ hidden field::
     ...     name='DISPLAY',
     ...     value='lorem ipsum',
     ...     mode='display',
-    ...     props={'display_proxy': True})
-    >>> widget()
-    u'<div class="display-text" id="display-DISPLAY">lorem ipsum</div><input 
-    class="text" id="input-DISPLAY" name="DISPLAY" type="hidden" 
-    value="lorem ipsum" />'
+    ...     props={
+    ...         'display_proxy': True
+    ...     })
+    >>> wrapped_pxml(widget())
+    <div>
+      <div class="display-text" id="display-DISPLAY">lorem ipsum</div>
+      <input class="text" id="input-DISPLAY" name="DISPLAY" type="hidden" 
+        value="lorem ipsum"/>
+    </div>
+    <BLANKLINE>
 
 On widgets with display mode display_proxy property set, the data gets
 extracted::
@@ -319,13 +371,14 @@ No datatype given, no datatype conversion happens at all::
     >>> widget = factory(
     ...     'text',
     ...     name='DATATYPE',
-    ...     value=''
-    ... )
+    ...     value='')
     >>> data = widget.extract({'DATATYPE': u''})
     >>> data.errors, data.extracted
     ([], u'')
 
 Test some sorts of False evaluating default values if string datatype set::
+
+    >>> from node.utils import UNSET
 
     >>> widget = factory(
     ...     'text',
@@ -333,12 +386,8 @@ Test some sorts of False evaluating default values if string datatype set::
     ...     value='',
     ...     props={
     ...         'datatype': 'str',
-    ...     }
-    ... )
-
-    >>> from node.utils import UNSET
-
-    >>> widget.attrs['default'] = 0
+    ...         'default': 0
+    ...     })
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
@@ -438,10 +487,8 @@ Test some sorts of False evaluating default values if numeric datatype set::
     ...     value='',
     ...     props={
     ...         'datatype': 'int',
-    ...     }
-    ... )
-
-    >>> widget.attrs['default'] = 0
+    ...         'default': 0
+    ...     })
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
@@ -541,8 +588,7 @@ Integer datatype::
     ...     value='',
     ...     props={
     ...         'datatype': 'int',
-    ...     }
-    ... )
+    ...     })
     >>> data = widget.extract({'DATATYPE': '1'})
     >>> data.errors, data.extracted
     ([], 1)
@@ -559,8 +605,7 @@ Float extraction::
     ...     value='',
     ...     props={
     ...         'datatype': 'float',
-    ...     }
-    ... )
+    ...     })
     >>> data = widget.extract({'DATATYPE': '1.2'})
     >>> data.errors, data.extracted
     ([], 1.2)
@@ -577,8 +622,7 @@ UUID extraction::
     ...     value='',
     ...     props={
     ...         'datatype': 'uuid',
-    ...     }
-    ... )
+    ...     })
     >>> data = widget.extract({
     ...     'DATATYPE': '3b8449f3-0456-4baa-a670-3066b0fcbda0'
     ... })
@@ -595,22 +639,34 @@ Checkbox
 
 A boolean checkbox widget (default)::
 
-    >>> widget = factory('checkbox', 'MYCHECKBOX')
-    >>> widget()
-    u'<input class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" 
-    type="checkbox" value="" /><input id="checkboxexists-MYCHECKBOX" 
-    name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />'
+    >>> widget = factory(
+    ...     'checkbox',
+    ...     name='MYCHECKBOX')
+    >>> wrapped_pxml(widget())
+    <div>
+      <input class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" 
+        type="checkbox" value=""/>
+      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
+        type="hidden" value="checkboxexists"/>
+    </div>
+    <BLANKLINE>
 
     >>> widget.mode = 'display'
     >>> widget()
     u'<div class="display-checkbox" id="display-MYCHECKBOX">No</div>'
 
-    >>> widget = factory('checkbox', 'MYCHECKBOX', value='True')
-    >>> widget()
-    u'<input checked="checked" class="checkbox" id="input-MYCHECKBOX" 
-    name="MYCHECKBOX" type="checkbox" value="" /><input 
-    id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
-    type="hidden" value="checkboxexists" />'
+    >>> widget = factory(
+    ...     'checkbox',
+    ...     name='MYCHECKBOX',
+    ...     value='True')
+    >>> wrapped_pxml(widget())
+    <div>
+      <input checked="checked" class="checkbox" id="input-MYCHECKBOX" 
+        name="MYCHECKBOX" type="checkbox" value=""/>
+      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
+        type="hidden" value="checkboxexists"/>
+    </div>
+    <BLANKLINE>
 
     >>> widget.mode = 'display'
     >>> widget()
@@ -618,7 +674,12 @@ A boolean checkbox widget (default)::
 
 A checkbox with label::
 
-    >>> widget = factory('checkbox', 'MYCHECKBOX', props={'with_label': True})
+    >>> widget = factory(
+    ...     'checkbox',
+    ...     name='MYCHECKBOX',
+    ...     props={
+    ...         'with_label': True
+    ...     })
     >>> widget()
     u'<input class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" 
     type="checkbox" value="" /><label class="checkbox_label" 
@@ -629,10 +690,12 @@ A checkbox widget with a value or an empty string::
 
     >>> widget = factory(
     ...     'checkbox',
-    ...     'MYCHECKBOX',
+    ...     name='MYCHECKBOX',
     ...     value='',
-    ...     props={'format': 'string'})
-    >>> pxml('<div>'+widget()+'</div>')
+    ...     props={
+    ...         'format': 'string'
+    ...     })
+    >>> wrapped_pxml(widget())
     <div>
       <input class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" 
       type="checkbox" value=""/>
@@ -647,10 +710,12 @@ A checkbox widget with a value or an empty string::
 
     >>> widget = factory(
     ...     'checkbox',
-    ...     'MYCHECKBOX',
+    ...     name='MYCHECKBOX',
     ...     value='Test Checkbox',
-    ...     props={'format': 'string'})
-    >>> pxml('<div>'+widget()+'</div>')
+    ...     props={
+    ...         'format': 'string'
+    ...     })
+    >>> wrapped_pxml(widget())
     <div>
       <input checked="checked" class="checkbox" id="input-MYCHECKBOX" 
       name="MYCHECKBOX" type="checkbox" value="Test Checkbox"/>
@@ -669,13 +734,13 @@ Checkbox with manually set 'checked' attribute::
 
     >>> widget = factory(
     ...     'checkbox',
-    ...     'MYCHECKBOX',
+    ...     name='MYCHECKBOX',
     ...     value='',
     ...     props={
     ...         'format': 'string',
     ...         'checked': True,
     ...     })
-    >>> pxml('<div>'+widget()+'</div>')
+    >>> wrapped_pxml(widget())
     <div>
       <input checked="checked" class="checkbox" id="input-MYCHECKBOX" 
       name="MYCHECKBOX" type="checkbox" value=""/>
@@ -686,13 +751,13 @@ Checkbox with manually set 'checked' attribute::
 
     >>> widget = factory(
     ...     'checkbox',
-    ...     'MYCHECKBOX',
+    ...     name='MYCHECKBOX',
     ...     value='Test Checkbox',
     ...     props={
     ...         'format': 'string',
     ...         'checked': False,
     ...     })
-    >>> pxml('<div>'+widget()+'</div>')
+    >>> wrapped_pxml(widget())
     <div>
       <input class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" 
       type="checkbox" value="Test Checkbox"/>
@@ -730,9 +795,11 @@ bool extraction::
 
     >>> widget = factory(
     ...     'checkbox',
-    ...     'MYCHECKBOX',
+    ...     name='MYCHECKBOX',
     ...     value='Test Checkbox',
-    ...     props={'format': 'bool'})
+    ...     props={
+    ...         'format': 'bool'
+    ...     })
     >>> request = {
     ...     'MYCHECKBOX': '',
     ...     'MYCHECKBOX-exists': 'checkboxexists'
@@ -752,8 +819,10 @@ invalid format::
 
     >>> widget = factory(
     ...     'checkbox',
-    ...     'MYCHECKBOX',
-    ...     props={'format': 'invalid'})
+    ...     name='MYCHECKBOX',
+    ...     props={
+    ...         'format': 'invalid'
+    ...     })
     >>> request = {
     ...     'MYCHECKBOX': '',
     ...     'MYCHECKBOX-exists': 'checkboxexists'
@@ -765,19 +834,29 @@ invalid format::
 
 Render in display mode::
 
-    >>> widget = factory('checkbox', 'MYCHECKBOX', value=False, mode='display',
+    >>> widget = factory(
+    ...     'checkbox',
+    ...     name='MYCHECKBOX',
+    ...     value=False,
+    ...     mode='display',
     ...     props={
-    ...         'format': 'bool'})
-    >>> pxml('<div>' + widget() + '</div>')
+    ...         'format': 'bool'
+    ...     })
+    >>> wrapped_pxml(widget())
     <div>
       <div class="display-checkbox" id="display-MYCHECKBOX">No</div>
     </div>
     <BLANKLINE>
 
-    >>> widget = factory('checkbox', 'MYCHECKBOX', value=True, mode='display',
+    >>> widget = factory(
+    ...     'checkbox',
+    ...     name='MYCHECKBOX',
+    ...     value=True,
+    ...     mode='display',
     ...     props={
-    ...         'format': 'bool'})
-    >>> pxml('<div>' + widget() + '</div>')
+    ...         'format': 'bool'
+    ...     })
+    >>> wrapped_pxml(widget())
     <div>
       <div class="display-checkbox" id="display-MYCHECKBOX">Yes</div>
     </div>
@@ -785,10 +864,15 @@ Render in display mode::
 
 Display mode and display proxy bool format::
 
-    >>> widget = factory('checkbox', 'MYCHECKBOX', value=True, mode='display',
+    >>> widget = factory(
+    ...     'checkbox',
+    ...     name='MYCHECKBOX',
+    ...     value=True,
     ...     props={
     ...         'format': 'bool',
-    ...         'display_proxy': True})
+    ...         'display_proxy': True
+    ...     },
+    ...     mode='display')
     >>> widget()
     u'<div class="display-checkbox" id="display-MYCHECKBOX">Yes<input 
     class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden" 
@@ -804,8 +888,10 @@ Display mode and display proxy bool format::
     id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden" 
     value="checkboxexists" /></div>'
 
-    >>> data = widget.extract(request={'MYCHECKBOX-exists': 'checkboxexists',
-    ...                                'MYCHECKBOX': ''})
+    >>> data = widget.extract(request={
+    ...     'MYCHECKBOX-exists': 'checkboxexists',
+    ...     'MYCHECKBOX': ''
+    ... })
     >>> data
     <RuntimeData MYCHECKBOX, value=True, extracted=True at ...>
 
@@ -817,10 +903,15 @@ Display mode and display proxy bool format::
 
 Display mode and display proxy string format::
 
-    >>> widget = factory('checkbox', 'MYCHECKBOX', value='yes', mode='display',
+    >>> widget = factory(
+    ...     'checkbox',
+    ...     name='MYCHECKBOX',
+    ...     value='yes',
     ...     props={
     ...         'format': 'string',
-    ...         'display_proxy': True})
+    ...         'display_proxy': True
+    ...     },
+    ...     mode='display')
     >>> widget()
     u'<div class="display-checkbox" id="display-MYCHECKBOX">yes<input 
     class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" 
@@ -837,8 +928,10 @@ Display mode and display proxy string format::
     value="" /><input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
     type="hidden" value="checkboxexists" /></div>'
 
-    >>> data = widget.extract(request={'MYCHECKBOX-exists': 'checkboxexists',
-    ...                                'MYCHECKBOX': ''})
+    >>> data = widget.extract(request={
+    ...     'MYCHECKBOX-exists': 'checkboxexists',
+    ...     'MYCHECKBOX': ''
+    ... })
     >>> data
     <RuntimeData MYCHECKBOX, value='yes', extracted='' at ...>
 
@@ -863,9 +956,11 @@ Generic HTML5 Data::
 
     >>> widget = factory(
     ...     'checkbox',
-    ...     'MYCHECKBOX',
+    ...     name='MYCHECKBOX',
     ...     value='Test Checkbox',
-    ...     props={'data': {'foo': 'bar'}})
+    ...     props={
+    ...         'data': {'foo': 'bar'}
+    ...     })
     >>> widget()
     u'<input checked="checked" class="checkbox" data-foo=\'bar\' 
     id="input-MYCHECKBOX" name="MYCHECKBOX" type="checkbox" value="" /><input 
@@ -880,7 +975,7 @@ Textarea widget::
 
     >>> widget = factory(
     ...     'textarea',
-    ...     'MYTEXTAREA',
+    ...     name='MYTEXTAREA',
     ...     value=None)
     >>> widget()
     u'<textarea class="textarea" cols="80" id="input-MYTEXTAREA" 
@@ -888,7 +983,7 @@ Textarea widget::
 
     >>> widget = factory(
     ...     'textarea',
-    ...     'MYTEXTAREA',
+    ...     name='MYTEXTAREA',
     ...     value=None,
     ...     props={
     ...         'data': {
@@ -910,13 +1005,20 @@ Lines
 
 Render empty::
 
-    >>> widget = factory('lines', 'MYLINES', value=None)
+    >>> widget = factory(
+    ...     'lines',
+    ...     name='MYLINES',
+    ...     value=None)
     >>> widget()
-    u'<textarea cols="40" id="input-MYLINES" name="MYLINES" rows="8"></textarea>'
+    u'<textarea cols="40" id="input-MYLINES" 
+    name="MYLINES" rows="8"></textarea>'
 
 Render with preset value, expected as list::
 
-    >>> widget = factory('lines', 'MYLINES', value=['a', 'b', 'c'])
+    >>> widget = factory(
+    ...     'lines',
+    ...     name='MYLINES',
+    ...     value=['a', 'b', 'c'])
     >>> pxml(widget())
     <textarea cols="40" id="input-MYLINES" name="MYLINES" rows="8">a
     b
@@ -944,8 +1046,11 @@ Render with extracted data::
 
 Display mode with preset value::
 
-    >>> widget = factory('lines', 'MYLINES', value=['a', 'b', 'c'],
-    ...                  mode='display')
+    >>> widget = factory(
+    ...     'lines',
+    ...     name='MYLINES',
+    ...     value=['a', 'b', 'c'],
+    ...     mode='display')
     >>> pxml(widget())
     <ul class="display-None" id="display-MYLINES">
       <li>a</li>
@@ -956,18 +1061,26 @@ Display mode with preset value::
 
 Display mode with empty preset value::
 
-    >>> widget = factory('lines', 'MYLINES', value=[], mode='display')
+    >>> widget = factory(
+    ...     'lines',
+    ...     name='MYLINES',
+    ...     value=[],
+    ...     mode='display')
     >>> pxml(widget())
     <ul class="display-None" id="display-MYLINES"/>
     <BLANKLINE>
 
 Display mode with ``display_proxy``::
 
-    >>> widget = factory('lines', 'MYLINES', value=['a', 'b', 'c'],
-    ...     mode='display', props={
+    >>> widget = factory(
+    ...     'lines',
+    ...     name='MYLINES',
+    ...     value=['a', 'b', 'c'],
+    ...     props={
     ...         'display_proxy': True,
-    ...     })
-    >>> pxml('<div>' + widget() + '</div>')
+    ...     },
+    ...     mode='display')
+    >>> wrapped_pxml(widget())
     <div>
       <ul class="display-None" id="display-MYLINES">
         <li>a</li>
@@ -984,7 +1097,7 @@ Display mode with ``display_proxy``::
     >>> data
     <RuntimeData MYLINES, value=['a', 'b', 'c'], extracted=['a', 'b'] at ...>
 
-    >>> pxml('<div>' + widget(data=data) + '</div>')
+    >>> wrapped_pxml(widget(data=data))
     <div>
       <ul class="display-None" id="display-MYLINES">
         <li>a</li>
@@ -997,8 +1110,13 @@ Display mode with ``display_proxy``::
 
 Generic HTML5 Data::
 
-    >>> widget = factory('lines', 'MYLINES', value=['a', 'b', 'c'],
-    ...                  props={'data': {'foo': 'bar'}})
+    >>> widget = factory(
+    ...     'lines',
+    ...     name='MYLINES',
+    ...     value=['a', 'b', 'c'],
+    ...     props={
+    ...         'data': {'foo': 'bar'}
+    ...     })
     >>> pxml(widget())
     <textarea cols="40" data-foo="bar" id="input-MYLINES" 
     name="MYLINES" rows="8">a
@@ -1006,8 +1124,14 @@ Generic HTML5 Data::
     c</textarea>
     <BLANKLINE>
 
-    >>> widget = factory('lines', 'MYLINES', value=['a', 'b', 'c'],
-    ...                  props={'data': {'foo': 'bar'}}, mode='display')
+    >>> widget = factory(
+    ...     'lines',
+    ...     name='MYLINES',
+    ...     value=['a', 'b', 'c'],
+    ...     props={
+    ...         'data': {'foo': 'bar'}
+    ...     },
+    ...     mode='display')
     >>> pxml(widget())
     <ul class="display-None" data-foo="bar" id="display-MYLINES">
       <li>a</li>
@@ -1034,14 +1158,15 @@ Default single value selection::
     ... ]
     >>> widget = factory(
     ...     'select',
-    ...     'MYSELECT',
+    ...     name='MYSELECT',
     ...     value='one',
     ...     props={
     ...         'vocabulary': vocab
     ...     })
     >>> pxml(widget())
     <select class="select" id="input-MYSELECT" name="MYSELECT">
-      <option id="input-MYSELECT-one" selected="selected" value="one">One</option>
+      <option id="input-MYSELECT-one" selected="selected" 
+        value="one">One</option>
       <option id="input-MYSELECT-two" value="two">Two</option>
       <option id="input-MYSELECT-three" value="three">Three</option>
       <option id="input-MYSELECT-four" value="four">Four</option>
@@ -1049,13 +1174,14 @@ Default single value selection::
     <BLANKLINE>
 
     >>> data = widget.extract({'MYSELECT': 'two'})
-    >>> data.extracted
-    'two'
+    >>> data.errors, data.extracted
+    ([], 'two')
 
     >>> pxml(widget(data=data))
     <select class="select" id="input-MYSELECT" name="MYSELECT">
       <option id="input-MYSELECT-one" value="one">One</option>
-      <option id="input-MYSELECT-two" selected="selected" value="two">Two</option>
+      <option id="input-MYSELECT-two" selected="selected" 
+        value="two">Two</option>
       <option id="input-MYSELECT-three" value="three">Three</option>
       <option id="input-MYSELECT-four" value="four">Four</option>
     </select>
@@ -1065,8 +1191,10 @@ Single value selection completly disabled::
 
     >>> widget.attrs['disabled'] = True
     >>> pxml(widget())
-    <select class="select" disabled="disabled" id="input-MYSELECT" name="MYSELECT">
-      <option id="input-MYSELECT-one" selected="selected" value="one">One</option>
+    <select class="select" disabled="disabled" id="input-MYSELECT" 
+      name="MYSELECT">
+      <option id="input-MYSELECT-one" selected="selected" 
+        value="one">One</option>
       <option id="input-MYSELECT-two" value="two">Two</option>
       <option id="input-MYSELECT-three" value="three">Three</option>
       <option id="input-MYSELECT-four" value="four">Four</option>
@@ -1078,10 +1206,13 @@ Single value selection with specific options disabled::
     >>> widget.attrs['disabled'] = ['two', 'four']
     >>> pxml(widget())
     <select class="select" id="input-MYSELECT" name="MYSELECT">
-      <option id="input-MYSELECT-one" selected="selected" value="one">One</option>
-      <option disabled="disabled" id="input-MYSELECT-two" value="two">Two</option>
+      <option id="input-MYSELECT-one" selected="selected" 
+        value="one">One</option>
+      <option disabled="disabled" id="input-MYSELECT-two" 
+        value="two">Two</option>
       <option id="input-MYSELECT-three" value="three">Three</option>
-      <option disabled="disabled" id="input-MYSELECT-four" value="four">Four</option>
+      <option disabled="disabled" id="input-MYSELECT-four" 
+        value="four">Four</option>
     </select>
     <BLANKLINE>
 
@@ -1094,23 +1225,27 @@ Single value selection display mode::
     u'<div class="display-select" id="display-MYSELECT">One</div>'
 
     >>> widget.attrs['display_proxy'] = True
-    >>> widget()
-    u'<div class="display-select" id="display-MYSELECT">One</div><input 
-    class="select" id="input-MYSELECT" name="MYSELECT" 
-    type="hidden" value="one" />'
+    >>> wrapped_pxml(widget())
+    <div>
+      <div class="display-select" id="display-MYSELECT">One</div>
+      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" 
+        value="one"/>
+    </div>
+    <BLANKLINE>
 
     >>> data = widget.extract(request={'MYSELECT': 'two'})
     >>> data
     <RuntimeData MYSELECT, value='one', extracted='two' at ...>
 
-    >>> pxml('<div>' + widget(data=data) + '</div>')
+    >>> wrapped_pxml(widget(data=data))
     <div>
       <div class="display-select" id="display-MYSELECT">Two</div>
-      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" value="two"/>
+      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" 
+        value="two"/>
     </div>
     <BLANKLINE>
 
-Single value selection with int datatype set::
+Single value selection with datatype set::
 
     >>> vocab = [
     ...     (1, 'One'),
@@ -1120,7 +1255,7 @@ Single value selection with int datatype set::
     ... ]
     >>> widget = factory(
     ...     'select',
-    ...     'MYSELECT',
+    ...     name='MYSELECT',
     ...     value=2,
     ...     props={
     ...         'vocabulary': vocab,
@@ -1143,16 +1278,92 @@ Single value selection with int datatype set::
     <select class="select" id="input-MYSELECT" name="MYSELECT">
       <option id="input-MYSELECT-1" value="1">One</option>
       <option id="input-MYSELECT-2" value="2">Two</option>
-      <option id="input-MYSELECT-3" selected="selected" value="3">Three</option>
+      <option id="input-MYSELECT-3" selected="selected" 
+        value="3">Three</option>
       <option id="input-MYSELECT-4" value="4">Four</option>
     </select>
+    <BLANKLINE>
+
+Single value with datatype set default values::
+
+    >>> widget.attrs['default'] = 0
+    >>> data = widget.extract({})
+    >>> data.extracted
+    <UNSET>
+
+    >>> data = widget.extract({'MYSELECT': ''})
+    >>> data.extracted
+    0
+
+    >>> widget.attrs['default'] = UNSET
+    >>> data = widget.extract({})
+    >>> data.extracted
+    <UNSET>
+
+    >>> data = widget.extract({'MYSELECT': ''})
+    >>> data.extracted
+    <UNSET>
+
+Single value selection with datatype set completly disabled::
+
+    >>> widget.attrs['disabled'] = True
+    >>> pxml(widget())
+    <select class="select" disabled="disabled" id="input-MYSELECT" 
+      name="MYSELECT">
+      <option id="input-MYSELECT-1" value="1">One</option>
+      <option id="input-MYSELECT-2" selected="selected" value="2">Two</option>
+      <option id="input-MYSELECT-3" value="3">Three</option>
+      <option id="input-MYSELECT-4" value="4">Four</option>
+    </select>
+    <BLANKLINE>
+
+Single value selection with datatype with specific options disabled::
+
+    >>> widget.attrs['disabled'] = [2, 4]
+    >>> pxml(widget())
+    <select class="select" id="input-MYSELECT" name="MYSELECT">
+      <option id="input-MYSELECT-1" value="1">One</option>
+      <option disabled="disabled" id="input-MYSELECT-2" selected="selected" 
+        value="2">Two</option>
+      <option id="input-MYSELECT-3" value="3">Three</option>
+      <option disabled="disabled" id="input-MYSELECT-4" value="4">Four</option>
+    </select>
+    <BLANKLINE>
+
+    >>> del widget.attrs['disabled']
+
+Single value selection with datatype display mode::
+
+    >>> widget.mode = 'display'
+    >>> widget()
+    u'<div class="display-select" id="display-MYSELECT">Two</div>'
+
+    >>> widget.attrs['display_proxy'] = True
+    >>> wrapped_pxml(widget())
+    <div>
+      <div class="display-select" id="display-MYSELECT">Two</div>
+      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" 
+        value="2"/>
+    </div>
+    <BLANKLINE>
+
+    >>> data = widget.extract(request={'MYSELECT': '1'})
+    >>> data
+    <RuntimeData MYSELECT, value=2, extracted=1 at ...>
+
+    >>> wrapped_pxml(widget(data=data))
+    <div>
+      <div class="display-select" id="display-MYSELECT">One</div>
+      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" 
+        value="1"/>
+    </div>
     <BLANKLINE>
 
 Generic HTML5 Data::
 
     >>> widget = factory(
     ...     'select',
-    ...     'MYSELECT',
+    ...     name='MYSELECT',
     ...     value='one',
     ...     props={
     ...         'data': {'foo': 'bar'},
@@ -1160,13 +1371,14 @@ Generic HTML5 Data::
     ...     })
     >>> pxml(widget())
     <select class="select" data-foo="bar" id="input-MYSELECT" name="MYSELECT">
-      <option id="input-MYSELECT-one" selected="selected" value="one">One</option>
+      <option id="input-MYSELECT-one" selected="selected" 
+        value="one">One</option>
     </select>
     <BLANKLINE>
 
     >>> widget = factory(
     ...     'select',
-    ...     'MYSELECT',
+    ...     name='MYSELECT',
     ...     value='one',
     ...     props={
     ...         'data': {'foo': 'bar'},
@@ -1191,32 +1403,37 @@ Render single selection as radio inputs::
     ... ]
     >>> widget = factory(
     ...     'select',
-    ...     'MYSELECT',
+    ...     name='MYSELECT',
     ...     value='one',
     ...     props={
     ...         'vocabulary': vocab,
     ...         'format': 'single',
     ...         'listing_label_position': 'before'
     ...     })
-    >>> pxml('<div>'+widget()+'</div>')
+    >>> wrapped_pxml(widget())
     <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
+        value="exists"/>
       <div id="radio-MYSELECT-wrapper">
         <div id="radio-MYSELECT-one">
           <label for="input-MYSELECT-one">One</label>
-          <input checked="checked" class="select" id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>
+          <input checked="checked" class="select" id="input-MYSELECT-one" 
+            name="MYSELECT" type="radio" value="one"/>
         </div>
         <div id="radio-MYSELECT-two">
           <label for="input-MYSELECT-two">Two</label>
-          <input class="select" id="input-MYSELECT-two" name="MYSELECT" type="radio" value="two"/>
+          <input class="select" id="input-MYSELECT-two" name="MYSELECT" 
+            type="radio" value="two"/>
         </div>
         <div id="radio-MYSELECT-three">
           <label for="input-MYSELECT-three">Three</label>
-          <input class="select" id="input-MYSELECT-three" name="MYSELECT" type="radio" value="three"/>
+          <input class="select" id="input-MYSELECT-three" name="MYSELECT" 
+            type="radio" value="three"/>
         </div>
         <div id="radio-MYSELECT-four">
           <label for="input-MYSELECT-four">Four</label>
-          <input class="select" id="input-MYSELECT-four" name="MYSELECT" type="radio" value="four"/>
+          <input class="select" id="input-MYSELECT-four" name="MYSELECT" 
+            type="radio" value="four"/>
         </div>
       </div>
     </div>
@@ -1225,25 +1442,30 @@ Render single selection as radio inputs::
 Render single selection as radio inputs, disables all::
 
     >>> widget.attrs['disabled'] = True
-    >>> pxml('<div>'+widget()+'</div>')
+    >>> wrapped_pxml(widget())
     <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
+        value="exists"/>
       <div id="radio-MYSELECT-wrapper">
         <div id="radio-MYSELECT-one">
           <label for="input-MYSELECT-one">One</label>
-          <input checked="checked" class="select" disabled="disabled" id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>
+          <input checked="checked" class="select" disabled="disabled" 
+            id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>
         </div>
         <div id="radio-MYSELECT-two">
           <label for="input-MYSELECT-two">Two</label>
-          <input class="select" disabled="disabled" id="input-MYSELECT-two" name="MYSELECT" type="radio" value="two"/>
+          <input class="select" disabled="disabled" id="input-MYSELECT-two" 
+            name="MYSELECT" type="radio" value="two"/>
         </div>
         <div id="radio-MYSELECT-three">
           <label for="input-MYSELECT-three">Three</label>
-          <input class="select" disabled="disabled" id="input-MYSELECT-three" name="MYSELECT" type="radio" value="three"/>
+          <input class="select" disabled="disabled" id="input-MYSELECT-three" 
+            name="MYSELECT" type="radio" value="three"/>
         </div>
         <div id="radio-MYSELECT-four">
           <label for="input-MYSELECT-four">Four</label>
-          <input class="select" disabled="disabled" id="input-MYSELECT-four" name="MYSELECT" type="radio" value="four"/>
+          <input class="select" disabled="disabled" id="input-MYSELECT-four" 
+            name="MYSELECT" type="radio" value="four"/>
         </div>
       </div>
     </div>
@@ -1252,25 +1474,30 @@ Render single selection as radio inputs, disables all::
 Render single selection as radio inputs, disables some::
 
     >>> widget.attrs['disabled'] = ['one', 'three']
-    >>> pxml('<div>'+widget()+'</div>')
+    >>> wrapped_pxml(widget())
     <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
+        value="exists"/>
       <div id="radio-MYSELECT-wrapper">
         <div id="radio-MYSELECT-one">
           <label for="input-MYSELECT-one">One</label>
-          <input checked="checked" class="select" disabled="disabled" id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>
+          <input checked="checked" class="select" disabled="disabled" 
+            id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>
         </div>
         <div id="radio-MYSELECT-two">
           <label for="input-MYSELECT-two">Two</label>
-          <input class="select" id="input-MYSELECT-two" name="MYSELECT" type="radio" value="two"/>
+          <input class="select" id="input-MYSELECT-two" name="MYSELECT" 
+            type="radio" value="two"/>
         </div>
         <div id="radio-MYSELECT-three">
           <label for="input-MYSELECT-three">Three</label>
-          <input class="select" disabled="disabled" id="input-MYSELECT-three" name="MYSELECT" type="radio" value="three"/>
+          <input class="select" disabled="disabled" id="input-MYSELECT-three" 
+            name="MYSELECT" type="radio" value="three"/>
         </div>
         <div id="radio-MYSELECT-four">
           <label for="input-MYSELECT-four">Four</label>
-          <input class="select" id="input-MYSELECT-four" name="MYSELECT" type="radio" value="four"/>
+          <input class="select" id="input-MYSELECT-four" name="MYSELECT" 
+            type="radio" value="four"/>
         </div>
       </div>
     </div>
@@ -1285,19 +1512,23 @@ Radio single valued display mode::
     u'<div class="display-select" id="display-MYSELECT">One</div>'
 
     >>> widget.attrs['display_proxy'] = True
-    >>> widget()
-    u'<div class="display-select" id="display-MYSELECT">One</div><input 
-    class="select" id="input-MYSELECT" name="MYSELECT" 
-    type="hidden" value="one" />'
+    >>> wrapped_pxml(widget())
+    <div>
+      <div class="display-select" id="display-MYSELECT">One</div>
+      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" 
+        value="one"/>
+    </div>
+    <BLANKLINE>
 
     >>> data = widget.extract(request={'MYSELECT': 'two'})
     >>> data
     <RuntimeData MYSELECT, value='one', extracted='two' at ...>
 
-    >>> pxml('<div>' + widget(data=data) + '</div>')
+    >>> wrapped_pxml(widget(data=data))
     <div>
       <div class="display-select" id="display-MYSELECT">Two</div>
-      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" value="two"/>
+      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" 
+        value="two"/>
     </div>
     <BLANKLINE>
 
@@ -1311,28 +1542,50 @@ Radio single value selection with uuid datatype set::
     ... ]
     >>> widget = factory(
     ...     'select',
-    ...     'MYSELECT',
+    ...     name='MYSELECT',
     ...     value='b1116392-4a80-496d-86f1-3a2c87e09c59',
     ...     props={
     ...         'vocabulary': vocab,
     ...         'datatype': 'uuid',
     ...         'format': 'single',
     ...     })
-    >>> pxml('<div>'+widget()+'</div>')
+    >>> wrapped_pxml(widget())
     <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
+        value="exists"/>
       <div id="radio-MYSELECT-wrapper">
         <div id="radio-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1">
-          <label for="input-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1"><input class="select" id="input-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1" name="MYSELECT" type="radio" value="3762033b-7118-4bad-89ed-7cb71f5ab6d1"/>One</label>
+          <label 
+            for="input-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1"><input 
+              class="select" 
+              id="input-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1" 
+              name="MYSELECT" type="radio" 
+              value="3762033b-7118-4bad-89ed-7cb71f5ab6d1"/>One</label>
         </div>
         <div id="radio-MYSELECT-74ef603d-29d0-4016-a003-334719dde835">
-          <label for="input-MYSELECT-74ef603d-29d0-4016-a003-334719dde835"><input class="select" id="input-MYSELECT-74ef603d-29d0-4016-a003-334719dde835" name="MYSELECT" type="radio" value="74ef603d-29d0-4016-a003-334719dde835"/>Two</label>
+          <label 
+            for="input-MYSELECT-74ef603d-29d0-4016-a003-334719dde835"><input 
+              class="select" 
+              id="input-MYSELECT-74ef603d-29d0-4016-a003-334719dde835" 
+              name="MYSELECT" type="radio" 
+              value="74ef603d-29d0-4016-a003-334719dde835"/>Two</label>
         </div>
         <div id="radio-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59">
-          <label for="input-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59"><input checked="checked" class="select" id="input-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59" name="MYSELECT" type="radio" value="b1116392-4a80-496d-86f1-3a2c87e09c59"/>Three</label>
+          <label 
+            for="input-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59"><input 
+              checked="checked" 
+              class="select" 
+              id="input-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59" 
+              name="MYSELECT" type="radio" 
+              value="b1116392-4a80-496d-86f1-3a2c87e09c59"/>Three</label>
         </div>
         <div id="radio-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13">
-          <label for="input-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13"><input class="select" id="input-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13" name="MYSELECT" type="radio" value="e09471dc-625d-463b-be03-438d7089ec13"/>Four</label>
+          <label 
+            for="input-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13"><input 
+              class="select" 
+              id="input-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13" 
+              name="MYSELECT" type="radio" 
+              value="e09471dc-625d-463b-be03-438d7089ec13"/>Four</label>
         </div>
       </div>
     </div>
@@ -1344,21 +1597,42 @@ Radio single value selection with uuid datatype set::
     >>> data.extracted
     UUID('e09471dc-625d-463b-be03-438d7089ec13')
 
-    >>> pxml('<div>'+widget(data=data)+'</div>')
+    >>> wrapped_pxml(widget(data=data))
     <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
+        value="exists"/>
       <div id="radio-MYSELECT-wrapper">
         <div id="radio-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1">
-          <label for="input-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1"><input class="select" id="input-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1" name="MYSELECT" type="radio" value="3762033b-7118-4bad-89ed-7cb71f5ab6d1"/>One</label>
+          <label 
+            for="input-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1"><input 
+              class="select" 
+              id="input-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1" 
+              name="MYSELECT" type="radio" 
+              value="3762033b-7118-4bad-89ed-7cb71f5ab6d1"/>One</label>
         </div>
         <div id="radio-MYSELECT-74ef603d-29d0-4016-a003-334719dde835">
-          <label for="input-MYSELECT-74ef603d-29d0-4016-a003-334719dde835"><input class="select" id="input-MYSELECT-74ef603d-29d0-4016-a003-334719dde835" name="MYSELECT" type="radio" value="74ef603d-29d0-4016-a003-334719dde835"/>Two</label>
+          <label 
+            for="input-MYSELECT-74ef603d-29d0-4016-a003-334719dde835"><input 
+              class="select" 
+              id="input-MYSELECT-74ef603d-29d0-4016-a003-334719dde835" 
+              name="MYSELECT" type="radio" 
+              value="74ef603d-29d0-4016-a003-334719dde835"/>Two</label>
         </div>
         <div id="radio-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59">
-          <label for="input-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59"><input class="select" id="input-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59" name="MYSELECT" type="radio" value="b1116392-4a80-496d-86f1-3a2c87e09c59"/>Three</label>
+          <label 
+            for="input-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59"><input 
+              class="select" 
+              id="input-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59" 
+              name="MYSELECT" type="radio" 
+              value="b1116392-4a80-496d-86f1-3a2c87e09c59"/>Three</label>
         </div>
         <div id="radio-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13">
-          <label for="input-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13"><input checked="checked" class="select" id="input-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13" name="MYSELECT" type="radio" value="e09471dc-625d-463b-be03-438d7089ec13"/>Four</label>
+          <label 
+            for="input-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13"><input 
+              checked="checked" class="select" 
+              id="input-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13" 
+              name="MYSELECT" type="radio" 
+              value="e09471dc-625d-463b-be03-438d7089ec13"/>Four</label>
         </div>
       </div>
     </div>
@@ -1368,7 +1642,7 @@ Generic HTML5 Data::
 
     >>> widget = factory(
     ...     'select',
-    ...     'MYSELECT',
+    ...     name='MYSELECT',
     ...     value='one',
     ...     props={
     ...         'vocabulary': [('one','One')],
@@ -1376,13 +1650,15 @@ Generic HTML5 Data::
     ...         'listing_label_position': 'before',
     ...         'data': {'foo': 'bar'}
     ...     })
-    >>> pxml('<div>'+widget()+'</div>')
+    >>> wrapped_pxml(widget())
     <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
+        value="exists"/>
       <div data-foo="bar" id="radio-MYSELECT-wrapper">
         <div id="radio-MYSELECT-one">
           <label for="input-MYSELECT-one">One</label>
-          <input checked="checked" class="select" id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>
+          <input checked="checked" class="select" id="input-MYSELECT-one" 
+            name="MYSELECT" type="radio" value="one"/>
         </div>
       </div>
     </div>
@@ -1390,7 +1666,7 @@ Generic HTML5 Data::
 
     >>> widget = factory(
     ...     'select',
-    ...     'MYSELECT',
+    ...     name='MYSELECT',
     ...     value='one',
     ...     props={
     ...         'vocabulary': [('one','One')],
@@ -1399,9 +1675,10 @@ Generic HTML5 Data::
     ...         'data': {'foo': 'bar'}
     ...     },
     ...     mode='display')
-    >>> pxml('<div>'+widget()+'</div>')
+    >>> wrapped_pxml(widget())
     <div>
-      <div class="display-select" data-foo="bar" id="display-MYSELECT">One</div>
+      <div class="display-select" data-foo="bar" 
+        id="display-MYSELECT">One</div>
     </div>
     <BLANKLINE>
 
@@ -1419,18 +1696,22 @@ Default multi valued::
     ... ]
     >>> widget = factory(
     ...     'select',
-    ...     'MYSELECT',
+    ...     name='MYSELECT',
     ...     value=['one', 'two'],
     ...     props={
     ...         'multivalued': True,
     ...         'vocabulary': vocab
     ...     })
-    >>> pxml('<div>' + widget() + '</div>')
+    >>> wrapped_pxml(widget())
     <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
-      <select class="select" id="input-MYSELECT" multiple="multiple" name="MYSELECT">
-        <option id="input-MYSELECT-one" selected="selected" value="one">One</option>
-        <option id="input-MYSELECT-two" selected="selected" value="two">Two</option>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
+        value="exists"/>
+      <select class="select" id="input-MYSELECT" multiple="multiple" 
+        name="MYSELECT">
+        <option id="input-MYSELECT-one" selected="selected" 
+          value="one">One</option>
+        <option id="input-MYSELECT-two" selected="selected" 
+          value="two">Two</option>
         <option id="input-MYSELECT-three" value="three">Three</option>
         <option id="input-MYSELECT-four" value="four">Four</option>
       </select>
@@ -1443,14 +1724,18 @@ Extract multi valued selection and render widget with extracted data::
     >>> data
     <RuntimeData MYSELECT, value=['one', 'two'], extracted=['one', 'four'] at ...>
 
-    >>> pxml('<div>' + widget(data=data) + '</div>')
+    >>> wrapped_pxml(widget(data=data))
     <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
-      <select class="select" id="input-MYSELECT" multiple="multiple" name="MYSELECT">
-        <option id="input-MYSELECT-one" selected="selected" value="one">One</option>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
+        value="exists"/>
+      <select class="select" id="input-MYSELECT" multiple="multiple" 
+        name="MYSELECT">
+        <option id="input-MYSELECT-one" selected="selected" 
+          value="one">One</option>
         <option id="input-MYSELECT-two" value="two">Two</option>
         <option id="input-MYSELECT-three" value="three">Three</option>
-        <option id="input-MYSELECT-four" selected="selected" value="four">Four</option>
+        <option id="input-MYSELECT-four" selected="selected" 
+          value="four">Four</option>
       </select>
     </div>
     <BLANKLINE>
@@ -1468,14 +1753,16 @@ Multi selection display mode::
 Multi selection display mode with display proxy::
 
     >>> widget.attrs['display_proxy'] = True
-    >>> pxml('<div>' + widget() + '</div>')
+    >>> wrapped_pxml(widget())
     <div>
       <ul class="display-select" id="display-MYSELECT">
         <li>One</li>
         <li>Two</li>
       </ul>
-      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" value="one"/>
-      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" value="two"/>
+      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" 
+        value="one"/>
+      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" 
+        value="two"/>
     </div>
     <BLANKLINE>
 
@@ -1485,12 +1772,13 @@ Multi selection display mode with display proxy and extracted data::
     >>> data
     <RuntimeData MYSELECT, value=['one', 'two'], extracted=['one'] at ...>
 
-    >>> pxml('<div>' + widget(data=data) + '</div>')
+    >>> wrapped_pxml(widget(data=data))
     <div>
       <ul class="display-select" id="display-MYSELECT">
         <li>One</li>
       </ul>
-      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" value="one"/>
+      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" 
+        value="one"/>
     </div>
     <BLANKLINE>
 
@@ -1498,14 +1786,14 @@ Multi selection display with empty values list::
 
     >>> widget = factory(
     ...     'select',
-    ...     'MYSELECT',
+    ...     name='MYSELECT',
     ...     value=[],
     ...     props={
     ...         'vocabulary': [],
     ...         'multivalued': True
     ...     },
     ...     mode='display')
-    >>> pxml('<div>' + widget() + '</div>')
+    >>> wrapped_pxml(widget())
     <div>
       <div class="display-select" id="display-MYSELECT"/>
     </div>
@@ -1521,7 +1809,7 @@ Multiple values on single valued selection fails::
     ... ]
     >>> widget = factory(
     ...     'select',
-    ...     'MYSELECT',
+    ...     name='MYSELECT',
     ...     value=['one', 'two'],
     ...     props={
     ...         'vocabulary': vocab
@@ -1541,19 +1829,23 @@ Multi value selection with float datatype set::
     ... ]
     >>> widget = factory(
     ...     'select',
-    ...     'MYSELECT',
+    ...     name='MYSELECT',
     ...     value=[1.0, 2.0],
     ...     props={
     ...         'datatype': 'float',
     ...         'multivalued': True,
     ...         'vocabulary': vocab
     ...     })
-    >>> pxml('<div>' + widget() + '</div>')
+    >>> wrapped_pxml(widget())
     <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
-      <select class="select" id="input-MYSELECT" multiple="multiple" name="MYSELECT">
-        <option id="input-MYSELECT-1.0" selected="selected" value="1.0">One</option>
-        <option id="input-MYSELECT-2.0" selected="selected" value="2.0">Two</option>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
+        value="exists"/>
+      <select class="select" id="input-MYSELECT" multiple="multiple" 
+        name="MYSELECT">
+        <option id="input-MYSELECT-1.0" selected="selected" 
+          value="1.0">One</option>
+        <option id="input-MYSELECT-2.0" selected="selected" 
+          value="2.0">Two</option>
         <option id="input-MYSELECT-3.0" value="3.0">Three</option>
         <option id="input-MYSELECT-4.0" value="4.0">Four</option>
       </select>
@@ -1567,13 +1859,17 @@ Multi value selection with float datatype set::
     >>> data.extracted
     [2.0, 3.0]
 
-    >>> pxml('<div>' + widget(data=data) + '</div>')
+    >>> wrapped_pxml(widget(data=data))
     <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
-      <select class="select" id="input-MYSELECT" multiple="multiple" name="MYSELECT">
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
+        value="exists"/>
+      <select class="select" id="input-MYSELECT" multiple="multiple" 
+        name="MYSELECT">
         <option id="input-MYSELECT-1.0" value="1.0">One</option>
-        <option id="input-MYSELECT-2.0" selected="selected" value="2.0">Two</option>
-        <option id="input-MYSELECT-3.0" selected="selected" value="3.0">Three</option>
+        <option id="input-MYSELECT-2.0" selected="selected" 
+          value="2.0">Two</option>
+        <option id="input-MYSELECT-3.0" selected="selected" 
+          value="3.0">Three</option>
         <option id="input-MYSELECT-4.0" value="4.0">Four</option>
       </select>
     </div>
@@ -1601,19 +1897,23 @@ Generic HTML5 Data::
     ... ]
     >>> widget = factory(
     ...     'select',
-    ...     'MYSELECT',
+    ...     name='MYSELECT',
     ...     value=['one', 'two'],
     ...     props={
     ...         'multivalued': True,
     ...         'data': {'foo': 'bar'},
     ...         'vocabulary': vocab
     ...     })
-    >>> pxml('<div>' + widget() + '</div>')
+    >>> wrapped_pxml(widget())
     <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
-      <select class="select" data-foo="bar" id="input-MYSELECT" multiple="multiple" name="MYSELECT">
-        <option id="input-MYSELECT-one" selected="selected" value="one">One</option>
-        <option id="input-MYSELECT-two" selected="selected" value="two">Two</option>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
+        value="exists"/>
+      <select class="select" data-foo="bar" id="input-MYSELECT" 
+        multiple="multiple" name="MYSELECT">
+        <option id="input-MYSELECT-one" selected="selected" 
+          value="one">One</option>
+        <option id="input-MYSELECT-two" selected="selected" 
+          value="two">Two</option>
       </select>
     </div>
     <BLANKLINE>
@@ -1640,28 +1940,37 @@ Render multi selection as checkboxes::
     ... ]
     >>> widget = factory(
     ...     'select',
-    ...     'MYSELECT',
+    ...     name='MYSELECT',
     ...     value='one',
     ...     props={
     ...         'multivalued': True,
     ...         'vocabulary': vocab,
     ...         'format': 'single'
     ...     })
-    >>> pxml('<div>' + widget() + '</div>')
+    >>> wrapped_pxml(widget())
     <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
+        value="exists"/>
       <div id="checkbox-MYSELECT-wrapper">
         <div id="checkbox-MYSELECT-one">
-          <label for="input-MYSELECT-one"><input checked="checked" class="select" id="input-MYSELECT-one" name="MYSELECT" type="checkbox" value="one"/>One</label>
+          <label for="input-MYSELECT-one"><input checked="checked" 
+            class="select" id="input-MYSELECT-one" name="MYSELECT" 
+            type="checkbox" value="one"/>One</label>
         </div>
         <div id="checkbox-MYSELECT-two">
-          <label for="input-MYSELECT-two"><input class="select" id="input-MYSELECT-two" name="MYSELECT" type="checkbox" value="two"/>Two</label>
+          <label for="input-MYSELECT-two"><input class="select" 
+            id="input-MYSELECT-two" name="MYSELECT" type="checkbox" 
+            value="two"/>Two</label>
         </div>
         <div id="checkbox-MYSELECT-three">
-          <label for="input-MYSELECT-three"><input class="select" id="input-MYSELECT-three" name="MYSELECT" type="checkbox" value="three"/>Three</label>
+          <label for="input-MYSELECT-three"><input class="select" 
+            id="input-MYSELECT-three" name="MYSELECT" type="checkbox" 
+            value="three"/>Three</label>
         </div>
         <div id="checkbox-MYSELECT-four">
-          <label for="input-MYSELECT-four"><input class="select" id="input-MYSELECT-four" name="MYSELECT" type="checkbox" value="four"/>Four</label>
+          <label for="input-MYSELECT-four"><input class="select" 
+            id="input-MYSELECT-four" name="MYSELECT" type="checkbox" 
+            value="four"/>Four</label>
         </div>
       </div>
     </div>
@@ -1681,12 +1990,13 @@ covered with the below tests::
 Checkbox multi selection display mode with display proxy::
 
     >>> widget.attrs['display_proxy'] = True
-    >>> pxml('<div>' + widget() + '</div>')
+    >>> wrapped_pxml(widget())
     <div>
       <ul class="display-select" id="display-MYSELECT">
         <li>One</li>
       </ul>
-      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" value="one"/>
+      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" 
+        value="one"/>
     </div>
     <BLANKLINE>
 
@@ -1696,12 +2006,13 @@ Checkbox multi selection display mode with display proxy and extracted data::
     >>> data
     <RuntimeData MYSELECT, value='one', extracted=['two'] at ...>
     
-    >>> pxml('<div>' + widget(data=data) + '</div>')
+    >>> wrapped_pxml(widget(data=data))
     <div>
       <ul class="display-select" id="display-MYSELECT">
         <li>Two</li>
       </ul>
-      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" value="two"/>
+      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" 
+        value="two"/>
     </div>
     <BLANKLINE>
 
@@ -1709,7 +2020,7 @@ Generic HTML5 Data::
 
     >>> widget = factory(
     ...     'select',
-    ...     'MYSELECT',
+    ...     name='MYSELECT',
     ...     value='one',
     ...     props={
     ...         'multivalued': True,
@@ -1717,12 +2028,15 @@ Generic HTML5 Data::
     ...         'vocabulary': [('one','One')],
     ...         'format': 'single'
     ...     })
-    >>> pxml('<div>' + widget() + '</div>')
+    >>> wrapped_pxml(widget())
     <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
+        value="exists"/>
       <div data-foo="bar" id="checkbox-MYSELECT-wrapper">
         <div id="checkbox-MYSELECT-one">
-          <label for="input-MYSELECT-one"><input checked="checked" class="select" id="input-MYSELECT-one" name="MYSELECT" type="checkbox" value="one"/>One</label>
+          <label for="input-MYSELECT-one"><input checked="checked" 
+            class="select" id="input-MYSELECT-one" name="MYSELECT" 
+            type="checkbox" value="one"/>One</label>
         </div>
       </div>
     </div>
@@ -1749,7 +2063,7 @@ Using 'ul' instead of 'div' for rendering radio or checkbox selections::
     ... ]
     >>> widget = factory(
     ...     'select',
-    ...     'MYSELECT',
+    ...     name='MYSELECT',
     ...     value='one',
     ...     props={
     ...         'multivalued': True,
@@ -1757,21 +2071,30 @@ Using 'ul' instead of 'div' for rendering radio or checkbox selections::
     ...         'format': 'single',
     ...         'listing_tag': 'ul'
     ...     })
-    >>> pxml('<div>'+widget()+'</div>')
+    >>> wrapped_pxml(widget())
     <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
+        value="exists"/>
       <ul id="checkbox-MYSELECT-wrapper">
         <li id="checkbox-MYSELECT-one">
-          <label for="input-MYSELECT-one"><input checked="checked" class="select" id="input-MYSELECT-one" name="MYSELECT" type="checkbox" value="one"/>One</label>
+          <label for="input-MYSELECT-one"><input checked="checked" 
+            class="select" id="input-MYSELECT-one" name="MYSELECT" 
+            type="checkbox" value="one"/>One</label>
         </li>
         <li id="checkbox-MYSELECT-two">
-          <label for="input-MYSELECT-two"><input class="select" id="input-MYSELECT-two" name="MYSELECT" type="checkbox" value="two"/>Two</label>
+          <label for="input-MYSELECT-two"><input class="select" 
+            id="input-MYSELECT-two" name="MYSELECT" type="checkbox" 
+            value="two"/>Two</label>
         </li>
         <li id="checkbox-MYSELECT-three">
-          <label for="input-MYSELECT-three"><input class="select" id="input-MYSELECT-three" name="MYSELECT" type="checkbox" value="three"/>Three</label>
+          <label for="input-MYSELECT-three"><input class="select" 
+            id="input-MYSELECT-three" name="MYSELECT" type="checkbox" 
+            value="three"/>Three</label>
         </li>
         <li id="checkbox-MYSELECT-four">
-          <label for="input-MYSELECT-four"><input class="select" id="input-MYSELECT-four" name="MYSELECT" type="checkbox" value="four"/>Four</label>
+          <label for="input-MYSELECT-four"><input class="select" 
+            id="input-MYSELECT-four" name="MYSELECT" type="checkbox" 
+            value="four"/>Four</label>
         </li>
       </ul>
     </div>
@@ -1781,7 +2104,7 @@ Render single format selection with label after input::
 
     >>> widget = factory(
     ...     'select',
-    ...     'MYSELECT',
+    ...     name='MYSELECT',
     ...     value='one',
     ...     props={
     ...         'multivalued': True,
@@ -1793,16 +2116,19 @@ Render single format selection with label after input::
     ...         'listing_tag': 'ul',
     ...         'listing_label_position': 'after'
     ...     })
-    >>> pxml('<div>'+widget()+'</div>')
+    >>> wrapped_pxml(widget())
     <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
+        value="exists"/>
       <ul id="checkbox-MYSELECT-wrapper">
         <li id="checkbox-MYSELECT-one">
-          <input checked="checked" class="select" id="input-MYSELECT-one" name="MYSELECT" type="checkbox" value="one"/>
+          <input checked="checked" class="select" id="input-MYSELECT-one" 
+            name="MYSELECT" type="checkbox" value="one"/>
           <label for="input-MYSELECT-one">One</label>
         </li>
         <li id="checkbox-MYSELECT-two">
-          <input class="select" id="input-MYSELECT-two" name="MYSELECT" type="checkbox" value="two"/>
+          <input class="select" id="input-MYSELECT-two" name="MYSELECT" 
+            type="checkbox" value="two"/>
           <label for="input-MYSELECT-two">Two</label>
         </li>
       </ul>
@@ -1813,7 +2139,7 @@ Render single format selection with input inside label before checkbox::
 
     >>> widget = factory(
     ...     'select',
-    ...     'MYSELECT',
+    ...     name='MYSELECT',
     ...     value='one',
     ...     props={
     ...         'multivalued': True,
@@ -1825,15 +2151,20 @@ Render single format selection with input inside label before checkbox::
     ...         'listing_tag': 'ul',
     ...         'listing_label_position': 'inner-before'
     ...     })
-    >>> pxml('<div>'+widget()+'</div>')
+    >>> wrapped_pxml(widget())
     <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
+        value="exists"/>
       <ul id="checkbox-MYSELECT-wrapper">
         <li id="checkbox-MYSELECT-one">
-          <label for="input-MYSELECT-one">One<input checked="checked" class="select" id="input-MYSELECT-one" name="MYSELECT" type="checkbox" value="one"/></label>
+          <label for="input-MYSELECT-one">One<input checked="checked" 
+            class="select" id="input-MYSELECT-one" name="MYSELECT" 
+            type="checkbox" value="one"/></label>
         </li>
         <li id="checkbox-MYSELECT-two">
-          <label for="input-MYSELECT-two">Two<input class="select" id="input-MYSELECT-two" name="MYSELECT" type="checkbox" value="two"/></label>
+          <label for="input-MYSELECT-two">Two<input class="select" 
+            id="input-MYSELECT-two" name="MYSELECT" type="checkbox" 
+            value="two"/></label>
         </li>
       </ul>
     </div>
@@ -1844,19 +2175,22 @@ Check BBB 'inner' for 'listing_label_position' which behaves like
 
     >>> widget = factory(
     ...     'select',
-    ...     'MYSELECT',
+    ...     name='MYSELECT',
     ...     value='one',
     ...     props={
     ...         'vocabulary': [('one','One')],
     ...         'format': 'single',
     ...         'listing_label_position': 'inner'
     ...     })
-    >>> pxml('<div>'+widget()+'</div>')
+    >>> wrapped_pxml(widget())
     <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" value="exists"/>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
+        value="exists"/>
       <div id="radio-MYSELECT-wrapper">
         <div id="radio-MYSELECT-one">
-          <label for="input-MYSELECT-one"><input checked="checked" class="select" id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>One</label>
+          <label for="input-MYSELECT-one"><input checked="checked" 
+            class="select" id="input-MYSELECT-one" name="MYSELECT" 
+            type="radio" value="one"/>One</label>
         </div>
       </div>
     </div>
@@ -1872,23 +2206,24 @@ Check selection required::
     ... ]
     >>> widget = factory(
     ...     'select',
-    ...     'reqselect',
+    ...     name='MYSELECT',
     ...     props={
     ...         'required': 'Selection required',
     ...         'vocabulary': vocab
     ...     })
     >>> pxml(widget())
-    <select class="select" id="input-reqselect" name="reqselect" required="required">
-      <option id="input-reqselect-one" value="one">One</option>
-      <option id="input-reqselect-two" value="two">Two</option>
-      <option id="input-reqselect-three" value="three">Three</option>
-      <option id="input-reqselect-four" value="four">Four</option>
+    <select class="select" id="input-MYSELECT" name="MYSELECT" 
+      required="required">
+      <option id="input-MYSELECT-one" value="one">One</option>
+      <option id="input-MYSELECT-two" value="two">Two</option>
+      <option id="input-MYSELECT-three" value="three">Three</option>
+      <option id="input-MYSELECT-four" value="four">Four</option>
     </select>
     <BLANKLINE>
 
-    >>> data = widget.extract(request={'reqselect': ''})
+    >>> data = widget.extract(request={'MYSELECT': ''})
     >>> data.printtree()
-    <RuntimeData reqselect, value=<UNSET>, extracted='', 1 error(s) at ...>
+    <RuntimeData MYSELECT, value=<UNSET>, extracted='', 1 error(s) at ...>
 
     >>> vocab = [
     ...     ('one','One'),
@@ -1898,126 +2233,128 @@ Check selection required::
     ... ]
     >>> widget = factory(
     ...     'select',
-    ...     'reqselect',
+    ...     name='MYSELECT',
     ...     props={
     ...         'required': 'Selection required',
     ...         'multivalued': True,
     ...         'vocabulary': vocab
     ...     })
-    >>> pxml('<div>' + widget() + '</div>')
+    >>> wrapped_pxml(widget())
     <div>
-      <input id="exists-reqselect" name="reqselect-exists" type="hidden" value="exists"/>
-      <select class="select" id="input-reqselect" multiple="multiple" name="reqselect" required="required">
-        <option id="input-reqselect-one" value="one">One</option>
-        <option id="input-reqselect-two" value="two">Two</option>
-        <option id="input-reqselect-three" value="three">Three</option>
-        <option id="input-reqselect-four" value="four">Four</option>
+      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
+        value="exists"/>
+      <select class="select" id="input-MYSELECT" multiple="multiple" 
+        name="MYSELECT" required="required">
+        <option id="input-MYSELECT-one" value="one">One</option>
+        <option id="input-MYSELECT-two" value="two">Two</option>
+        <option id="input-MYSELECT-three" value="three">Three</option>
+        <option id="input-MYSELECT-four" value="four">Four</option>
       </select>
     </div>
     <BLANKLINE>
 
-    >>> data = widget.extract(request={'reqselect-exists': 'exists'})
+    >>> data = widget.extract(request={'MYSELECT-exists': 'exists'})
     >>> data.printtree()
-    <RuntimeData reqselect, value=<UNSET>, extracted=[], 1 error(s) at ...>
+    <RuntimeData MYSELECT, value=<UNSET>, extracted=[], 1 error(s) at ...>
 
 Single selection extraction without value::
 
     >>> widget = factory(
     ...     'select',
-    ...     'myselect',
+    ...     name='MYSELECT',
     ...     props={
     ...         'vocabulary': [
     ...             ('one','One'),
-    ...             ('two', 'Two')]
+    ...             ('two', 'Two')
+    ...         ]
     ...     })
-
     >>> request = {
-    ...     'myselect': 'one',
-    ...     'myselect-exists': True,
+    ...     'MYSELECT': 'one',
+    ...     'MYSELECT-exists': True,
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
-    <RuntimeData myselect, value=<UNSET>, extracted='one' at ...>
+    <RuntimeData MYSELECT, value=<UNSET>, extracted='one' at ...>
 
 Single selection extraction with value::
 
     >>> widget = factory(
     ...     'select',
-    ...     'myselect',
+    ...     name='MYSELECT',
     ...     value='two',
     ...     props={
     ...         'vocabulary': [
     ...             ('one','One'),
-    ...             ('two', 'Two')]
+    ...             ('two', 'Two')
+    ...         ]
     ...     })
-
     >>> request = {
-    ...     'myselect': 'one',
+    ...     'MYSELECT': 'one',
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
-    <RuntimeData myselect, value='two', extracted='one' at ...>
+    <RuntimeData MYSELECT, value='two', extracted='one' at ...>
 
 Single selection extraction disabled (means browser does not post the value)
 with value::
 
     >>> widget.attrs['disabled'] = True
-    >>> data = widget.extract({'myselect-exists': True})
+    >>> data = widget.extract({'MYSELECT-exists': True})
     >>> data.printtree()
-    <RuntimeData myselect, value='two', extracted='two' at ...>
+    <RuntimeData MYSELECT, value='two', extracted='two' at ...>
 
 Disabled can be also the value itself::
 
     >>> widget.attrs['disabled'] = 'two'
-    >>> data = widget.extract({'myselect-exists': True})
+    >>> data = widget.extract({'MYSELECT-exists': True})
     >>> data.printtree()
-    <RuntimeData myselect, value='two', extracted='two' at ...>
+    <RuntimeData MYSELECT, value='two', extracted='two' at ...>
 
 Single selection extraction required::
 
     >>> widget = factory(
     ...     'select',
-    ...     'myselect',
+    ...     name='MYSELECT',
     ...     value='two',
     ...     props={
     ...         'required': True,
     ...         'vocabulary': [
     ...             ('one','One'),
-    ...             ('two', 'Two')]
+    ...             ('two', 'Two')
+    ...         ]
     ...     })
-
     >>> request = {
-    ...     'myselect': '',
+    ...     'MYSELECT': '',
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
-    <RuntimeData myselect, value='two', extracted='', 1 error(s) at ...>
+    <RuntimeData MYSELECT, value='two', extracted='', 1 error(s) at ...>
 
 A disabled and required returns value itself::
 
     >>> widget.attrs['disabled'] = True
-    >>> data = widget.extract({'myselect-exists': True})
+    >>> data = widget.extract({'MYSELECT-exists': True})
     >>> data.printtree()
-    <RuntimeData myselect, value='two', extracted='two' at ...>
+    <RuntimeData MYSELECT, value='two', extracted='two' at ...>
 
 Multiple selection extraction without value::
 
     >>> widget = factory(
     ...     'select',
-    ...     'myselect',
+    ...     name='MYSELECT',
     ...     props={
     ...         'multivalued': True,
     ...         'vocabulary': [
     ...             ('one','One'),
-    ...             ('two', 'Two')]
+    ...             ('two', 'Two')
+    ...         ]
     ...     })
-
     >>> request = {
-    ...     'myselect': ['one', 'two'],
+    ...     'MYSELECT': ['one', 'two'],
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
-    <RuntimeData myselect, value=<UNSET>, extracted=['one', 'two'] at ...>
+    <RuntimeData MYSELECT, value=<UNSET>, extracted=['one', 'two'] at ...>
 
 Multiple selection extraction with value::
 
@@ -2028,27 +2365,26 @@ Multiple selection extraction with value::
     ... ]
     >>> widget = factory(
     ...     'select',
-    ...     'myselect',
+    ...     name='MYSELECT',
     ...     value='three',
     ...     props={
     ...         'multivalued': True,
     ...         'vocabulary': vocab
     ...     })
-
     >>> request = {
-    ...     'myselect': 'one',
-    ...     'myselect-exists': True,
+    ...     'MYSELECT': 'one',
+    ...     'MYSELECT-exists': True,
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
-    <RuntimeData myselect, value='three', extracted=['one'] at ...>
+    <RuntimeData MYSELECT, value='three', extracted=['one'] at ...>
 
 Multiselection, completly disabled::
 
     >>> widget.attrs['disabled'] = True
-    >>> data = widget.extract({'myselect-exists': True})
+    >>> data = widget.extract({'MYSELECT-exists': True})
     >>> data.printtree()
-    <RuntimeData myselect, value='three', extracted=['three'] at ...>
+    <RuntimeData MYSELECT, value='three', extracted=['three'] at ...>
 
 Multiselection, partly disabled, empty request::
 
@@ -2060,17 +2396,16 @@ Multiselection, partly disabled, empty request::
     ... ]
     >>> widget = factory(
     ...     'select',
-    ...     'myselect',
+    ...     name='MYSELECT',
     ...     value=['one', 'three'],
     ...     props={
     ...         'multivalued': True,
     ...         'disabled': ['two', 'three'],
     ...         'vocabulary': vocab
     ...     })
-
     >>> data = widget.extract({})
     >>> data.printtree()
-    <RuntimeData myselect, value=['one', 'three'], extracted=<UNSET> at ...>
+    <RuntimeData MYSELECT, value=['one', 'three'], extracted=<UNSET> at ...>
 
 Multiselection, partly disabled, non-empty request::
 
@@ -2083,7 +2418,7 @@ Multiselection, partly disabled, non-empty request::
     ... ]
     >>> widget = factory(
     ...     'select',
-    ...     'myselect',
+    ...     name='MYSELECT',
     ...     value=['one', 'two', 'four'],
     ...     props={
     ...         'multivalued': True,
@@ -2091,8 +2426,8 @@ Multiselection, partly disabled, non-empty request::
     ...         'vocabulary': vocab
     ...     })
     >>> request = {
-    ...     'myselect': ['one', 'two', 'five'],
-    ...     'myselect-exists': True,
+    ...     'MYSELECT': ['one', 'two', 'five'],
+    ...     'MYSELECT-exists': True,
     ... }
 
 Explanation:
@@ -2109,7 +2444,7 @@ Check extraction::
 
     >>> data = widget.extract(request)
     >>> data.printtree()
-    <RuntimeData myselect, value=['one', 'two', 'four'],
+    <RuntimeData MYSELECT, value=['one', 'two', 'four'],
     extracted=['one', 'two', 'four'] at ...>
 
 Single selection radio extraction::
@@ -2121,7 +2456,7 @@ Single selection radio extraction::
     ... ]
     >>> widget = factory(
     ...     'select',
-    ...     'myselect',
+    ...     'MYSELECT',
     ...     props={
     ...         'format': 'single',
     ...         'vocabulary': vocab
@@ -2133,26 +2468,26 @@ No exists marker in request. Extracts to UNSET::
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
-    <RuntimeData myselect, value=<UNSET>, extracted=<UNSET> at ...>
+    <RuntimeData MYSELECT, value=<UNSET>, extracted=<UNSET> at ...>
 
 Exists marker in request. Extracts to empty string::
 
     >>> request = {
-    ...     'myselect-exists': '1',
+    ...     'MYSELECT-exists': '1',
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
-    <RuntimeData myselect, value=<UNSET>, extracted='' at ...>
+    <RuntimeData MYSELECT, value=<UNSET>, extracted='' at ...>
 
 Select value::
 
     >>> request = {
-    ...     'myselect-exists': '1',
-    ...     'myselect': 'one',
+    ...     'MYSELECT-exists': '1',
+    ...     'MYSELECT': 'one',
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
-    <RuntimeData myselect, value=<UNSET>, extracted='one' at ...>
+    <RuntimeData MYSELECT, value=<UNSET>, extracted='one' at ...>
 
 Multi selection radio extraction::
 
@@ -2163,7 +2498,7 @@ Multi selection radio extraction::
     ... ]
     >>> widget = factory(
     ...     'select',
-    ...     'myselect',
+    ...     name='MYSELECT',
     ...     props={
     ...         'multivalued': True,
     ...         'format': 'single',
@@ -2176,26 +2511,26 @@ No exists marker in request. Extracts to UNSET::
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
-    <RuntimeData myselect, value=<UNSET>, extracted=<UNSET> at ...>
+    <RuntimeData MYSELECT, value=<UNSET>, extracted=<UNSET> at ...>
 
 Exists marker in request. Extracts to empty list::
 
     >>> request = {
-    ...     'myselect-exists': '1',
+    ...     'MYSELECT-exists': '1',
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
-    <RuntimeData myselect, value=<UNSET>, extracted=[] at ...>
+    <RuntimeData MYSELECT, value=<UNSET>, extracted=[] at ...>
 
 Select values::
 
     >>> request = {
-    ...     'myselect-exists': '1',
-    ...     'myselect': ['one', 'two'],
+    ...     'MYSELECT-exists': '1',
+    ...     'MYSELECT': ['one', 'two'],
     ... }
     >>> data = widget.extract(request)
     >>> data.printtree()
-    <RuntimeData myselect, value=<UNSET>, extracted=['one', 'two'] at ...>
+    <RuntimeData MYSELECT, value=<UNSET>, extracted=['one', 'two'] at ...>
 
 
 File
@@ -2203,14 +2538,15 @@ File
 
 Render file input::
 
-    >>> widget = factory('file', 'MYFILE')
+    >>> widget = factory(
+    ...     'file',
+    ...     name='MYFILE')
     >>> widget()
     u'<input id="input-MYFILE" name="MYFILE" type="file" />'
 
 Extract empty::
 
-    >>> request = {
-    ... }
+    >>> request = {}
     >>> data = widget.extract(request)
     >>> data.extracted
     <UNSET>
@@ -2237,23 +2573,26 @@ File with value preset::
 
     >>> widget = factory(
     ...     'file',
-    ...     'MYFILE',
+    ...     name='MYFILE',
     ...     value={
     ...         'file': StringIO('321'),
     ...     })
-    >>> pxml('<div>' + widget() + '</div>')
+    >>> wrapped_pxml(widget())
     <div>
       <input id="input-MYFILE" name="MYFILE" type="file"/>
       <div id="radio-MYFILE-keep">
-        <input checked="checked" id="input-MYFILE-keep" name="MYFILE-action" type="radio" value="keep"/>
+        <input checked="checked" id="input-MYFILE-keep" name="MYFILE-action" 
+          type="radio" value="keep"/>
         <span>Keep Existing file</span>
       </div>
       <div id="radio-MYFILE-replace">
-        <input id="input-MYFILE-replace" name="MYFILE-action" type="radio" value="replace"/>
+        <input id="input-MYFILE-replace" name="MYFILE-action" type="radio" 
+          value="replace"/>
         <span>Replace existing file</span>
       </div>
       <div id="radio-MYFILE-delete">
-        <input id="input-MYFILE-delete" name="MYFILE-action" type="radio" value="delete"/>
+        <input id="input-MYFILE-delete" name="MYFILE-action" type="radio" 
+          value="delete"/>
         <span>Delete existing file</span>
       </div>
     </div>
@@ -2312,25 +2651,33 @@ Extract ``delete`` returns UNSET::
     >>> data.extracted['action']
     'delete'
 
-    >>> pxml('<div>' + widget(request=request) + '</div>')
+    >>> wrapped_pxml(widget(request=request))
     <div>
       <input id="input-MYFILE" name="MYFILE" type="file"/>
       <div id="radio-MYFILE-keep">
-        <input id="input-MYFILE-keep" name="MYFILE-action" type="radio" value="keep"/>
+        <input id="input-MYFILE-keep" name="MYFILE-action" type="radio" 
+          value="keep"/>
         <span>Keep Existing file</span>
       </div>
       <div id="radio-MYFILE-replace">
-        <input id="input-MYFILE-replace" name="MYFILE-action" type="radio" value="replace"/>
+        <input id="input-MYFILE-replace" name="MYFILE-action" type="radio" 
+          value="replace"/>
         <span>Replace existing file</span>
       </div>
       <div id="radio-MYFILE-delete">
-        <input checked="checked" id="input-MYFILE-delete" name="MYFILE-action" type="radio" value="delete"/>
+        <input checked="checked" id="input-MYFILE-delete" name="MYFILE-action" 
+          type="radio" value="delete"/>
         <span>Delete existing file</span>
       </div>
     </div>
     <BLANKLINE>
 
-    >>> widget = factory('file', 'MYFILE', props={'accept': 'foo/bar'})
+    >>> widget = factory(
+    ...     'file',
+    ...     name='MYFILE',
+    ...     props={
+    ...         'accept': 'foo/bar'
+    ...     })
     >>> widget()
     u'<input accept="foo/bar" id="input-MYFILE" name="MYFILE"
     type="file" />'
@@ -2355,7 +2702,7 @@ File display renderer::
 
     >>> widget = factory(
     ...     'file',
-    ...     'MYFILE',
+    ...     name='MYFILE',
     ...     mode='display')
     >>> pxml(widget())
     <div>No file</div>
@@ -2368,7 +2715,7 @@ File display renderer::
     ... }
     >>> widget = factory(
     ...     'file',
-    ...     'MYFILE',
+    ...     name='MYFILE',
     ...     value=value,
     ...     mode='display')
     >>> pxml(widget())
@@ -2383,9 +2730,15 @@ File display renderer::
 
 Generic HTML5 Data::
 
-    >>> widget = factory('file', 'MYFILE', props={
-    ...     'accept': 'foo/bar',
-    ...     'data': {'foo': 'bar'}})
+    >>> widget = factory(
+    ...     'file',
+    ...     name='MYFILE',
+    ...     props={
+    ...         'accept': 'foo/bar',
+    ...         'data': {
+    ...             'foo': 'bar'
+    ...         }
+    ...     })
     >>> widget()
     u'<input accept="foo/bar" data-foo=\'bar\' 
     id="input-MYFILE" name="MYFILE" type="file" />'
@@ -2400,44 +2753,53 @@ Submit(action)
 
 Render submit button::
 
-    >>> props = {
-    ...     'action': True,
-    ...     'label': 'Action name',
-    ... }
-    >>> widget = factory('submit', name='save', props=props)
+    >>> widget = factory(
+    ...     'submit',
+    ...     name='SAVE',
+    ...     props={
+    ...         'action': True,
+    ...         'label': 'Action name',
+    ...     })
     >>> widget()
-    u'<input id="input-save" name="action.save" type="submit" value="Action name" />'
+    u'<input id="input-SAVE" name="action.SAVE" type="submit" 
+    value="Action name" />'
 
 If expression is or evaluates to False, skip rendering::
 
-    >>> props = {
-    ...     'action': True,
-    ...     'label': 'Action name',
-    ...     'expression': False,
-    ... }
-    >>> widget = factory('submit', name='save', props=props)
+    >>> widget = factory(
+    ...     'submit',
+    ...     name='SAVE',
+    ...     props={
+    ...         'action': True,
+    ...         'label': 'Action name',
+    ...         'expression': False,
+    ...     })
     >>> widget()
     u''
 
-    >>> props = {
-    ...     'action': True,
-    ...     'label': 'Action name',
-    ...     'expression': lambda: False,
-    ... }
-    >>> widget = factory('submit', name='save', props=props)
+    >>> widget = factory(
+    ...     'submit',
+    ...     name='SAVE',
+    ...     props={
+    ...         'action': True,
+    ...         'label': 'Action name',
+    ...         'expression': lambda: False,
+    ...     })
     >>> widget()
     u''
 
 Generic HTML5 Data::
 
-    >>> props = {
-    ...     'action': True,
-    ...     'label': 'Action name',
-    ...     'data': {'foo': 'bar'},
-    ... }
-    >>> widget = factory('submit', name='save', props=props)
+    >>> widget = factory(
+    ...     'submit',
+    ...     name='SAVE',
+    ...     props={
+    ...         'action': True,
+    ...         'label': 'Action name',
+    ...         'data': {'foo': 'bar'},
+    ...     })
     >>> widget()
-    u'<input data-foo=\'bar\' id="input-save" name="action.save" 
+    u'<input data-foo=\'bar\' id="input-SAVE" name="action.SAVE" 
     type="submit" value="Action name" />'
 
 
@@ -2446,12 +2808,15 @@ Proxy
 
 Used to pass hidden arguments out of form namespace::
 
-    >>> widget = factory('proxy', name='proxy', value='1')
+    >>> widget = factory(
+    ...     'proxy',
+    ...     name='PROXY',
+    ...     value='1')
     >>> widget()
-    u'<input id="input-proxy" name="proxy" type="hidden" value="1" />'
+    u'<input id="input-PROXY" name="PROXY" type="hidden" value="1" />'
 
-    >>> widget(request={'proxy': '2'})
-    u'<input id="input-proxy" name="proxy" type="hidden" value="2" />'
+    >>> widget(request={'PROXY': '2'})
+    u'<input id="input-PROXY" name="PROXY" type="hidden" value="2" />'
 
 
 Label
@@ -2459,9 +2824,13 @@ Label
 
 Default::
 
-    >>> widget = factory('label:file', name='MYFILE', \
-    ...                   props={'label': 'MY FILE'})
-    >>> pxml(tag('div', widget()))
+    >>> widget = factory(
+    ...     'label:file',
+    ...     name='MYFILE',
+    ...     props={
+    ...         'label': 'MY FILE'
+    ...     })
+    >>> wrapped_pxml(widget())
     <div>
       <label for="input-MYFILE">MY FILE</label>
       <input id="input-MYFILE" name="MYFILE" type="file"/>
@@ -2470,10 +2839,14 @@ Default::
 
 Label after widget::
 
-    >>> widget = factory('label:file', name='MYFILE', \
-    ...                   props={'label': 'MY FILE',
-    ...                          'label.position': 'after'})
-    >>> pxml(tag('div', widget()))
+    >>> widget = factory(
+    ...     'label:file',
+    ...     name='MYFILE',
+    ...     props={
+    ...         'label': 'MY FILE',
+    ...         'label.position': 'after'
+    ...     })
+    >>> wrapped_pxml(widget())
     <div>
       <input id="input-MYFILE" name="MYFILE" type="file"/>
       <label for="input-MYFILE">MY FILE</label>
@@ -2482,21 +2855,30 @@ Label after widget::
 
 Same with inner label::
 
-    >>> widget = factory('label:file', name='MYFILE', \
-    ...                   props={'label': 'MY FILE',
-    ...                          'label.position': 'inner'})
-    >>> pxml(tag('div', widget()))
+    >>> widget = factory(
+    ...     'label:file',
+    ...     name='MYFILE',
+    ...     props={
+    ...         'label': 'MY FILE',
+    ...         'label.position': 'inner'
+    ...     })
+    >>> wrapped_pxml(widget())
     <div>
-      <label for="input-MYFILE">MY FILE<input id="input-MYFILE" name="MYFILE" type="file"/></label>
+      <label for="input-MYFILE">MY FILE<input id="input-MYFILE" name="MYFILE" 
+        type="file"/></label>
     </div>
     <BLANKLINE>
 
 Invalid position::
 
-    >>> widget = factory('label:file', name='MYFILE', \
-    ...                   props={'label': 'MY FILE',
-    ...                          'label.position': 'inexistent'})
-    >>> pxml(tag('div', widget()))
+    >>> widget = factory(
+    ...     'label:file',
+    ...     name='MYFILE',
+    ...     props={
+    ...         'label': 'MY FILE',
+    ...         'label.position': 'inexistent'
+    ...     })
+    >>> wrapped_pxml(widget())
     Traceback (most recent call last):
       ...
     ValueError: Invalid value for position "inexistent"
@@ -2544,7 +2926,9 @@ Chained file inside field with label::
     >>> widget = factory(
     ...     'field:label:file',
     ...     name='MYFILE',
-    ...     props={'label': 'MY FILE'})
+    ...     props={
+    ...         'label': 'MY FILE'
+    ...     })
     >>> pxml(widget())
     <div class="field" id="field-MYFILE">
       <label for="input-MYFILE">MY FILE</label>
@@ -2556,17 +2940,19 @@ Render error class directly on field::
 
     >>> widget = factory(
     ...     'field:text',
-    ...     name='myfield',
+    ...     name='MYFIELD',
     ...     props={
     ...         'required': True,
-    ...         'witherror': 'fielderrorclass'})
-    >>> data = widget.extract({'myfield': ''})
+    ...         'witherror': 'fielderrorclass'
+    ...     })
+    >>> data = widget.extract({'MYFIELD': ''})
     >>> data.printtree()
-    <RuntimeData myfield, value=<UNSET>, extracted='', 1 error(s) at ...>
+    <RuntimeData MYFIELD, value=<UNSET>, extracted='', 1 error(s) at ...>
 
     >>> pxml(widget(data))
-    <div class="field fielderrorclass" id="field-myfield">
-      <input class="required text" id="input-myfield" name="myfield" required="required" type="text" value=""/>
+    <div class="field fielderrorclass" id="field-MYFIELD">
+      <input class="required text" id="input-MYFIELD" name="MYFIELD" 
+        required="required" type="text" value=""/>
     </div>
     <BLANKLINE>
 
@@ -2581,17 +2967,16 @@ Use in add forms, no password set yet::
 
     >>> widget = factory(
     ...     'password',
-    ...     name='pwd',
-    ...     props={
-    ...     })
+    ...     name='PWD')
     >>> widget()
-    u'<input class="password" id="input-pwd" name="pwd" type="password" value="" />'
+    u'<input class="password" id="input-PWD" name="PWD" type="password" 
+    value="" />'
 
     >>> data = widget.extract({})
     >>> data.extracted
     <UNSET>
 
-    >>> data = widget.extract({'pwd': 'xx'})
+    >>> data = widget.extract({'PWD': 'xx'})
     >>> data.extracted
     'xx'
 
@@ -2605,23 +2990,23 @@ password value is UNSET, this means that password was not changed::
 
     >>> widget = factory(
     ...     'password',
-    ...     name='password',
-    ...     value='secret',
-    ...     props={
-    ...     })
+    ...     name='PASSWORD',
+    ...     value='secret')
     >>> widget()
-    u'<input class="password" id="input-password" name="password" type="password" value="_NOCHANGE_" />'
+    u'<input class="password" id="input-PASSWORD" name="PASSWORD" 
+    type="password" value="_NOCHANGE_" />'
 
-    >>> data = widget.extract({'password': '_NOCHANGE_'})
+    >>> data = widget.extract({'PASSWORD': '_NOCHANGE_'})
     >>> data.extracted
     <UNSET>
 
-    >>> data = widget.extract({'password': 'foo'})
+    >>> data = widget.extract({'PASSWORD': 'foo'})
     >>> data.extracted
     'foo'
 
     >>> widget(data=data)
-    u'<input class="password" id="input-password" name="password" type="password" value="foo" />'
+    u'<input class="password" id="input-PASSWORD" name="PASSWORD" 
+    type="password" value="foo" />'
 
     >>> widget.mode = 'display'
     >>> widget()
@@ -2631,31 +3016,31 @@ Password validation::
 
     >>> widget = factory(
     ...     'password',
-    ...     name='pwd',
+    ...     name='PWD',
     ...     props={
     ...         'strength': 5, # max 4, does not matter, max is used
     ...     })
-    >>> data = widget.extract({'pwd': ''})
+    >>> data = widget.extract({'PWD': ''})
     >>> data.errors
     [ExtractionError('Password too weak',)]
 
-    >>> data = widget.extract({'pwd': 'A0*'})
+    >>> data = widget.extract({'PWD': 'A0*'})
     >>> data.errors
     [ExtractionError('Password too weak',)]
 
-    >>> data = widget.extract({'pwd': 'a0*'})
+    >>> data = widget.extract({'PWD': 'a0*'})
     >>> data.errors
     [ExtractionError('Password too weak',)]
 
-    >>> data = widget.extract({'pwd': 'aA*'})
+    >>> data = widget.extract({'PWD': 'aA*'})
     >>> data.errors
     [ExtractionError('Password too weak',)]
 
-    >>> data = widget.extract({'pwd': 'aA0'})
+    >>> data = widget.extract({'PWD': 'aA0'})
     >>> data.errors
     [ExtractionError('Password too weak',)]
 
-    >>> data = widget.extract({'pwd': 'aA0*'})
+    >>> data = widget.extract({'PWD': 'aA0*'})
     >>> data.errors
     []
 
@@ -2663,15 +3048,15 @@ Minlength validation::
 
     >>> widget = factory(
     ...     'password',
-    ...     name='pwd',
+    ...     name='PWD',
     ...     props={
     ...         'minlength': 3,
     ...     })
-    >>> data = widget.extract({'pwd': 'xx'})
+    >>> data = widget.extract({'PWD': 'xx'})
     >>> data.errors
     [ExtractionError('Input must have at least 3 characters.',)]
 
-    >>> data = widget.extract({'pwd': 'xxx'})
+    >>> data = widget.extract({'PWD': 'xxx'})
     >>> data.errors
     []
 
@@ -2679,15 +3064,15 @@ Ascii validation::
 
     >>> widget = factory(
     ...     'password',
-    ...     name='pwd',
+    ...     name='PWD',
     ...     props={
     ...         'ascii': True,
     ...     })
-    >>> data = widget.extract({'pwd': u'äää'})
+    >>> data = widget.extract({'PWD': u'äää'})
     >>> data.errors
     [ExtractionError('Input contains illegal characters.',)]
 
-    >>> data = widget.extract({'pwd': u'xx'})
+    >>> data = widget.extract({'PWD': u'xx'})
     >>> data.errors
     []
 
@@ -2695,30 +3080,30 @@ Combine all validations::
 
     >>> widget = factory(
     ...     'password',
-    ...     name='pwd',
+    ...     name='PWD',
     ...     props={
     ...         'required': 'No Password given',
     ...         'minlength': 6,
     ...         'ascii': True,
     ...         'strength': 4,
     ...     })
-    >>> data = widget.extract({'pwd': u''})
+    >>> data = widget.extract({'PWD': u''})
     >>> data.errors
     [ExtractionError('No Password given',)]
 
-    >>> data = widget.extract({'pwd': u'xxxxx'})
+    >>> data = widget.extract({'PWD': u'xxxxx'})
     >>> data.errors
     [ExtractionError('Input must have at least 6 characters.',)]
 
-    >>> data = widget.extract({'pwd': u'xxxxxä'})
+    >>> data = widget.extract({'PWD': u'xxxxxä'})
     >>> data.errors
     [ExtractionError('Input contains illegal characters.',)]
 
-    >>> data = widget.extract({'pwd': u'xxxxxx'})
+    >>> data = widget.extract({'PWD': u'xxxxxx'})
     >>> data.errors
     [ExtractionError('Password too weak',)]
 
-    >>> data = widget.extract({'pwd': u'xX1*00'})
+    >>> data = widget.extract({'PWD': u'xX1*00'})
     >>> data.errors
     []
 
@@ -2728,42 +3113,56 @@ Error
 
 Chained password inside error inside field::
 
-    >>> widget = factory('field:error:password', name='password',
-    ...                  props={'label': 'Password',
-    ...                         'required': 'No password given!'})
-    >>> data = widget.extract({'password': ''})
+    >>> widget = factory(
+    ...     'field:error:password',
+    ...     name='PASSWORD',
+    ...     props={
+    ...         'label': 'Password',
+    ...         'required': 'No password given!'
+    ...     })
+    >>> data = widget.extract({'PASSWORD': ''})
     >>> pxml(widget(data=data))
-    <div class="field" id="field-password">
+    <div class="field" id="field-PASSWORD">
       <div class="error">
         <div class="errormessage">No password given!</div>
-        <input class="password required" id="input-password" name="password" required="required" type="password" value=""/>
+        <input class="password required" id="input-PASSWORD" name="PASSWORD" 
+          required="required" type="password" value=""/>
       </div>
     </div>
     <BLANKLINE>
 
-    >>> data = widget.extract({'password': 'secret'})
+    >>> data = widget.extract({'PASSWORD': 'secret'})
     >>> pxml(widget(data=data))
-    <div class="field" id="field-password">
-      <input class="password required" id="input-password" name="password" required="required" type="password" value="secret"/>
+    <div class="field" id="field-PASSWORD">
+      <input class="password required" id="input-PASSWORD" name="PASSWORD" 
+        required="required" type="password" value="secret"/>
     </div>
     <BLANKLINE>
 
-    >>> widget = factory('error:text', name='mydisplay',
-    ...                  value='somevalue',
-    ...                  mode='display')
+    >>> widget = factory(
+    ...     'error:text',
+    ...     name='MYDISPLAY',
+    ...     value='somevalue',
+    ...     mode='display')
     >>> widget()
-    u'<div class="display-text" id="display-mydisplay">somevalue</div>'
+    u'<div class="display-text" id="display-MYDISPLAY">somevalue</div>'
 
 Error wrapping in div element can be suppressed::
 
-    >>> widget = factory('field:error:password', name='password',
-    ...                  props={'label': 'Password',
-    ...                         'required': 'No password given!',
-    ...                         'message_tag': None})
-    >>> data = widget.extract({'password': ''})
+    >>> widget = factory(
+    ...     'field:error:password',
+    ...     name='PASSWORD',
+    ...     props={
+    ...         'label': 'Password',
+    ...         'required': 'No password given!',
+    ...         'message_tag': None
+    ...     })
+    >>> data = widget.extract({'PASSWORD': ''})
     >>> pxml(widget(data=data))
-    <div class="field" id="field-password">
-      <div class="error">No password given!<input class="password required" id="input-password" name="password" required="required" type="password" value=""/></div>
+    <div class="field" id="field-PASSWORD">
+      <div class="error">No password given!<input class="password required" 
+        id="input-PASSWORD" name="PASSWORD" required="required" 
+        type="password" value=""/></div>
     </div>
     <BLANKLINE>
 
@@ -2773,25 +3172,35 @@ Help
 
 Render some additional help text::
 
-    >>> widget = factory('field:help:text', name='helpexample',
-    ...                  props={'label': 'Help',
-    ...                         'help': 'Shout out loud here'})
+    >>> widget = factory(
+    ...     'field:help:text',
+    ...     name='HELPEXAMPLE',
+    ...     props={
+    ...         'label': 'Help',
+    ...         'help': 'Shout out loud here'
+    ...     })
     >>> pxml(widget())
-    <div class="field" id="field-helpexample">
+    <div class="field" id="field-HELPEXAMPLE">
       <div class="help">Shout out loud here</div>
-      <input class="text" id="input-helpexample" name="helpexample" type="text" value=""/>
+      <input class="text" id="input-HELPEXAMPLE" name="HELPEXAMPLE" 
+        type="text" value=""/>
     </div>
     <BLANKLINE>
 
 Render empty (WHAT'S THIS GOOD FOR?)::
 
-    >>> widget = factory('field:help:text', name='helpexample',
-    ...                  props={'label': 'Help',
-    ...                         'help': False,
-    ...                         'render_empty': False})
+    >>> widget = factory(
+    ...     'field:help:text',
+    ...     name='HELPEXAMPLE',
+    ...     props={
+    ...         'label': 'Help',
+    ...         'help': False,
+    ...         'render_empty': False
+    ...     })
     >>> pxml(widget())
-    <div class="field" id="field-helpexample">
-      <input class="text" id="input-helpexample" name="helpexample" type="text" value=""/>
+    <div class="field" id="field-HELPEXAMPLE">
+      <input class="text" id="input-HELPEXAMPLE" name="HELPEXAMPLE" 
+        type="text" value=""/>
     </div>
     <BLANKLINE>
 
@@ -2803,29 +3212,29 @@ Render email input field::
 
     >>> widget = factory(
     ...     'email',
-    ...     name='email')
+    ...     name='EMAIL')
     >>> pxml(widget())
-    <input class="email" id="input-email" name="email" type="email" value=""/>
+    <input class="email" id="input-EMAIL" name="EMAIL" type="email" value=""/>
 
 Extract not required and empty::
 
-    >>> data = widget.extract({'email': ''})
+    >>> data = widget.extract({'EMAIL': ''})
     >>> data.errors
     []
 
 Extract invalid email input::
 
-    >>> data = widget.extract({'email': 'foo@bar'})
+    >>> data = widget.extract({'EMAIL': 'foo@bar'})
     >>> data.errors
     [ExtractionError('Input not a valid email address.',)]
 
-    >>> data = widget.extract({'email': '@bar.com'})
+    >>> data = widget.extract({'EMAIL': '@bar.com'})
     >>> data.errors
     [ExtractionError('Input not a valid email address.',)]
 
 Extract valid email input::
 
-    >>> data = widget.extract({'email': 'foo@bar.com'})
+    >>> data = widget.extract({'EMAIL': 'foo@bar.com'})
     >>> data.errors
     []
 
@@ -2833,14 +3242,15 @@ Extract required email input::
 
     >>> widget = factory(
     ...     'email',
-    ...     name='email',
-    ...     props={'required': 'E-Mail Address is required'})
-
-    >>> data = widget.extract({'email': ''})
+    ...     name='EMAIL',
+    ...     props={
+    ...         'required': 'E-Mail Address is required'
+    ...     })
+    >>> data = widget.extract({'EMAIL': ''})
     >>> data.errors
     [ExtractionError('E-Mail Address is required',)]
 
-    >>> data = widget.extract({'email': 'foo@bar.com'})
+    >>> data = widget.extract({'EMAIL': 'foo@bar.com'})
     >>> data.errors
     []
 
@@ -2852,30 +3262,30 @@ Render URL input field::
 
     >>> widget = factory(
     ...     'url',
-    ...     name='url')
+    ...     name='URL')
     >>> pxml(widget())
-    <input class="url" id="input-url" name="url" type="url" value=""/>
+    <input class="url" id="input-URL" name="URL" type="url" value=""/>
 
 Extract not required and empty::
 
-    >>> data = widget.extract({'url': ''})
+    >>> data = widget.extract({'URL': ''})
     >>> data.errors
     []
 
 Extract invalid URL input::
 
-    >>> data = widget.extract({'url': 'htt:/bla'})
+    >>> data = widget.extract({'URL': 'htt:/bla'})
     >>> data.errors
     [ExtractionError('Input not a valid web address.',)]
 
-    >>> data = widget.extract({'url': 'invalid'})
+    >>> data = widget.extract({'URL': 'invalid'})
     >>> data.errors
     [ExtractionError('Input not a valid web address.',)]
 
 Extract value URL input::
 
     >>> data = widget.extract({
-    ...     'url': 'http://www.foo.bar.com:8080/bla#fasel?blubber=bla&bla=fasel'
+    ...     'URL': 'http://www.foo.bar.com:8080/bla#fasel?blubber=bla&bla=fasel'
     ... })
     >>> data.errors
     []
@@ -2946,7 +3356,9 @@ Instanciate with invalid datatype::
     >>> widget = factory(
     ...     'number',
     ...     name='NUMBER',
-    ...     props={'datatype': 'invalid'})
+    ...     props={
+    ...         'datatype': 'invalid'
+    ...     })
     >>> widget.extract({'NUMBER': '10.0'})
     Traceback (most recent call last):
       ...
@@ -2957,8 +3369,9 @@ Extract invalid integer input::
     >>> widget = factory(
     ...     'number',
     ...     name='NUMBER',
-    ...     props={'datatype': "integer"})
-
+    ...     props={
+    ...         'datatype': 'integer'
+    ...     })
     >>> data = widget.extract({'NUMBER': '10.0'})
     >>> data.errors
     [ExtractionError('Input is not a valid integer.',)]
@@ -2968,8 +3381,9 @@ Extract with min value set::
     >>> widget = factory(
     ...     'number',
     ...     name='NUMBER',
-    ...     props={'min': 10})
-
+    ...     props={
+    ...         'min': 10
+    ...     })
     >>> data = widget.extract({'NUMBER': '9'})
     >>> data.errors
     [ExtractionError('Value has to be at minimum 10.',)]
@@ -2987,8 +3401,9 @@ Extract with max value set::
     >>> widget = factory(
     ...     'number',
     ...     name='NUMBER',
-    ...     props={'max': lambda w,d: 10})
-
+    ...     props={
+    ...         'max': lambda w,d: 10
+    ...     })
     >>> data = widget.extract({'NUMBER': '9'})
     >>> data.errors
     []
@@ -3006,8 +3421,9 @@ Extract with step set::
     >>> widget = factory(
     ...     'number',
     ...     name='NUMBER',
-    ...     props={'step': 2})
-
+    ...     props={
+    ...         'step': 2
+    ...     })
     >>> data = widget.extract({'NUMBER': '9'})
     >>> data.errors
     [ExtractionError('Value 9.0 has to be in stepping of 2',)]
@@ -3021,8 +3437,10 @@ Extract with step and min value set::
     >>> widget = factory(
     ...     'number',
     ...     name='NUMBER',
-    ...     props={'step': 2, 'min': 3})
-
+    ...     props={
+    ...         'step': 2,
+    ...         'min': 3
+    ...     })
     >>> data = widget.extract({'NUMBER': '7'})
     >>> data.errors
     []
@@ -3044,7 +3462,9 @@ Extract 0 value::
     >>> widget = factory(
     ...     'number',
     ...     name='NUMBER',
-    ...     props={'datatype': 'int'})
+    ...     props={
+    ...         'datatype': 'int'
+    ...     })
     >>> data = widget.extract({'NUMBER': '0'})
     >>> data.extracted
     0
