@@ -325,7 +325,7 @@ No datatype given, no datatype conversion happens at all::
     >>> data.errors, data.extracted
     ([], u'')
 
-Datatype given, UNSET gets returned if value not found on request::
+Test some sorts of False evaluating default values if string datatype set::
 
     >>> widget = factory(
     ...     'text',
@@ -335,55 +335,203 @@ Datatype given, UNSET gets returned if value not found on request::
     ...         'datatype': 'str',
     ...     }
     ... )
+
+    >>> from node.utils import UNSET
+
+    >>> widget.attrs['default'] = 0
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-If empty value found on requets and datatype defined, no conversion happens,
-instead ``default`` is returned::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='DATATYPE',
-    ...     value='',
-    ...     props={
-    ...         'datatype': 'str',
-    ...         'default': 'EMPTYVALUE',
-    ...     }
-    ... )
-    >>> data = widget.extract({})
+    >>> data = widget.extract({'DATATYPE': ''})
     >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'DATATYPE': u''})
-    >>> data.errors, data.extracted
-    ([], 'EMPTYVALUE')
+    ([], 0)
 
     >>> widget.attrs['default'] = None
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-    >>> data = widget.extract({'DATATYPE': u''})
+    >>> data = widget.extract({'DATATYPE': ''})
     >>> data.errors, data.extracted
     ([], None)
 
-    >>> from node.utils import UNSET
     >>> widget.attrs['default'] = UNSET
-    >>> data = widget.extract({'DATATYPE': u''})
-
+    >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-If value is given, conversion happens::
-
-    >>> data = widget.extract({'DATATYPE': u'hallo'})
+    >>> data = widget.extract({'DATATYPE': ''})
     >>> data.errors, data.extracted
-    ([], 'hallo')
+    ([], <UNSET>)
 
-    >>> data = widget.extract({'DATATYPE': u'äöü'})
-    >>> data.errors
-    [ExtractionError('Input is not a valid string.',)]
+    >>> widget.attrs['default'] = ''
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data.errors, data.extracted
+    ([], '')
+
+    >>> widget.attrs['default'] = u''
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data.errors, data.extracted
+    ([], u'')
+
+    >>> widget.attrs['default'] = False
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data.errors, data.extracted
+    ([], False)
+
+Test some sorts of True evaluating default values if string datatype set::
+
+    >>> widget.attrs['default'] = 1
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data.errors, data.extracted
+    ([], 1)
+
+    >>> widget.attrs['default'] = '1'
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data.errors, data.extracted
+    ([], '1')
+
+    >>> widget.attrs['default'] = u'1'
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data.errors, data.extracted
+    ([], u'1')
+
+    >>> widget.attrs['default'] = True
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data.errors, data.extracted
+    ([], True)
+
+Test some sorts of False evaluating default values if numeric datatype set::
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='DATATYPE',
+    ...     value='',
+    ...     props={
+    ...         'datatype': 'int',
+    ...     }
+    ... )
+
+    >>> widget.attrs['default'] = 0
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data.errors, data.extracted
+    ([], 0)
+
+    >>> widget.attrs['default'] = None
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data.errors, data.extracted
+    ([], None)
+
+    >>> widget.attrs['default'] = UNSET
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> widget.attrs['default'] = ''
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data.errors, data.extracted
+    ([], '')
+
+    >>> widget.attrs['default'] = u''
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data.errors, data.extracted
+    ([], u'')
+
+    >>> widget.attrs['default'] = False
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data.errors, data.extracted
+    ([], False)
+
+Test some sorts of True evaluating default values if numeric datatype set::
+
+    >>> widget.attrs['default'] = 1
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data.errors, data.extracted
+    ([], 1)
+
+    >>> widget.attrs['default'] = '1'
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data.errors, data.extracted
+    ([], '1')
+
+    >>> widget.attrs['default'] = u'1'
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data.errors, data.extracted
+    ([], u'1')
+
+    >>> widget.attrs['default'] = True
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data.errors, data.extracted
+    ([], True)
 
 Integer datatype::
 
