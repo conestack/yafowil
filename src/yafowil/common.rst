@@ -149,11 +149,35 @@ Generic HTML5 Data::
     u'<input class="text" data-foo=\'bar\' id="input-MYTEXT" 
     name="MYTEXT" title="My awesome title" type="text" value="ja ha!" />'
 
-
 Default values
 --------------
 
-::
+############ See release TODO::
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='MYTEXT',
+    ...     props={
+    ...         'title': 'Default tests',
+    ...         'data': {'foo': 'bar'},
+    ...         'default': 'hallo'
+    ...     })
+    >>> widget()
+    u'<input class="text" data-foo=\'bar\' id="input-MYTEXT" name="MYTEXT" 
+    title="Default tests" type="text" value="hallo" />'
+
+    >>> widget.attrs['default'] = 'hallo'
+    >>> data = widget.extract(request={})
+    >>> data.extracted
+    <UNSET>
+
+    >>> data = widget.extract(request={'MYTEXT': ''})
+    >>> data.extracted
+    'hallo'
+
+    >>> widget.attrs['default'] = ''
+
+############::
 
     >>> data = widget.extract(request={})
     >>> data.extracted
