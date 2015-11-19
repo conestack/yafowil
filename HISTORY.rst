@@ -5,18 +5,26 @@ History
 2.1.4 (unreleased)
 ------------------
 
-- ``Widget.attrs`` can also be ``UNSET``. Fix behavior.
+- Fix ``default`` property setting at factory time (at least for mentioned
+  blueprints below) WORK IN PROGRESS.
+
+- Use ``generic_default_value_extractor`` and
+  ``generic_default_value_extractor`` in ``text``, ``select`` and ``number``
+  blueprints.
+  [rnix, 2015-11-19]
+
+- Introduce ``generic_default_value_extractor``.
+  [rnix, 2015-11-19]
+
+- Instroduce ``generic_datatype_extractor``.
+  [rnix, 2015-11-18]
+
+- Values in ``Widget.attrs`` can also be ``UNSET``.
   [rnix, 2015-11-18]
 
 - Change ``default`` value of ``select`` blueprint from ``list()`` to
   ``UNSET``. This can represent both, an empty single valued and an empty
   multi valued selection.
-  [rnix, 2015-11-18]
-
-- ``number`` blueprint uses ``generic_datatype_extractor``.
-  [rnix, 2015-11-18]
-
-- Instroduce ``generic_datatype_extractor`` and add it to ``text`` blueprint.
   [rnix, 2015-11-18]
 
 - Fix URL extractor. Must not raise ExtractionError if not required on empty
