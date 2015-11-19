@@ -376,58 +376,55 @@ Test convert_value_to_datatype
     >>> from yafowil.utils import convert_value_to_datatype
     >>> import uuid
 
-    >>> convert_value_to_datatype('', None)
-    ''
+    >>> convert_value_to_datatype('', 'inexistent')
+    Traceback (most recent call last):
+      ...
+    KeyError: 'inexistent'
 
-    >>> convert_value_to_datatype(UNSET, None)
+    >>> convert_value_to_datatype(UNSET, 'str')
     <UNSET>
 
-    >>> convert_value_to_datatype('', 'str')
-    >>> convert_value_to_datatype('', 'str', default='')
-    ''
+    >>> convert_value_to_datatype(u'string', 'str')
+    'string'
 
-    >>> convert_value_to_datatype(UNSET, 'str', default='')
-    <UNSET>
-
-    >>> convert_value_to_datatype(u'covertable unicode', 'str', default='')
-    'covertable unicode'
-
-    >>> convert_value_to_datatype(u'äöü', 'str', default='')
+    >>> convert_value_to_datatype(u'äöü', 'str')
     Traceback (most recent call last):
       ...
     UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-5: 
     ordinal not in range(128)
 
-    >>> convert_value_to_datatype('', 'int', default=UNSET)
+    >>> convert_value_to_datatype(UNSET, 'int')
     <UNSET>
 
-    >>> convert_value_to_datatype('1', 'int', default=UNSET)
+    >>> convert_value_to_datatype('1', 'int')
     1
 
-    >>> convert_value_to_datatype('1.0', 'int', default=UNSET)
+    >>> convert_value_to_datatype('1.0', 'int')
     Traceback (most recent call last):
       ...
     ValueError: invalid literal for int() with base 10: '1.0'
 
-    >>> convert_value_to_datatype('a', 'int', default=UNSET)
+    >>> convert_value_to_datatype('a', 'int')
     Traceback (most recent call last):
       ...
     ValueError: invalid literal for int() with base 10: 'a'
 
-    >>> convert_value_to_datatype('', 'float', default=None)
-    >>> convert_value_to_datatype('1.0', 'float', default=None)
+    >>> convert_value_to_datatype(UNSET, 'float')
+    <UNSET>
+
+    >>> convert_value_to_datatype('1.0', 'float')
     1.0
 
-    >>> convert_value_to_datatype('1', 'float', default=None)
+    >>> convert_value_to_datatype('1', 'float')
     1.0
 
-    >>> convert_value_to_datatype('a', 'float', default=None)
+    >>> convert_value_to_datatype('a', 'float')
     Traceback (most recent call last):
       ...
     ValueError: could not convert string to float: a
 
-    >>> convert_value_to_datatype('', 'uuid', default=uuid.uuid4())
-    UUID('...')
+    >>> convert_value_to_datatype(UNSET, 'uuid')
+    <UNSET>
 
     >>> convert_value_to_datatype(str(uuid.uuid4()), 'uuid')
     UUID('...')
@@ -444,29 +441,14 @@ Test convert_values_to_datatype
 ::
 
     >>> from yafowil.utils import convert_values_to_datatype
-    >>> convert_values_to_datatype(UNSET, 'int', default=-1)
+    >>> convert_values_to_datatype(UNSET, 'int')
     <UNSET>
 
-    >>> convert_values_to_datatype('', 'int', default=-1)
-    -1
+    >>> convert_values_to_datatype([UNSET], 'int')
+    [<UNSET>]
 
-    >>> convert_values_to_datatype('-1', 'int', default=1)
-    -1
-
-    >>> convert_values_to_datatype('0', 'int', default=1)
+    >>> convert_values_to_datatype('0', 'int')
     0
 
-    >>> convert_values_to_datatype('', 'int', default=1)
-    1
-
-    >>> convert_values_to_datatype([''], 'int', default=-1)
-    [-1]
-
-    >>> convert_values_to_datatype(['-1'], 'int', default=1)
-    [-1]
-
-    >>> convert_values_to_datatype(['0'], 'int', default=1)
-    [0]
-
-    >>> convert_values_to_datatype([''], 'int', default=1)
-    [1]
+    >>> convert_values_to_datatype(['0', '1'], 'int')
+    [0, 1]

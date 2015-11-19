@@ -9,13 +9,17 @@ This test creates widgets from ist blueprints with different properties.
 Prepare
 -------
 
-Trigger registry by importing module::
+Imports::
 
-    >>> import yafowil.common
-
-Helper::
-
+    >>> from StringIO import StringIO
+    >>> from node.utils import UNSET
+    >>> from yafowil.base import factory
+    >>> from yafowil.common import convert_bytes
     >>> from yafowil.utils import Tag
+    >>> import uuid
+
+Helpers::
+
     >>> tag = Tag(lambda msg: msg)
 
     >>> def wrapped_pxml(value):
@@ -26,7 +30,6 @@ Hidden
 
 Hidden input widget::
 
-    >>> from yafowil.base import factory
     >>> widget = factory(
     ...     'hidden',
     ...     name='MYHIDDEN',
@@ -146,7 +149,11 @@ Generic HTML5 Data::
     u'<input class="text" data-foo=\'bar\' id="input-MYTEXT" 
     name="MYTEXT" title="My awesome title" type="text" value="ja ha!" />'
 
-Default values::
+
+Default values
+--------------
+
+::
 
     >>> data = widget.extract(request={})
     >>> data.extracted
@@ -163,7 +170,26 @@ Default values::
 
     >>> data = widget.extract(request={'MYTEXT': ''})
     >>> data.extracted
-    ''
+    'hallo'
+
+    >>> widget.attrs['default'] = False
+    >>> data = widget.extract(request={})
+    >>> data.extracted
+    <UNSET>
+
+    >>> data = widget.extract(request={'MYTEXT': ''})
+    >>> data.extracted
+    False
+
+    >>> widget.attrs['default'] = UNSET
+    >>> data = widget.extract(request={})
+    >>> data.extracted
+    <UNSET>
+
+    >>> data = widget.extract(request={'MYTEXT': ''})
+    >>> data.extracted
+    <UNSET>
+
 
 Autofocus Text Input
 --------------------
@@ -290,6 +316,10 @@ Create a custom error message::
     >>> data.errors
     [ExtractionError('Foooo',)]
 
+
+Generic display renderer
+------------------------
+
 Display mode of text widget uses ``generic_display_renderer``::
 
     >>> widget = factory(
@@ -374,11 +404,9 @@ No datatype given, no datatype conversion happens at all::
     ...     value='')
     >>> data = widget.extract({'DATATYPE': u''})
     >>> data.errors, data.extracted
-    ([], u'')
+    ([], '')
 
-Test some sorts of False evaluating default values if string datatype set::
-
-    >>> from node.utils import UNSET
+Test default values if ``str`` datatype set::
 
     >>> widget = factory(
     ...     'text',
@@ -386,24 +414,19 @@ Test some sorts of False evaluating default values if string datatype set::
     ...     value='',
     ...     props={
     ...         'datatype': 'str',
-    ...         'default': 0
     ...     })
+
+Default default::
+
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
     >>> data = widget.extract({'DATATYPE': ''})
     >>> data.errors, data.extracted
-    ([], 0)
+    ([], '')
 
-    >>> widget.attrs['default'] = None
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'DATATYPE': ''})
-    >>> data.errors, data.extracted
-    ([], None)
+UNSET default::
 
     >>> widget.attrs['default'] = UNSET
     >>> data = widget.extract({})
@@ -414,14 +437,17 @@ Test some sorts of False evaluating default values if string datatype set::
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-    >>> widget.attrs['default'] = ''
-    >>> data = widget.extract({})
+String default::
+
+    >>> widget.attrs['default'] = 'abc'
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
     >>> data = widget.extract({'DATATYPE': ''})
     >>> data.errors, data.extracted
-    ([], '')
+    ([], 'abc')
+
+Unicode default::
 
     >>> widget.attrs['default'] = u''
     >>> data = widget.extract({})
@@ -430,56 +456,9 @@ Test some sorts of False evaluating default values if string datatype set::
 
     >>> data = widget.extract({'DATATYPE': ''})
     >>> data.errors, data.extracted
-    ([], u'')
+    ([], '')
 
-    >>> widget.attrs['default'] = False
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'DATATYPE': ''})
-    >>> data.errors, data.extracted
-    ([], False)
-
-Test some sorts of True evaluating default values if string datatype set::
-
-    >>> widget.attrs['default'] = 1
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'DATATYPE': ''})
-    >>> data.errors, data.extracted
-    ([], 1)
-
-    >>> widget.attrs['default'] = '1'
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'DATATYPE': ''})
-    >>> data.errors, data.extracted
-    ([], '1')
-
-    >>> widget.attrs['default'] = u'1'
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'DATATYPE': ''})
-    >>> data.errors, data.extracted
-    ([], u'1')
-
-    >>> widget.attrs['default'] = True
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'DATATYPE': ''})
-    >>> data.errors, data.extracted
-    ([], True)
-
-Test some sorts of False evaluating default values if numeric datatype set::
+Test default values if ``int`` datatype set::
 
     >>> widget = factory(
     ...     'text',
@@ -487,24 +466,19 @@ Test some sorts of False evaluating default values if numeric datatype set::
     ...     value='',
     ...     props={
     ...         'datatype': 'int',
-    ...         'default': 0
     ...     })
+
+Default default::
+
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
     >>> data = widget.extract({'DATATYPE': ''})
     >>> data.errors, data.extracted
-    ([], 0)
+    ([ExtractionError('Input is not a valid integer.',)], '')
 
-    >>> widget.attrs['default'] = None
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'DATATYPE': ''})
-    >>> data.errors, data.extracted
-    ([], None)
+UNSET default::
 
     >>> widget.attrs['default'] = UNSET
     >>> data = widget.extract({})
@@ -515,70 +489,133 @@ Test some sorts of False evaluating default values if numeric datatype set::
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-    >>> widget.attrs['default'] = ''
+Int default::
+
+    >>> widget.attrs['default'] = -1
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
     >>> data = widget.extract({'DATATYPE': ''})
     >>> data.errors, data.extracted
-    ([], '')
+    ([], -1)
 
-    >>> widget.attrs['default'] = u''
+String default. If convertable still fine::
+
+    >>> widget.attrs['default'] = '0'
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
     >>> data = widget.extract({'DATATYPE': ''})
     >>> data.errors, data.extracted
-    ([], u'')
+    ([], 0)
 
-    >>> widget.attrs['default'] = False
+Test default values if ``float`` datatype set::
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='DATATYPE',
+    ...     value='',
+    ...     props={
+    ...         'datatype': 'float',
+    ...     })
+
+Default default::
+
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
     >>> data = widget.extract({'DATATYPE': ''})
     >>> data.errors, data.extracted
-    ([], False)
+    ([ExtractionError('Input is not a valid floating point number.',)], '')
 
-Test some sorts of True evaluating default values if numeric datatype set::
+UNSET default::
 
-    >>> widget.attrs['default'] = 1
+    >>> widget.attrs['default'] = UNSET
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
     >>> data = widget.extract({'DATATYPE': ''})
     >>> data.errors, data.extracted
-    ([], 1)
+    ([], <UNSET>)
 
-    >>> widget.attrs['default'] = '1'
+Float default::
+
+    >>> widget.attrs['default'] = 0.1
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
     >>> data = widget.extract({'DATATYPE': ''})
     >>> data.errors, data.extracted
-    ([], '1')
+    ([], 0.1)
 
-    >>> widget.attrs['default'] = u'1'
+String default. If convertable still fine::
+
+    >>> widget.attrs['default'] = '0,2'
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
     >>> data = widget.extract({'DATATYPE': ''})
     >>> data.errors, data.extracted
-    ([], u'1')
+    ([], 0.2)
 
-    >>> widget.attrs['default'] = True
+Test default values if ``uuid`` datatype set::
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='DATATYPE',
+    ...     value='',
+    ...     props={
+    ...         'datatype': 'uuid',
+    ...     })
+
+Default default::
+
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
     >>> data = widget.extract({'DATATYPE': ''})
     >>> data.errors, data.extracted
-    ([], True)
+    ([ExtractionError('Input is not a valid UUID.',)], '')
+
+UNSET default::
+
+    >>> widget.attrs['default'] = UNSET
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+UUID default::
+
+    >>> widget.attrs['default'] = uuid.uuid4()
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data.errors, data.extracted
+    ([], UUID('...'))
+
+String default. If convertable still fine::
+
+    >>> widget.attrs['default'] = str(uuid.uuid4())
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data.errors, data.extracted
+    ([], UUID('...'))
 
 Integer datatype::
 
@@ -1887,7 +1924,7 @@ Multi value selection with float datatype set::
     ... }
     >>> data = widget.extract(request=request)
     >>> data.extracted
-    [<UNSET>]
+    <UNSET>
 
 Generic HTML5 Data::
 
@@ -2553,7 +2590,6 @@ Extract empty::
 
 Extract ``new``::
 
-    >>> from StringIO import StringIO
     >>> request = {
     ...     'MYFILE': {'file': StringIO('123')},
     ... }
@@ -2684,7 +2720,6 @@ Extract ``delete`` returns UNSET::
 
 File display renderer::
 
-    >>> from yafowil.common import convert_bytes
     >>> convert_bytes(1 * 1024 * 1024 * 1024 * 1024)
     '1.00T'
 

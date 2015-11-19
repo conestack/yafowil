@@ -139,30 +139,24 @@ input.
 ###############################################################################
 
 def generic_extractor(widget, data):
-    """Extract raw data from request by ``widget.dottedpath``.
+    """Extract raw value from request by ``widget.dottedpath``.
+
+    Return ``UNSET`` if widget not present in request.
     """
     __managed_props = []  # noqa
-    if widget.dottedpath not in data.request:
+    try:
+        return data.request[widget.dottedpath]
+    except KeyError:
         return UNSET
-    return data.request[widget.dottedpath]
 
 
 @managedprops('required', 'required_message')
 def generic_required_extractor(widget, data):
     """Validate required.
 
-    If required is set and some value was extracted,
-    so ``data.extracted`` is not ``UNSET``, then we evaluate ``data.extracted``
-    to boolean. Raise ``ExtractionError`` if result is ``False``.
-
-    Properties:
-
-    ``required``
-        Define  value is required ot not. Either basestring instance or
-        callable returning basestring is expected.
-
-    ``required_message``
-        Default required message as basestring instance.
+    If ``required`` is set and some raw value has been extracted,
+    evaluate ``data.extracted`` to boolean. Raise ``ExtractionError`` if
+    ``False``.
     """
     required = attr_value('required', widget, data)
     if not required or bool(data.extracted) or data.extracted is UNSET:
@@ -170,6 +164,20 @@ def generic_required_extractor(widget, data):
     if isinstance(required, basestring):
         raise ExtractionError(required)
     raise ExtractionError(attr_value('required_message', widget, data))
+
+
+@managedprops('default')
+def generic_default_value_extractor(widget, data):
+    """Extract default value.
+
+    Return default value if widget present in request and raw value is empty.
+    """
+    try:
+        if not data.request[widget.dottedpath]:
+            return attr_value('default', widget, data)
+    except KeyError:
+        pass
+    return data.extracted
 
 
 DATATYPE_LABELS = {
@@ -186,9 +194,9 @@ def generic_datatype_extractor(widget, data):
     """Convert extracted value to ``datatype``.
 
     If extracted value is ``UNSET`` return ``UNSET``.
-    If empty value has been extracted return ``default``.
     Otherwise try to convert value to given ``datatype`` and return the
-    converted value or raise an ``ExtractionError``
+    converted value or raise an ``ExtractionError`` if conversion fails.
+    Value can also be a list, then all items inside the list are converted.
     """
     extracted = data.extracted
     if extracted is UNSET:
@@ -197,9 +205,7 @@ def generic_datatype_extractor(widget, data):
     if not datatype:
         return extracted
     try:
-        default = attr_value('default', widget, data)
-        return convert_value_to_datatype(
-            extracted, datatype, default=default)
+        return convert_values_to_datatype(extracted, datatype)
     except KeyError:
         raise ValueError('Unknown datatype: "{0}"'.format(datatype))
     except (ValueError, UnicodeEncodeError):
@@ -398,6 +404,7 @@ factory.register(
     extractors=[
         generic_extractor,
         generic_required_extractor,
+        generic_default_value_extractor,
         generic_datatype_extractor,
     ],
     edit_renderers=[text_edit_renderer],
@@ -1005,11 +1012,9 @@ factory.defaults['checkbox.required_class'] = 'required'
 # selection
 ###############################################################################
 
-@managedprops('multivalued', 'disabled', 'datatype')
+@managedprops('multivalued', 'disabled')
 def select_extractor(widget, data):
     extracted = generic_extractor(widget, data)
-    datatype = attr_value('datatype', widget, data)
-    default = attr_value('default', widget, data)
     multivalued = attr_value('multivalued', widget, data)
     if extracted is UNSET and '%s-exists' % widget.dottedpath in data.request:
         if multivalued:
@@ -1022,23 +1027,16 @@ def select_extractor(widget, data):
         extracted = [extracted]
     disabled = widget.attrs.get('disabled', False)
     if not disabled:
-        return convert_values_to_datatype(extracted, datatype, default=default)
+        return extracted
     if not multivalued:
-        return convert_values_to_datatype(
-            data.value, datatype, default=default)
+        return data.value
     disabled_items = disabled is True and data.value or disabled
     if isinstance(disabled_items, basestring):
         disabled_items = [disabled_items]
-    disabled_items = convert_values_to_datatype(
-        disabled_items, datatype, default=default)
-    data_value = convert_values_to_datatype(
-        data.value, datatype, default=default)
-    extracted = convert_values_to_datatype(
-        extracted, datatype, default=default)
     for item in disabled_items:
-        if item in extracted and item not in data_value:
+        if item in extracted and item not in data.value:
             extracted.remove(item)
-        elif item not in extracted and item in data_value:
+        elif item not in extracted and item in data.value:
             extracted.append(item)
     return extracted
 
@@ -1066,9 +1064,8 @@ def select_edit_renderer(widget, data, custom_attrs={}):
     if isinstance(value, basestring) or not hasattr(value, '__iter__'):
         value = [value]
     datatype = attr_value('datatype', widget, data)
-    default = attr_value('default', widget, data)
-    value = convert_values_to_datatype(
-        value, datatype, default=default)
+    if datatype:
+        value = convert_values_to_datatype(value, datatype)
     if not multivalued and len(value) > 1:
         raise ValueError(u'Multiple values for single selection.')
     disabled = attr_value('disabled', widget, data, False)
@@ -1076,8 +1073,8 @@ def select_edit_renderer(widget, data, custom_attrs={}):
         optiontags = []
         vocab = attr_value('vocabulary', widget, data, [])
         for key, term in vocabulary(vocab):
-            key = convert_value_to_datatype(
-                key, datatype, default=default)
+            if datatype:
+                key = convert_value_to_datatype(key, datatype)
             attrs = {
                 'selected': (key in value) and 'selected' or None,
                 'value': key,
@@ -1141,8 +1138,8 @@ def select_edit_renderer(widget, data, custom_attrs={}):
                 label_class = attr_value('label_radio_class', widget, data)
         vocab = attr_value('vocabulary', widget, data, [])
         for key, term in vocabulary(vocab):
-            key = convert_value_to_datatype(
-                key, datatype, default=default)
+            if datatype:
+                key = convert_value_to_datatype(key, datatype)
             input_attrs = {
                 'type': tagtype,
                 'value': key,
@@ -1201,7 +1198,9 @@ factory.register(
     'select',
     extractors=[
         select_extractor,
-        generic_required_extractor
+        generic_required_extractor,
+        generic_default_value_extractor,
+        generic_datatype_extractor,
     ],
     edit_renderers=[select_edit_renderer],
     display_renderers=[
@@ -1696,8 +1695,9 @@ factory.register(
     extractors=[
         generic_extractor,
         generic_required_extractor,
+        generic_default_value_extractor,
         generic_datatype_extractor,
-        number_extractor
+        number_extractor,
     ],
     edit_renderers=[input_generic_renderer],
     display_renderers=[

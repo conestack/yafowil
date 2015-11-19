@@ -283,14 +283,12 @@ DATATYPE_PRECONVERTERS = {
 }
 
 
-def convert_value_to_datatype(value, datatype, default=None):
-    if not datatype:
-        return value
-    if isinstance(value, basestring) and not value:
-        return default
-    if isinstance(value, DATATYPE_CONVERTERS[datatype]):
-        return value
-    if value is UNSET:
+def convert_value_to_datatype(value, datatype):
+    """Convert given value to datatype.
+
+    If value is UNSET, return UNSET, regardless of datatype.
+    """
+    if value is UNSET or isinstance(value, DATATYPE_CONVERTERS[datatype]):
         return value
     preconverter = DATATYPE_PRECONVERTERS.get(datatype)
     if preconverter:
@@ -299,12 +297,11 @@ def convert_value_to_datatype(value, datatype, default=None):
     return converter(value)
 
 
-def convert_values_to_datatype(value, datatype, default=None):
+def convert_values_to_datatype(value, datatype):
     if isinstance(value, list):
         res = list()
         for item in value:
-            converted = convert_value_to_datatype(
-                item, datatype, default=default)
+            converted = convert_value_to_datatype(item, datatype)
             res.append(converted)
         return res
-    return convert_value_to_datatype(value, datatype, default=default)
+    return convert_value_to_datatype(value, datatype)
