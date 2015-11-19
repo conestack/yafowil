@@ -194,6 +194,7 @@ def generic_datatype_extractor(widget, data):
     """Convert extracted value to ``datatype``.
 
     If extracted value is ``UNSET`` return ``UNSET``.
+    If no ``datatype`` given, return extracted value.
     Otherwise try to convert value to given ``datatype`` and return the
     converted value or raise an ``ExtractionError`` if conversion fails.
     Value can also be a list, then all items inside the list are converted.
@@ -1649,9 +1650,6 @@ factory.defaults['search.class'] = 'search'
 @managedprops('datatype', 'min', 'max', 'step')
 def number_extractor(widget, data):
     val = data.extracted
-    default = attr_value('default', widget, data)
-    if val is UNSET or val is default:
-        return val
     min_val = attr_value('min', widget, data)
     if min_val and val < min_val:
         message = _('input_number_minimum_value',

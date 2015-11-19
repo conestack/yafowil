@@ -279,7 +279,7 @@ DATATYPE_CONVERTERS = {
     'uuid': uuid.UUID
 }
 DATATYPE_PRECONVERTERS = {
-    'float': lambda x: x.replace(',', '.')
+    'float': lambda x: isinstance(x, basestring) and x.replace(',', '.') or x
 }
 
 

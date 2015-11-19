@@ -2,8 +2,23 @@
 History
 =======
 
-2.1.4 (unreleased)
-------------------
+2.2 (unreleased)
+----------------
+
+[X] - text (both)
+[X] - select(both)
+[X] - number(both)
+[ ] - hidden (both)
+[ ] - proxy (both)
+[ ] - lines (both)
+[ ] - textarea (default only)
+[ ] - password (default only)
+[ ] - checkbox (default onyly)
+[ ] - file (default only)
+[ ] - email (default only)
+[ ] - url (default only)
+[ ] - search (default only)
+[ ] - check data attribute rendering on common widgets
 
 - Fix ``default`` property setting at factory time (at least for mentioned
   blueprints below) WORK IN PROGRESS.
