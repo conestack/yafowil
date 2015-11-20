@@ -264,19 +264,13 @@ class Widget(object):
         self.display_renderers = display_renderers
         self.preprocessors = preprocessors or list()
         self.defaults = defaults
-        self._lock = RLock()
         self.current_prefix = None
         # keep properties for use in dottedpath to avoid recursion errors
         self.properties = properties
         for key in properties:
             self.attrs[key] = properties[key]
         self.custom = custom
-
-    def lock(self):
-        self._lock.acquire()
-
-    def unlock(self):
-        self._lock.release()
+        self._lock = RLock()
 
     def __call__(self, data=None, request=None):
         """Renders the widget.
@@ -316,24 +310,23 @@ class Widget(object):
                     data.mode
                 )
             )
-        self.lock()
-        try:
-            for ren_name, renderer in renderers:
-                self.current_prefix = ren_name
-                __traceback_supplement__ = (
-                    TBSupplementWidget,
-                    self,
-                    renderer,
-                    'render',
-                    "failed at '{0}' in mode '{1}'".format(
-                        ren_name,
-                        data.mode
+        with self._lock:
+            try:
+                for ren_name, renderer in renderers:
+                    self.current_prefix = ren_name
+                    __traceback_supplement__ = (
+                        TBSupplementWidget,
+                        self,
+                        renderer,
+                        'render',
+                        "failed at '{0}' in mode '{1}'".format(
+                            ren_name,
+                            data.mode
+                        )
                     )
-                )
-                data.rendered = renderer(self, data)
-        finally:
-            self.current_prefix = None
-            self.unlock()
+                    data.rendered = renderer(self, data)
+            finally:
+                self.current_prefix = None
         return data.rendered
 
     def extract(self, request, parent=None):
@@ -362,26 +355,25 @@ class Widget(object):
             #      case not accepting ``widget`` and ``data`` if callable.
             if not self.attrs.get('display_proxy'):
                 return data
-        self.lock()
-        try:
-            for ex_name, extractor in self.extractors:
-                self.current_prefix = ex_name
-                __traceback_supplement__ = (
-                    TBSupplementWidget,
-                    self,
-                    extractor,
-                    'extract',
-                    "failed at '{0}'".format(ex_name)
-                )
-                try:
-                    data.extracted = extractor(self, data)
-                except ExtractionError, e:
-                    data.errors.append(e)
-                    if e.abort:
-                        break
-        finally:
-            self.current_prefix = None
-            self.unlock()
+        with self._lock:
+            try:
+                for ex_name, extractor in self.extractors:
+                    self.current_prefix = ex_name
+                    __traceback_supplement__ = (
+                        TBSupplementWidget,
+                        self,
+                        extractor,
+                        'extract',
+                        "failed at '{0}'".format(ex_name)
+                    )
+                    try:
+                        data.extracted = extractor(self, data)
+                    except ExtractionError, e:
+                        data.errors.append(e)
+                        if e.abort:
+                            break
+            finally:
+                self.current_prefix = None
         return data
 
     @property
@@ -457,8 +449,13 @@ class Factory(object):
         """Registers a blueprint in the factory.
         """
         self._name_check(name)
-        self._blueprints[name] = (extractors, edit_renderers,
-                                  preprocessors, builders, display_renderers)
+        self._blueprints[name] = (
+            extractors,
+            edit_renderers,
+            preprocessors,
+            builders,
+            display_renderers
+        )
 
     def register_global_preprocessors(self, preprocessors):
         self._global_preprocessors += preprocessors
