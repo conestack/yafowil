@@ -166,20 +166,25 @@ def attr_value(key, widget, data, default=None):
     attr = widget.attrs.get(key, default)
     if callable(attr):
         try:
+            # assume property factory signature
+            # XXX: use keyword arguments?
             return attr(widget, data)
-        except TypeError:  # B/C
+        except TypeError:
             try:
+                # assume function or class
                 spec = inspect.getargspec(attr)
             except TypeError:
                 spec = None
             if spec is not None:
+                # assume B/C property factory signature if argument specs found
                 if len(spec.args) <= 1 and not spec.keywords:
-                    logging.warn(
-                        "Deprecated usage of callback attributes. Please "
-                        "accept 'widget' and 'data' as arguments."
-                    )
                     try:
-                        return attr()
+                        res = attr()
+                        logging.warn(
+                            "Deprecated usage of callback attributes. Please "
+                            "accept 'widget' and 'data' as arguments."
+                        )
+                        return res
                     except TypeError:
                         return attr
     return attr
