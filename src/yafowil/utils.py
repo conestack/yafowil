@@ -163,13 +163,21 @@ def attr_value(key, widget, data, default=None):
     if callable(attr):
         try:
             return attr(widget, data)
-        except Exception, e:  # B/C
-            spec = inspect.getargspec(attr)
-            if len(spec.args) <= 1 and not spec.keywords:
-                logging.warn("Deprecated usage of callback attributes. Please "
-                             "accept 'widget' and 'data' as arguments.")
-                return attr()
-            raise e
+        except TypeError:  # B/C
+            try:
+                spec = inspect.getargspec(attr)
+            except TypeError:
+                spec = None
+            if spec is not None:
+                if len(spec.args) <= 1 and not spec.keywords:
+                    logging.warn(
+                        "Deprecated usage of callback attributes. Please "
+                        "accept 'widget' and 'data' as arguments."
+                    )
+                    try:
+                        return attr()
+                    except TypeError:
+                        return attr
     return attr
 
 
@@ -271,29 +279,51 @@ def cssclasses(widget, data, classattr='class', additional=[]):
     return _classes and ' '.join(sorted(_classes)) or None
 
 
+DATATYPE_PRECONVERTERS = {
+    float: lambda x: isinstance(x, basestring) and x.replace(',', '.') or x
+}
+# B/C
+DATATYPE_PRECONVERTERS['float'] = DATATYPE_PRECONVERTERS[float]
 DATATYPE_CONVERTERS = {
-    'int': int,
-    'integer': int,  # B/C
     'str': str,
+    'unicode': unicode,
+    'int': int,
+    'integer': int,
+    'long': long,
     'float': float,
     'uuid': uuid.UUID
-}
-DATATYPE_PRECONVERTERS = {
-    'float': lambda x: isinstance(x, basestring) and x.replace(',', '.') or x
 }
 
 
 def convert_value_to_datatype(value, datatype):
     """Convert given value to datatype.
 
-    If value is UNSET, return UNSET, regardless of datatype.
+    Datatype is either a callable or a string out of ``'str'``, ``'unicode'``,
+    ``'int'``, ``'integer'``, ``'long'``, ``'float'`` or ``'uuid'``
+
+    If value is ``UNSET``, return ``UNSET``, regardless of given datatype.
+
+    Converter callables must raise one out of the following exceptions if
+    conversion fails:
+        * ``ValueError``
+        * ``UnicodeDecodeError``
+        * ``UnicodeEncodeError``
     """
-    if value is UNSET or isinstance(value, DATATYPE_CONVERTERS[datatype]):
+    if value is UNSET:
         return value
+    if isinstance(datatype, basestring):
+        converter = DATATYPE_CONVERTERS[datatype]
+    else:
+        converter = datatype
+    try:
+        if isinstance(value, converter):
+            return value
+    except TypeError:
+        # converter is instance of class or function
+        pass
     preconverter = DATATYPE_PRECONVERTERS.get(datatype)
     if preconverter:
         value = preconverter(value)
-    converter = DATATYPE_CONVERTERS[datatype]
     return converter(value)
 
 

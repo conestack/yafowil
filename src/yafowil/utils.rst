@@ -1,19 +1,47 @@
 # -*- coding: utf-8 -*-
 
+Prepare
+-------
+
+Imports::
+
+    >>> from node.base import AttributedNode
+    >>> from node.base import OrderedNode
+    >>> from node.behaviors import Attributes
+    >>> from node.behaviors import Nodespaces
+    >>> from node.utils import UNSET
+    >>> from plumber import plumbing
+    >>> from yafowil.base import factory
+    >>> from yafowil.utils import Tag
+    >>> from yafowil.utils import Tag
+    >>> from yafowil.utils import attr_value
+    >>> from yafowil.utils import convert_value_to_datatype
+    >>> from yafowil.utils import convert_values_to_datatype
+    >>> from yafowil.utils import cssclasses
+    >>> from yafowil.utils import data_attrs_helper
+    >>> from yafowil.utils import generic_html5_attrs
+    >>> from yafowil.utils import get_entry_points
+    >>> from yafowil.utils import get_example
+    >>> from yafowil.utils import get_example_names
+    >>> from yafowil.utils import get_plugin_names
+    >>> from yafowil.utils import managedprops
+    >>> from yafowil.utils import tag as deprecated_tag
+    >>> from yafowil.utils import vocabulary
+    >>> import uuid
+    >>> import yafowil.loader
+
+
 Test entry_point support tools
 ------------------------------
 
 ::
 
-    >>> import yafowil.loader
-    >>> from yafowil.utils import get_entry_points
     >>> get_entry_points()
     [...EntryPoint.parse('register = yafowil.loader:register')...]
 
     >>> get_entry_points('nonexisting')
     []
 
-    >>> from yafowil.utils import get_plugin_names
     >>> get_plugin_names()
     [...'yafowil'...]
 
@@ -26,14 +54,11 @@ Test examples lookup
 
 ::
 
-    >>> from yafowil.utils import get_example_names
     >>> sorted(get_example_names())
     ['yafowil'...]
 
-    >>> from yafowil.base import factory
     >>> factory.register_macro('field', 'field:label:error', {})
 
-    >>> from yafowil.utils import get_example
     >>> get_example('inexistent')
 
     >>> examples = get_example('yafowil')
@@ -52,7 +77,6 @@ Test the Vocabulary
 
 ::
 
-    >>> from yafowil.utils import vocabulary
     >>> vocabulary('foo')
     [('foo', 'foo')]
 
@@ -80,8 +104,6 @@ Test Tag renderer
 
 ::
 
-    >>> from node.utils import UNSET
-    >>> from yafowil.utils import Tag
     >>> tag = Tag(lambda msg: msg)
     >>> a = {'class': u'fancy', 'id': '2f5b8a234ff'}
     >>> tag('p', 'Lorem Ipsum. ', u'Hello World!',
@@ -99,7 +121,6 @@ Test Tag renderer
 
 deprecated test::
 
-    >>> from yafowil.utils import tag as deprecated_tag
     >>> deprecated_tag('div', 'foo')
     u'<div>foo</div>'
 
@@ -109,13 +130,10 @@ Test CSS Classes
 
 ::
 
-    >>> from plumber import plumbing
-    >>> from node.base import OrderedNode
-    >>> from node.behaviors import Nodespaces
-    >>> from node.behaviors import Attributes
     >>> @plumbing(Nodespaces, Attributes)
     ... class CSSTestNode(OrderedNode):
     ...     pass
+
     >>> widget = CSSTestNode()
     >>> widget.attrs['required'] = False
     >>> widget.attrs['required_class'] = None
@@ -128,9 +146,9 @@ Test CSS Classes
     >>> class DummyData(object):
     ...     def __init__(self):
     ...         self.errors = []
+
     >>> data = DummyData()
 
-    >>> from yafowil.utils import cssclasses
     >>> print cssclasses(widget, data)
     None
 
@@ -209,12 +227,13 @@ Test managedprops annotation
 
 ::
 
-    >>> from yafowil.utils import managedprops
     >>> @managedprops('foo', 'bar')
     ... def somefunc(a, b, c):
     ...     return a, b, c
+
     >>> somefunc(1, 2, 3)
     (1, 2, 3)
+
     >>> somefunc.__yafowil_managed_props__
     ('foo', 'bar')
 
@@ -223,9 +242,6 @@ Test attr_value
 ---------------
 
 ::
-
-    >>> from node.base import AttributedNode
-    >>> from yafowil.utils import attr_value
 
     >>> widget = AttributedNode()
     >>> data = AttributedNode()
@@ -236,26 +252,30 @@ Test attr_value
 
     >>> def func_callback(widget, data):
     ...     return 'func_callback value'
+
     >>> widget.attrs['attr'] = func_callback
     >>> attr_value('attr', widget, data)
     'func_callback value'
 
     >>> def failing_func_callback(widget, data):
     ...     raise Exception('failing_func_callback')
+
     >>> widget.attrs['attr'] = failing_func_callback
     >>> attr_value('attr', widget, data)
     Traceback (most recent call last):
       ...
     Exception: failing_func_callback
 
-    >>> def bc_func_callback(widget, data):
+    >>> def bc_func_callback():
     ...     return 'bc_func_callback value'
+
     >>> widget.attrs['attr'] = bc_func_callback
     >>> attr_value('attr', widget, data)
     'bc_func_callback value'
 
-    >>> def failing_bc_func_callback(widget, data):
+    >>> def failing_bc_func_callback():
     ...     raise Exception('failing_bc_func_callback')
+
     >>> widget.attrs['attr'] = failing_bc_func_callback
     >>> attr_value('attr', widget, data)
     Traceback (most recent call last):
@@ -302,9 +322,12 @@ Test generic_html5_attrs
 
 ::
 
-    >>> from yafowil.utils import generic_html5_attrs
-    >>> generic_html5_attrs(
-    ...     {'foo': 'bar', 'baz': ['bam'], 'nada': None, 'unset': UNSET})
+    >>> generic_html5_attrs({
+    ...     'foo': 'bar',
+    ...     'baz': ['bam'],
+    ...     'nada': None,
+    ...     'unset': UNSET
+    ... })
     {'data-baz': '["bam"]', 'data-foo': 'bar'}
 
 
@@ -312,9 +335,6 @@ Test data_attrs_helper
 ----------------------
 
 ::
-
-    >>> from node.base import AttributedNode
-    >>> from yafowil.utils import data_attrs_helper
 
     >>> widget = AttributedNode()
     >>> data = AttributedNode()
@@ -324,12 +344,19 @@ Test data_attrs_helper
     >>> widget.attrs['testattr3'] = False
     >>> widget.attrs['testattr4'] = None
     >>> widget.attrs['testattr5'] = ['item1', 'item2', 'item3']
-    >>> widget.attrs['testattr6'] = {'key1': 'item1', 'key2': 'item2', 'key3': 'item3'}
+    >>> widget.attrs['testattr6'] = {
+    ...     'key1': 'item1',
+    ...     'key2': 'item2',
+    ...     'key3': 'item3'
+    ... }
     >>> widget.attrs['testattr7'] = 1234
     >>> widget.attrs['testattr8'] = 1234.5678
     >>> widget.attrs['camelAttrName'] = 'camelValue'
 
-    >>> data_attrs_keys = ['testattr1', 'testattr2', 'testattr3', 'testattr4', 'testattr5', 'testattr6', 'testattr7', 'testattr8', 'camelAttrName']
+    >>> data_attrs_keys = [
+    ...     'testattr1', 'testattr2', 'testattr3', 'testattr4', 'testattr5',
+    ...     'testattr6', 'testattr7', 'testattr8', 'camelAttrName'
+    ... ]
     >>> data_attrs = data_attrs_helper(widget, data, data_attrs_keys)
 
     >>> data_attrs['data-testattr1']
@@ -359,27 +386,28 @@ Test data_attrs_helper
     >>> data_attrs['data-camel-attr-name']
     'camelValue'
 
+Test with Tag renderer::
 
-    Test with Tag renderer
-
-    >>> from yafowil.utils import Tag
     >>> tag = Tag(lambda msg: msg)
     >>> tag('dummy', name='foo', **data_attrs)
-    u'<dummy data-camel-attr-name=\'camelValue\' data-testattr1=\'value\' data-testattr2=\'true\' data-testattr3=\'false\' data-testattr5=\'["item1", "item2", "item3"]\' data-testattr6=\'{"key3": "item3", "key2": "item2", "key1": "item1"}\' data-testattr7=\'1234\' data-testattr8=\'1234.5678\' name="foo" />'
+    u'<dummy data-camel-attr-name=\'camelValue\' data-testattr1=\'value\' 
+    data-testattr2=\'true\' data-testattr3=\'false\' 
+    data-testattr5=\'["item1", "item2", "item3"]\' 
+    data-testattr6=\'{"key3": "item3", "key2": "item2", "key1": "item1"}\' 
+    data-testattr7=\'1234\' data-testattr8=\'1234.5678\' name="foo" />'
 
 
 Test convert_value_to_datatype
 ------------------------------
 
-::
-
-    >>> from yafowil.utils import convert_value_to_datatype
-    >>> import uuid
+Unknown string identifier::
 
     >>> convert_value_to_datatype('', 'inexistent')
     Traceback (most recent call last):
       ...
     KeyError: 'inexistent'
+
+Convert to string::
 
     >>> convert_value_to_datatype(UNSET, 'str')
     <UNSET>
@@ -392,6 +420,46 @@ Test convert_value_to_datatype
       ...
     UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-5: 
     ordinal not in range(128)
+
+    >>> convert_value_to_datatype(UNSET, str)
+    <UNSET>
+
+    >>> convert_value_to_datatype(u'string', str)
+    'string'
+
+    >>> convert_value_to_datatype(u'äöü', str)
+    Traceback (most recent call last):
+      ...
+    UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-5: 
+    ordinal not in range(128)
+
+Convert to unicode::
+
+    >>> convert_value_to_datatype(UNSET, 'unicode')
+    <UNSET>
+
+    >>> convert_value_to_datatype('unicode', 'unicode')
+    u'unicode'
+
+    >>> convert_value_to_datatype('\xc3\xa4\xc3\xb6\xc3\xbc', 'unicode')
+    Traceback (most recent call last):
+      ...
+    UnicodeDecodeError: 'ascii' codec can't decode byte 0xc3 in position 0: 
+    ordinal not in range(128)
+
+    >>> convert_value_to_datatype(UNSET, unicode)
+    <UNSET>
+
+    >>> convert_value_to_datatype('unicode', unicode)
+    u'unicode'
+
+    >>> convert_value_to_datatype('\xc3\xa4\xc3\xb6\xc3\xbc', unicode)
+    Traceback (most recent call last):
+      ...
+    UnicodeDecodeError: 'ascii' codec can't decode byte 0xc3 in position 0: 
+    ordinal not in range(128)
+
+Convert to int::
 
     >>> convert_value_to_datatype(UNSET, 'int')
     <UNSET>
@@ -409,10 +477,64 @@ Test convert_value_to_datatype
       ...
     ValueError: invalid literal for int() with base 10: 'a'
 
+    >>> convert_value_to_datatype(1.0, 'int')
+    1
+
+    >>> convert_value_to_datatype(UNSET, int)
+    <UNSET>
+
+    >>> convert_value_to_datatype('1', int)
+    1
+
+    >>> convert_value_to_datatype('1.0', int)
+    Traceback (most recent call last):
+      ...
+    ValueError: invalid literal for int() with base 10: '1.0'
+
+    >>> convert_value_to_datatype('a', int)
+    Traceback (most recent call last):
+      ...
+    ValueError: invalid literal for int() with base 10: 'a'
+
+    >>> convert_value_to_datatype(1.0, int)
+    1
+
+Convert to long::
+
+    >>> convert_value_to_datatype(UNSET, 'long')
+    <UNSET>
+
+    >>> convert_value_to_datatype('1', 'long')
+    1L
+
+    >>> convert_value_to_datatype(1.0, 'long')
+    1L
+
+    >>> convert_value_to_datatype('a', 'long')
+    Traceback (most recent call last):
+      ...
+    ValueError: invalid literal for long() with base 10: 'a'
+
+    >>> convert_value_to_datatype(UNSET, long)
+    <UNSET>
+
+    >>> convert_value_to_datatype('1', long)
+    1L
+
+    >>> convert_value_to_datatype(1.0, long)
+    1L
+
+    >>> convert_value_to_datatype('a', long)
+    Traceback (most recent call last):
+      ...
+    ValueError: invalid literal for long() with base 10: 'a'
+
+Convert to float::
+
     >>> convert_value_to_datatype(UNSET, 'float')
     <UNSET>
 
-    >>> convert_value_to_datatype('1.0', 'float')
+    >>> convert_value_to_datatype('1,0', 'float')
     1.0
 
     >>> convert_value_to_datatype('1', 'float')
@@ -422,6 +544,28 @@ Test convert_value_to_datatype
     Traceback (most recent call last):
       ...
     ValueError: could not convert string to float: a
+
+    >>> convert_value_to_datatype(1, 'float')
+    1.0
+
+    >>> convert_value_to_datatype(UNSET, float)
+    <UNSET>
+
+    >>> convert_value_to_datatype('1,0', float)
+    1.0
+
+    >>> convert_value_to_datatype('1', float)
+    1.0
+
+    >>> convert_value_to_datatype('a', float)
+    Traceback (most recent call last):
+      ...
+    ValueError: could not convert string to float: a
+
+    >>> convert_value_to_datatype(1, float)
+    1.0
+
+Convert to uuid::
 
     >>> convert_value_to_datatype(UNSET, 'uuid')
     <UNSET>
@@ -434,21 +578,82 @@ Test convert_value_to_datatype
       ...
     ValueError: badly formed hexadecimal UUID string
 
+    >>> convert_value_to_datatype(UNSET, uuid.UUID)
+    <UNSET>
+
+    >>> convert_value_to_datatype(str(uuid.uuid4()), uuid.UUID)
+    UUID('...')
+
+    >>> convert_value_to_datatype('a', uuid.UUID)
+    Traceback (most recent call last):
+      ...
+    ValueError: badly formed hexadecimal UUID string
+
+Custom converter as function::
+
+    >>> def convert_func(val):
+    ...     if val == 'a':
+    ...         return 'convertet: {0}'.format(val)
+    ...     raise ValueError("Value not 'a'")
+
+    >>> convert_value_to_datatype('a', convert_func)
+    'convertet: a'
+
+    >>> convert_value_to_datatype('b', convert_func)
+    Traceback (most recent call last):
+      ...
+    ValueError: Value not 'a'
+
+Custom converters as class::
+
+    >>> class Converter(object):
+    ... 
+    ...     def __init__(self, val):
+    ...         if val != 'a':
+    ...             raise ValueError("Value not 'a'")
+    ... 
+    ...     def __repr__(self):
+    ...         return '<Converter instance>'
+
+    >>> convert_value_to_datatype('a', Converter)
+    <Converter instance>
+
+    >>> convert_value_to_datatype('b', Converter)
+    Traceback (most recent call last):
+      ...
+    ValueError: Value not 'a'
+
+Custom converter as class instance with ``__call__`` function::
+
+    >>> class ConverterInst(object):
+    ... 
+    ...     def __call__(self, val):
+    ...         if val != 'a':
+    ...             raise ValueError("Value not 'a'")
+    ...         return 'convertet: {0}'.format(val)
+
+    >>> convert_value_to_datatype('a', ConverterInst())
+    'convertet: a'
+
+    >>> convert_value_to_datatype('b', ConverterInst())
+    Traceback (most recent call last):
+      ...
+    ValueError: Value not 'a'
+
 
 Test convert_values_to_datatype
 -------------------------------
 
 ::
 
-    >>> from yafowil.utils import convert_values_to_datatype
     >>> convert_values_to_datatype(UNSET, 'int')
     <UNSET>
 
     >>> convert_values_to_datatype([UNSET], 'int')
     [<UNSET>]
 
-    >>> convert_values_to_datatype('0', 'int')
+    >>> convert_values_to_datatype('0', int)
     0
 
-    >>> convert_values_to_datatype(['0', '1'], 'int')
+    >>> convert_values_to_datatype(['0', '1'], int)
     [0, 1]

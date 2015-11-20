@@ -15,6 +15,7 @@ from yafowil.utils import managedprops
 from yafowil.utils import vocabulary
 import re
 import types
+import uuid
 
 
 ###############################################################################
@@ -23,7 +24,7 @@ import types
 
 factory.defaults['default'] = UNSET
 factory.doc['props']['default'] = """\
-Default value.
+Default value for rendering.
 """
 
 factory.defaults['class'] = None
@@ -63,9 +64,35 @@ factory.doc['props']['placeholder'] = """\
 Whether this input has a placeholder value or not (if browser supports it).
 """
 
+factory.doc['props']['emptyvalue'] = """\
+If configured and received value in request is empty, return as extracted
+value.
+"""
+
 factory.defaults['datatype'] = None
 factory.doc['props']['datatype'] = """\
-Output datatype, one out of ``'int'`` or ``'float'``, ``'str'`` or ``'uuid'``
+Callable for converting extracted value to output datatype.
+
+``datatype`` can also be defined as string with value out of ``'str'``,
+``'unicode'``, ``'int'``, ``'integer'``, ``'long'``, ``'float'`` or
+``'uuid'``.
+
+Custom converter callables must raise one out of the following exceptions if
+conversion fails:
+    * ``ValueError``
+    * ``UnicodeDecodeError``
+    * ``UnicodeEncodeError``
+"""
+
+factory.defaults['allowed_datatypes'] = UNSET
+factory.doc['props']['allowed_datatypes'] = """\
+List of allowed datatypes. If ``UNSET``, datatype converters are not
+restricted.
+"""
+
+factory.defaults['datatype_message'] = None
+factory.doc['props']['datatype_message'] = """\
+Custom extraction error message if ``datatype`` conversion fails.
 """
 
 factory.defaults['required'] = False
@@ -166,30 +193,37 @@ def generic_required_extractor(widget, data):
     raise ExtractionError(attr_value('required_message', widget, data))
 
 
-@managedprops('default')
-def generic_default_value_extractor(widget, data):
-    """Extract default value.
-
-    Return default value if widget present in request and raw value is empty.
+@managedprops('emptyvalue')
+def generic_emptyvalue_extractor(widget, data):
+    """Return emptyvalue if widget present in request and raw value is empty.
     """
     try:
         if not data.request[widget.dottedpath]:
-            return attr_value('default', widget, data)
+            return attr_value('emptyvalue', widget, data, data.extracted)
     except KeyError:
         pass
     return data.extracted
 
 
 DATATYPE_LABELS = {
-    'int': _('datatype_integer', default='integer'),
-    'integer': _('datatype_integer', default='integer'),  # B/C
-    'str': _('datatype_str', default='string'),
-    'float': _('datatype_float', default='floating point number'),
-    'uuid': _('datatype_uuid', default='UUID')
+    str: _('datatype_str', default='string'),
+    unicode: _('datatype_unicode', default='unicode'),
+    int: _('datatype_integer', default='integer'),
+    long: _('datatype_long', default='long integer'),
+    float: _('datatype_float', default='floating point number'),
+    uuid.UUID: _('datatype_uuid', default='UUID')
 }
+# B/C
+DATATYPE_LABELS['str'] = DATATYPE_LABELS[str]
+DATATYPE_LABELS['unicode'] = DATATYPE_LABELS[unicode]
+DATATYPE_LABELS['int'] = DATATYPE_LABELS[int]
+DATATYPE_LABELS['integer'] = DATATYPE_LABELS[int]
+DATATYPE_LABELS['long'] = DATATYPE_LABELS[long]
+DATATYPE_LABELS['float'] = DATATYPE_LABELS[float]
+DATATYPE_LABELS['uuid'] = DATATYPE_LABELS[uuid.UUID]
 
 
-@managedprops('datatype')
+@managedprops('datatype', 'allowed_datatypes', 'datatype_message')
 def generic_datatype_extractor(widget, data):
     """Convert extracted value to ``datatype``.
 
@@ -197,7 +231,9 @@ def generic_datatype_extractor(widget, data):
     If no ``datatype`` given, return extracted value.
     Otherwise try to convert value to given ``datatype`` and return the
     converted value or raise an ``ExtractionError`` if conversion fails.
-    Value can also be a list, then all items inside the list are converted.
+    Extraction error message can be customized with ``datatype_message``
+    property. Value can also be a list, then all items inside the list are
+    converted.
     """
     extracted = data.extracted
     if extracted is UNSET:
@@ -205,15 +241,31 @@ def generic_datatype_extractor(widget, data):
     datatype = attr_value('datatype', widget, data)
     if not datatype:
         return extracted
+    allowed_datatypes = attr_value('allowed_datatypes', widget, data)
+    if allowed_datatypes and datatype not in allowed_datatypes:
+        raise ValueError('Datatype not allowed: "{0}"'.format(datatype))
     try:
         return convert_values_to_datatype(extracted, datatype)
     except KeyError:
-        raise ValueError('Unknown datatype: "{0}"'.format(datatype))
+        raise ValueError('Datatype unknown: "{0}"'.format(datatype))
     except (ValueError, UnicodeEncodeError):
-        raise ExtractionError(_(
-            'generic_datatype_error',
-            default=u'Input is not a valid ${datatype}.',
-            mapping={'datatype': DATATYPE_LABELS[datatype]}))
+        datatype_message = attr_value('datatype_message', widget, data)
+        if not datatype_message:
+            datatype_label = DATATYPE_LABELS.get(datatype)
+            if not datatype_label:
+                datatype_message = _(
+                    'generic_datatype_message',
+                    default=u'Input conversion failed.'
+                )
+            else:
+                datatype_message = _(
+                    'standard_datatype_message',
+                    default=u'Input is not a valid ${datatype}.',
+                    mapping={
+                        'datatype': datatype_label
+                    }
+                )
+        raise ExtractionError(datatype_message)
 
 
 def input_attributes_common(widget, data, excludes=list(), value=None):
@@ -405,7 +457,7 @@ factory.register(
     extractors=[
         generic_extractor,
         generic_required_extractor,
-        generic_default_value_extractor,
+        generic_emptyvalue_extractor,
         generic_datatype_extractor,
     ],
     edit_renderers=[text_edit_renderer],
@@ -558,6 +610,7 @@ HTML textarea blueprint.
 """
 
 factory.defaults['textarea.default'] = ''
+
 factory.defaults['textarea.wrap'] = None
 factory.doc['props']['textarea.wrap'] = """\
 Either ``soft``, ``hard``, ``virtual``, ``physical`` or  ``off``.
@@ -642,6 +695,7 @@ Lines blueprint. Renders a textarea and extracts lines as list.
 """
 
 factory.defaults['lines.default'] = ''
+
 factory.defaults['lines.wrap'] = None
 factory.doc['props']['lines.wrap'] = """\
 Either ``soft``, ``hard``, ``virtual``, ``physical`` or  ``off``.
@@ -1056,8 +1110,7 @@ def select_exists_marker(widget, data):
 @managedprops('data', 'title', 'format', 'vocabulary', 'multivalued',
               'disabled', 'listing_label_position', 'listing_tag', 'size',
               'label_checkbox_class', 'label_radio_class', 'block_class',
-              'autofocus', 'placeholder', 'datatype',
-              *css_managed_props)
+              'autofocus', 'placeholder', *css_managed_props)
 def select_edit_renderer(widget, data, custom_attrs={}):
     tag = data.tag
     value = fetch_value(widget, data)
@@ -1200,7 +1253,7 @@ factory.register(
     extractors=[
         select_extractor,
         generic_required_extractor,
-        generic_default_value_extractor,
+        generic_emptyvalue_extractor,
         generic_datatype_extractor,
     ],
     edit_renderers=[select_edit_renderer],
@@ -1224,6 +1277,7 @@ factory.doc['props']['select.size'] = """\
 Size of input if multivalued and format 'block'.
 """
 
+# maybe callable returning '' for single select and [] for multi select
 factory.defaults['select.default'] = UNSET
 
 factory.defaults['select.format'] = 'block'
@@ -1298,12 +1352,6 @@ factory.doc['props']['select.disabled'] = """\
 Disables the whole widget or single selections. To disable the whole widget
 set the value to 'True'. To disable single selection pass a iterable of keys to
 disable, i.e. ``['foo', 'baz']``. Defaults to False.
-"""
-
-factory.doc['props']['select.datatype'] = """\
-Output data type. If given, extracted values gets converted to desired data
-type. Preset value and vocabulary keys must also be convertible or of defined
-data type. Possible values are ``'int'``, ``'float'``, ``'str'`` or ``'uuid'``.
 """
 
 
@@ -1647,7 +1695,7 @@ factory.defaults['search.class'] = 'search'
 # number
 ###############################################################################
 
-@managedprops('datatype', 'min', 'max', 'step')
+@managedprops('min', 'max', 'step')
 def number_extractor(widget, data):
     val = data.extracted
     min_val = attr_value('min', widget, data)
@@ -1693,7 +1741,7 @@ factory.register(
     extractors=[
         generic_extractor,
         generic_required_extractor,
-        generic_default_value_extractor,
+        generic_emptyvalue_extractor,
         generic_datatype_extractor,
         number_extractor,
     ],
@@ -1709,15 +1757,24 @@ Number blueprint (HTML5).
 
 factory.defaults['number.type'] = 'number'
 
-factory.defaults['number.datatype'] = 'float'
-factory.doc['props']['number.datatype'] = """\
-Output datatype, one out of ``'int'`` or ``'float'``, defaults to
-``'float'``.
+factory.defaults['number.default'] = ''
 
-B/C ``integer`` value still provided, but should not be used any more.
+factory.defaults['number.emptyvalue'] = UNSET
+
+factory.defaults['number.datatype'] = float
+factory.doc['props']['number.datatype'] = """\
+Callable for converting extracted value to output datatype. Allowed datatypes
+are ``int`` and ``float``
+
+``datatype`` can also be defined as string with value out of `'int'``,
+``'integer'`` or ``'float'``.
 """
 
-factory.defaults['number.default'] = UNSET
+factory.defaults['number.allowed_datatypes'] = [
+    int, float,
+    # B/C
+    'int', 'integer', 'float'
+]
 
 factory.defaults['number.min'] = None
 factory.doc['props']['number.min'] = """\

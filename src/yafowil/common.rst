@@ -149,10 +149,11 @@ Generic HTML5 Data::
     u'<input class="text" data-foo=\'bar\' id="input-MYTEXT" 
     name="MYTEXT" title="My awesome title" type="text" value="ja ha!" />'
 
-Default values
---------------
 
-############ See release TODO::
+Empty values
+------------
+
+::
 
     >>> widget = factory(
     ...     'text',
@@ -160,24 +161,11 @@ Default values
     ...     props={
     ...         'title': 'Default tests',
     ...         'data': {'foo': 'bar'},
-    ...         'default': 'hallo'
+    ...         'default': 'defaultvalue'
     ...     })
     >>> widget()
     u'<input class="text" data-foo=\'bar\' id="input-MYTEXT" name="MYTEXT" 
-    title="Default tests" type="text" value="hallo" />'
-
-    >>> widget.attrs['default'] = 'hallo'
-    >>> data = widget.extract(request={})
-    >>> data.extracted
-    <UNSET>
-
-    >>> data = widget.extract(request={'MYTEXT': ''})
-    >>> data.extracted
-    'hallo'
-
-    >>> widget.attrs['default'] = ''
-
-############::
+    title="Default tests" type="text" value="defaultvalue" />'
 
     >>> data = widget.extract(request={})
     >>> data.extracted
@@ -187,16 +175,12 @@ Default values
     >>> data.extracted
     ''
 
-    >>> widget.attrs['default'] = 'hallo'
-    >>> data = widget.extract(request={})
-    >>> data.extracted
-    <UNSET>
-
+    >>> widget.attrs['emptyvalue'] = 'emptyvalue'
     >>> data = widget.extract(request={'MYTEXT': ''})
     >>> data.extracted
-    'hallo'
+    'emptyvalue'
 
-    >>> widget.attrs['default'] = False
+    >>> widget.attrs['emptyvalue'] = False
     >>> data = widget.extract(request={})
     >>> data.extracted
     <UNSET>
@@ -205,7 +189,7 @@ Default values
     >>> data.extracted
     False
 
-    >>> widget.attrs['default'] = UNSET
+    >>> widget.attrs['emptyvalue'] = UNSET
     >>> data = widget.extract(request={})
     >>> data.extracted
     <UNSET>
@@ -424,220 +408,273 @@ No datatype given, no datatype conversion happens at all::
 
     >>> widget = factory(
     ...     'text',
-    ...     name='DATATYPE',
+    ...     name='MYFIELD',
     ...     value='')
-    >>> data = widget.extract({'DATATYPE': u''})
+    >>> data = widget.extract({'MYFIELD': u''})
     >>> data.errors, data.extracted
-    ([], '')
+    ([], u'')
 
-Test default values if ``str`` datatype set::
+Test emptyvalue if ``str`` datatype set::
 
     >>> widget = factory(
     ...     'text',
-    ...     name='DATATYPE',
+    ...     name='MYDATATYPEFIELD',
     ...     value='',
     ...     props={
     ...         'datatype': 'str',
     ...     })
 
-Default default::
+Default emptyvalue::
 
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
     ([], '')
 
-UNSET default::
+UNSET emptyvalue::
 
-    >>> widget.attrs['default'] = UNSET
+    >>> widget.attrs['emptyvalue'] = UNSET
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-String default::
+String emptyvalue::
 
-    >>> widget.attrs['default'] = 'abc'
+    >>> widget.attrs['emptyvalue'] = 'abc'
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
     ([], 'abc')
 
-Unicode default::
+Unicode emptyvalue::
 
-    >>> widget.attrs['default'] = u''
+    >>> widget.attrs['emptyvalue'] = u''
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
     ([], '')
 
-Test default values if ``int`` datatype set::
+Test emptyvalue if ``int`` datatype set::
 
     >>> widget = factory(
     ...     'text',
-    ...     name='DATATYPE',
+    ...     name='MYDATATYPEFIELD',
     ...     value='',
     ...     props={
     ...         'datatype': 'int',
     ...     })
 
-Default default::
+Default emptyvalue::
 
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
     ([ExtractionError('Input is not a valid integer.',)], '')
 
-UNSET default::
+UNSET emptyvalue::
 
-    >>> widget.attrs['default'] = UNSET
+    >>> widget.attrs['emptyvalue'] = UNSET
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-Int default::
+Int emptyvalue::
 
-    >>> widget.attrs['default'] = -1
+    >>> widget.attrs['emptyvalue'] = -1
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
     ([], -1)
 
-String default. If convertable still fine::
+String emptyvalue. If convertable still fine::
 
-    >>> widget.attrs['default'] = '0'
+    >>> widget.attrs['emptyvalue'] = '0'
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
     ([], 0)
 
-Test default values if ``float`` datatype set::
+Test emptyvalue if ``long`` datatype set::
 
     >>> widget = factory(
     ...     'text',
-    ...     name='DATATYPE',
+    ...     name='MYDATATYPEFIELD',
+    ...     value='',
+    ...     props={
+    ...         'datatype': 'long',
+    ...     })
+
+Default emptyvalue::
+
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
+    >>> data.errors, data.extracted
+    ([ExtractionError('Input is not a valid long integer.',)], '')
+
+UNSET emptyvalue::
+
+    >>> widget.attrs['emptyvalue'] = UNSET
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+Int emptyvalue::
+
+    >>> widget.attrs['emptyvalue'] = -1
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
+    >>> data.errors, data.extracted
+    ([], -1L)
+
+String emptyvalue. If convertable still fine::
+
+    >>> widget.attrs['emptyvalue'] = '0'
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
+    >>> data.errors, data.extracted
+    ([], 0L)
+
+Test emptyvalue if ``float`` datatype set::
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='MYDATATYPEFIELD',
     ...     value='',
     ...     props={
     ...         'datatype': 'float',
     ...     })
 
-Default default::
+Default emptyvalue::
 
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
     ([ExtractionError('Input is not a valid floating point number.',)], '')
 
-UNSET default::
+UNSET emptyvalue::
 
-    >>> widget.attrs['default'] = UNSET
+    >>> widget.attrs['emptyvalue'] = UNSET
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-Float default::
+Float emptyvalue::
 
-    >>> widget.attrs['default'] = 0.1
+    >>> widget.attrs['emptyvalue'] = 0.1
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
     ([], 0.1)
 
-String default. If convertable still fine::
+String emptyvalue. If convertable still fine::
 
-    >>> widget.attrs['default'] = '0,2'
+    >>> widget.attrs['emptyvalue'] = '0,2'
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
     ([], 0.2)
 
-Test default values if ``uuid`` datatype set::
+Test emptyvalue if ``uuid`` datatype set::
 
     >>> widget = factory(
     ...     'text',
-    ...     name='DATATYPE',
+    ...     name='MYDATATYPEFIELD',
     ...     value='',
     ...     props={
     ...         'datatype': 'uuid',
     ...     })
 
-Default default::
+Default emptyvalue::
 
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
     ([ExtractionError('Input is not a valid UUID.',)], '')
 
-UNSET default::
+UNSET emptyvalue::
 
-    >>> widget.attrs['default'] = UNSET
+    >>> widget.attrs['emptyvalue'] = UNSET
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-UUID default::
+UUID emptyvalue::
 
-    >>> widget.attrs['default'] = uuid.uuid4()
+    >>> widget.attrs['emptyvalue'] = uuid.uuid4()
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
     ([], UUID('...'))
 
-String default. If convertable still fine::
+String emptyvalue. If convertable still fine::
 
-    >>> widget.attrs['default'] = str(uuid.uuid4())
+    >>> widget.attrs['emptyvalue'] = str(uuid.uuid4())
     >>> data = widget.extract({})
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-    >>> data = widget.extract({'DATATYPE': ''})
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
     ([], UUID('...'))
 
@@ -645,16 +682,16 @@ Integer datatype::
 
     >>> widget = factory(
     ...     'text',
-    ...     name='DATATYPE',
+    ...     name='MYDATATYPEFIELD',
     ...     value='',
     ...     props={
     ...         'datatype': 'int',
     ...     })
-    >>> data = widget.extract({'DATATYPE': '1'})
+    >>> data = widget.extract({'MYDATATYPEFIELD': '1'})
     >>> data.errors, data.extracted
     ([], 1)
 
-    >>> data = widget.extract({'DATATYPE': 'a'})
+    >>> data = widget.extract({'MYDATATYPEFIELD': 'a'})
     >>> data.errors
     [ExtractionError('Input is not a valid integer.',)]
 
@@ -662,16 +699,16 @@ Float extraction::
 
     >>> widget = factory(
     ...     'text',
-    ...     name='DATATYPE',
+    ...     name='MYDATATYPEFIELD',
     ...     value='',
     ...     props={
     ...         'datatype': 'float',
     ...     })
-    >>> data = widget.extract({'DATATYPE': '1.2'})
+    >>> data = widget.extract({'MYDATATYPEFIELD': '1.2'})
     >>> data.errors, data.extracted
     ([], 1.2)
 
-    >>> data = widget.extract({'DATATYPE': 'a'})
+    >>> data = widget.extract({'MYDATATYPEFIELD': 'a'})
     >>> data.errors
     [ExtractionError('Input is not a valid floating point number.',)]
 
@@ -679,20 +716,89 @@ UUID extraction::
 
     >>> widget = factory(
     ...     'text',
-    ...     name='DATATYPE',
+    ...     name='MYDATATYPEFIELD',
     ...     value='',
     ...     props={
     ...         'datatype': 'uuid',
     ...     })
     >>> data = widget.extract({
-    ...     'DATATYPE': '3b8449f3-0456-4baa-a670-3066b0fcbda0'
+    ...     'MYDATATYPEFIELD': '3b8449f3-0456-4baa-a670-3066b0fcbda0'
     ... })
     >>> data.errors, data.extracted
     ([], UUID('3b8449f3-0456-4baa-a670-3066b0fcbda0'))
 
-    >>> data = widget.extract({'DATATYPE': 'a'})
+    >>> data = widget.extract({'MYDATATYPEFIELD': 'a'})
     >>> data.errors
     [ExtractionError('Input is not a valid UUID.',)]
+
+Test ``datatype`` not allowed::
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='MYDATATYPEFIELD',
+    ...     value='',
+    ...     props={
+    ...         'datatype': 'uuid',
+    ...         'allowed_datatypes': [int],
+    ...     })
+
+    >>> request = {
+    ...     'MYDATATYPEFIELD': '3b8449f3-0456-4baa-a670-3066b0fcbda0'
+    ... }
+    >>> data = widget.extract(request)
+    Traceback (most recent call last):
+      ...
+    ValueError: Datatype not allowed: "uuid"
+
+Test ``datatype_message``::
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='MYDATATYPEFIELD',
+    ...     value='',
+    ...     props={
+    ...         'datatype': int,
+    ...         'datatype_message': 'This did not work'
+    ...     })
+    >>> request = {
+    ...     'MYDATATYPEFIELD': 'a'
+    ... }
+    >>> data = widget.extract(request)
+    >>> data.errors, data.extracted
+    ([ExtractionError('This did not work',)], 'a')
+
+Test default error message if custom converter given but no
+``datatype_message`` defined::
+
+    >>> def custom_converter(val):
+    ...     raise ValueError
+    >>> widget = factory(
+    ...     'text',
+    ...     name='MYDATATYPEFIELD',
+    ...     value='',
+    ...     props={
+    ...         'datatype': custom_converter,
+    ...     })
+    >>> request = {
+    ...     'MYDATATYPEFIELD': 'a'
+    ... }
+    >>> data = widget.extract(request)
+    >>> data.errors, data.extracted
+    ([ExtractionError('Input conversion failed.',)], 'a')
+
+Test unknown string ``datatype`` identifier::
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='MYDATATYPEFIELD',
+    ...     value='',
+    ...     props={
+    ...         'datatype': 'inexistent',
+    ...     })
+    >>> data = widget.extract({'MYDATATYPEFIELD': 'a'})
+    Traceback (most recent call last):
+      ...
+    ValueError: Datatype unknown: "inexistent"
 
 
 Checkbox
@@ -1347,7 +1453,7 @@ Single value selection with datatype set::
 
 Single value with datatype set default values::
 
-    >>> widget.attrs['default'] = 0
+    >>> widget.attrs['emptyvalue'] = 0
     >>> data = widget.extract({})
     >>> data.extracted
     <UNSET>
@@ -1356,7 +1462,7 @@ Single value with datatype set default values::
     >>> data.extracted
     0
 
-    >>> widget.attrs['default'] = UNSET
+    >>> widget.attrs['emptyvalue'] = UNSET
     >>> data = widget.extract({})
     >>> data.extracted
     <UNSET>
@@ -1895,7 +2001,8 @@ Multi value selection with float datatype set::
     ...     props={
     ...         'datatype': 'float',
     ...         'multivalued': True,
-    ...         'vocabulary': vocab
+    ...         'vocabulary': vocab,
+    ...         'emptyvalue': UNSET
     ...     })
     >>> wrapped_pxml(widget())
     <div>
@@ -2525,8 +2632,7 @@ Single selection radio extraction::
 
 No exists marker in request. Extracts to UNSET::
 
-    >>> request = {
-    ... }
+    >>> request = {}
     >>> data = widget.extract(request)
     >>> data.printtree()
     <RuntimeData MYSELECT, value=<UNSET>, extracted=<UNSET> at ...>
@@ -3421,7 +3527,7 @@ Instanciate with invalid datatype::
     >>> widget.extract({'NUMBER': '10.0'})
     Traceback (most recent call last):
       ...
-    ValueError: Unknown datatype: "invalid"
+    ValueError: Datatype not allowed: "invalid"
 
 Extract invalid integer input::
 

@@ -8,15 +8,6 @@ History
 Release TODO
 ~~~~~~~~~~~~
 
-[ ] - ``default`` has been used for renderers until now as primary purpose.
-      Decide whether to use for extraction as well (as right now done for
-      text, select and number extraction). Pitfalls are usecases where some sets
-      'x' as default value and want to overwrite with '' but receive 'x' as
-      extracted value. Maybe it would be better to use ``emptyvalue`` or similar
-      to have explicit mechanisms for rendering and extrating defaut values.
-[ ] - ``unicode`` data converter.
-[ ] - ``datatype`` can be callable (type, function) and string identifier is
-      B/C fallback
 [X] - text (both)
 [X] - select(both)
 [X] - number(both)
