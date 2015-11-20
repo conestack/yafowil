@@ -17,15 +17,22 @@ Dummy getter::
     ...     return data.request.context.value
 
 Create Widget tree::
- 
-    >>> form = factory(u'form',
-    ...                name='testform',
-    ...                props={'action': 'http://fubar.com'})
-    >>> form['field1'] = factory('text',
-    ...                          value=getter)
-    >>> form['field2'] = factory('text',
-    ...                          value='',
-    ...                          props={'required': True})
+
+    >>> form = factory(
+    ...     u'form',
+    ...     name='testform',
+    ...     props={
+    ...         'action': 'http://fubar.com'
+    ...     })
+    >>> form['field1'] = factory(
+    ...     'text',
+    ...     value=getter)
+    >>> form['field2'] = factory(
+    ...     'text',
+    ...     value='',
+    ...     props={
+    ...         'required': True
+    ...     })
 
 Define action ``handler``::
 
@@ -40,7 +47,7 @@ Define action ``next``::
 Indicate widget to be an ``action`` definition by setting ``action`` attribute
 to widget properties. ``expression``, ``handler`` and ``next`` are action
 referring properties::
-    
+
     >>> props = {
     ...     'action': 'save',
     ...     'expression': True,
@@ -77,7 +84,7 @@ Check widget tree::
       <class 'yafowil.base.Widget'>: cancel
 
 Dummy request::
-  
+
     >>> class Request(dict):
     ...     context = context
     >>> request = Request()
@@ -86,23 +93,28 @@ Render form with empty request::
 
     >>> data = form.extract(request)
     >>> pxml(form(data))
-    <form action="http://fubar.com" enctype="multipart/form-data" id="form-testform" method="post" novalidate="novalidate">
-      <input class="text" id="input-testform-field1" name="testform.field1" type="text" value="hello world"/>
-      <input class="required text" id="input-testform-field2" name="testform.field2" required="required" type="text" value=""/>
-      <input id="input-testform-save" name="action.testform.save" type="submit" value="Save"/>
-      <input id="input-testform-cancel" name="action.testform.cancel" type="submit" value="Cancel"/>
+    <form action="http://fubar.com" enctype="multipart/form-data" 
+      id="form-testform" method="post" novalidate="novalidate">
+      <input class="text" id="input-testform-field1" name="testform.field1" 
+        type="text" value="hello world"/>
+      <input class="required text" id="input-testform-field2" 
+        name="testform.field2" required="required" type="text" value=""/>
+      <input id="input-testform-save" name="action.testform.save" 
+        type="submit" value="Save"/>
+      <input id="input-testform-cancel" name="action.testform.cancel" 
+        type="submit" value="Cancel"/>
     </form>
     <BLANKLINE>
 
 Create controller for form::
 
     >>> controller = Controller(form, request)
-    
+
 If action is not triggered, or ``action['next']`` is not set,
 ``Controller.next`` is ``None``::
-    
+
     >>> controller.next
-    
+
 An empty request does not trigger validation failures::
 
     >>> controller.error
@@ -129,7 +141,7 @@ Trigger save action without required field::
     >>> controller = Controller(form, request)
     >>> controller.error
     True
-    
+
     >>> controller.performed
     True
 
@@ -138,65 +150,85 @@ Trigger save action with valid input::
     >>> request['testform.field2'] = '1'
     >>> controller = Controller(form, request)
     handler called "testform"
-    
+
     >>> controller.next
     'next return value'
-    
+
     >>> controller.error
     False
-    
+
     >>> controller.performed
     True
 
 Render the form performed::
 
     >>> pxml(controller.rendered)
-    <form action="http://fubar.com" enctype="multipart/form-data" id="form-testform" method="post" novalidate="novalidate">
-      <input class="text" id="input-testform-field1" name="testform.field1" type="text" value="hello world"/>
-      <input class="required text" id="input-testform-field2" name="testform.field2" required="required" type="text" value="1"/>
-      <input id="input-testform-save" name="action.testform.save" type="submit" value="Save"/>
-      <input id="input-testform-cancel" name="action.testform.cancel" type="submit" value="Cancel"/>
+    <form action="http://fubar.com" enctype="multipart/form-data" 
+      id="form-testform" method="post" novalidate="novalidate">
+      <input class="text" id="input-testform-field1" name="testform.field1" 
+        type="text" value="hello world"/>
+      <input class="required text" id="input-testform-field2" 
+        name="testform.field2" required="required" type="text" value="1"/>
+      <input id="input-testform-save" name="action.testform.save" 
+        type="submit" value="Save"/>
+      <input id="input-testform-cancel" name="action.testform.cancel" 
+        type="submit" value="Cancel"/>
     </form>
     <BLANKLINE>
-
 
 Trigger cancel action. performing is skipped::
 
     >>> del request['action.testform.save']
     >>> request['action.testform.cancel'] = '1'
     >>> controller = Controller(form, request)
-    
+
     >>> controller.next
     'next return value'
-    
+
     >>> controller.performed
     False
-    
+
 Render form not performed::
 
     >>> pxml(controller.rendered)
-    <form action="http://fubar.com" enctype="multipart/form-data" id="form-testform" method="post" novalidate="novalidate">
-      <input class="text" id="input-testform-field1" name="testform.field1" type="text" value="hello world"/>
-      <input class="required text" id="input-testform-field2" name="testform.field2" required="required" type="text" value=""/>
-      <input id="input-testform-save" name="action.testform.save" type="submit" value="Save"/>
-      <input id="input-testform-cancel" name="action.testform.cancel" type="submit" value="Cancel"/>
+    <form action="http://fubar.com" enctype="multipart/form-data" 
+      id="form-testform" method="post" novalidate="novalidate">
+      <input class="text" id="input-testform-field1" name="testform.field1" 
+        type="text" value="hello world"/>
+      <input class="required text" id="input-testform-field2" 
+        name="testform.field2" required="required" type="text" value=""/>
+      <input id="input-testform-save" name="action.testform.save" 
+        type="submit" value="Save"/>
+      <input id="input-testform-cancel" name="action.testform.cancel" 
+        type="submit" value="Cancel"/>
     </form>
     <BLANKLINE>
 
-
 Try recursive lookup of actions::
 
-    >>> form = factory(u'form',
-    ...                name='testform',
-    ...                props={'action': 'http://fubar.com'})
-    >>> form['level1'] = factory('submit', 
-    ...                          props={'action': 'l1action'})
+    >>> form = factory(
+    ...     u'form',
+    ...     name='testform',
+    ...     props={
+    ...         'action': 'http://fubar.com'
+    ...     })
+    >>> form['level1'] = factory(
+    ...     'submit',
+    ...     props={
+    ...         'action': 'l1action'
+    ...     })
     >>> form['fieldset'] = factory('fieldset')
-    >>> form['fieldset']['level2'] = factory('submit', 
-    ...                                          props={'action': 'l2action'})
+    >>> form['fieldset']['level2'] = factory(
+    ...     'submit',
+    ...     props={
+    ...         'action': 'l2action'
+    ...     })
     >>> form['fieldset']['subset'] = factory('fieldset')
-    >>> form['fieldset']['subset']['level3'] = factory('submit', 
-    ...                                            props={'action': 'l3action'})
+    >>> form['fieldset']['subset']['level3'] = factory(
+    ...     'submit',
+    ...     props={
+    ...         'action': 'l3action'
+    ...     })
     >>> controller = Controller(form, {})
     >>> controller.actions
     [<Widget object 'level1' at ...>, 

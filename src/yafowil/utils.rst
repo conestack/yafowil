@@ -13,7 +13,6 @@ Imports::
     >>> from plumber import plumbing
     >>> from yafowil.base import factory
     >>> from yafowil.utils import Tag
-    >>> from yafowil.utils import Tag
     >>> from yafowil.utils import attr_value
     >>> from yafowil.utils import convert_value_to_datatype
     >>> from yafowil.utils import convert_values_to_datatype

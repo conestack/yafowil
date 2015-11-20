@@ -51,8 +51,10 @@ def compound_renderer(widget, data):
                 if child.getter is UNSET:
                     child.getter = value[childname]
                 else:
-                    raise ValueError(u"Both compound and compound member "
-                                     u"provide a value for '%s'" % childname)
+                    raise ValueError(
+                        u"Both compound and compound member "
+                        u"provide a value for '{0}'".format(childname)
+                    )
         if subdata is None:
             result += child(request=data.request)
         else:
@@ -132,9 +134,9 @@ factory.register(
     'fieldset',
     extractors=factory.extractors('compound'),
     edit_renderers=factory.edit_renderers('compound') + [fieldset_renderer],
-    display_renderers=(factory.display_renderers('compound') +
-                       [fieldset_renderer])
-)
+    display_renderers=(
+        factory.display_renderers('compound') + [fieldset_renderer]
+    ))
 
 factory.doc['blueprint']['fieldset'] = """\
 Renders a fieldset around the prior rendered output.
@@ -159,7 +161,7 @@ def form_edit_renderer(widget, data):
         'enctype': enctype,
         'novalidate': noval,
         'class_': cssclasses(widget, data),
-        'id': 'form-%s' % '-'.join(widget.path),
+        'id': 'form-{0}'.format('-'.join(widget.path)),
     }
     return data.tag('form', data.rendered, **form_attrs)
 
@@ -172,9 +174,9 @@ factory.register(
     'form',
     extractors=factory.extractors('compound'),
     edit_renderers=factory.edit_renderers('compound') + [form_edit_renderer],
-    display_renderers=(factory.display_renderers('compound') +
-                       [form_display_renderer])
-)
+    display_renderers=(
+        factory.display_renderers('compound') + [form_display_renderer]
+    ))
 
 factory.doc['blueprint']['form'] = """\
 A html-form element as a compound of widgets.
