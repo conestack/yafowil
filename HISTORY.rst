@@ -5,33 +5,16 @@ History
 2.2 (unreleased)
 ----------------
 
-Release TODO
-~~~~~~~~~~~~
+- Use ``generic_emptyvalue_extractor`` in ``hidden``, ``proxy``, ``text``,
+  ``textarea``, ``lines``, ``select``, ``file``, ``password``, ``email``,
+  ``url``, ``search`` and ``number`` blueprints.
+  [rnix, 2015-11-20]
 
-[X] - text (both)
-[X] - select(both)
-[X] - number(both)
-[ ] - hidden (both)
-[ ] - proxy (both)
-[ ] - lines (both)
-[ ] - textarea (default only)
-[ ] - password (default only)
-[ ] - checkbox (default onyly)
-[ ] - file (default only)
-[ ] - email (default only)
-[ ] - url (default only)
-[ ] - search (default only)
-[ ] - check data attribute rendering on common widgets
-
-- Fix ``default`` property setting at factory time (at least for mentioned
-  blueprints below) WORK IN PROGRESS.
-
-- Use ``generic_default_value_extractor`` and
-  ``generic_default_value_extractor`` in ``text``, ``select`` and ``number``
-  blueprints.
+- Use ``generic_datatype_extractor`` in ``hidden``, ``proxy``, ``text``,
+  ``lines``, ``select`` and ``number`` blueprints.
   [rnix, 2015-11-19]
 
-- Introduce ``generic_default_value_extractor``.
+- Introduce ``generic_emptyvalue_extractor``.
   [rnix, 2015-11-19]
 
 - Instroduce ``generic_datatype_extractor``.
@@ -41,7 +24,7 @@ Release TODO
   [rnix, 2015-11-18]
 
 - Change ``default`` value of ``select`` blueprint from ``list()`` to
-  ``UNSET``. This can represent both, an empty single valued and an empty
+  ``UNSET``. This represents both, an empty single valued and an empty
   multi valued selection.
   [rnix, 2015-11-18]
 

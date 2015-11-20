@@ -493,7 +493,11 @@ Flag  input field is disabled.
 
 factory.register(
     'hidden',
-    extractors=[generic_extractor],
+    extractors=[
+        generic_extractor,
+        generic_emptyvalue_extractor,
+        generic_datatype_extractor
+    ],
     edit_renderers=[input_generic_renderer],
     display_renderers=[empty_display_renderer])
 
@@ -536,7 +540,11 @@ def input_proxy_renderer(widget, data):
 
 factory.register(
     'proxy',
-    extractors=[generic_extractor],
+    extractors=[
+        generic_extractor,
+        generic_emptyvalue_extractor,
+        generic_datatype_extractor
+    ],
     edit_renderers=[input_proxy_renderer],
     display_renderers=[empty_display_renderer])
 
@@ -597,7 +605,8 @@ factory.register(
     'textarea',
     extractors=[
         generic_extractor,
-        generic_required_extractor
+        generic_required_extractor,
+        generic_emptyvalue_extractor
     ],
     edit_renderers=[textarea_renderer],
     display_renderers=[
@@ -682,7 +691,9 @@ factory.register(
     extractors=[
         generic_extractor,
         generic_required_extractor,
-        lines_extractor
+        lines_extractor,
+        generic_emptyvalue_extractor,
+        generic_datatype_extractor,
     ],
     edit_renderers=[lines_edit_renderer],
     display_renderers=[
@@ -856,6 +867,7 @@ factory.register(
     extractors=[
         generic_extractor,
         generic_required_extractor,
+        generic_emptyvalue_extractor,
         minlength_extractor,
         ascii_extractor,
         password_extractor
@@ -1596,6 +1608,7 @@ factory.register(
     extractors=[
         generic_extractor,
         generic_required_extractor,
+        generic_emptyvalue_extractor,
         email_extractor
     ],
     edit_renderers=[input_generic_renderer],
@@ -1641,6 +1654,7 @@ factory.register(
     extractors=[
         generic_extractor,
         generic_required_extractor,
+        generic_emptyvalue_extractor,
         url_extractor
     ],
     edit_renderers=[input_generic_renderer],
@@ -1670,7 +1684,8 @@ factory.register(
     'search',
     extractors=[
         generic_extractor,
-        generic_required_extractor
+        generic_required_extractor,
+        generic_emptyvalue_extractor,
     ],
     edit_renderers=[input_generic_renderer],
     display_renderers=[

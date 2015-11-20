@@ -73,6 +73,36 @@ Generic HTML5 Data::
     u'<input class="hidden" data-foo=\'bar\' id="input-MYHIDDEN" 
     name="MYHIDDEN" type="hidden" value="Test Hidden" />'
 
+Emptyvalue::
+
+    >>> widget = factory(
+    ...     'hidden',
+    ...     name='MYHIDDEN',
+    ...     props={
+    ...         'emptyvalue': 'EMPTYVALUE'
+    ...     })
+    >>> widget.extract(request={'MYHIDDEN': ''})
+    <RuntimeData MYHIDDEN, value=<UNSET>, extracted='EMPTYVALUE' at ...>
+
+Datatype::
+
+    >>> widget = factory(
+    ...     'hidden',
+    ...     name='MYHIDDEN',
+    ...     props={
+    ...         'emptyvalue': 0,
+    ...         'datatype': int
+    ...     })
+    >>> widget.extract(request={'MYHIDDEN': ''})
+    <RuntimeData MYHIDDEN, value=<UNSET>, extracted=0 at ...>
+
+Be aware that working with datatype on hidden without emptyvalue may result in
+extraction errors, which is really unwanted::
+
+    >>> del widget.attrs['emptyvalue']
+    >>> widget.extract(request={'MYHIDDEN': ''})
+    <RuntimeData MYHIDDEN, value=<UNSET>, extracted='', 1 error(s) at ...>
+
 
 Generic tag
 -----------
@@ -1166,6 +1196,20 @@ Textarea widget::
     u'<div class="display-textarea" data-foo=\'bar\' 
     id="display-MYTEXTAREA"></div>'
 
+Emptyvalue::
+
+    >>> widget = factory(
+    ...     'textarea',
+    ...     name='MYTEXTAREA',
+    ...     props={
+    ...         'emptyvalue': 'EMPTYVALUE',
+    ...     })
+    >>> widget.extract(request={'MYTEXTAREA': ''})
+    <RuntimeData MYTEXTAREA, value=<UNSET>, extracted='EMPTYVALUE' at ...>
+
+    >>> widget.extract(request={'MYTEXTAREA': 'NOEMPTY'})
+    <RuntimeData MYTEXTAREA, value=<UNSET>, extracted='NOEMPTY' at ...>
+
 
 Lines
 -----
@@ -1306,6 +1350,40 @@ Generic HTML5 Data::
       <li>c</li>
     </ul>
     <BLANKLINE>
+
+Emptyvalue::
+
+    >>> widget = factory(
+    ...     'lines',
+    ...     name='MYLINES',
+    ...     value=['a', 'b', 'c'],
+    ...     props={
+    ...         'emptyvalue': ['1']
+    ...     })
+    >>> widget.extract(request={'MYLINES': ''})
+    <RuntimeData MYLINES, value=['a', 'b', 'c'], extracted=['1'] at ...>
+
+    >>> widget.extract(request={'MYLINES': '1\n2'})
+    <RuntimeData MYLINES, value=['a', 'b', 'c'], extracted=['1', '2'] at ...>
+
+Datatype::
+
+    >>> widget = factory(
+    ...     'lines',
+    ...     name='MYLINES',
+    ...     props={
+    ...         'emptyvalue': [1],
+    ...         'datatype': int
+    ...     })
+    >>> widget.extract(request={'MYLINES': ''})
+    <RuntimeData MYLINES, value=<UNSET>, extracted=[1] at ...>
+
+    >>> widget.extract(request={'MYLINES': '1\n2'})
+    <RuntimeData MYLINES, value=<UNSET>, extracted=[1, 2] at ...>
+
+    >>> widget.attrs['emptyvalue'] = ['1']
+    >>> widget.extract(request={'MYLINES': ''})
+    <RuntimeData MYLINES, value=<UNSET>, extracted=[1] at ...>
 
 
 Selection
@@ -1451,7 +1529,7 @@ Single value selection with datatype set::
     </select>
     <BLANKLINE>
 
-Single value with datatype set default values::
+Single value with datatype set emptyvalue::
 
     >>> widget.attrs['emptyvalue'] = 0
     >>> data = widget.extract({})
@@ -2002,7 +2080,7 @@ Multi value selection with float datatype set::
     ...         'datatype': 'float',
     ...         'multivalued': True,
     ...         'vocabulary': vocab,
-    ...         'emptyvalue': UNSET
+    ...         'emptyvalue': []
     ...     })
     >>> wrapped_pxml(widget())
     <div>
@@ -2055,7 +2133,7 @@ Multi value selection with float datatype set::
     ... }
     >>> data = widget.extract(request=request)
     >>> data.extracted
-    <UNSET>
+    []
 
 Generic HTML5 Data::
 
@@ -2425,6 +2503,31 @@ Check selection required::
     >>> data.printtree()
     <RuntimeData MYSELECT, value=<UNSET>, extracted=[], 1 error(s) at ...>
 
+Check selection required with datatype set::
+
+    >>> vocab = [
+    ...     (1,'One'),
+    ...     (2, 'Two'),
+    ...     (3, 'Three'),
+    ...     (4, 'Four')
+    ... ]
+    >>> widget = factory(
+    ...     'select',
+    ...     name='MYSELECT',
+    ...     props={
+    ...         'required': 'Selection required',
+    ...         'multivalued': True,
+    ...         'vocabulary': vocab,
+    ...         'datatype': int,
+    ...     })
+    >>> data = widget.extract(request={'MYSELECT-exists': 'exists'})
+    >>> data.printtree()
+    <RuntimeData MYSELECT, value=<UNSET>, extracted=[], 1 error(s) at ...>
+
+    >>> data = widget.extract(request={'MYSELECT': ['1', '2']})
+    >>> data.printtree()
+    <RuntimeData MYSELECT, value=<UNSET>, extracted=[1, 2] at ...>
+
 Single selection extraction without value::
 
     >>> widget = factory(
@@ -2591,7 +2694,8 @@ Multiselection, partly disabled, non-empty request::
     ...     props={
     ...         'multivalued': True,
     ...         'disabled': ['two', 'three', 'four', 'five'],
-    ...         'vocabulary': vocab
+    ...         'vocabulary': vocab,
+    ...         'datatype': unicode,
     ...     })
     >>> request = {
     ...     'MYSELECT': ['one', 'two', 'five'],
@@ -2612,8 +2716,8 @@ Check extraction::
 
     >>> data = widget.extract(request)
     >>> data.printtree()
-    <RuntimeData MYSELECT, value=['one', 'two', 'four'],
-    extracted=['one', 'two', 'four'] at ...>
+    <RuntimeData MYSELECT, value=['one', 'two', 'four'], 
+    extracted=[u'one', u'two', u'four'] at ...>
 
 Single selection radio extraction::
 
@@ -2983,6 +3087,41 @@ Used to pass hidden arguments out of form namespace::
     >>> widget(request={'PROXY': '2'})
     u'<input id="input-PROXY" name="PROXY" type="hidden" value="2" />'
 
+Emptyvalue::
+
+    >>> widget = factory(
+    ...     'proxy',
+    ...     name='PROXY',
+    ...     value='',
+    ...     props={
+    ...         'emptyvalue': '1.0'
+    ...     })
+    >>> widget.extract(request={'PROXY': ''})
+    <RuntimeData PROXY, value='', extracted='1.0' at ...>
+
+Datatype::
+
+    >>> widget = factory(
+    ...     'proxy',
+    ...     name='PROXY',
+    ...     value='',
+    ...     props={
+    ...         'emptyvalue': '1.0',
+    ...         'datatype': float
+    ...     })
+    >>> widget.extract(request={'PROXY': '2.0'})
+    <RuntimeData PROXY, value='', extracted=2.0 at ...>
+
+    >>> widget.extract(request={'PROXY': ''})
+    <RuntimeData PROXY, value='', extracted=1.0 at ...>
+
+Be aware that working with datatype on proxy without emptyvalue may result in
+extraction errors, which is really unwanted::
+
+    >>> del widget.attrs['emptyvalue']
+    >>> widget.extract(request={'PROXY': ''})
+    <RuntimeData PROXY, value='', extracted='', 1 error(s) at ...>
+
 
 Label
 -----
@@ -3272,6 +3411,20 @@ Combine all validations::
     >>> data.errors
     []
 
+Emptyvalue::
+
+    >>> widget = factory(
+    ...     'password',
+    ...     name='PWD',
+    ...     props={
+    ...         'emptyvalue': 'DEFAULTPWD',  # <- not a good idea, but works
+    ...     })
+    >>> widget.extract(request={'PWD': ''})
+    <RuntimeData PWD, value=<UNSET>, extracted='DEFAULTPWD' at ...>
+
+    >>> widget.extract(request={'PWD': 'NOEMPTY'})
+    <RuntimeData PWD, value=<UNSET>, extracted='NOEMPTY' at ...>
+
 
 Error
 -----
@@ -3419,6 +3572,20 @@ Extract required email input::
     >>> data.errors
     []
 
+Emptyvalue::
+
+    >>> widget = factory(
+    ...     'email',
+    ...     name='EMAIL',
+    ...     props={
+    ...         'emptyvalue': 'foo@bar.baz',
+    ...     })
+    >>> widget.extract(request={'EMAIL': ''})
+    <RuntimeData EMAIL, value=<UNSET>, extracted='foo@bar.baz' at ...>
+
+    >>> widget.extract(request={'EMAIL': 'foo@baz.bam'})
+    <RuntimeData EMAIL, value=<UNSET>, extracted='foo@baz.bam' at ...>
+
 
 URL
 ---
@@ -3454,6 +3621,56 @@ Extract value URL input::
     ... })
     >>> data.errors
     []
+
+Emptyvalue::
+
+    >>> widget = factory(
+    ...     'url',
+    ...     name='URL',
+    ...     props={
+    ...         'emptyvalue': 'http://www.example.com',
+    ...     })
+    >>> widget.extract(request={'URL': ''})
+    <RuntimeData URL, value=<UNSET>, extracted='http://www.example.com' at ...>
+
+    >>> widget.extract(request={'URL': 'http://www.example.org'})
+    <RuntimeData URL, value=<UNSET>, extracted='http://www.example.org' at ...>
+
+
+Search
+------
+
+Render search input field::
+
+    >>> widget = factory(
+    ...     'search',
+    ...     name='SEARCH')
+    >>> pxml(widget())
+    <input class="search" id="input-SEARCH" name="SEARCH" 
+    type="search" value=""/>
+
+Extract not required and empty::
+
+    >>> data = widget.extract({'SEARCH': ''})
+    >>> data.errors
+    []
+
+Extract required empty::
+
+    >>> widget.attrs['required'] = True
+    >>> widget.extract({'SEARCH': ''})
+    <RuntimeData SEARCH, value=<UNSET>, extracted='', 1 error(s) at ...>
+
+    >>> del widget.attrs['required']
+
+Emptyvalue::
+
+    >>> widget.attrs['emptyvalue'] = 'defaultsearch'
+    >>> widget.extract(request={'SEARCH': ''})
+    <RuntimeData SEARCH, value=<UNSET>, extracted='defaultsearch' at ...>
+
+    >>> widget.extract(request={'SEARCH': 'searchstr'})
+    <RuntimeData SEARCH, value=<UNSET>, extracted='searchstr' at ...>
 
 
 Number
