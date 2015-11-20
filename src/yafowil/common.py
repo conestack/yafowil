@@ -248,7 +248,7 @@ def generic_datatype_extractor(widget, data):
         return convert_values_to_datatype(extracted, datatype)
     except KeyError:
         raise ValueError('Datatype unknown: "{0}"'.format(datatype))
-    except (ValueError, UnicodeEncodeError):
+    except (ValueError, UnicodeEncodeError, UnicodeDecodeError):
         datatype_message = attr_value('datatype_message', widget, data)
         if not datatype_message:
             datatype_label = DATATYPE_LABELS.get(datatype)
