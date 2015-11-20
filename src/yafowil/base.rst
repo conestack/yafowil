@@ -159,13 +159,15 @@ Create some test dummies::
 The widget class::    
 
     >>> test_request = {'MYUID': 'New Test Value'}
-    >>> testwidget = Widget('blueprint_names_goes_here',
-    ...                     [('1', test_extractor)], 
-    ...                     [('1', test_edit_renderer)], 
-    ...                     [('1', test_display_renderer)], 
-    ...                     [('1', test_preprocessor)],
-    ...                     'MYUID', test_getter,
-    ...                     dict(test1='Test1', test2='Test2'))
+    >>> testwidget = Widget(
+    ...     'blueprint_names_goes_here',
+    ...     [('1', test_extractor)],
+    ...     [('1', test_edit_renderer)],
+    ...     [('1', test_display_renderer)],
+    ...     [('1', test_preprocessor)],
+    ...     'MYUID',
+    ...     test_getter,
+    ...     dict(test1='Test1', test2='Test2'))
 
     >>> testwidget() 
     ('r1', 'MYUID', "<RuntimeData MYUID, value='Test Value', extracted=<UNSET>, 
@@ -200,53 +202,62 @@ Different cases,
 
 a.1) defaults: edit::     
 
-    >>> testwidget = Widget('blueprint_names_goes_here',
-    ...                     [('1', test_extractor)], 
-    ...                     [('1', test_edit_renderer)], 
-    ...                     [('1', test_display_renderer)], 
-    ...                     [],
-    ...                     'MYUID', test_getter,
-    ...                     dict(test1='Test1', test2='Test2'),
-    ...                     )    
+    >>> testwidget = Widget(
+    ...     'blueprint_names_goes_here',
+    ...     [('1', test_extractor)],
+    ...     [('1', test_edit_renderer)],
+    ...     [('1', test_display_renderer)],
+    ...     [],
+    ...     'MYUID',
+    ...     test_getter,
+    ...     dict(test1='Test1', test2='Test2'))
     >>> testwidget()
     ('r1', 'MYUID', "<RuntimeData MYUID, value='Test Value', extracted=<UNSET> 
     at ...>", "{'test1': 'Test1', 'test2': 'Test2'}")
 
 a.2) mode display::   
 
-    >>> testwidget = Widget('blueprint_names_goes_here',
-    ...                     [('1', test_extractor)], 
-    ...                     [('1', test_edit_renderer)], 
-    ...                     [('1', test_display_renderer)], 
-    ...                     [],
-    ...                     'MYUID', test_getter,
-    ...                     dict(test1='Test1', test2='Test2'),
-    ...                     mode='display')    
+    >>> testwidget = Widget(
+    ...     'blueprint_names_goes_here',
+    ...     [('1', test_extractor)],
+    ...     [('1', test_edit_renderer)],
+    ...     [('1', test_display_renderer)],
+    ...     [],
+    ...     'MYUID',
+    ...     test_getter,
+    ...     dict(test1='Test1', test2='Test2'),
+    ...     mode='display')
     >>> testwidget()
-    ('disr1', 'MYUID', "<RuntimeData MYUID, value='Test Value', extracted=<UNSET> 
-    at ...>", "{'test1': 'Test1', 'test2': 'Test2'}")
+    ('disr1', 'MYUID', "<RuntimeData MYUID, value='Test Value', 
+    extracted=<UNSET> at ...>", "{'test1': 'Test1', 'test2': 'Test2'}")
 
 a.3) mode skip::   
 
-    >>> testwidget = Widget('blueprint_names_goes_here',
-    ...                     [('1', test_extractor)], 
-    ...                     [('1', test_edit_renderer)], 
-    ...                     [('1', test_display_renderer)], 
-    ...                     [],
-    ...                     'MYUID', test_getter,
-    ...                     dict(test1='Test1', test2='Test2'),
-    ...                     mode='skip')    
+    >>> testwidget = Widget(
+    ...     'blueprint_names_goes_here',
+    ...     [('1', test_extractor)],
+    ...     [('1', test_edit_renderer)],
+    ...     [('1', test_display_renderer)],
+    ...     [],
+    ...     'MYUID',
+    ...     test_getter,
+    ...     dict(test1='Test1', test2='Test2'),
+    ...     mode='skip')
     >>> testwidget()
     u''
 
 a.4) mode w/o renderer:: 
 
-    >>> testwidget = Widget('blueprint_names_goes_here',
-    ...                     [('1', test_extractor)], 
-    ...                     [], [], [],
-    ...                     'MYUID', test_getter,
-    ...                     dict(test1='Test1', test2='Test2'),
-    ...                     mode='display')    
+    >>> testwidget = Widget(
+    ...     'blueprint_names_goes_here',
+    ...     [('1', test_extractor)],
+    ...     [],
+    ...     [],
+    ...     [],
+    ...     'MYUID',
+    ...     test_getter,
+    ...     dict(test1='Test1', test2='Test2'),
+    ...     mode='display')
     >>> testwidget()
     Traceback (most recent call last):
     ...
@@ -254,66 +265,73 @@ a.4) mode w/o renderer::
 
 b.1) two extractors w/o request:: 
 
-    >>> testwidget = Widget('blueprint_names_goes_here',
-    ...                     [('1', test_extractor), ('2', test_extractor2)], 
-    ...                     [('1', test_edit_renderer), 
-    ...                      ('2', test_edit_renderer2)], 
-    ...                     [('1', test_display_renderer)], 
-    ...                     [],
-    ...                     'MYUID2', test_getter,
-    ...                     dict(test1='Test1', test2='Test2'))
+    >>> testwidget = Widget(
+    ...     'blueprint_names_goes_here',
+    ...     [('1', test_extractor), ('2', test_extractor2)],
+    ...     [('1', test_edit_renderer), ('2', test_edit_renderer2)],
+    ...     [('1', test_display_renderer)],
+    ...     [],
+    ...     'MYUID2',
+    ...     test_getter,
+    ...     dict(test1='Test1', test2='Test2'))
     >>> testwidget()
     ('r2', 'MYUID2', "<RuntimeData MYUID2, value='Test Value', 
     extracted=<UNSET> at ...>", "{'test1': 'Test1', 'test2': 'Test2'}")
 
 b.2) extractor with request, non int has to fail::
 
-    >>> testwidget = Widget('blueprint_names_goes_here',
-    ...                     [('1', test_extractor3)], 
-    ...                     [('1', test_edit_renderer)], 
-    ...                     [('1', test_display_renderer)], 
-    ...                     [],
-    ...                     'MYUID2', test_getter2,
-    ...                     dict(test1='Test1', test2='Test2'))
+    >>> testwidget = Widget(
+    ...     'blueprint_names_goes_here',
+    ...     [('1', test_extractor3)],
+    ...     [('1', test_edit_renderer)],
+    ...     [('1', test_display_renderer)],
+    ...     [],
+    ...     'MYUID2',
+    ...     test_getter2,
+    ...     dict(test1='Test1', test2='Test2'))
     >>> testwidget.extract({'MYUID2': 'ABC'})
     <RuntimeData MYUID2, value=999, extracted=<UNSET>, 1 error(s) at ...>    
 
 b.3) extractor with request, but mode display::
 
-    >>> testwidget = Widget('blueprint_names_goes_here',
-    ...                     [('1', test_extractor3)], 
-    ...                     [('1', test_edit_renderer)], 
-    ...                     [('1', test_display_renderer)], 
-    ...                     [],
-    ...                     'MYUID2', test_getter2,
-    ...                     dict(test1='Test1', test2='Test2'),
-    ...                     mode='display')    
+    >>> testwidget = Widget(
+    ...     'blueprint_names_goes_here',
+    ...     [('1', test_extractor3)],
+    ...     [('1', test_edit_renderer)],
+    ...     [('1', test_display_renderer)],
+    ...     [],
+    ...     'MYUID2',
+    ...     test_getter2,
+    ...     dict(test1='Test1', test2='Test2'),
+    ...     mode='display')
     >>> testwidget.extract({'MYUID2': '123'})
     <RuntimeData MYUID2, value=999, extracted=<UNSET> ...>    
 
 b.3) two extractors with request::
 
-    >>> testwidget = Widget('blueprint_names_goes_here',
-    ...                     [('1', test_extractor3)], 
-    ...                     [('1', test_edit_renderer)], 
-    ...                     [('1', test_display_renderer)], 
-    ...                     [],
-    ...                     'MYUID2', test_getter2,
-    ...                     dict(test1='Test1', test2='Test2'))
-
+    >>> testwidget = Widget(
+    ...     'blueprint_names_goes_here',
+    ...     [('1', test_extractor3)],
+    ...     [('1', test_edit_renderer)],
+    ...     [('1', test_display_renderer)],
+    ...     [],
+    ...     'MYUID2',
+    ...     test_getter2,
+    ...     dict(test1='Test1', test2='Test2'))
     >>> testwidget.extract({'MYUID2': '123'})
     <RuntimeData MYUID2, value=999, extracted=123 at ...>
 
 A failing widget::
 
-    >>> testwidget = Widget('blueprint_names_goes_here',
-    ...                     [('1', fail_extractor)], 
-    ...                     [('1', fail_edit_renderer)], 
-    ...                     [('1', test_display_renderer)], 
-    ...                     [],
-    ...                     'MYFAIL', '',
-    ...                     dict())
-
+    >>> testwidget = Widget(
+    ...     'blueprint_names_goes_here',
+    ...     [('1', fail_extractor)],
+    ...     [('1', fail_edit_renderer)],
+    ...     [('1', test_display_renderer)],
+    ...     [],
+    ...     'MYFAIL',
+    ...     '',
+    ...     dict())
     >>> try:
     ...    testwidget.extract({})
     ... except Exception, e:
@@ -354,7 +372,7 @@ The dottedpath.
 
 Fails with no name in root::
 
-    >>> testwidget = Widget('blueprint_names_goes_here', [], [], [], [])    
+    >>> testwidget = Widget('blueprint_names_goes_here', [], [], [], [])
     >>> testwidget.dottedpath
     Traceback (most recent call last):
     ...
@@ -362,60 +380,76 @@ Fails with no name in root::
 
 At this test level the factory is not used, so we pass it directly to Widget::    
 
-    >>> testwidget = Widget('blueprint_names_goes_here',
-    ...                     [], [], [], [], uniquename='root')    
+    >>> testwidget = Widget(
+    ...     'blueprint_names_goes_here', [], [], [], [], uniquename='root')
     >>> testwidget.dottedpath
     'root'
 
-    >>> testwidget['child'] = Widget('blueprint_names_goes_here',
-    ...                              [], [], [], [])
+    >>> testwidget['child'] = Widget(
+    ...     'blueprint_names_goes_here', [], [], [], [])
     >>> testwidget['child'].dottedpath
     'root.child'
 
-    >>> testwidget['child']['level3'] = Widget('blueprint_names_goes_here',
-    ...                                        [], [], [], [])
+    >>> testwidget['child']['level3'] = Widget(
+    ...     'blueprint_names_goes_here', [], [], [], [])
     >>> testwidget['child']['level3'].dottedpath
     'root.child.level3'
 
 The mode::
 
-    >>> testwidget = Widget('blueprint_names_goes_here',
-    ...                     [], [], [], [], uniquename='root')
+    >>> testwidget = Widget(
+    ...     'blueprint_names_goes_here', [], [], [], [], uniquename='root')
     >>> data = testwidget.extract({})
     >>> data.mode
     'edit'    
 
-    >>> testwidget = Widget('blueprint_names_goes_here',
-    ...                     [], [], [], [], uniquename='root', mode='display')
+    >>> testwidget = Widget(
+    ...     'blueprint_names_goes_here',
+    ...     [], [], [], [],
+    ...     uniquename='root',
+    ...     mode='display')
     >>> data = testwidget.extract({})
     >>> data.mode
     'display'    
 
-    >>> testwidget = Widget('blueprint_names_goes_here',
-    ...                     [], [], [], [], uniquename='root', mode='skip')
+    >>> testwidget = Widget(
+    ...     'blueprint_names_goes_here',
+    ...     [], [], [], [],
+    ...     uniquename='root',
+    ...     mode='skip')
     >>> data = testwidget.extract({})
     >>> data.mode
     'skip'    
 
-    >>> testwidget = Widget('blueprint_names_goes_here',
-    ...                     [], [], [], [], uniquename='root', mode='other')
+    >>> testwidget = Widget(
+    ...     'blueprint_names_goes_here',
+    ...     [], [], [], [],
+    ...     uniquename='root',
+    ...     mode='other')
     >>> data = testwidget.extract({})
     Traceback (most recent call last):
     ...      
-    ValueError: mode must be one out of 'edit', 'display', 'skip', but 'other' was given
+    ValueError: mode must be one out of 'edit', 'display', 'skip', but 
+    'other' was given
 
     >>> def mode(widget, data):
     ...     return 'edit'
-    >>> testwidget = Widget('blueprint_names_goes_here',
-    ...                     [], [], [], [], uniquename='root', mode=mode)
+    >>> testwidget = Widget(
+    ...     'blueprint_names_goes_here',
+    ...     [], [], [], [],
+    ...     uniquename='root',
+    ...     mode=mode)
     >>> data = testwidget.extract({})
     >>> data.mode
     'edit'    
 
     >>> def mode(widget, data):
     ...     return 'display'
-    >>> testwidget = Widget('blueprint_names_goes_here',
-    ...                     [], [], [], [], uniquename='root', mode=mode)
+    >>> testwidget = Widget(
+    ...     'blueprint_names_goes_here',
+    ...     [], [], [], [],
+    ...     uniquename='root',
+    ...     mode=mode)
     >>> data = testwidget.extract({})
     >>> data.mode
     'display'    
@@ -434,15 +468,20 @@ Fill factory with test blueprints::
     >>> factory.edit_renderers('widget_test')
     [<function test_edit_renderer at ...>]
 
-    >>> testwidget = factory('widget_test', name='MYFAC', value=test_getter, 
-    ...                      props=dict(foo='bar'))
+    >>> testwidget = factory(
+    ...     'widget_test',
+    ...     name='MYFAC',
+    ...     value=test_getter,
+    ...     props=dict(foo='bar'))
     >>> testwidget()
     ('r1', 'MYFAC', "<RuntimeData MYFAC, value='Test Value', extracted=<UNSET> 
     at ...>", "{'foo': 'bar'}")
 
-    >>> factory.register('widget_test', [test_extractor], [test_edit_renderer], 
-    ...                  preprocessors=[test_preprocessor])
-
+    >>> factory.register(
+    ...     'widget_test',
+    ...     [test_extractor],
+    ...     [test_edit_renderer],
+    ...     preprocessors=[test_preprocessor])
     >>> factory.preprocessors('widget_test')
     [<function test_preprocessor at 0x...>]
 
@@ -454,8 +493,11 @@ Fill factory with test blueprints::
     [<function test_global_preprocessor at 0x...>, 
     <function test_preprocessor at 0x...>]
 
-    >>> testwidget = factory('widget_test', name='MYFAC', value=test_getter, 
-    ...                      props=dict(foo='bar'), mode='display')
+    >>> testwidget = factory(
+    ...     'widget_test',
+    ...     name='MYFAC',
+    ...     value=test_getter,
+    ...     props=dict(foo='bar'), mode='display')
     >>> data = testwidget.extract({})
     >>> data.mode
     'display'    
@@ -467,8 +509,8 @@ field with two input fields in. Here a simpler example::
     ...     widget['one'] = factory('widget_test', widget.attrs)
     ...     widget['two'] = factory('widget_test', widget.attrs)
 
-    >>> factory.register('static_compound', [], [], 
-    ...                  builders=[create_static_compound])
+    >>> factory.register(
+    ...     'static_compound', [], [], builders=[create_static_compound])
 
     >>> widget = factory('static_compound', props={})
     >>> widget.keys()
@@ -496,8 +538,8 @@ Some basic name checks are done::
 
 Test the macros::
 
-    >>> factory.register_macro('test_macro',
-    ...                        'foo:*bar:baz', {'foo.newprop': 'abc'})
+    >>> factory.register_macro(
+    ...     'test_macro', 'foo:*bar:baz', {'foo.newprop': 'abc'})
     >>> factory._macros
     {'test_macro': (['foo', '*bar', 'baz'], {'foo.newprop': 'abc'})}
 
@@ -526,29 +568,33 @@ Theme to use::
 
 Register addon widget resources for default theme::
 
-    >>> factory.register_theme('default', 'yafowil.widget.someaddon',
-    ...                        '/foo/bar/resources',
-    ...                        js=[{'resource': 'default/widget.js',
-    ...                             'thirdparty': False,
-    ...                             'order': 10,
-    ...                             'merge': False}],
-    ...                        css=[{'resource': 'default/widget.css',
-    ...                              'thirdparty': False,
-    ...                              'order': 10,
-    ...                              'merge': False}])
+    >>> factory.register_theme(
+    ...     'default',
+    ...     'yafowil.widget.someaddon',
+    ...     '/foo/bar/resources',
+    ...     js=[{'resource': 'default/widget.js',
+    ...          'thirdparty': False,
+    ...          'order': 10,
+    ...          'merge': False}],
+    ...     css=[{'resource': 'default/widget.css',
+    ...           'thirdparty': False,
+    ...           'order': 10,
+    ...           'merge': False}])
 
 Register addon widget resources for custom theme::
 
-    >>> factory.register_theme('custom', 'yafowil.widget.someaddon',
-    ...                        '/foo/bar/resources',
-    ...                        js=[{'resource': 'custom/widget.js',
-    ...                             'thirdparty': False,
-    ...                             'order': 10,
-    ...                             'merge': False}],
-    ...                        css=[{'resource': 'custom/widget.css',
-    ...                              'thirdparty': False,
-    ...                              'order': 10,
-    ...                              'merge': False}])
+    >>> factory.register_theme(
+    ...     'custom',
+    ...     'yafowil.widget.someaddon',
+    ...     '/foo/bar/resources',
+    ...     js=[{'resource': 'custom/widget.js',
+    ...          'thirdparty': False,
+    ...          'order': 10,
+    ...          'merge': False}],
+    ...     css=[{'resource': 'custom/widget.css',
+    ...           'thirdparty': False,
+    ...           'order': 10,
+    ...           'merge': False}])
 
 Lookup resouces for addon widget::
 
@@ -594,10 +640,10 @@ default::
 
 Some might want the resource definitions as original instance::
 
-    >>> resources = factory.resources_for('yafowil.widget.someaddon',
-    ...                                   copy_resources=False)
-    >>> resources is factory.resources_for('yafowil.widget.someaddon',
-    ...                                    copy_resources=False)
+    >>> resources = factory.resources_for(
+    ...     'yafowil.widget.someaddon', copy_resources=False)
+    >>> resources is factory.resources_for(
+    ...     'yafowil.widget.someaddon', copy_resources=False)
     True
 
 
@@ -659,10 +705,20 @@ instead of a colon seperated string as well::
     >>> def outer_extractor(widget, data):
     ...     return data.extracted + ['extracted outer']
 
-    >>> factory.register('inner', [inner_extractor], [inner_renderer], [], [], 
-    ...                  [inner_display_renderer])
-    >>> factory.register('outer', [outer_extractor], [outer_renderer], [], [],
-    ...                  [outer_display_renderer])
+    >>> factory.register(
+    ...     'inner',
+    ...     [inner_extractor],
+    ...     [inner_renderer],
+    ...     [],
+    ...     [],
+    ...     [inner_display_renderer])
+    >>> factory.register(
+    ...     'outer',
+    ...     [outer_extractor],
+    ...     [outer_renderer],
+    ...     [],
+    ...     [],
+    ...     [outer_display_renderer])
     >>> factory.display_renderers('inner')
     [<function inner_display_renderer at ...>]
 
@@ -709,9 +765,14 @@ you can inject your custom special render or extractor into the chain::
 
 Inject as dict::
 
-    >>> widget = factory('outer:*special:inner', custom={
-    ...     'special': {'extractors': [special_extractor], 
-    ...                 'edit_renderers': [special_renderer]}})
+    >>> widget = factory(
+    ...     'outer:*special:inner',
+    ...     custom={
+    ...         'special': {
+    ...             'extractors': [special_extractor],
+    ...             'edit_renderers': [special_renderer]
+    ...         }
+    ...     })
     >>> data = widget.extract({})
     >>> data.extracted
     ['extracted inner', 'extracted special', 'extracted outer']
@@ -721,8 +782,17 @@ Inject as dict::
 
 Inject as list::
 
-    >>> widget = factory('outer:*special:inner', custom={
-    ...    'special': ([special_extractor], [special_renderer], [], [], [])})
+    >>> widget = factory(
+    ...     'outer:*special:inner',
+    ...     custom={
+    ...         'special': (
+    ...             [special_extractor],
+    ...             [special_renderer],
+    ...             [],
+    ...             [],
+    ...             []
+    ...         )
+    ...     })
     >>> data = widget.extract({})
     >>> data.extracted
     ['extracted inner', 'extracted special', 'extracted outer']
@@ -732,10 +802,16 @@ Inject as list::
 
 BBB, w/o display_renderer::  
       
-    >>> widget = factory('outer:*special:inner', 
-    ...                  custom={'special': ([special_extractor], 
-    ...                                      [special_renderer], 
-    ...                                      [], [])})
+    >>> widget = factory(
+    ...     'outer:*special:inner',
+    ...     custom={
+    ...         'special': (
+    ...             [special_extractor],
+    ...             [special_renderer],
+    ...             [],
+    ...             []
+    ...         )
+    ...     })
     >>> data = widget.extract({})
     >>> data.extracted
     ['extracted inner', 'extracted special', 'extracted outer']
@@ -819,21 +895,27 @@ fetch value
 
     >>> dmarker = list()
     >>> defaults = dict(default=dmarker)
-    >>> widget_no_return = Widget('blueprint_names_goes_here',
-    ...                           [],[],[], 'empty', defaults=defaults)
-    >>> widget_with_value = Widget('blueprint_names_goes_here',
-    ...                            [],[],[], 'value', 
-    ...                            value_or_getter='withvalue', 
-    ...                            defaults=defaults)
-    >>> widget_with_default = Widget('blueprint_names_goes_here',
-    ...                              [],[],[], 'default',
-    ...                              properties=dict(default='defaultvalue'),
-    ...                              defaults=defaults)
-    >>> widget_with_both = Widget('blueprint_names_goes_here',
-    ...                           [],[],[], 'both', 
-    ...                           value_or_getter='valueboth',  
-    ...                           properties=dict(default='defaultboth'),
-    ...                           defaults=defaults)
+    >>> widget_no_return = Widget(
+    ...     'blueprint_names_goes_here', [],[],[], 'empty', defaults=defaults)
+    >>> widget_with_value = Widget(
+    ...     'blueprint_names_goes_here',
+    ...     [], [], [],
+    ...     'value',
+    ...     value_or_getter='withvalue',
+    ...     defaults=defaults)
+    >>> widget_with_default = Widget(
+    ...     'blueprint_names_goes_here',
+    ...     [], [], [],
+    ...     'default',
+    ...     properties=dict(default='defaultvalue'),
+    ...     defaults=defaults)
+    >>> widget_with_both = Widget(
+    ...     'blueprint_names_goes_here',
+    ...     [], [], [],
+    ...     'both',
+    ...     value_or_getter='valueboth',
+    ...     properties=dict(default='defaultboth'),
+    ...     defaults=defaults)
     >>> data_empty = RuntimeData()
     >>> data_filled = RuntimeData()
     >>> data_filled.extracted = 'extractedvalue'    
@@ -882,8 +964,8 @@ TraceBack Supplment
     ...     def dottedpath(self):
     ...          raise ValueError('fail')
     >>> mock = NoNameMock()
-    >>> suppl = TBSupplementWidget(mock, lambda x:x, 'testtask',
-    ...                            'some description')
+    >>> suppl = TBSupplementWidget(
+    ...     mock, lambda x:x, 'testtask', 'some description')
     >>> print suppl.getInfo()
     yafowil widget processing info:
         - path      : (name not set)

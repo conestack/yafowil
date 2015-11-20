@@ -390,9 +390,13 @@ class Widget(object):
         return '.'.join(path)
 
     def _runpreprocessors(self, data):
-        __traceback_supplement__ = (TBSupplementWidget, self,
-                                    self._runpreprocessors,
-                                    'run preprocessors', 'execute')
+        __traceback_supplement__ = (
+            TBSupplementWidget,
+            self,
+            self._runpreprocessors,
+            'run preprocessors',
+            'execute'
+        )
         if data.preprocessed:
             return data
         if callable(self.getter):
