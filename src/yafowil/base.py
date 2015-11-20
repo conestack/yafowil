@@ -423,7 +423,7 @@ class Widget(object):
                 self,
                 pp,
                 'preprocessor',
-                "failed at '{0}i'".format(ppname)
+                "failed at '{0}'".format(ppname)
             )
             data = pp(self, data)
         data.current_prefix = None

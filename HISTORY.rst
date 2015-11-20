@@ -5,6 +5,9 @@ History
 2.2 (unreleased)
 ----------------
 
+- Add default ``class`` property to ``lines`` blueprint.
+  [rnix, 2015-11-20]
+
 - Use ``generic_emptyvalue_extractor`` in ``hidden``, ``proxy``, ``text``,
   ``textarea``, ``lines``, ``select``, ``file``, ``password``, ``email``,
   ``url``, ``search`` and ``number`` blueprints.

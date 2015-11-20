@@ -356,7 +356,9 @@ def generic_display_renderer(widget, data, value=None):
         content = widget.attrs['template'] % value
     attrs = {
         'id': cssid(widget, 'display'),
-        'class_': 'display-%s' % attr_value('class', widget, data) or 'generic'
+        'class_': 'display-{0}'.format(
+            attr_value('class', widget, data) or 'generic'
+        )
     }
     attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
     return data.tag('div', content, **attrs)
@@ -392,7 +394,7 @@ def generic_positional_rendering_helper(tagname, message, attrs, rendered, pos,
         'inner-after'= <newtag>rendered message</newtag>
     """
     if pos not in ['before', 'after', 'inner-before', 'inner-after']:
-        raise ValueError('Invalid value for position "%s"' % pos)
+        raise ValueError('Invalid value for position "{0}"'.format(pos))
     if pos.startswith('inner'):
         if pos.endswith('before'):
             inner = message, rendered
@@ -677,7 +679,7 @@ def lines_display_renderer(widget, data):
         value = u''
     attrs = {
         'id': cssid(widget, 'display'),
-        'class_': 'display-%s' % attr_value('class', widget, data) or 'generic'
+        'class_': 'display-{0}'.format(attr_value('class', widget, data))
     }
     attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
     content = u''
@@ -706,6 +708,8 @@ Lines blueprint. Renders a textarea and extracts lines as list.
 """
 
 factory.defaults['lines.default'] = ''
+
+factory.defaults['lines.class'] = 'lines'
 
 factory.defaults['lines.wrap'] = None
 factory.doc['props']['lines.wrap'] = """\
@@ -930,14 +934,16 @@ Placeholder shown in display mode if password was set.
 def checkbox_extractor(widget, data):
     """Extracts data from a single input with type checkbox.
     """
-    if '%s-exists' % widget.dottedpath not in data.request:
+    if '{0}-exists'.format(widget.dottedpath) not in data.request:
         return UNSET
     fmt = attr_value('format', widget, data)
     if fmt == 'bool':
         return widget.dottedpath in data.request
     elif fmt == 'string':
         return data.request.get(widget.dottedpath, '')
-    raise ValueError("Checkbox widget has invalid format '%s' set" % fmt)
+    raise ValueError(
+        "Checkbox widget has invalid format '{0}' set".format(fmt)
+    )
 
 
 @managedprops('data', 'title', 'size', 'disabled', 'autofocus',
@@ -966,7 +972,7 @@ def checkbox_edit_renderer(widget, data):
     input_attrs = {
         'type': 'hidden',
         'value': 'checkboxexists',
-        'name_': "%s-exists" % widget.dottedpath,
+        'name_': "{0}-exists".format(widget.dottedpath),
         'id': cssid(widget, 'checkboxexists'),
     }
     exists_marker = tag('input', **input_attrs)
@@ -989,7 +995,7 @@ def checkbox_display_renderer(widget, data):
             content = data.tag.translate(content)
     attrs = {
         'id': cssid(widget, 'display'),
-        'class_': 'display-%s' % attr_value('class', widget, data) or 'generic'
+        'class_': 'display-{0}'.format(attr_value('class', widget, data))
     }
     if attr_value('display_proxy', widget, data):
         widget.attrs['type'] = 'hidden'
@@ -1003,7 +1009,7 @@ def checkbox_display_renderer(widget, data):
         input_attrs = {
             'type': 'hidden',
             'value': 'checkboxexists',
-            'name_': "%s-exists" % widget.dottedpath,
+            'name_': "{0}-exists".format(widget.dottedpath),
             'id': cssid(widget, 'checkboxexists'),
         }
         content += data.tag('input', **input_attrs)
@@ -1083,7 +1089,8 @@ factory.defaults['checkbox.required_class'] = 'required'
 def select_extractor(widget, data):
     extracted = generic_extractor(widget, data)
     multivalued = attr_value('multivalued', widget, data)
-    if extracted is UNSET and '%s-exists' % widget.dottedpath in data.request:
+    exists_marker = '{0}-exists'.format(widget.dottedpath)
+    if extracted is UNSET and exists_marker in data.request:
         if multivalued:
             extracted = []
         else:
@@ -1113,7 +1120,7 @@ def select_exists_marker(widget, data):
     attrs = {
         'type': 'hidden',
         'value': 'exists',
-        'name_': "%s-exists" % widget.dottedpath,
+        'name_': "{0}-exists".format(widget.dottedpath),
         'id': cssid(widget, 'exists'),
     }
     return tag('input', **attrs)
@@ -1175,7 +1182,7 @@ def select_edit_renderer(widget, data, custom_attrs={}):
             attrs = {
                 'type': 'hidden',
                 'value': 'exists',
-                'name_': '%s-exists' % widget.dottedpath,
+                'name_': '{0}-exists'.format(widget.dottedpath),
                 'id': cssid(widget, 'exists'),
             }
             rendered = select_exists_marker(widget, data) + rendered
@@ -1249,7 +1256,7 @@ def select_display_renderer(widget, data):
         return generic_display_renderer(widget, data, value=value)
     attrs = {
         'id': cssid(widget, 'display'),
-        'class_': 'display-%s' % attr_value('class', widget, data) or 'generic'
+        'class_': 'display-{0}'.format(attr_value('class', widget, data))
     }
     attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
     content = u''
@@ -1390,13 +1397,16 @@ def file_extractor(widget, data):
     name = widget.dottedpath
     if name not in data.request:
         return UNSET
-    if not '%s-action' % name in data.request:
+    if not '{0}-action'.format(name) in data.request:
         value = data.request[name]
         if value:
             value['action'] = 'new'
         return value
     value = data.value
-    action = value['action'] = data.request.get('%s-action' % name, 'keep')
+    action = value['action'] = data.request.get(
+        '{0}-action'.format(name),
+        'keep'
+    )
     if action == 'delete':
         value['file'] = UNSET
     elif action == 'replace':
@@ -1472,7 +1482,9 @@ def file_options_renderer(widget, data):
         return data.rendered
     tag = data.tag
     if data.request:
-        value = [data.request.get('%s-action' % widget.dottedpath, 'keep')]
+        value = [
+            data.request.get('{0}-action'.format(widget.dottedpath), 'keep')
+        ]
     else:
         value = ['keep']
     tags = []
@@ -1482,7 +1494,7 @@ def file_options_renderer(widget, data):
             'type': 'radio',
             'value': key,
             'checked': (key in value) and 'checked' or None,
-            'name_': '%s-action' % widget.dottedpath,
+            'name_': '{0}-action'.format(widget.dottedpath),
             'id': cssid(widget, 'input', key),
             'class_': cssclasses(widget, data),
         }
@@ -1534,8 +1546,8 @@ def submit_renderer(widget, data):
     tag = data.tag
     input_attrs = input_attributes_common(widget, data)
     input_attrs['type'] = 'submit'
-    input_attrs['name_'] = attr_value('action', widget, data) and \
-        'action.%s' % widget.dottedpath
+    input_attrs['name_'] = attr_value('action', widget, data) \
+        and 'action.{0}'.format(widget.dottedpath)
     input_attrs['value'] = attr_value('label', widget, data, widget.name)
     return tag('input', **input_attrs)
 
@@ -1882,7 +1894,7 @@ def field_renderer(widget, data):
     }
     witherror = attr_value('witherror', widget, data)
     if witherror and data.errors:
-        div_attrs['class_'] += u' %s' % witherror
+        div_attrs['class_'] += u' {0}'.format(witherror)
     return tag('div', data.rendered, **div_attrs)
 
 

@@ -108,9 +108,13 @@ class Tag(object):
         # because the JSON standard requires string values to be enclosed in
         # double quotes.
         if cl:
-            attributes = ['data-' in _[0] and u"%s='%s'" % _ or u'%s="%s"' % _
-                          for _ in cl]
-            attributes = u' %s' % u' '.join(sorted(attributes))
+            attributes = list()
+            for attr in cl:
+                if 'data-' in attr[0]:
+                    attributes.append(u"{0}='{1}'".format(*attr))
+                else:
+                    attributes.append(u'{0}="{1}"'.format(*attr))
+            attributes = u' {0}'.format(u' '.join(sorted(attributes)))
         cl = list()
         for inner in inners:
             inner = self.translate(inner)
@@ -118,15 +122,15 @@ class Tag(object):
                 inner = str(inner).decode(self.encoding)
             cl.append(inner)
         if not cl:
-            return u'<%(name)s%(attrs)s />' % {
+            return u'<{name}{attrs} />'.format(**{
                 'name': tag_name,
                 'attrs': attributes,
-            }
-        return u'<%(name)s%(attrs)s>%(value)s</%(name)s>' % {
+            })
+        return u'<{name}{attrs}>{value}</{name}>'.format(**{
             'name': tag_name,
             'attrs': attributes,
             'value': u''.join(i for i in cl),
-        }
+        })
 
 
 # Deprecation message
@@ -152,9 +156,9 @@ def cssid(widget, prefix, postfix=None):
     if widget.attrs.get('structural', False):
         return None
     path = widget.dottedpath.replace('.', '-')
-    cssid = "%s-%s" % (prefix, path)
+    cssid = '{0}-{1}'.format(prefix, path)
     if postfix is not None:
-        cssid = '%s-%s' % (cssid, postfix)
+        cssid = '{0}-{1}'.format(cssid, postfix)
     return cssid
 
 
@@ -198,8 +202,8 @@ def generic_html5_attrs(data_dict):
             # they are not needed for data-attributes
             ret = ret.strip('"')
         # replace camelCase with camel-case
-        key = re.sub("([a-z])([A-Z])", "\g<1>-\g<2>", key).lower()
-        data_attrs['data-%s' % key] = ret
+        key = re.sub('([a-z])([A-Z])', '\g<1>-\g<2>', key).lower()
+        data_attrs['data-{0}'.format(key)] = ret
     return data_attrs
 
 
@@ -245,8 +249,8 @@ def data_attrs_helper(widget, data, attrs):
             # they are not needed for data-attributes
             ret = ret.strip('"')
         # replace camelCase with camel-case
-        key = re.sub("([a-z])([A-Z])", "\g<1>-\g<2>", key).lower()
-        data_attrs['data-%s' % key] = ret
+        key = re.sub('([a-z])([A-Z])', '\g<1>-\g<2>', key).lower()
+        data_attrs['data-{0}'.format(key)] = ret
     return data_attrs
 
 

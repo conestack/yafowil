@@ -1221,8 +1221,8 @@ Render empty::
     ...     name='MYLINES',
     ...     value=None)
     >>> widget()
-    u'<textarea cols="40" id="input-MYLINES" 
-    name="MYLINES" rows="8"></textarea>'
+    u'<textarea class="lines" cols="40" id="input-MYLINES" name="MYLINES" 
+    rows="8"></textarea>'
 
 Render with preset value, expected as list::
 
@@ -1231,7 +1231,8 @@ Render with preset value, expected as list::
     ...     name='MYLINES',
     ...     value=['a', 'b', 'c'])
     >>> pxml(widget())
-    <textarea cols="40" id="input-MYLINES" name="MYLINES" rows="8">a
+    <textarea class="lines" cols="40" id="input-MYLINES" name="MYLINES" 
+    rows="8">a
     b
     c</textarea>
     <BLANKLINE>
@@ -1251,7 +1252,8 @@ Extract with data::
 Render with extracted data::
 
     >>> pxml(widget(data=data))
-    <textarea cols="40" id="input-MYLINES" name="MYLINES" rows="8">a
+    <textarea class="lines" cols="40" id="input-MYLINES" name="MYLINES" 
+    rows="8">a
     b</textarea>
     <BLANKLINE>
 
@@ -1263,7 +1265,7 @@ Display mode with preset value::
     ...     value=['a', 'b', 'c'],
     ...     mode='display')
     >>> pxml(widget())
-    <ul class="display-None" id="display-MYLINES">
+    <ul class="display-lines" id="display-MYLINES">
       <li>a</li>
       <li>b</li>
       <li>c</li>
@@ -1278,7 +1280,7 @@ Display mode with empty preset value::
     ...     value=[],
     ...     mode='display')
     >>> pxml(widget())
-    <ul class="display-None" id="display-MYLINES"/>
+    <ul class="display-lines" id="display-MYLINES"/>
     <BLANKLINE>
 
 Display mode with ``display_proxy``::
@@ -1293,14 +1295,17 @@ Display mode with ``display_proxy``::
     ...     mode='display')
     >>> wrapped_pxml(widget())
     <div>
-      <ul class="display-None" id="display-MYLINES">
+      <ul class="display-lines" id="display-MYLINES">
         <li>a</li>
         <li>b</li>
         <li>c</li>
       </ul>
-      <input id="input-MYLINES" name="MYLINES" type="hidden" value="a"/>
-      <input id="input-MYLINES" name="MYLINES" type="hidden" value="b"/>
-      <input id="input-MYLINES" name="MYLINES" type="hidden" value="c"/>
+      <input class="lines" id="input-MYLINES" name="MYLINES" type="hidden" 
+        value="a"/>
+      <input class="lines" id="input-MYLINES" name="MYLINES" type="hidden" 
+        value="b"/>
+      <input class="lines" id="input-MYLINES" name="MYLINES" type="hidden" 
+        value="c"/>
     </div>
     <BLANKLINE>
 
@@ -1310,12 +1315,14 @@ Display mode with ``display_proxy``::
 
     >>> wrapped_pxml(widget(data=data))
     <div>
-      <ul class="display-None" id="display-MYLINES">
+      <ul class="display-lines" id="display-MYLINES">
         <li>a</li>
         <li>b</li>
       </ul>
-      <input id="input-MYLINES" name="MYLINES" type="hidden" value="a"/>
-      <input id="input-MYLINES" name="MYLINES" type="hidden" value="b"/>
+      <input class="lines" id="input-MYLINES" name="MYLINES" type="hidden" 
+        value="a"/>
+      <input class="lines" id="input-MYLINES" name="MYLINES" type="hidden" 
+        value="b"/>
     </div>
     <BLANKLINE>
 
@@ -1329,7 +1336,7 @@ Generic HTML5 Data::
     ...         'data': {'foo': 'bar'}
     ...     })
     >>> pxml(widget())
-    <textarea cols="40" data-foo="bar" id="input-MYLINES" 
+    <textarea class="lines" cols="40" data-foo="bar" id="input-MYLINES" 
     name="MYLINES" rows="8">a
     b
     c</textarea>
@@ -1344,7 +1351,7 @@ Generic HTML5 Data::
     ...     },
     ...     mode='display')
     >>> pxml(widget())
-    <ul class="display-None" data-foo="bar" id="display-MYLINES">
+    <ul class="display-lines" data-foo="bar" id="display-MYLINES">
       <li>a</li>
       <li>b</li>
       <li>c</li>
