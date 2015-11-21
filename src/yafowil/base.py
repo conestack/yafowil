@@ -17,8 +17,12 @@ import types
 
 
 def _dict__repr__(self):
-    return '{%s}' % ', '.join(['%s: %s' % (repr(k), repr(v))
-                               for k, v in self.items()])
+    return '{{{0}}}'.format(
+        ', '.join(['{0}: {1}'.format(
+            repr(k),
+            repr(v)
+        ) for k, v in self.items()])
+    )
 
 
 class RuntimeDataAttributes(NodeAttributes):
@@ -54,7 +58,7 @@ class RuntimeData(object):
         data = self.root
         if path[0] != data.__name__:
             raise KeyError('Invalid name of root element')
-        __traceback_info__ = 'fetch path: %s' % path
+        __traceback_info__ = 'fetch path: {0}'.format(path)
         for key in path[1:]:
             data = data[key]
         return data
@@ -64,16 +68,16 @@ class RuntimeData(object):
         return Tag(self.translate_callable)
 
     def __repr__(self):
-        rep = "<RuntimeData %s, value=%s, extracted=%s" % (
+        rep = "<RuntimeData {0}, value={1}, extracted={2}".format(
             '.'.join([str(_) for _ in self.path]),
             repr(self.value),
             repr(self.extracted)
         )
         if self.errors:
-            rep += ', %d error(s)' % len(self.errors)
+            rep += ', {0} error(s)'.format(len(self.errors))
         if len(self.attrs):
-            rep += ', attrs=%s' % repr(self.attrs)
-        rep += ' at %s>' % hex(id(self))[:-1]
+            rep += ', attrs={0}'.format(repr(self.attrs))
+        rep += ' at {0}>'.format(hex(id(self))[:-1])
         return rep
 
     __str__ = __repr__
@@ -102,7 +106,7 @@ class ExtractionError(Exception):
         self.abort = abort
 
     def __repr__(self):
-        return u"ExtractionError('%s',)" % str(self)
+        return u"ExtractionError('{0}',)".format(str(self))
 
 
 class TBSupplementWidget(object):
@@ -132,10 +136,10 @@ class TBSupplementWidget(object):
         """
         if not as_html:
             info = '    yafowil widget processing info:\n'
-            info += '    - path      : %s\n' % self.name
-            info += '    - blueprints: %s\n' % self.blueprints
-            info += '    - task      : %s\n' % self.task
-            info += '    - descr     : %s' % self.descr
+            info += '    - path      : {0}\n'.format(self.name)
+            info += '    - blueprints: {0}\n'.format(self.blueprints)
+            info += '    - task      : {0}\n'.format(self.task)
+            info += '    - descr     : {0}'.format(self.descr)
             return info
         tag = Tag(lambda x: x)
         li = tag('li', 'path: ', tag('strong', self.name))
@@ -146,36 +150,26 @@ class TBSupplementWidget(object):
 
 
 class WidgetAttributes(NodeAttributes):
-
     __str__ = __repr__ = _dict__repr__
 
     def __getitem__(self, name):
-        prefixed = '%s.%s' % (self.__parent__.current_prefix or '', name)
+        prefixed = '{0}.{1}'.format(self.__parent__.current_prefix or '', name)
         try:
-            value = NodeAttributes.__getitem__(self, prefixed)
+            return NodeAttributes.__getitem__(self, prefixed)
         except KeyError:
-            value = UNSET
-        if value is not UNSET:
-            return value
-        try:
-            value = NodeAttributes.__getitem__(self, name)
-        except KeyError:
-            value = UNSET
-        if value is not UNSET:
-            return value
-        value = self.__parent__.defaults.get(prefixed, UNSET)
-        if value is not UNSET:
-            return value
-        if name in self.__parent__.defaults:
-            return self.__parent__.defaults[name]
-        msg = 'Property with key "%s" is not given on widget "%s" (no default)'
-        raise KeyError(msg % (name, self.__parent__.dottedpath))
-
-    def get(self, key, default=None):
-        try:
-            return self[key]
-        except KeyError:
-            return default
+            try:
+                return NodeAttributes.__getitem__(self, name)
+            except KeyError:
+                try:
+                    return self.__parent__.defaults[prefixed]
+                except KeyError:
+                    try:
+                        return self.__parent__.defaults[name]
+                    except KeyError:
+                        raise KeyError((
+                            'Property with key "{0}" is not given on '
+                            'widget "{1}" (no default)'
+                        ).format(name, self.__parent__.dottedpath))
 
 
 @plumbing(
@@ -270,19 +264,13 @@ class Widget(object):
         self.display_renderers = display_renderers
         self.preprocessors = preprocessors or list()
         self.defaults = defaults
-        self._lock = RLock()
         self.current_prefix = None
         # keep properties for use in dottedpath to avoid recursion errors
         self.properties = properties
         for key in properties:
             self.attrs[key] = properties[key]
         self.custom = custom
-
-    def lock(self):
-        self._lock.acquire()
-
-    def unlock(self):
-        self._lock.release()
+        self._lock = RLock()
 
     def __call__(self, data=None, request=None):
         """Renders the widget.
@@ -317,21 +305,28 @@ class Widget(object):
             renderers = self.edit_renderers
         if not renderers:
             raise ValueError(
-                "no renderers given for widget '%s' at mode '%s'" %
-                (self.dottedpath, data.mode)
+                "no renderers given for widget '{0}' at mode '{1}'".format(
+                    self.dottedpath,
+                    data.mode
+                )
             )
-        self.lock()
-        try:
-            for ren_name, renderer in renderers:
-                self.current_prefix = ren_name
-                __traceback_supplement__ = (TBSupplementWidget, self, renderer,
-                                            'render',
-                                            "failed at '%s' in mode '%s'" %
-                                            (ren_name, data.mode))
-                data.rendered = renderer(self, data)
-        finally:
-            self.current_prefix = None
-            self.unlock()
+        with self._lock:
+            try:
+                for ren_name, renderer in renderers:
+                    self.current_prefix = ren_name
+                    __traceback_supplement__ = (
+                        TBSupplementWidget,
+                        self,
+                        renderer,
+                        'render',
+                        "failed at '{0}' in mode '{1}'".format(
+                            ren_name,
+                            data.mode
+                        )
+                    )
+                    data.rendered = renderer(self, data)
+            finally:
+                self.current_prefix = None
         return data.rendered
 
     def extract(self, request, parent=None):
@@ -360,24 +355,25 @@ class Widget(object):
             #      case not accepting ``widget`` and ``data`` if callable.
             if not self.attrs.get('display_proxy'):
                 return data
-        self.lock()
-        try:
-            for ex_name, extractor in self.extractors:
-                self.current_prefix = ex_name
-                __traceback_supplement__ = (TBSupplementWidget,
-                                            self,
-                                            extractor,
-                                            'extract',
-                                            "failed at '%s'" % ex_name)
-                try:
-                    data.extracted = extractor(self, data)
-                except ExtractionError, e:
-                    data.errors.append(e)
-                    if e.abort:
-                        break
-        finally:
-            self.current_prefix = None
-            self.unlock()
+        with self._lock:
+            try:
+                for ex_name, extractor in self.extractors:
+                    self.current_prefix = ex_name
+                    __traceback_supplement__ = (
+                        TBSupplementWidget,
+                        self,
+                        extractor,
+                        'extract',
+                        "failed at '{0}'".format(ex_name)
+                    )
+                    try:
+                        data.extracted = extractor(self, data)
+                    except ExtractionError, e:
+                        data.errors.append(e)
+                        if e.abort:
+                            break
+            finally:
+                self.current_prefix = None
         return data
 
     @property
@@ -394,9 +390,13 @@ class Widget(object):
         return '.'.join(path)
 
     def _runpreprocessors(self, data):
-        __traceback_supplement__ = (TBSupplementWidget, self,
-                                    self._runpreprocessors,
-                                    'run preprocessors', 'execute')
+        __traceback_supplement__ = (
+            TBSupplementWidget,
+            self,
+            self._runpreprocessors,
+            'run preprocessors',
+            'execute'
+        )
         if data.preprocessed:
             return data
         if callable(self.getter):
@@ -408,13 +408,19 @@ class Widget(object):
         else:
             data.mode = self.mode
         if data.mode not in ('edit', 'display', 'skip'):
-            raise ValueError("mode must be one out of 'edit', 'display', "
-                             "'skip', but '%s' was given " % data.mode)
+            raise ValueError(
+                "mode must be one out of 'edit', 'display', 'skip', but "
+                "'{0}' was given ".format(data.mode)
+            )
         for ppname, pp in self.preprocessors:
             data.current_prefix = ppname
-            __traceback_supplement__ = (TBSupplementWidget, self, pp,
-                                        'preprocessor',
-                                        "failed at '%si'" % ppname)
+            __traceback_supplement__ = (
+                TBSupplementWidget,
+                self,
+                pp,
+                'preprocessor',
+                "failed at '{0}'".format(ppname)
+            )
             data = pp(self, data)
         data.current_prefix = None
         data.preprocessed = True
@@ -438,15 +444,22 @@ class Factory(object):
     def _name_check(self, name):
         for chara in '*:#':
             if chara in name:
-                raise ValueError('"%s" as char not allowed as name.' % chara)
+                raise ValueError(
+                    '"{0}" as char not allowed as name.'.format(chara)
+                )
 
     def register(self, name, extractors=[], edit_renderers=[],
                  preprocessors=[], builders=[], display_renderers=[]):
         """Registers a blueprint in the factory.
         """
         self._name_check(name)
-        self._blueprints[name] = (extractors, edit_renderers,
-                                  preprocessors, builders, display_renderers)
+        self._blueprints[name] = (
+            extractors,
+            edit_renderers,
+            preprocessors,
+            builders,
+            display_renderers
+        )
 
     def register_global_preprocessors(self, preprocessors):
         self._global_preprocessors += preprocessors
@@ -486,9 +499,11 @@ class Factory(object):
             if blueprint.startswith('#'):
                 macro_name = blueprint[1:]
                 if macro_name not in self._macros:
-                    msg = "Macro named '%s' is not registered in factory" % \
-                          macro_name
-                    raise ValueError(msg)
+                    raise ValueError(
+                        "Macro named '{}' is not registered in factory".format(
+                            macro_name
+                        )
+                    )
                 macro_chain, macro_props = self._macros[macro_name]
                 for key in macro_props:
                     if key not in props:
@@ -573,17 +588,19 @@ class Factory(object):
             preprocessors = preprocessors + [(part_name, _) for _ in pre]
             builders = builders + [(part_name, _) for _ in bui]
         global_pre = [('__GLOBAL__', _) for _ in self._global_preprocessors]
-        widget = Widget(blueprints,
-                        extractors,
-                        edit_renderers,
-                        disp_renderers,
-                        global_pre + preprocessors,
-                        uniquename=name,
-                        value_or_getter=value,
-                        properties=props,
-                        custom=custom,
-                        defaults=self.defaults,
-                        mode=mode)
+        widget = Widget(
+            blueprints,
+            extractors,
+            edit_renderers,
+            disp_renderers,
+            global_pre + preprocessors,
+            uniquename=name,
+            value_or_getter=value,
+            properties=props,
+            custom=custom,
+            defaults=self.defaults,
+            mode=mode
+        )
         for part_name, builder_func in builders:
             widget.current_prefix = part_name
             builder_func(widget, self)

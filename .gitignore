@@ -20,3 +20,5 @@
 /.mr.developer.cfg
 /.coverage
 /htmlcov/
+/.settings/
+/pip-selfcheck.json

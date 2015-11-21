@@ -5,6 +5,7 @@ import inspect
 import json
 import logging
 import re
+import uuid
 
 
 def get_entry_points(ns=None):
@@ -106,9 +107,13 @@ class Tag(object):
         # because the JSON standard requires string values to be enclosed in
         # double quotes.
         if cl:
-            attributes = ['data-' in _[0] and u"%s='%s'" % _ or u'%s="%s"' % _
-                          for _ in cl]
-            attributes = u' %s' % u' '.join(sorted(attributes))
+            attributes = list()
+            for attr in cl:
+                if 'data-' in attr[0]:
+                    attributes.append(u"{0}='{1}'".format(*attr))
+                else:
+                    attributes.append(u'{0}="{1}"'.format(*attr))
+            attributes = u' {0}'.format(u' '.join(sorted(attributes)))
         cl = list()
         for inner in inners:
             inner = self.translate(inner)
@@ -116,15 +121,15 @@ class Tag(object):
                 inner = str(inner).decode(self.encoding)
             cl.append(inner)
         if not cl:
-            return u'<%(name)s%(attrs)s />' % {
+            return u'<{name}{attrs} />'.format(**{
                 'name': tag_name,
                 'attrs': attributes,
-            }
-        return u'<%(name)s%(attrs)s>%(value)s</%(name)s>' % {
+            })
+        return u'<{name}{attrs}>{value}</{name}>'.format(**{
             'name': tag_name,
             'attrs': attributes,
             'value': u''.join(i for i in cl),
-        }
+        })
 
 
 # Deprecation message
@@ -150,9 +155,9 @@ def cssid(widget, prefix, postfix=None):
     if widget.attrs.get('structural', False):
         return None
     path = widget.dottedpath.replace('.', '-')
-    cssid = "%s-%s" % (prefix, path)
+    cssid = '{0}-{1}'.format(prefix, path)
     if postfix is not None:
-        cssid = '%s-%s' % (cssid, postfix)
+        cssid = '{0}-{1}'.format(cssid, postfix)
     return cssid
 
 
@@ -160,14 +165,27 @@ def attr_value(key, widget, data, default=None):
     attr = widget.attrs.get(key, default)
     if callable(attr):
         try:
+            # assume property factory signature
+            # XXX: use keyword arguments?
             return attr(widget, data)
-        except Exception, e:  # B/C
-            spec = inspect.getargspec(attr)
-            if len(spec.args) <= 1 and not spec.keywords:
-                logging.warn("Deprecated usage of callback attributes. Please "
-                             "accept 'widget' and 'data' as arguments.")
-                return attr()
-            raise e
+        except TypeError:
+            try:
+                # assume function or class
+                spec = inspect.getargspec(attr)
+            except TypeError:
+                spec = None
+            if spec is not None:
+                # assume B/C property factory signature if argument specs found
+                if len(spec.args) <= 1 and not spec.keywords:
+                    try:
+                        res = attr()
+                        logging.warn(
+                            "Deprecated usage of callback attributes. Please "
+                            "accept 'widget' and 'data' as arguments."
+                        )
+                        return res
+                    except TypeError:
+                        return attr
     return attr
 
 
@@ -188,8 +206,8 @@ def generic_html5_attrs(data_dict):
             # they are not needed for data-attributes
             ret = ret.strip('"')
         # replace camelCase with camel-case
-        key = re.sub("([a-z])([A-Z])", "\g<1>-\g<2>", key).lower()
-        data_attrs['data-%s' % key] = ret
+        key = re.sub('([a-z])([A-Z])', '\g<1>-\g<2>', key).lower()
+        data_attrs['data-{0}'.format(key)] = ret
     return data_attrs
 
 
@@ -235,8 +253,8 @@ def data_attrs_helper(widget, data, attrs):
             # they are not needed for data-attributes
             ret = ret.strip('"')
         # replace camelCase with camel-case
-        key = re.sub("([a-z])([A-Z])", "\g<1>-\g<2>", key).lower()
-        data_attrs['data-%s' % key] = ret
+        key = re.sub('([a-z])([A-Z])', '\g<1>-\g<2>', key).lower()
+        data_attrs['data-{0}'.format(key)] = ret
     return data_attrs
 
 
@@ -267,3 +285,61 @@ def cssclasses(widget, data, classattr='class', additional=[]):
     additional = [add for add in additional if add]
     _classes += additional
     return _classes and ' '.join(sorted(_classes)) or None
+
+
+DATATYPE_PRECONVERTERS = {
+    float: lambda x: isinstance(x, basestring) and x.replace(',', '.') or x
+}
+# B/C
+DATATYPE_PRECONVERTERS['float'] = DATATYPE_PRECONVERTERS[float]
+DATATYPE_CONVERTERS = {
+    'str': str,
+    'unicode': unicode,
+    'int': int,
+    'integer': int,
+    'long': long,
+    'float': float,
+    'uuid': uuid.UUID
+}
+
+
+def convert_value_to_datatype(value, datatype):
+    """Convert given value to datatype.
+
+    Datatype is either a callable or a string out of ``'str'``, ``'unicode'``,
+    ``'int'``, ``'integer'``, ``'long'``, ``'float'`` or ``'uuid'``
+
+    If value is ``UNSET``, return ``UNSET``, regardless of given datatype.
+
+    Converter callables must raise one out of the following exceptions if
+    conversion fails:
+        * ``ValueError``
+        * ``UnicodeDecodeError``
+        * ``UnicodeEncodeError``
+    """
+    if value is UNSET:
+        return value
+    if isinstance(datatype, basestring):
+        converter = DATATYPE_CONVERTERS[datatype]
+    else:
+        converter = datatype
+    try:
+        if isinstance(value, converter):
+            return value
+    except TypeError:
+        # converter is instance of class or function
+        pass
+    preconverter = DATATYPE_PRECONVERTERS.get(datatype)
+    if preconverter:
+        value = preconverter(value)
+    return converter(value)
+
+
+def convert_values_to_datatype(value, datatype):
+    if isinstance(value, list):
+        res = list()
+        for item in value:
+            converted = convert_value_to_datatype(item, datatype)
+            res.append(converted)
+        return res
+    return convert_value_to_datatype(value, datatype)

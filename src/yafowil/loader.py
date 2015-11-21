@@ -5,7 +5,7 @@ import yafowil.utils
 def register():
     import yafowil.common
     import yafowil.compound
-    import yafowil.table
+    import yafowil.table  # noqa
 
 
 # execute all register entry points. supposed to be used for widget and theme

@@ -1,4 +1,5 @@
 from yafowil.base import factory
+from yafowil.compound import compound_extractor
 from yafowil.compound import compound_renderer
 from yafowil.compound import hybrid_extractor
 from yafowil.utils import attr_value
@@ -6,6 +7,10 @@ from yafowil.utils import css_managed_props
 from yafowil.utils import cssclasses
 from yafowil.utils import managedprops
 
+
+###############################################################################
+# table
+###############################################################################
 
 @managedprops('id', *css_managed_props)
 def table_renderer(widget, data):
@@ -18,9 +23,15 @@ def table_renderer(widget, data):
 
 factory.register(
     'table',
-    extractors=factory.extractors('compound'),
-    edit_renderers=factory.edit_renderers('compound') + [table_renderer],
-    display_renderers=factory.display_renderers('compound') + [table_renderer])
+    extractors=[compound_extractor],
+    edit_renderers=[
+        compound_renderer,
+        table_renderer
+    ],
+    display_renderers=[
+        compound_renderer,
+        table_renderer
+    ])
 
 factory.doc['blueprint']['table'] = """\
 ``<table>`` compound widget for table creation.
@@ -31,20 +42,34 @@ Value of table id attribute.
 """
 
 
+###############################################################################
+# thead
+###############################################################################
+
 def thead_renderer(widget, data):
     return data.tag('thead', data.rendered)
 
 
 factory.register(
     'thead',
-    extractors=factory.extractors('compound'),
-    edit_renderers=factory.edit_renderers('compound') + [thead_renderer],
-    display_renderers=factory.display_renderers('compound') + [thead_renderer])
+    extractors=[compound_extractor],
+    edit_renderers=[
+        compound_renderer,
+        thead_renderer
+    ],
+    display_renderers=[
+        compound_renderer,
+        thead_renderer
+    ])
 
 factory.doc['blueprint']['thead'] = """\
 ``<thead>`` compound widget for table creation.
 """
 
+
+###############################################################################
+# tbody
+###############################################################################
 
 def tbody_renderer(widget, data):
     return data.tag('tbody', data.rendered)
@@ -52,14 +77,24 @@ def tbody_renderer(widget, data):
 
 factory.register(
     'tbody',
-    extractors=factory.extractors('compound'),
-    edit_renderers=factory.edit_renderers('compound') + [tbody_renderer],
-    display_renderers=factory.display_renderers('compound') + [tbody_renderer])
+    extractors=[compound_extractor],
+    edit_renderers=[
+        compound_renderer,
+        tbody_renderer
+    ],
+    display_renderers=[
+        compound_renderer,
+        tbody_renderer
+    ])
 
 factory.doc['blueprint']['tbody'] = """\
 ``<tbody>`` compound widget for table creation.
 """
 
+
+###############################################################################
+# tr
+###############################################################################
 
 @managedprops('id', *css_managed_props)
 def tr_renderer(widget, data):
@@ -72,9 +107,15 @@ def tr_renderer(widget, data):
 
 factory.register(
     'tr',
-    extractors=factory.extractors('compound'),
-    edit_renderers=factory.edit_renderers('compound') + [tr_renderer],
-    display_renderers=factory.display_renderers('compound') + [tr_renderer])
+    extractors=[compound_extractor],
+    edit_renderers=[
+        compound_renderer,
+        tr_renderer
+    ],
+    display_renderers=[
+        compound_renderer,
+        tr_renderer
+    ])
 
 factory.doc['blueprint']['tr'] = """\
 ``<tr>`` compound widget for table creation.
@@ -84,6 +125,10 @@ factory.doc['props']['tr.id'] = """\
 Value of id attribute.
 """
 
+
+###############################################################################
+# th
+###############################################################################
 
 @managedprops('id', 'rowspan', 'colspan', 'label', *css_managed_props)
 def th_renderer(widget, data):
@@ -125,6 +170,10 @@ Explicit th content. If absent, rendered markup from downstream blueprint(s)
 is used.
 """
 
+
+###############################################################################
+# td
+###############################################################################
 
 @managedprops('id', 'rowspan', 'colspan', *css_managed_props)
 def td_renderer(widget, data):

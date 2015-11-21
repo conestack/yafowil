@@ -2,10 +2,38 @@
 History
 =======
 
-2.1.4 (unreleased)
-------------------
+2.2 (unreleased)
+----------------
 
-- No changes yet.
+- Add default ``class`` property to ``lines`` blueprint.
+  [rnix, 2015-11-20]
+
+- Use ``generic_emptyvalue_extractor`` in ``hidden``, ``proxy``, ``text``,
+  ``textarea``, ``lines``, ``select``, ``file``, ``password``, ``email``,
+  ``url``, ``search`` and ``number`` blueprints.
+  [rnix, 2015-11-20]
+
+- Use ``generic_datatype_extractor`` in ``hidden``, ``proxy``, ``text``,
+  ``lines``, ``select`` and ``number`` blueprints.
+  [rnix, 2015-11-19]
+
+- Introduce ``generic_emptyvalue_extractor``.
+  [rnix, 2015-11-19]
+
+- Instroduce ``generic_datatype_extractor``.
+  [rnix, 2015-11-18]
+
+- Values in ``Widget.attrs`` can also be ``UNSET``.
+  [rnix, 2015-11-18]
+
+- Change ``default`` value of ``select`` blueprint from ``list()`` to
+  ``UNSET``. This represents both, an empty single valued and an empty
+  multi valued selection.
+  [rnix, 2015-11-18]
+
+- Fix URL extractor. Must not raise ExtractionError if not required on empty
+  input.
+  [rnix, 2015-11-18]
 
 
 2.1.3 (2015-04-12)
