@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from node.utils import UNSET
 from pkg_resources import iter_entry_points
-from yafowil.tsf import _
 import inspect
 import json
 import logging
