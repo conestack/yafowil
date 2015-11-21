@@ -8,40 +8,77 @@ form elements inside a table, providing pretty looking forms::
     >>> import yafowil.common
     >>> import yafowil.compound
     >>> import yafowil.table
-    >>> factory('table', name='foo')()
+    >>> factory(
+    ...     'table',
+    ...     name='foo')()
     u'<table></table>'
 
-    >>> factory('table', name='foo_table', props={'id': 'id', 'class': 'css'})()
+    >>> factory(
+    ...     'table',
+    ...     name='foo_table',
+    ...     props={
+    ...         'id': 'id',
+    ...         'class': 'css'
+    ...     })()
     u'<table class="css" id="id"></table>'
 
-    >>> factory('table', name='foo', mode='display')()
+    >>> factory(
+    ...     'table',
+    ...     name='foo',
+    ...     mode='display')()
     u'<table></table>'
 
-    >>> factory('thead', name='foo')()
+    >>> factory(
+    ...     'thead',
+    ...     name='foo')()
     u'<thead></thead>'
 
-    >>> factory('thead', name='foo', mode='display')()
+    >>> factory(
+    ...     'thead',
+    ...     name='foo',
+    ...     mode='display')()
     u'<thead></thead>'
 
-    >>> factory('tbody', name='foo')()
+    >>> factory(
+    ...     'tbody',
+    ...     name='foo')()
     u'<tbody></tbody>'
 
-    >>> factory('tbody', name='foo', mode='display')()
+    >>> factory(
+    ...     'tbody',
+    ...     name='foo',
+    ...     mode='display')()
     u'<tbody></tbody>'
 
-    >>> factory('tr', name='foo')()
+    >>> factory(
+    ...     'tr',
+    ...     name='foo')()
     u'<tr></tr>'
 
-    >>> factory('tr', name='foo', mode='display')()
+    >>> factory(
+    ...     'tr',
+    ...     name='foo',
+    ...     mode='display')()
     u'<tr></tr>'
 
-    >>> factory('tr', name='foo', props={'id': 'id', 'class': 'css'})()
+    >>> factory(
+    ...     'tr',
+    ...     name='foo',
+    ...     props={
+    ...         'id': 'id',
+    ...         'class': 'css'
+    ...     })()
     u'<tr class="css" id="id"></tr>'
 
-    >>> factory('th', name='foo')()
+    >>> factory(
+    ...     'th',
+    ...     name='foo')()
     u'<th></th>'
 
-    >>> factory('th', name='foo', mode='display')()
+    >>> factory(
+    ...     'th',
+    ...     name='foo',
+    ...     mode='display')()
     u'<th></th>'
     
     >>> factory(
@@ -55,10 +92,15 @@ form elements inside a table, providing pretty looking forms::
     ...     })()
     u'<th class="css" colspan="2" id="id" rowspan="2"></th>'
 
-    >>> factory('td', name='foo')()
+    >>> factory(
+    ...     'td',
+    ...     name='foo')()
     u'<td></td>'
 
-    >>> factory('td', name='foo', mode='display')()
+    >>> factory(
+    ...     'td',
+    ...     name='foo',
+    ...     mode='display')()
     u'<td></td>'
 
     >>> factory(
@@ -80,7 +122,9 @@ form elements inside a table, providing pretty looking forms::
     ...     })
     >>> form['table'] = factory('table')
     >>> form['table']['row1'] = factory('tr')
-    >>> form['table']['row1']['field1'] = factory('td:text', name='field1')
+    >>> form['table']['row1']['field1'] = factory(
+    ...     'td:text',
+    ...     name='field1')
     >>> pxml(form())
     <form action="myaction" enctype="multipart/form-data" id="form-myform" 
       method="post" novalidate="novalidate">
@@ -104,8 +148,16 @@ Build same table again but set some nodes structural. This is considered in
     ...     props={
     ...         'action': 'mytableaction',
     ...     })
-    >>> form['table'] = factory('table', props={'structural': True})
-    >>> form['table']['row1'] = factory('tr', props={'structural': True})
+    >>> form['table'] = factory(
+    ...     'table',
+    ...     props={
+    ...         'structural': True
+    ...     })
+    >>> form['table']['row1'] = factory(
+    ...     'tr',
+    ...     props={
+    ...         'structural': True
+    ...     })
     >>> form['table']['row1']['field1'] = factory(
     ...     'td:error:text',
     ...     props={
@@ -160,14 +212,27 @@ Build same table again but set some nodes structural. This is considered in
 
 Create table with 'td' as compound::
 
-    >>> form = factory('form',
-    ...                name='mytableform',
-    ...                props={
-    ...                    'action': 'mytableaction',
-    ...                })
-    >>> form['table'] = factory('table', props={'structural': True})
-    >>> form['table']['row1'] = factory('tr', props={'structural': True})
-    >>> form['table']['row1']['td1'] = factory('td', props={'structural': True})
+    >>> form = factory(
+    ...     'form',
+    ...     name='mytableform',
+    ...     props={
+    ...         'action': 'mytableaction',
+    ...     })
+    >>> form['table'] = factory(
+    ...     'table',
+    ...     props={
+    ...         'structural': True
+    ...     })
+    >>> form['table']['row1'] = factory(
+    ...     'tr',
+    ...     props={
+    ...         'structural': True
+    ...     })
+    >>> form['table']['row1']['td1'] = factory(
+    ...     'td',
+    ...     props={
+    ...         'structural': True
+    ...     })
     >>> form['table']['row1']['td1']['field1'] = factory(
     ...     'error:text',
     ...     props={
