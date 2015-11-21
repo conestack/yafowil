@@ -17,9 +17,16 @@ Render Compound with values set via compound widget::
     ...     'inner': 'Value 1 from parent',
     ...     'inner2': 'Value 2 from parent',
     ... }
-    >>> compound = factory('compound', name='COMPOUND', value=value)
+    >>> compound = factory(
+    ...     'compound',
+    ...     name='COMPOUND',
+    ...     value=value)
     >>> compound['inner']  = factory('text')
-    >>> compound['inner2'] = factory('text', props={'required': True})
+    >>> compound['inner2'] = factory(
+    ...     'text',
+    ...     props={
+    ...         'required': True
+    ...     })
     >>> pxml(tag('div', compound()))
     <div>
       <input class="text" id="input-COMPOUND-inner" name="COMPOUND.inner" 
@@ -33,8 +40,13 @@ Render Compound with values set via compound widget::
 ValueError if value for a compound member is defined both::
 
     >>> value = {'inner': 'Value 1 from parent'}
-    >>> compound = factory('compound', name='COMPOUND', value=value)
-    >>> compound['inner']  = factory('text', value='value1')
+    >>> compound = factory(
+    ...     'compound',
+    ...     name='COMPOUND',
+    ...     value=value)
+    >>> compound['inner']  = factory(
+    ...     'text',
+    ...     value='value1')
     >>> pxml(tag('div', compound()))
     Traceback (most recent call last):
       ...
@@ -42,10 +54,18 @@ ValueError if value for a compound member is defined both::
 
 Render Compound with values set via compound members::
 
-    >>> compound = factory('compound', name='COMPOUND')
-    >>> compound['inner']  = factory('text', value='value1')
-    >>> compound['inner2'] = factory('error:text', value='value2', 
-    ...                              props={'required': True})
+    >>> compound = factory(
+    ...     'compound',
+    ...     name='COMPOUND')
+    >>> compound['inner']  = factory(
+    ...     'text',
+    ...     value='value1')
+    >>> compound['inner2'] = factory(
+    ...     'error:text',
+    ...     value='value2',
+    ...     props={
+    ...         'required': True
+    ...     })
     >>> pxml(tag('div', compound()))
     <div>
       <input class="text" id="input-COMPOUND-inner" name="COMPOUND.inner" 
@@ -99,7 +119,10 @@ Extract with a value in request::
 
 Compound display renderers, same as edit renderers::
 
-    >>> compound = factory('compound', name='COMPOUND', mode='display')
+    >>> compound = factory(
+    ...     'compound',
+    ...     name='COMPOUND',
+    ...     mode='display')
     >>> pxml(tag('div', compound()))
     <div/>
     <BLANKLINE>
@@ -110,12 +133,21 @@ Compound with structural compound as child::
     ...     'inner': 'Value 1 from parent',
     ...     'inner2': 'Value 2 from parent',
     ... }
-    >>> compound = factory('compound', name='COMPOUND', value=value)
+    >>> compound = factory(
+    ...     'compound',
+    ...     name='COMPOUND',
+    ...     value=value)
     >>> structural = compound['STRUCTURAL'] = factory(
     ...     'compound',
-    ...     props={'structural': True})
+    ...     props={
+    ...         'structural': True
+    ...     })
     >>> structural['inner']  = factory('text')
-    >>> structural['inner2'] = factory('text', props={'required': True})
+    >>> structural['inner2'] = factory(
+    ...     'text',
+    ...     props={
+    ...         'required': True
+    ...     })
     >>> pxml(tag('div', compound()))
     <div>
       <input class="text" id="input-COMPOUND-inner" name="COMPOUND.inner" 
@@ -156,10 +188,17 @@ Compound with compound as child::
     ...         'inner2': 'Value 2 from parent',
     ...     }
     ... }
-    >>> compound = factory('compound', name='COMPOUND', value=value)
+    >>> compound = factory(
+    ...     'compound',
+    ...     name='COMPOUND',
+    ...     value=value)
     >>> child_compound = compound['CHILD_COMPOUND'] = factory('compound')
-    >>> child_compound['inner']  = factory('text')
-    >>> child_compound['inner2'] = factory('text', props={'required': True})
+    >>> child_compound['inner'] = factory('text')
+    >>> child_compound['inner2'] = factory(
+    ...     'text',
+    ...     props={
+    ...         'required': True
+    ...     })
     >>> pxml(tag('div', compound()))
     <div>
       <input class="text" id="input-COMPOUND-CHILD_COMPOUND-inner" 
@@ -209,13 +248,22 @@ Compound with structural compound with compound as children::
     ...         'inner2': 'Value 2 from parent',
     ...     }
     ... }
-    >>> compound = factory('compound', name='COMPOUND', value=value)
+    >>> compound = factory(
+    ...     'compound',
+    ...     name='COMPOUND',
+    ...     value=value)
     >>> structural = compound['STRUCTURAL'] = factory(
     ...     'compound',
-    ...     props={'structural': True})
+    ...     props={
+    ...         'structural': True
+    ...     })
     >>> child_compound = structural['CHILD_COMPOUND'] = factory('compound')
-    >>> child_compound['inner']  = factory('text')
-    >>> child_compound['inner2'] = factory('text', props={'required': True})
+    >>> child_compound['inner'] = factory('text')
+    >>> child_compound['inner2'] = factory(
+    ...     'text',
+    ...     props={
+    ...         'required': True
+    ...     })
     >>> pxml(tag('div', compound()))
     <div>
       <input class="text" id="input-COMPOUND-CHILD_COMPOUND-inner" 
@@ -276,7 +324,10 @@ Address different compounds with value on parent::
     ...         'f3': 'Baz',
     ...     },
     ... }
-    >>> compound = factory('compound', 'comp', value=value)
+    >>> compound = factory(
+    ...     'compound',
+    ...     'comp',
+    ...     value=value)
     >>> compound['c1'] = factory('compound')
     >>> compound['c1']['f1'] = factory('text')
     >>> compound['c2'] = factory('compound')
@@ -338,7 +389,10 @@ Check compound with value callbacks::
     >>> value = {
     ...     'f1': val,
     ... }
-    >>> compound = factory('compound', 'comp', value=value)
+    >>> compound = factory(
+    ...     'compound',
+    ...     'comp',
+    ...     value=value)
     >>> compound['f1'] = factory('text')
     >>> compound()
     u'<input class="text" id="input-comp-f1" name="comp.f1" type="text" 
@@ -354,7 +408,10 @@ Check compound with value callbacks::
     ...     return {
     ...         'f1': 'F1 Val'
     ...     }
-    >>> compound = factory('compound', 'comp', value=value)
+    >>> compound = factory(
+    ...     'compound',
+    ...     'comp',
+    ...     value=value)
     >>> compound['f1'] = factory('text')
     >>> compound()
     u'<input class="text" id="input-comp-f1" name="comp.f1" type="text" 
@@ -372,10 +429,18 @@ Div
 
 Div blueprint can act as compound or leaf widget::
 
-    >>> div = factory('div', name='WRAPPED_COMPOUND')
-    >>> div['inner']  = factory('text', value='value1')
+    >>> div = factory(
+    ...     'div',
+    ...     name='WRAPPED_COMPOUND')
+    >>> div['inner']  = factory(
+    ...     'text',
+    ...     value='value1')
     >>> div['inner2'] = factory(
-    ...     'text', value='value2', props={'required': True})
+    ...     'text',
+    ...     value='value2',
+    ...     props={
+    ...         'required': True
+    ...     })
     >>> pxml(div())
     <div>
       <input class="text" id="input-WRAPPED_COMPOUND-inner" 
@@ -401,13 +466,18 @@ Div blueprint can act as compound or leaf widget::
     >>> div = factory(
     ...     'div',
     ...     name='WRAPPED_COMPOUND',
-    ...     props={'class': 'foo'},
+    ...     props={
+    ...         'class': 'foo'
+    ...     },
     ...     mode='display')
     >>> pxml(div())
     <div class="foo"/>
     <BLANKLINE>
 
-    >>> input = factory('div:text', 'field', value='1')
+    >>> input = factory(
+    ...     'div:text',
+    ...     'field',
+    ...     value='1')
     >>> pxml(input())
     <div>
       <input class="text" id="input-field" name="field" type="text" value="1"/>
@@ -420,7 +490,11 @@ Div blueprint can act as compound or leaf widget::
     >>> data.printtree()
     <RuntimeData field, value='1', extracted='2' at ...>
 
-    >>> input = factory('div:text', 'field', value='1', mode='display')
+    >>> input = factory(
+    ...     'div:text',
+    ...     'field',
+    ...     value='1',
+    ...     mode='display')
     >>> pxml(input())
     <div>
       <div class="display-text" id="display-field">1</div>
@@ -433,9 +507,12 @@ Fieldset
 
 ::
 
-    >>> compound = factory('fieldset', 
-    ...                    'COMPOUND',
-    ...                    props={'legend': 'Some Test'})
+    >>> compound = factory(
+    ...     'fieldset',
+    ...     'COMPOUND',
+    ...     props={
+    ...         'legend': 'Some Test'
+    ...     })
     >>> compound['inner'] = factory('text', 'inner', 'value')
     >>> compound['inner2'] = factory('text', 'inner2', 'value2')
     >>> pxml(compound())
@@ -450,30 +527,43 @@ Fieldset
 
 Structural fieldset renders without id attribute::
 
-    >>> compound = factory('fieldset', 
-    ...                    'COMPOUND',
-    ...                    props={'structural': True})
+    >>> compound = factory(
+    ...     'fieldset',
+    ...     'COMPOUND',
+    ...     props={
+    ...         'structural': True
+    ...     })
     >>> pxml(compound())
     <fieldset/>
     <BLANKLINE>
  
 Fieldset display renderers are the same as fieldset edit renderers::
 
-    >>> compound = factory('fieldset', 
-    ...                    'COMPOUND',
-    ...                    props={'legend': 'Some Test'},
-    ...                    mode='display')
+    >>> compound = factory(
+    ...     'fieldset',
+    ...     'COMPOUND',
+    ...     props={
+    ...         'legend': 'Some Test'
+    ...     },
+    ...     mode='display')
     >>> pxml(compound())
     <fieldset id="fieldset-COMPOUND">
       <legend>Some Test</legend>
     </fieldset>
     <BLANKLINE>
 
+
+Form
+----
+
 Test Form::
 
-    >>> form = factory('form',
-    ...                name = 'FORM',
-    ...                props={'action': 'http://fubar.com'})
+    >>> form = factory(
+    ...     'form',
+    ...     name = 'FORM',
+    ...     props={
+    ...         'action': 'http://fubar.com'
+    ...     })
     >>> form()
     u'<form action="http://fubar.com" enctype="multipart/form-data" 
     id="form-FORM" method="post" novalidate="novalidate"></form>'
@@ -483,32 +573,41 @@ Form action as callable::
     >>> def action(widget, data):
     ...     return 'http://fubar.com'
 
-    >>> form = factory('form',
-    ...                name = 'FORM',
-    ...                props={'action': action})
+    >>> form = factory(
+    ...     'form',
+    ...     name = 'FORM',
+    ...     props={
+    ...         'action': action
+    ...     })
     >>> form()
     u'<form action="http://fubar.com" enctype="multipart/form-data" 
     id="form-FORM" method="post" novalidate="novalidate"></form>'
 
 Form display renderer::
 
-    >>> form = factory('form',
-    ...                name = 'FORM',
-    ...                props={'action': 'http://fubar.com'},
-    ...                mode='display')
+    >>> form = factory(
+    ...     'form',
+    ...     name = 'FORM',
+    ...     props={
+    ...         'action': 'http://fubar.com'
+    ...     },
+    ...     mode='display')
     >>> form()
     u'<div></div>'
 
+Create a form with some children::
 
-Form
-----
-
-Create a form::
-
-    >>> form = factory('form', name='myform', 
-    ...     props={'action': 'http://www.domain.tld/someform'})
-    >>> form['someinput'] = factory('label:text', 
-    ...     props={'label': 'Your Text'})
+    >>> form = factory(
+    ...     'form',
+    ...     name='myform',
+    ...     props={
+    ...         'action': 'http://www.domain.tld/someform'
+    ...     })
+    >>> form['someinput'] = factory(
+    ...     'label:text',
+    ...     props={
+    ...         'label': 'Your Text'
+    ...     })
 
     >>> def formaction(widget, data):
     ...     data.printtree()
@@ -516,8 +615,13 @@ Create a form::
     >>> def formnext(request):
     ...     return 'http://www.domain.tld/result'
 
-    >>> form['submit'] = factory('submit', 
-    ...     props={'handler': formaction, 'next': formnext, 'action': True})
+    >>> form['submit'] = factory(
+    ...     'submit',
+    ...     props={
+    ...         'handler': formaction,
+    ...         'next': formnext,
+    ...         'action': True
+    ...     })
 
 Render an empty form::
 
@@ -535,8 +639,10 @@ Render an empty form::
 
 Get form data out of request (request is expected dict-like)::
 
-    >>> request = {'myform.someinput': 'Hello World', 
-    ...            'action.myform.submit': 'submit'}
+    >>> request = {
+    ...     'myform.someinput': 'Hello World',
+    ...     'action.myform.submit': 'submit'
+    ... }
     >>> controller = Controller(form, request)
     <RuntimeData myform, value=<UNSET>, 
       extracted=odict([('someinput', 'Hello World'), 
@@ -566,12 +672,14 @@ Create label for field in other compound::
     ...     'form',
     ...     name = 'form',
     ...     props = {
-    ...         'action': 'action'})
+    ...         'action': 'action'
+    ...     })
     >>> form['label'] = factory(
     ...     'label',
     ...     props={
     ...         'label': 'Foo',
-    ...         'for': 'field'})
+    ...         'for': 'field'
+    ...     })
     >>> form['field'] = factory('text')
     >>> form()
     u'<form action="action" enctype="multipart/form-data" id="form-form" 

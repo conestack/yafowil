@@ -1082,7 +1082,7 @@ factory.defaults['checkbox.required_class'] = 'required'
 
 
 ###############################################################################
-# selection
+# select
 ###############################################################################
 
 @managedprops('multivalued', 'disabled')

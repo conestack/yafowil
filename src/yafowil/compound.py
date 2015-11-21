@@ -9,6 +9,10 @@ from yafowil.utils import cssid
 from yafowil.utils import managedprops
 
 
+###############################################################################
+# compound
+###############################################################################
+
 @managedprops('structural')
 def compound_extractor(widget, data):
     """Delegates extraction to children.
@@ -18,15 +22,14 @@ def compound_extractor(widget, data):
         if attr_value('structural', child, data):
             for structuralchildname in child:
                 structuralchild = child[structuralchildname]
-                if len(structuralchild) \
-                   and attr_value('structural', structuralchild, data):
-                    # call compound extractor if structural child has children
-                    # which are as well structural compounds.
+                structural = attr_value('structural', structuralchild, data)
+                # call compound extractor if structural child has children
+                # which are as well structural compounds.
+                if len(structuralchild) and structural:
                     compound_extractor(structuralchild, data)
-                else:
-                    # call extract on widget directly if not structural
-                    if not attr_value('structural', structuralchild, data):
-                        structuralchild.extract(data.request, parent=data)
+                # call extract on widget directly if not structural
+                elif not structural:
+                    structuralchild.extract(data.request, parent=data)
         else:
             child.extract(data.request, parent=data)
     return odict([(k, v.extracted) for k, v in data.items()])
@@ -80,6 +83,10 @@ will not have an own runtime-data.
 """
 
 
+###############################################################################
+# div
+###############################################################################
+
 def hybrid_extractor(widget, data):
     """This extractor can be used if a blueprint can act as compound or leaf.
     """
@@ -117,6 +124,10 @@ HTML id attribute.
 """
 
 
+###############################################################################
+# fieldset
+###############################################################################
+
 @managedprops('legend', *css_managed_props)
 def fieldset_renderer(widget, data):
     fs_attrs = {
@@ -132,11 +143,15 @@ def fieldset_renderer(widget, data):
 
 factory.register(
     'fieldset',
-    extractors=factory.extractors('compound'),
-    edit_renderers=factory.edit_renderers('compound') + [fieldset_renderer],
-    display_renderers=(
-        factory.display_renderers('compound') + [fieldset_renderer]
-    ))
+    extractors=[compound_extractor],
+    edit_renderers=[
+        compound_renderer,
+        fieldset_renderer
+    ],
+    display_renderers=[
+        compound_renderer,
+        fieldset_renderer
+    ])
 
 factory.doc['blueprint']['fieldset'] = """\
 Renders a fieldset around the prior rendered output.
@@ -149,6 +164,10 @@ Content of legend tag if legend should be rendered.
 
 factory.defaults['fieldset.class'] = None
 
+
+###############################################################################
+# form
+###############################################################################
 
 @managedprops('action', 'method', 'enctype', 'novalidate', *css_managed_props)
 def form_edit_renderer(widget, data):
@@ -172,11 +191,15 @@ def form_display_renderer(widget, data):
 
 factory.register(
     'form',
-    extractors=factory.extractors('compound'),
-    edit_renderers=factory.edit_renderers('compound') + [form_edit_renderer],
-    display_renderers=(
-        factory.display_renderers('compound') + [form_display_renderer]
-    ))
+    extractors=[compound_extractor],
+    edit_renderers=[
+        compound_renderer,
+        form_edit_renderer
+    ],
+    display_renderers=[
+        compound_renderer,
+        form_display_renderer
+    ])
 
 factory.doc['blueprint']['form'] = """\
 A html-form element as a compound of widgets.
