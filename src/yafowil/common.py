@@ -1434,18 +1434,18 @@ def convert_bytes(value):
     value = float(value)
     if value >= 1099511627776:
         terabytes = value / 1099511627776
-        size = '%.2fT' % terabytes
+        size = '{0:.2f}T'.format(terabytes)
     elif value >= 1073741824:
         gigabytes = value / 1073741824
-        size = '%.2fG' % gigabytes
+        size = '{0:.2f}G'.format(gigabytes)
     elif value >= 1048576:
         megabytes = value / 1048576
-        size = '%.2fM' % megabytes
+        size = '{0:.2f}M'.format(megabytes)
     elif value >= 1024:
         kilobytes = value / 1024
-        size = '%.2fK' % kilobytes
+        size = '{0:.2f}K'.format(kilobytes)
     else:
-        size = '%.2fb' % value
+        size = '{0:.2f}b'.format(value)
     return size
 
 
