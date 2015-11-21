@@ -17,21 +17,22 @@ from yafowil.utils import managedprops
 def compound_extractor(widget, data):
     """Delegates extraction to children.
     """
-    for childname in widget:
-        child = widget[childname]
-        if attr_value('structural', child, data):
-            for structuralchildname in child:
-                structuralchild = child[structuralchildname]
-                structural = attr_value('structural', structuralchild, data)
-                # call compound extractor if structural child has children
-                # which are as well structural compounds.
-                if len(structuralchild) and structural:
-                    compound_extractor(structuralchild, data)
-                # call extract on widget directly if not structural
-                elif not structural:
-                    structuralchild.extract(data.request, parent=data)
-        else:
+    for child in widget.values():
+        # regular child widget, extract
+        if not attr_value('structural', child, data):
             child.extract(data.request, parent=data)
+            continue
+        # structural child widget, go one level deeper
+        for subchild in child.values():
+            # sub child widget may be structural as well
+            structural = attr_value('structural', subchild, data)
+            # use compound extractor if sub child widget has children and is
+            # structural
+            if len(subchild) and structural:
+                compound_extractor(subchild, data)
+            # call extract on sub child widget directly if not structural
+            elif not structural:
+                subchild.extract(data.request, parent=data)
     return odict([(k, v.extracted) for k, v in data.items()])
 
 
