@@ -160,6 +160,22 @@ If 'True' and widget mode 'display', widget value gets rendered as hidden
 input.
 """
 
+factory.defaults['persist'] = False
+factory.doc['props']['persist'] = """\
+Marker that widget data should be considered in when using persistence
+mechanism.
+"""
+
+factory.defaults['persist_target'] = UNSET
+factory.doc['props']['persist_target'] = """\
+Target when using persistence mechanism. If not set, target is widget name.
+"""
+
+factory.defaults['persist_writer'] = UNSET
+factory.doc['props']['persist_writer'] = """\
+Callback used to persist data. Accepts model, target and value as parameters.
+"""
+
 
 ###############################################################################
 # generic

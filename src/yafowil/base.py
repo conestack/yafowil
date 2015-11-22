@@ -51,6 +51,9 @@ class RuntimeData(object):
         self.rendered = UNSET
         self.errors = list()
         self.translate_callable = lambda msg: msg
+        self.persist = False
+        self.persist_target = UNSET
+        self.persist_writer = UNSET
 
     def fetch(self, path):
         if isinstance(path, basestring):
@@ -62,6 +65,22 @@ class RuntimeData(object):
         for key in path[1:]:
             data = data[key]
         return data
+
+    def write(self, model, writer=None, recursiv=True):
+        current_writer = self.persist_writer or writer
+        if not current_writer:
+            raise ValueError('No persistence writer found')
+        if not writer:
+            writer = current_writer
+        if self.persist:
+            target = self.persist_target
+            if not target:
+                target = self.__name__
+            current_writer(model, target, self.extracted)
+        if not recursiv:
+            return
+        for child in self.values():
+            child.write(model, writer=writer, recursiv=recursiv)
 
     @property
     def tag(self):
@@ -368,6 +387,9 @@ class Widget(object):
                     )
                     try:
                         data.extracted = extractor(self, data)
+                        data.persist = self.attrs.get('persist')
+                        data.persist_target = self.attrs.get('persist_target')
+                        data.persist_writer = self.attrs.get('persist_writer')
                     except ExtractionError, e:
                         data.errors.append(e)
                         if e.abort:

@@ -732,7 +732,7 @@ instead of a colon seperated string as well::
 
 Colon seperated blueprint chain definition::
 
-    >>> widget = factory('outer:inner')
+    >>> widget = factory('outer:inner', name='OUTER_INNER')
     >>> data = widget.extract({})
     >>> data.extracted
     ['extracted inner', 'extracted outer']
@@ -742,7 +742,7 @@ Colon seperated blueprint chain definition::
 
 Blueprint chain definition as list::
 
-    >>> widget = factory(['outer', 'inner'])
+    >>> widget = factory(['outer', 'inner'], name='OUTER_INNER')
     >>> data = widget.extract({})
     >>> data.extracted
     ['extracted inner', 'extracted outer']
@@ -767,6 +767,7 @@ Inject as dict::
 
     >>> widget = factory(
     ...     'outer:*special:inner',
+    ...     name='OUTER_SPECIAL_INNER',
     ...     custom={
     ...         'special': {
     ...             'extractors': [special_extractor],
@@ -784,6 +785,7 @@ Inject as list::
 
     >>> widget = factory(
     ...     'outer:*special:inner',
+    ...     name='OUTER_SPECIAL_INNER',
     ...     custom={
     ...         'special': (
     ...             [special_extractor],
@@ -804,6 +806,7 @@ BBB, w/o display_renderer::
       
     >>> widget = factory(
     ...     'outer:*special:inner',
+    ...     name='OUTER_SPECIAL_INNER',
     ...     custom={
     ...         'special': (
     ...             [special_extractor],

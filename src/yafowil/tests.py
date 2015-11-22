@@ -19,6 +19,7 @@ TESTFILES = [
     'common.rst',
     'compound.rst',
     'controller.rst',
+    'persistence.rst',
     'table.rst',
     'resources.rst',
 ]
