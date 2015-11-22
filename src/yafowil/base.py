@@ -387,13 +387,13 @@ class Widget(object):
                     )
                     try:
                         data.extracted = extractor(self, data)
-                        data.persist = self.attrs.get('persist')
-                        data.persist_target = self.attrs.get('persist_target')
-                        data.persist_writer = self.attrs.get('persist_writer')
                     except ExtractionError, e:
                         data.errors.append(e)
                         if e.abort:
                             break
+                data.persist = self.attrs.get('persist')
+                data.persist_target = self.attrs.get('persist_target')
+                data.persist_writer = self.attrs.get('persist_writer')
             finally:
                 self.current_prefix = None
         return data
