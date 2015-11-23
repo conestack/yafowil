@@ -361,6 +361,9 @@ class Widget(object):
         data.request = request
         if parent is not None:
             parent[self.__name__] = data
+        data.persist = self.attrs.get('persist')
+        data.persist_target = self.attrs.get('persist_target')
+        data.persist_writer = self.attrs.get('persist_writer')
         data = self._runpreprocessors(data)
         # don't extract if skip mode
         if data.mode == 'skip':
@@ -391,9 +394,6 @@ class Widget(object):
                         data.errors.append(e)
                         if e.abort:
                             break
-                data.persist = self.attrs.get('persist')
-                data.persist_target = self.attrs.get('persist_target')
-                data.persist_writer = self.attrs.get('persist_writer')
             finally:
                 self.current_prefix = None
         return data
