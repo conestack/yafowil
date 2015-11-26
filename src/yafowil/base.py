@@ -8,6 +8,7 @@ from node.behaviors import Nodify
 from node.behaviors import OdictStorage
 from node.behaviors import Order
 from node.utils import UNSET
+from node.utils import instance_property
 from plumber import plumbing
 from threading import RLock
 from yafowil.utils import Tag
@@ -39,27 +40,52 @@ class RuntimeDataAttributes(NodeAttributes):
 class RuntimeData(object):
     """Holds Runtime data of widget.
     """
+    attributes_factory = RuntimeDataAttributes
 
-    def __init__(self, name=None, parent=None):
+    def __init__(self,
+                 name=None,
+                 parent=None,
+                 request=UNSET,
+                 persist=False,
+                 persist_target=UNSET,
+                 persist_writer=UNSET):
         self.__name__ = name
         self.__parent__ = parent
-        self.attributes_factory = RuntimeDataAttributes
-        self.request = UNSET
+        if parent is not None:
+            parent[self.name] = self
+        self.request = request
         self.value = UNSET
         self.preprocessed = False
         self.extracted = UNSET
         self.rendered = UNSET
         self.errors = list()
         self.translate_callable = lambda msg: msg
-        self.persist = False
-        self.persist_target = UNSET
-        self.persist_writer = UNSET
+        self.persist = persist
+        self.persist_target = persist_target
+        self.persist_writer = persist_writer
+
+    @instance_property
+    def has_errors(self):
+        """Return ``True`` if extraction error occurred on self or children
+        of self, otherwise ``False``.
+        """
+        error = bool(self.errors)
+        if not error:
+            for child in self.values():
+                error = child.has_errors
+                if error:
+                    break
+        return error
+
+    @property
+    def tag(self):
+        return Tag(self.translate_callable)
 
     def fetch(self, path):
         if isinstance(path, basestring):
             path = path.split('.')
         data = self.root
-        if path[0] != data.__name__:
+        if path[0] != data.name:
             raise KeyError('Invalid name of root element')
         __traceback_info__ = 'fetch path: {0}'.format(path)
         for key in path[1:]:
@@ -67,6 +93,10 @@ class RuntimeData(object):
         return data
 
     def write(self, model, writer=None, recursiv=True):
+        if self.has_errors:
+            raise RuntimeError(
+                'Attempt to persist data which failed to extract'
+            )
         current_writer = self.persist_writer or writer
         if not current_writer:
             raise ValueError('No persistence writer found')
@@ -75,16 +105,12 @@ class RuntimeData(object):
         if self.persist:
             target = self.persist_target
             if not target:
-                target = self.__name__
+                target = self.name
             current_writer(model, target, self.extracted)
         if not recursiv:
             return
         for child in self.values():
             child.write(model, writer=writer, recursiv=recursiv)
-
-    @property
-    def tag(self):
-        return Tag(self.translate_callable)
 
     def __repr__(self):
         rep = "<RuntimeData {0}, value={1}, extracted={2}".format(
@@ -172,7 +198,7 @@ class WidgetAttributes(NodeAttributes):
     __str__ = __repr__ = _dict__repr__
 
     def __getitem__(self, name):
-        prefixed = '{0}.{1}'.format(self.__parent__.current_prefix or '', name)
+        prefixed = '{0}.{1}'.format(self.parent.current_prefix or '', name)
         try:
             return NodeAttributes.__getitem__(self, prefixed)
         except KeyError:
@@ -180,15 +206,15 @@ class WidgetAttributes(NodeAttributes):
                 return NodeAttributes.__getitem__(self, name)
             except KeyError:
                 try:
-                    return self.__parent__.defaults[prefixed]
+                    return self.parent.defaults[prefixed]
                 except KeyError:
                     try:
-                        return self.__parent__.defaults[name]
+                        return self.parent.defaults[name]
                     except KeyError:
                         raise KeyError((
                             'Property with key "{0}" is not given on '
                             'widget "{1}" (no default)'
-                        ).format(name, self.__parent__.dottedpath))
+                        ).format(name, self.parent.dottedpath))
 
 
 @plumbing(
@@ -200,8 +226,9 @@ class WidgetAttributes(NodeAttributes):
     Nodify,
     OdictStorage)
 class Widget(object):
-    """Base Widget Class
+    """Base Widget Class.
     """
+    attributes_factory = WidgetAttributes
 
     def __init__(self,
                  blueprints,
@@ -274,7 +301,6 @@ class Widget(object):
         """
         self.__name__ = uniquename
         self.__parent__ = None
-        self.attributes_factory = WidgetAttributes
         self.blueprints = blueprints
         self.getter = value_or_getter
         self.mode = mode
@@ -286,8 +312,7 @@ class Widget(object):
         self.current_prefix = None
         # keep properties for use in dottedpath to avoid recursion errors
         self.properties = properties
-        for key in properties:
-            self.attrs[key] = properties[key]
+        self.attrs.update(properties)
         self.custom = custom
         self._lock = RLock()
 
@@ -311,10 +336,12 @@ class Widget(object):
         if data is not None and request is not None:
             raise ValueError("if data is passed in, don't pass in request!")
         if data is None:
-            data = RuntimeData(self.__name__)
-            if request is not None:
-                data.request = request
-            data = self._runpreprocessors(data)
+            if request is None:
+                request = UNSET
+            data = self._runpreprocessors(RuntimeData(
+                name=self.name,
+                request=request
+            ))
         if data.mode == 'skip':
             data.rendered = u''
             return data.rendered
@@ -357,14 +384,14 @@ class Widget(object):
         ``parent``
             parent data
         """
-        data = RuntimeData(self.__name__)
-        data.request = request
-        if parent is not None:
-            parent[self.__name__] = data
-        data.persist = self.attrs.get('persist')
-        data.persist_target = self.attrs.get('persist_target')
-        data.persist_writer = self.attrs.get('persist_writer')
-        data = self._runpreprocessors(data)
+        data = self._runpreprocessors(RuntimeData(
+            name=self.name,
+            parent=parent,
+            request=request,
+            persist=self.attrs.get('persist', False),
+            persist_target=self.attrs.get('persist_target', UNSET),
+            persist_writer=self.attrs.get('persist_writer', UNSET)
+        ))
         # don't extract if skip mode
         if data.mode == 'skip':
             return data
@@ -406,8 +433,8 @@ class Widget(object):
         node = self
         while node is not None:
             if not node.properties.get('structural'):
-                path.append(node.__name__)
-            node = node.__parent__
+                path.append(node.name)
+            node = node.parent
         path.reverse()
         return '.'.join(path)
 
@@ -434,14 +461,14 @@ class Widget(object):
                 "mode must be one out of 'edit', 'display', 'skip', but "
                 "'{0}' was given ".format(data.mode)
             )
-        for ppname, pp in self.preprocessors:
-            data.current_prefix = ppname
+        for pp_name, pp in self.preprocessors:
+            data.current_prefix = pp_name
             __traceback_supplement__ = (
                 TBSupplementWidget,
                 self,
                 pp,
                 'preprocessor',
-                "failed at '{0}'".format(ppname)
+                "failed at '{0}'".format(pp_name)
             )
             data = pp(self, data)
         data.current_prefix = None

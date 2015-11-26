@@ -208,3 +208,18 @@ for single model bound forms::
     [('f1', 1.0), 
     ('f2', UUID('c6b19794-dc9e-4a98-920d-182a9ec07b7a')), 
     ('my_field', <UNSET>)]
+
+When trying to persist data containing errors we get a runtime error::
+
+    >>> data = form.extract(request={
+    ...     'form.my_field': '',
+    ...     'form.compound.f1': 'a',
+    ...     'form.compound.f2': 'c6b19794-dc9e-4a98-920d-182a9ec07b7a'
+    ... })
+    >>> data.has_errors
+    True
+
+    >>> data.write(dict())
+    Traceback (most recent call last):
+      ...
+    RuntimeError: Attempt to persist data which failed to extract

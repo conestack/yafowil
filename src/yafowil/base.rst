@@ -198,7 +198,7 @@ Preprocessor is only called once!::
     >>> data.attrs['test_preprocessor']
     'reset'    
 
-Different cases,
+Different cases.
 
 a.1) defaults: edit::     
 
@@ -368,7 +368,7 @@ Plausability::
     ...
     ValueError: if data is passed in, don't pass in request!
 
-The dottedpath.
+Widget dottedpath.
 
 Fails with no name in root::
 
@@ -453,6 +453,63 @@ The mode::
     >>> data = testwidget.extract({})
     >>> data.mode
     'display'    
+
+Check whether error occurred somewhere in Tree::
+
+    >>> def value_extractor(widget, data):
+    ...     return data.request[widget.dottedpath]
+
+    >>> def child_extractor(widget, data):
+    ...     for child in widget.values():
+    ...          child.extract(request=data.request, parent=data)
+
+    >>> def error_extractor(widget, data):
+    ...     raise ExtractionError(widget.dottedpath)
+
+    >>> root = Widget(
+    ...     'root_blueprint',
+    ...     [('child_extractor', child_extractor)],
+    ...     [],
+    ...     [],
+    ...     [],
+    ...     uniquename='root')
+    >>> child_0 = root['child_0'] = Widget(
+    ...     'child_blueprint',
+    ...     [('value_extractor', value_extractor)],
+    ...     [],
+    ...     [],
+    ...     [])
+    >>> child_1 = root['child_1'] = Widget(
+    ...     'child_blueprint',
+    ...     [('error_extractor', error_extractor)],
+    ...     [],
+    ...     [],
+    ...     [])
+
+    >>> root.printtree()
+    <class 'yafowil.base.Widget'>: root
+      <class 'yafowil.base.Widget'>: child_0
+      <class 'yafowil.base.Widget'>: child_1
+
+    >>> data = root.extract({
+    ...     'root.child_0': 'a',
+    ...     'root.child_1': 'b',
+    ... })
+    >>> data.printtree()
+    <RuntimeData root, value=<UNSET>, extracted=None at ...>
+      <RuntimeData root.child_0, 
+        value=<UNSET>, extracted='a' at ...>
+      <RuntimeData root.child_1, 
+        value=<UNSET>, extracted=<UNSET>, 1 error(s) at ...>
+
+    >>> data.has_errors
+    True
+
+    >>> data['child_0'].has_errors
+    False
+
+    >>> data['child_1'].has_errors
+    True
 
 
 factory
@@ -559,7 +616,9 @@ Test the macros::
     >>> factory._expand_blueprints('#test_macro2', {})
     (['alpha', 'foo', '*bar', 'baz', 'beta'], {'foo.newprop': 'abc'})
 
-Test theme registry.
+
+Test theme registry
+-------------------
 
 Theme to use::
 

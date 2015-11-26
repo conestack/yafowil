@@ -3,6 +3,7 @@ import yafowil.utils
 
 
 def register():
+    import yafowil.persistence
     import yafowil.common
     import yafowil.compound
     import yafowil.table  # noqa

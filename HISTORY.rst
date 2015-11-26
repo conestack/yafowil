@@ -5,6 +5,9 @@ History
 2.2 (unreleased)
 ----------------
 
+- Introduce ``yafowil.persistence``, ``RuntimeData.write`` and
+  ``RuntimeData.has_errors``.
+
 - Add default ``class`` property to ``lines`` blueprint.
   [rnix, 2015-11-20]
 
