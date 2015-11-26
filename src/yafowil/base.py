@@ -46,9 +46,9 @@ class RuntimeData(object):
                  name=None,
                  parent=None,
                  request=UNSET,
-                 persist=False,
-                 persist_target=UNSET,
-                 persist_writer=UNSET):
+                 persist=None,
+                 persist_target=None,
+                 persist_writer=None):
         self.__name__ = name
         self.__parent__ = parent
         if parent is not None:
@@ -60,9 +60,39 @@ class RuntimeData(object):
         self.rendered = UNSET
         self.errors = list()
         self.translate_callable = lambda msg: msg
-        self.persist = persist
-        self.persist_target = persist_target
-        self.persist_writer = persist_writer
+        self._persist = persist
+        self._persist_target = persist_target
+        self._persist_writer = persist_writer
+
+    @property
+    def persist(self):
+        return self._persist
+
+    @persist.setter
+    def persist(self, value):
+        # override only if not defined yet and given value not None
+        if self._persist is None and value is not None:
+            self._persist = value
+
+    @property
+    def persist_target(self):
+        return self._persist_target
+
+    @persist_target.setter
+    def persist_target(self, value):
+        # override only if not defined yet and given value not None
+        if self._persist_target is None and value is not None:
+            self._persist_target = value
+
+    @property
+    def persist_writer(self):
+        return self._persist_writer
+
+    @persist_writer.setter
+    def persist_writer(self, value):
+        # override only if not defined yet and given value not None
+        if self._persist_writer is None and value is not None:
+            self._persist_writer = value
 
     @instance_property
     def has_errors(self):
@@ -198,7 +228,7 @@ class WidgetAttributes(NodeAttributes):
     __str__ = __repr__ = _dict__repr__
 
     def __getitem__(self, name):
-        prefixed = '{0}.{1}'.format(self.parent.current_prefix or '', name)
+        prefixed = '{0}.{1}'.format(self.parent.current_prefix, name)
         try:
             return NodeAttributes.__getitem__(self, prefixed)
         except KeyError:
@@ -309,7 +339,7 @@ class Widget(object):
         self.display_renderers = display_renderers
         self.preprocessors = preprocessors or list()
         self.defaults = defaults
-        self.current_prefix = None
+        self.current_prefix = ''
         # keep properties for use in dottedpath to avoid recursion errors
         self.properties = properties
         self.attrs.update(properties)
@@ -372,7 +402,7 @@ class Widget(object):
                     )
                     data.rendered = renderer(self, data)
             finally:
-                self.current_prefix = None
+                self.current_prefix = ''
         return data.rendered
 
     def extract(self, request, parent=None):
@@ -388,26 +418,31 @@ class Widget(object):
             name=self.name,
             parent=parent,
             request=request,
-            persist=self.attrs.get('persist', False),
-            persist_target=self.attrs.get('persist_target', UNSET),
-            persist_writer=self.attrs.get('persist_writer', UNSET)
+            persist=self.attrs.get('persist'),
+            persist_target=self.attrs.get('persist_target'),
+            persist_writer=self.attrs.get('persist_writer')
         ))
         # don't extract if skip mode
         if data.mode == 'skip':
             return data
         # dont't extract if display mode and no display proxy
         if data.mode == 'display':
-            # XXX: display_proxy cannot be called here, currently not possible
-            #      to use ``attr_value``, widget not available. this causes an
-            #      inconsistency with the use of display_proxy inside
-            #      blueprint callbacks. maybe display_proxy might be a special
-            #      case not accepting ``widget`` and ``data`` if callable.
+            # display_proxy cannot be called here, currently not possible to
+            # use ``attr_value``, widget not available. this causes an
+            # inconsistency with the use of display_proxy inside blueprint
+            # callbacks.
+            # XXX: Use ``attr_value`` after signature change.
             if not self.attrs.get('display_proxy'):
                 return data
         with self._lock:
             try:
                 for ex_name, extractor in self.extractors:
                     self.current_prefix = ex_name
+                    # update persistence settings for data node. necessary for
+                    # blueprint specific factory defaults to work.
+                    data.persist = self.attrs.get('persist')
+                    data.persist_target = self.attrs.get('persist_target')
+                    data.persist_writer = self.attrs.get('persist_writer')
                     __traceback_supplement__ = (
                         TBSupplementWidget,
                         self,
@@ -422,7 +457,7 @@ class Widget(object):
                         if e.abort:
                             break
             finally:
-                self.current_prefix = None
+                self.current_prefix = ''
         return data
 
     @property
@@ -471,7 +506,7 @@ class Widget(object):
                 "failed at '{0}'".format(pp_name)
             )
             data = pp(self, data)
-        data.current_prefix = None
+        data.current_prefix = ''
         data.preprocessed = True
         return data
 
@@ -653,7 +688,7 @@ class Factory(object):
         for part_name, builder_func in builders:
             widget.current_prefix = part_name
             builder_func(widget, self)
-            widget.current_prefix = None
+            widget.current_prefix = ''
         return widget
 
     def extractors(self, name):

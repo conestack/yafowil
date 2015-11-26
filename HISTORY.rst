@@ -5,6 +5,10 @@ History
 2.2 (unreleased)
 ----------------
 
+- Set ``persist`` factory default to ``True`` for ``hidden``, ``proxy``,
+  ``text``, ``textarea``, ``lines``, ``password``, ``checkbox``, ``select``,
+  ``email``, ``url`` and ``number`` blueprints.
+
 - Introduce ``yafowil.persistence``, ``RuntimeData.write`` and
   ``RuntimeData.has_errors``.
 

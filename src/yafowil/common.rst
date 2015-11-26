@@ -15,6 +15,7 @@ Imports::
     >>> from node.utils import UNSET
     >>> from yafowil.base import factory
     >>> from yafowil.common import convert_bytes
+    >>> from yafowil.persistence import write_mapping_writer
     >>> from yafowil.utils import Tag
     >>> import uuid
 
@@ -103,6 +104,28 @@ extraction errors, which is really unwanted::
     >>> widget.extract(request={'MYHIDDEN': ''})
     <RuntimeData MYHIDDEN, value=<UNSET>, extracted='', 1 error(s) at ...>
 
+Persist property::
+
+    >>> widget = factory(
+    ...     'hidden',
+    ...     name='MYHIDDEN',
+    ...     props={
+    ...         'emptyvalue': 0,
+    ...         'datatype': int,
+    ...         'persist_writer': write_mapping_writer,
+    ...     })
+    >>> data = widget.extract(request={'MYHIDDEN': '10'})
+    >>> model = dict()
+    >>> data.write(model)
+    >>> model
+    {'MYHIDDEN': 10}
+
+    >>> data.persist_target = 'myhidden'
+    >>> model = dict()
+    >>> data.write(model)
+    >>> model
+    {'myhidden': 10}
+
 
 Generic tag
 -----------
@@ -178,6 +201,23 @@ Generic HTML5 Data::
     >>> widget()
     u'<input class="text" data-foo=\'bar\' id="input-MYTEXT" 
     name="MYTEXT" title="My awesome title" type="text" value="ja ha!" />'
+
+Extract and persist::
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='MYTEXT',
+    ...     props={
+    ...         'persist_writer': write_mapping_writer
+    ...     })
+    >>> data = widget.extract(request={'MYTEXT': '10'})
+    >>> data
+    <RuntimeData MYTEXT, value=<UNSET>, extracted='10' at ...>
+
+    >>> model = dict()
+    >>> data.write(model)
+    >>> model
+    {'MYTEXT': '10'}
 
 
 Empty values
@@ -988,6 +1028,12 @@ Checkbox extraction::
     >>> data.printtree()
     <RuntimeData MYCHECKBOX, value='Test Checkbox', extracted=<UNSET> at ...>
 
+    >>> model = dict()
+    >>> data.persist_writer = write_mapping_writer
+    >>> data.write(model)
+    >>> model
+    {'MYCHECKBOX': <UNSET>}
+
 bool extraction::
 
     >>> widget = factory(
@@ -1011,6 +1057,12 @@ bool extraction::
     >>> data = widget.extract(request)
     >>> data.printtree()
     <RuntimeData MYCHECKBOX, value='Test Checkbox', extracted=False at ...>
+
+    >>> model = dict()
+    >>> data.persist_writer = write_mapping_writer
+    >>> data.write(model)
+    >>> model
+    {'MYCHECKBOX': False}
 
 invalid format::
 
@@ -1210,6 +1262,20 @@ Emptyvalue::
     >>> widget.extract(request={'MYTEXTAREA': 'NOEMPTY'})
     <RuntimeData MYTEXTAREA, value=<UNSET>, extracted='NOEMPTY' at ...>
 
+Persist::
+
+    >>> widget = factory(
+    ...     'textarea',
+    ...     name='MYTEXTAREA',
+    ...     props={
+    ...         'persist_writer': write_mapping_writer
+    ...     })
+    >>> data = widget.extract(request={'MYTEXTAREA': 'Text'})
+    >>> model = dict()
+    >>> data.write(model)
+    >>> model
+    {'MYTEXTAREA': 'Text'}
+
 
 Lines
 -----
@@ -1391,6 +1457,20 @@ Datatype::
     >>> widget.attrs['emptyvalue'] = ['1']
     >>> widget.extract(request={'MYLINES': ''})
     <RuntimeData MYLINES, value=<UNSET>, extracted=[1] at ...>
+
+Persist::
+
+    >>> widget = factory(
+    ...     'lines',
+    ...     name='MYLINES',
+    ...     props={
+    ...         'persist_writer': write_mapping_writer
+    ...     })
+    >>> data = widget.extract(request={'MYLINES': '1\n2'})
+    >>> model = dict()
+    >>> data.write(model)
+    >>> model
+    {'MYLINES': ['1', '2']}
 
 
 Selection
@@ -1619,7 +1699,7 @@ Generic HTML5 Data::
     ...     value='one',
     ...     props={
     ...         'data': {'foo': 'bar'},
-    ...         'vocabulary': [('one','One')]
+    ...         'vocabulary': [('one', 'One')]
     ...     })
     >>> pxml(widget())
     <select class="select" data-foo="bar" id="input-MYSELECT" name="MYSELECT">
@@ -1634,12 +1714,27 @@ Generic HTML5 Data::
     ...     value='one',
     ...     props={
     ...         'data': {'foo': 'bar'},
-    ...         'vocabulary': [('one','One')]
+    ...         'vocabulary': [('one', 'One')]
     ...     },
     ...     mode='display')
     >>> pxml(widget())
     <div class="display-select" data-foo="bar" id="display-MYSELECT">One</div>
     <BLANKLINE>
+
+Persist::
+
+    >>> widget = factory(
+    ...     'select',
+    ...     name='MYSELECT',
+    ...     props={
+    ...         'vocabulary': [('one', 'One')]
+    ...     })
+    >>> data = widget.extract({'MYSELECT': 'one'})
+    >>> model = dict()
+    >>> data.persist_writer = write_mapping_writer
+    >>> data.write(model)
+    >>> model
+    {'MYSELECT': 'one'}
 
 
 With Radio
@@ -2178,6 +2273,23 @@ Generic HTML5 Data::
       <li>Two</li>
     </ul>
     <BLANKLINE>
+
+Persist::
+
+    >>> widget = factory(
+    ...     'select',
+    ...     name='MYSELECT',
+    ...     value=['one', 'two'],
+    ...     props={
+    ...         'multivalued': True,
+    ...         'vocabulary': vocab
+    ...     })
+    >>> data = widget.extract({'MYSELECT': ['one', 'two', 'three']})
+    >>> model = dict()
+    >>> data.persist_writer = write_mapping_writer
+    >>> data.write(model)
+    >>> model
+    {'MYSELECT': ['one', 'two', 'three']}
 
 
 With Checkboxes
@@ -3129,6 +3241,20 @@ extraction errors, which is really unwanted::
     >>> widget.extract(request={'PROXY': ''})
     <RuntimeData PROXY, value='', extracted='', 1 error(s) at ...>
 
+Persist::
+
+    >>> widget = factory(
+    ...     'proxy',
+    ...     name='PROXY',
+    ...     props={
+    ...         'persist_writer': write_mapping_writer
+    ...     })
+    >>> data = widget.extract(request={'PROXY': '10'})
+    >>> model = dict()
+    >>> data.write(model)
+    >>> model
+    {'PROXY': '10'}
+
 
 Label
 -----
@@ -3432,6 +3558,20 @@ Emptyvalue::
     >>> widget.extract(request={'PWD': 'NOEMPTY'})
     <RuntimeData PWD, value=<UNSET>, extracted='NOEMPTY' at ...>
 
+Persist::
+
+    >>> widget = factory(
+    ...     'password',
+    ...     name='PWD',
+    ...     props={
+    ...         'persist_writer': write_mapping_writer
+    ...     })
+    >>> data = widget.extract(request={'PWD': '1234'})
+    >>> model = dict()
+    >>> data.write(model)
+    >>> model
+    {'PWD': '1234'}
+
 
 Error
 -----
@@ -3593,6 +3733,18 @@ Emptyvalue::
     >>> widget.extract(request={'EMAIL': 'foo@baz.bam'})
     <RuntimeData EMAIL, value=<UNSET>, extracted='foo@baz.bam' at ...>
 
+Persist::
+
+    >>> widget = factory(
+    ...     'email',
+    ...     name='EMAIL')
+    >>> data = widget.extract({'EMAIL': 'foo@bar.baz'})
+    >>> model = dict()
+    >>> data.persist_writer = write_mapping_writer
+    >>> data.write(model)
+    >>> model
+    {'EMAIL': 'foo@bar.baz'}
+
 
 URL
 ---
@@ -3642,6 +3794,18 @@ Emptyvalue::
 
     >>> widget.extract(request={'URL': 'http://www.example.org'})
     <RuntimeData URL, value=<UNSET>, extracted='http://www.example.org' at ...>
+
+Persist::
+
+    >>> widget = factory(
+    ...     'url',
+    ...     name='URL')
+    >>> data = widget.extract({'URL': 'http://www.example.org'})
+    >>> model = dict()
+    >>> data.persist_writer = write_mapping_writer
+    >>> data.write(model)
+    >>> model
+    {'URL': 'http://www.example.org'}
 
 
 Search
@@ -3857,3 +4021,18 @@ Extract 0 value::
     >>> data = widget.extract({'NUMBER': '0'})
     >>> data.extracted
     0
+
+Persist::
+
+    >>> widget = factory(
+    ...     'number',
+    ...     name='NUMBER',
+    ...     props={
+    ...         'datatype': 'int'
+    ...     })
+    >>> data = widget.extract({'NUMBER': '0'})
+    >>> model = dict()
+    >>> data.persist_writer = write_mapping_writer
+    >>> data.write(model)
+    >>> model
+    {'NUMBER': 0}

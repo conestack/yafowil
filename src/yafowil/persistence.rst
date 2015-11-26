@@ -129,8 +129,16 @@ We can also persist extracted from compound::
     ...     props={
     ...         'persist': True,
     ...     })
-    >>> form['compound']['f1'] = factory('text')
-    >>> form['compound']['f2'] = factory('text')
+    >>> form['compound']['f1'] = factory(
+    ...     'text',
+    ...     props={
+    ...         'persist': False
+    ...     })
+    >>> form['compound']['f2'] = factory(
+    ...     'text',
+    ...     props={
+    ...         'persist': False
+    ...     })
 
     >>> data = form.extract(request={
     ...     'form.my_field': 'value',

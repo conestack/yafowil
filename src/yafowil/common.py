@@ -488,6 +488,8 @@ factory.doc['props']['text.disabled'] = """\
 Flag  input field is disabled.
 """
 
+factory.defaults['text.persist'] = True
+
 
 ###############################################################################
 # hidden
@@ -515,6 +517,8 @@ Type of input tag.
 factory.defaults['hidden.default'] = ''
 
 factory.defaults['hidden.class'] = 'hidden'
+
+factory.defaults['hidden.persist'] = True
 
 
 ###############################################################################
@@ -555,6 +559,8 @@ Bypass arguments out of form namespace using a hidden field.
 """
 
 factory.defaults['proxy.class'] = None
+
+factory.defaults['proxy.persist'] = True
 
 
 ###############################################################################
@@ -644,6 +650,8 @@ factory.doc['props']['textarea.readonly'] = """\
 Flag textarea is readonly.
 """
 
+factory.defaults['textarea.persist'] = True
+
 
 ###############################################################################
 # lines
@@ -730,6 +738,8 @@ factory.defaults['lines.readonly'] = None
 factory.doc['props']['lines.readonly'] = """\
 Flag textarea is readonly.
 """
+
+factory.defaults['lines.persist'] = True
 
 
 ###############################################################################
@@ -925,6 +935,8 @@ factory.doc['props']['password.displayplaceholder'] = """\
 Placeholder shown in display mode if password was set.
 """
 
+factory.defaults['password.persist'] = True
+
 
 ###############################################################################
 # checkbox
@@ -1079,6 +1091,8 @@ customizable via CSS like so::
 """
 
 factory.defaults['checkbox.required_class'] = 'required'
+
+factory.defaults['checkbox.persist'] = True
 
 
 ###############################################################################
@@ -1373,6 +1387,8 @@ set the value to 'True'. To disable single selection pass a iterable of keys to
 disable, i.e. ``['foo', 'baz']``. Defaults to False.
 """
 
+factory.defaults['select.persist'] = True
+
 
 ###############################################################################
 # file
@@ -1641,6 +1657,8 @@ factory.defaults['email.required_class'] = 'required'
 
 factory.defaults['email.class'] = 'email'
 
+factory.defaults['email.persist'] = True
+
 
 ###############################################################################
 # url
@@ -1686,6 +1704,8 @@ factory.defaults['url.default'] = ''
 factory.defaults['url.required_class'] = 'required'
 
 factory.defaults['url.class'] = 'url'
+
+factory.defaults['url.persist'] = True
 
 
 ###############################################################################
@@ -1821,6 +1841,8 @@ Stepping value must be in.
 factory.defaults['number.required_class'] = 'required'
 
 factory.defaults['number.class'] = 'number'
+
+factory.defaults['number.persist'] = True
 
 
 ###############################################################################
