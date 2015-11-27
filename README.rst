@@ -9,18 +9,16 @@
     :alt: Number of PyPI downloads
 
 
-YAFOWIL offers html-form creation and modification at runtime. It is
-light-weight and provides an extensible, reusable set of blueprints to build
-flexible forms.
+YAFOWIL offers html-form creation and modification at runtime. 
+It is light-weight and provides an extensible, reusable set of blueprints to build flexible forms.
 
-YAFOWIL is independent from any web-framework, but easy to use in your
-web-framework.
+YAFOWIL is independent from any web-framework, but easy to use in your web-framework.
 
-It's all just about rendering widgets and extracting the data returned from the
-browser per widget. It does not fight with storage.
+It's all just about rendering widgets and extracting the data returned from the browser per widget. 
+It does not fight with storage.
 
-YAFOWIL vary from most other HTML form packages: Its all just configuration. No
-subclassing needed any more; no specific schema-framework is necessary.
+YAFOWIL vary from most other HTML form packages: Its all just configuration. 
+No subclassing needed any more; no specific schema-framework is necessary.
 
 Yafowil provides a factory where you can fetch your widgets instances from.
 Or you register your own.
@@ -29,9 +27,9 @@ Or you register your own.
 Detailed Documentation
 ======================
 
-If you're interested to dig deeper: The `detailed YAFOWIL documentation
-<http://docs.yafowil.info>`_ is available. Read it and learn how to
-create your example application with YAFOWIL forms in 15 minutes.
+If you're interested to dig deeper: i
+The `detailed YAFOWIL documentation <http://docs.yafowil.info>`_ is available. 
+Read it and learn how to create your example application with YAFOWIL forms in 15 minutes.
 
 
 Source Code
