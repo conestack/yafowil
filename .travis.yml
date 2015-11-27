@@ -1,11 +1,24 @@
 language: python
-python: "2.7"
+sudo: false
+cache:
+  pip: true
+  directories:
+    - $HOME/buildout-cache
+python:
+  - 2.7
+before_install:
+  - mkdir -p $HOME/buildout-cache/{eggs,downloads}
+  - mkdir $HOME/.buildout
+  - echo "[buildout]" > $HOME/.buildout/default.cfg
+  - echo "download-cache = $HOME/buildout-cache/downloads" >> $HOME/.buildout/default.cfg
+  - echo "eggs-directory = $HOME/buildout-cache/eggs" >> $HOME/.buildout/default.cfg
+  - virtualenv .
+  - bin/pip install --upgrade pip setuptools zc.buildout coveralls createcoverage
 install:
-  - python2.7 bootstrap.py 
-  - ./bin/buildout -q
-script: ./bin/test && bin/code-analysis
+  - bin/buildout -N -t 3 -c travis.cfg
+script:
+  - bin/code-analysis
+  - bin/test
 after_success:
-  - bin/coverage.sh
-  - pip install coveralls
-  - coveralls
-
+  - bin/createcoverage
+  - bin/coveralls
