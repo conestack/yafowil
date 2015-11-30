@@ -5,6 +5,7 @@ import inspect
 import json
 import logging
 import re
+import unicodedata
 import uuid
 
 
@@ -154,11 +155,13 @@ class managedprops(object):
 def cssid(widget, prefix, postfix=None):
     if widget.attrs.get('structural', False):
         return None
-    path = widget.dottedpath.replace('.', '-')
-    cssid = '{0}-{1}'.format(prefix, path)
+    path = widget.dottedpath.replace(u'.', u'-')
+    cssid = u'{0}-{1}'.format(prefix, path)
     if postfix is not None:
-        cssid = '{0}-{1}'.format(cssid, postfix)
-    return cssid
+        cssid = u'{0}-{1}'.format(cssid, postfix)
+    return unicodedata.normalize('NFKD', cssid)\
+        .encode('ASCII', 'ignore')\
+        .replace(' ', '_')
 
 
 def attr_value(key, widget, data, default=None):

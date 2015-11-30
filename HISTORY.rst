@@ -5,12 +5,19 @@ History
 2.2 (unreleased)
 ----------------
 
+- Fix ``yafowil.utils.cssid``. CSS ID's must not contain special characters
+  which get normalized now and should not contain whitespaces which get
+  replaced by underscore.
+  [rnix, 2015-11-30]
+
 - Set ``persist`` factory default to ``True`` for ``hidden``, ``proxy``,
   ``text``, ``textarea``, ``lines``, ``password``, ``checkbox``, ``select``,
   ``email``, ``url`` and ``number`` blueprints.
+  [rnix, 2015-11-26]
 
 - Introduce ``yafowil.persistence``, ``RuntimeData.write`` and
   ``RuntimeData.has_errors``.
+  [rnix, 2015-11-26]
 
 - Add default ``class`` property to ``lines`` blueprint.
   [rnix, 2015-11-20]
