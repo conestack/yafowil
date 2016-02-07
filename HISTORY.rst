@@ -5,6 +5,12 @@ History
 2.2 (unreleased)
 ----------------
 
+- Improve ``yafowil.base.WidgetAttributes`` to check attribute containment with
+  ``__iter__`` instead of ``__getitem__`` catching a ``KeyError``. Speeds up
+  whole yafowil test suite (including official addon widgets) by approximately
+  18 percent.
+  [rnix, 2016-02-07]
+
 - Fix ``yafowil.utils.cssid``. CSS ID's must not contain special characters
   which get normalized now and should not contain whitespaces which get
   replaced by underscore.

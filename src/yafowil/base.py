@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from node.behaviors import Adopt
 from node.behaviors import Attributes
+from node.behaviors import DictStorage
 from node.behaviors import NodeAttributes
 from node.behaviors import NodeChildValidate
 from node.behaviors import Nodespaces
@@ -224,27 +225,34 @@ class TBSupplementWidget(object):
         return tag('p', 'yafowil widget processing info:', tag('ul', li))
 
 
-class WidgetAttributes(NodeAttributes):
+@plumbing(
+    NodeChildValidate,
+    Adopt,
+    Nodify,
+    DictStorage)
+class WidgetAttributes(object):
+    allow_non_node_childs = True
     __str__ = __repr__ = _dict__repr__
+
+    def __init__(self, name=None, parent=None):
+        self.__name__ = name
+        self.__parent__ = parent
 
     def __getitem__(self, name):
         prefixed = '{0}.{1}'.format(self.parent.current_prefix, name)
-        try:
-            return NodeAttributes.__getitem__(self, prefixed)
-        except KeyError:
-            try:
-                return NodeAttributes.__getitem__(self, name)
-            except KeyError:
-                try:
-                    return self.parent.defaults[prefixed]
-                except KeyError:
-                    try:
-                        return self.parent.defaults[name]
-                    except KeyError:
-                        raise KeyError((
-                            'Property with key "{0}" is not given on '
-                            'widget "{1}" (no default)'
-                        ).format(name, self.parent.dottedpath))
+        storage = self.storage
+        if prefixed in storage:
+            return storage[prefixed]
+        if name in storage:
+            return storage[name]
+        defaults = self.parent.defaults
+        if prefixed in defaults:
+            return defaults[prefixed]
+        if name in defaults:
+            return defaults[name]
+        raise KeyError((
+            'Property with key "{0}" is not given on widget "{1}" (no default)'
+        ).format(name, self.parent.dottedpath))
 
 
 @plumbing(
