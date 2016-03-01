@@ -2,7 +2,7 @@
 History
 =======
 
-2.2b1 (unreleased)
+2.2b1 (2016-03-01)
 ------------------
 
 - Fix typo in ``setup.py``, fixes #26
