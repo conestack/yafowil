@@ -2,8 +2,8 @@
 History
 =======
 
-2.2 (unreleased)
-----------------
+2.2b1 (unreleased)
+------------------
 
 - Fix typo in ``setup.py``, fixes #26
   [saily, 2016-03-01]

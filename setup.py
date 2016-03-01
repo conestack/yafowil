@@ -3,11 +3,11 @@ from setuptools import setup
 from setuptools import find_packages
 
 
-version = '2.2.dev2'
+version = '2.2b1.dev2'
 shortdesc = \
     'YAFOWIL - declarative, flexible html forms, framework independent.'
 longdesc = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
-longdesc += open(os.path.join(os.path.dirname(__file__), 'HISTORY.rst')).read()
+longdesc += open(os.path.join(os.path.dirname(__file__), 'CHANGES.rst')).read()
 longdesc += open(os.path.join(os.path.dirname(__file__), 'LICENSE.rst')).read()
 tests_require = ['interlude', 'lxml']
 
