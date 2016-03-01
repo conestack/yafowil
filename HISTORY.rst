@@ -5,6 +5,9 @@ History
 2.2 (unreleased)
 ----------------
 
+- Fix typo in ``setup.py``, fixes #26
+  [saily, 2016-03-01]
+
 - Improve ``yafowil.base.WidgetAttributes`` to check attribute containment with
   ``__iter__`` instead of ``__getitem__`` catching a ``KeyError``. Speeds up
   whole yafowil test suite (including official addon widgets) by approximately
