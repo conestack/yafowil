@@ -5,7 +5,9 @@ History
 2.1.4 (unreleased)
 ------------------
 
-- No changes yet.
+- Fix plumber requirement definition.
+  Fixes https://github.com/bluedynamics/yafowil/issues/26
+  [thet]
 
 
 2.1.3 (2015-04-12)
