@@ -2,7 +2,7 @@
 History
 =======
 
-2.1.4 (unreleased)
+2.1.4 (2016-05-04)
 ------------------
 
 - Fix plumber requirement definition.
