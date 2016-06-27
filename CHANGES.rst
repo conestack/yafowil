@@ -5,7 +5,9 @@ History
 2.2b2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add ``yafowil.utils.entry_point`` decorator to control order of entry point
+  loading.
+  [rnix, 2016-06-27]
 
 
 2.2b1 (2016-03-01)

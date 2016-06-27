@@ -9,13 +9,29 @@ import unicodedata
 import uuid
 
 
+class entry_point(object):
+    """Decorator for yafowil entry points.
+    """
+
+    def __init__(self, order=0):
+        self.order = order
+
+    def __call__(self, ob):
+        ob.order = self.order
+        return ob
+
+
+def _ep_sortkey(val):
+    return getattr(val, 'order', 0)
+
+
 def get_entry_points(ns=None):
     entry_points = []
     for ep in iter_entry_points('yafowil.plugin'):
         if ns is not None and ep.name != ns:
             continue
-        entry_points.append(ep)
-    return entry_points
+        entry_points.append(ep.load())
+    return sorted(entry_points, key=_ep_sortkey)
 
 
 def get_plugin_names(ns=None):
