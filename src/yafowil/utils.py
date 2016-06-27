@@ -22,7 +22,7 @@ class entry_point(object):
 
 
 def _ep_sortkey(val):
-    return getattr(val, 'order', 0)
+    return getattr(val.load(), 'order', 0)
 
 
 def get_entry_points(ns=None):
@@ -30,7 +30,7 @@ def get_entry_points(ns=None):
     for ep in iter_entry_points('yafowil.plugin'):
         if ns is not None and ep.name != ns:
             continue
-        entry_points.append(ep.load())
+        entry_points.append(ep)
     return sorted(entry_points, key=_ep_sortkey)
 
 
