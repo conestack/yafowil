@@ -2,7 +2,7 @@
 History
 =======
 
-2.2b2 (unreleased)
+2.2b2 (2016-09-08)
 ------------------
 
 - Add ``yafowil.utils.entry_point`` decorator to control order of entry point
