@@ -2,10 +2,10 @@
 History
 =======
 
-2.2b3 (unreleased)
-------------------
+2.2 (2016-10-06)
+----------------
 
-- Nothing changed yet.
+- No changes.
 
 
 2.2b2 (2016-09-08)
