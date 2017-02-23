@@ -5,7 +5,8 @@ History
 2.2.1 (unreleased)
 ------------------
 
-- No chnages yet.
+- When creating a blueprint chain with a factory, allow blueprints defined after blueprints based in ``generic_input_renderer``.
+  [thet]
 
 
 2.2 (2016-10-06)

@@ -449,8 +449,7 @@ hidden field::
     >>> wrapped_pxml(widget())
     <div>
       <div class="display-text" id="display-DISPLAY">lorem ipsum</div>
-      <input class="text" id="input-DISPLAY" name="DISPLAY" type="hidden" 
-        value="lorem ipsum"/>
+      <input class="text" id="input-DISPLAY" name="DISPLAY" type="hidden" value="lorem ipsum"/>
     </div>
     <BLANKLINE>
 
@@ -470,6 +469,23 @@ Skip mode renders empty string.::
     >>> widget()
     u''
 
+Multiple blueprints::
+
+    >>> widget = factory(
+    ...     'label:text:help',
+    ...     name="textinput",
+    ...     props={
+    ...         'label': 'label before input',
+    ...         'help': 'help after input',
+    ...     }
+    ... )
+    >>> wrapped_pxml(widget())
+    <div>
+      <label for="input-textinput">label before input</label>
+      <input class="text" id="input-textinput" name="textinput" type="text" value=""/>
+      <div class="help">help after input</div>
+    </div>
+    <BLANKLINE>
 
 Datatype extraction
 -------------------

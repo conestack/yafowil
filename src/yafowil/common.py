@@ -309,12 +309,17 @@ def input_attributes_full(widget, data, value=None):
 
 
 @managedprops(*css_managed_props)
-def input_generic_renderer(widget, data, custom_attrs={}):
+def input_generic_renderer(widget, data, pos='before', custom_attrs={}):
     """Generic HTML ``input`` tag render.
     """
     input_attrs = input_attributes_full(widget, data)
     input_attrs.update(custom_attrs)
-    return data.tag('input', **input_attrs)
+    rendered = data.tag('input', **input_attrs)
+    if pos == 'before':
+        rendered = rendered + (data.rendered or u'')
+    else:
+        rendered = (data.rendered or u'') + rendered
+    return rendered
 
 
 # multivalued is not documented, because its only valid for specific blueprints
@@ -333,7 +338,7 @@ def display_proxy_renderer(widget, data):
                 input_attrs = input_attributes_full(widget, data, value=val)
                 rendered += data.tag('input', **input_attrs)
         else:
-            rendered += input_generic_renderer(widget, data)
+            rendered = input_generic_renderer(widget, data, pos='after')
         if orgin_type:
             widget.attrs['type'] = orgin_type
         else:
@@ -389,10 +394,11 @@ def generic_positional_rendering_helper(tagname, message, attrs, rendered, pos,
     pos
         position how to place the newtag relative to the prior rendered:
         'before'='<newtag>message</newtag>rendered',
-        'after' ='<newtag>message</newtag>'
+        'after' ='rendered<newtag>message</newtag>'
         'inner-before'= <newtag>message rendered</newtag>
         'inner-after'= <newtag>rendered message</newtag>
     """
+    rendered = rendered or u''
     if pos not in ['before', 'after', 'inner-before', 'inner-after']:
         raise ValueError('Invalid value for position "{0}"'.format(pos))
     if pos.startswith('inner'):
