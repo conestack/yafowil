@@ -160,6 +160,22 @@ If 'True' and widget mode 'display', widget value gets rendered as hidden
 input.
 """
 
+managed_props__input_common = css_managed_props + [
+    'autofocus',
+    'data',
+    'disabled',
+    'maxlength',
+    'placeholder',
+    'required',
+    'size',
+    'title'
+]
+
+
+managed_props__input_full = managed_props__input_common + [
+    'autocomplete'
+]
+
 
 ###############################################################################
 # generic
@@ -308,7 +324,7 @@ def input_attributes_full(widget, data, value=None):
     return input_attrs
 
 
-@managedprops(*css_managed_props)
+@managedprops(*managed_props__input_full)
 def input_generic_renderer(widget, data, pos='before', custom_attrs={}):
     """Generic HTML ``input`` tag render.
     """
@@ -454,8 +470,7 @@ Tag contents.
 # text
 ###############################################################################
 
-@managedprops('data', 'title', 'size', 'disabled', 'autofocus',
-              'placeholder', 'autocomplete', *css_managed_props)
+@managedprops(*managed_props__input_full)
 def text_edit_renderer(widget, data):
     return input_generic_renderer(widget, data)
 
@@ -490,9 +505,6 @@ factory.defaults['text.default'] = ''
 factory.defaults['text.class'] = 'text'
 
 factory.defaults['text.disabled'] = False
-factory.doc['props']['text.disabled'] = """\
-Flag  input field is disabled.
-"""
 
 factory.defaults['text.persist'] = True
 
@@ -862,8 +874,7 @@ def _pwd_value(widget, data):
     return attr_value('default', widget, data)
 
 
-@managedprops('data', 'title', 'size', 'disabled', 'autofocus',
-              'placeholder', 'autocomplete', *css_managed_props)
+@managedprops(*managed_props__input_common)
 def password_edit_renderer(widget, data):
     """Render password widget.
     """
@@ -964,8 +975,7 @@ def checkbox_extractor(widget, data):
     )
 
 
-@managedprops('data', 'title', 'size', 'disabled', 'autofocus',
-              'format', 'disabled', 'checked', *css_managed_props)
+@managedprops('format', *managed_props__input_common)
 def checkbox_edit_renderer(widget, data):
     tag = data.tag
     input_attrs = input_attributes_common(widget, data)
@@ -1057,9 +1067,6 @@ Data-type of the extracted value. One out of ``bool`` or ``string``.
 factory.defaults['checkbox.class'] = 'checkbox'
 
 factory.defaults['checkbox.disabled'] = False
-factory.doc['props']['checkbox.disabled'] = """\
-Flag whether checkbox is disabled.
-"""
 
 factory.defaults['checkbox.checked'] = None
 factory.doc['props']['checkbox.checked'] = """\
@@ -1441,8 +1448,7 @@ def file_extractor(widget, data):
     return value
 
 
-@managedprops('accept', 'placeholder', 'autofocus',
-              'required', *css_managed_props)
+@managedprops('accept', *managed_props__input_common)
 def input_file_edit_renderer(widget, data):
     tag = data.tag
     input_attrs = input_attributes_common(widget, data, excludes=['value'])
@@ -1559,8 +1565,8 @@ factory.defaults['file.vocabulary'] = [
 # submit
 ###############################################################################
 
-@managedprops('label', 'class', 'action', 'handler',
-              'next', 'skip', 'expression')
+@managedprops('label', 'action', 'handler', 'next', 'skip', 'expression',
+              *managed_props__input_common)
 def submit_renderer(widget, data):
     expression = attr_value('expression', widget, data)
     if not expression:
@@ -1789,6 +1795,11 @@ def number_extractor(widget, data):
     return val
 
 
+@managedprops('min', 'max', 'step', *managed_props__input_full)
+def number_edit_renderer(widget, data):
+    return input_generic_renderer(widget, data)
+
+
 factory.register(
     'number',
     extractors=[
@@ -1798,7 +1809,7 @@ factory.register(
         generic_datatype_extractor,
         number_extractor,
     ],
-    edit_renderers=[input_generic_renderer],
+    edit_renderers=[number_edit_renderer],
     display_renderers=[
         generic_display_renderer,
         display_proxy_renderer

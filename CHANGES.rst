@@ -5,6 +5,9 @@ History
 2.2.1 (unreleased)
 ------------------
 
+- Use predefined lists of managed attributes for documentation where common or full generic input renderer are used.
+  [thet]
+
 - When creating a blueprint chain with a factory, allow blueprints defined after blueprints based in ``generic_input_renderer``.
   [thet]
 
