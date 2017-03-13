@@ -131,6 +131,11 @@ factory.doc['props']['disabled'] = """\
 Disables input.
 """
 
+factory.defaults['readonly'] = None
+factory.doc['props']['readonly'] = """\
+Readonly input.
+"""
+
 factory.defaults['required_class_default'] = 'required'
 factory.doc['props']['required_class_default'] = """\
 CSS-class to apply if required condition was not met - if no specific class
@@ -166,6 +171,7 @@ managed_props__input_common = css_managed_props + [
     'disabled',
     'maxlength',
     'placeholder',
+    'readonly',
     'required',
     'size',
     'title'
@@ -292,11 +298,14 @@ def input_attributes_common(widget, data, excludes=list(), value=None):
     autofocus = attr_value('autofocus', widget, data) and 'autofocus' or None
     disabled = attr_value('disabled', widget, data)
     disabled = bool(disabled) and 'disabled' or None
+    readonly = attr_value('readonly', widget, data)
+    readonly = bool(readonly) and 'readonly' or None
     required = attr_value('required', widget, data) and 'required' or None
     input_attrs = {
         'autofocus': autofocus,
         'class_': cssclasses(widget, data),
         'disabled': disabled,
+        'readonly': readonly,
         'id': cssid(widget, 'input'),
         'name_': widget.dottedpath,
         'placeholder': attr_value('placeholder', widget, data),

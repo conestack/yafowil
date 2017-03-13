@@ -188,7 +188,29 @@ Render with title attribute::
     u'<input class="text" id="input-MYTEXT" name="MYTEXT" 
     title="My awesome title" type="text" value="ja ha!" />'
 
-Generic HTML5 Data::
+ Render disabled::
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='MYTEXT',
+    ...     props={
+    ...         'disabled': True
+    ...     })
+    >>> widget()
+    u'<input class="text" disabled="disabled" id="input-MYTEXT" name="MYTEXT" type="text" value="" />'
+
+ Render readonly::
+
+    >>> widget = factory(
+    ...     'text',
+    ...     name='MYTEXT',
+    ...     props={
+    ...         'readonly': True
+    ...     })
+    >>> widget()
+    u'<input class="text" id="input-MYTEXT" name="MYTEXT" readonly="readonly" type="text" value="" />'
+
+ Generic HTML5 Data::
 
     >>> widget = factory(
     ...     'text',

@@ -5,6 +5,9 @@ History
 2.2.1 (unreleased)
 ------------------
 
+- Add ``readonly`` as possible attribute of input elements.
+  [thet]
+
 - Use predefined lists of managed attributes for documentation where common or full generic input renderer are used.
   [thet]
 
