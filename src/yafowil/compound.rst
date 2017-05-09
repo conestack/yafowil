@@ -491,6 +491,13 @@ Div blueprint can act as compound or leaf widget::
     <RuntimeData field, value='1', extracted='2' at ...>
 
     >>> input = factory(
+    ...     'div',
+    ...     'field')
+    >>> pxml(input())
+    <div/>
+    <BLANKLINE>
+
+    >>> input = factory(
     ...     'div:text',
     ...     'field',
     ...     value='1',

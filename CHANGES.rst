@@ -5,6 +5,9 @@ History
 2.2.1 (unreleased)
 ------------------
 
+- Fix rendering of empty div blueprint.
+  [rnix]
+
 - Add ``readonly`` as possible attribute of input elements.
   [thet]
 

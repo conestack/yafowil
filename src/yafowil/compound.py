@@ -106,6 +106,8 @@ def div_renderer(widget, data):
         rendered = compound_renderer(widget, data)
     else:
         rendered = data.rendered
+        if data.rendered is None:
+            rendered = u''
     return data.tag('div', rendered, **attrs)
 
 
