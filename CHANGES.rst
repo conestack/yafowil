@@ -8,11 +8,17 @@ History
 - Add ``readonly`` as possible attribute of input elements.
   [thet]
 
-- Use predefined lists of managed attributes for documentation where common or full generic input renderer are used.
+- Use predefined lists of managed attributes for documentation where common or
+  full generic input renderer are used.
   [thet]
 
-- When creating a blueprint chain with a factory, allow blueprints defined after blueprints based in ``generic_input_renderer``.
+- When creating a blueprint chain with a factory, allow blueprints defined
+  after blueprints based in ``generic_input_renderer``.
   [thet]
+
+- Explicitely check for ``None`` and ``UNSET`` before rendering empty value in
+  ``generic_display_renderer``.
+  [rnix]
 
 
 2.2 (2016-10-06)
