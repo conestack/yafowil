@@ -5,7 +5,9 @@ History
 2.2.1 (unreleased)
 ------------------
 
-- No chnages yet.
+- Explicitely check for ``None`` and ``UNSET`` before rendering empty value in
+  ``generic_display_renderer``.
+  [rnix]
 
 
 2.2 (2016-10-06)
