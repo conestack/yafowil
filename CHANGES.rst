@@ -5,9 +5,6 @@ History
 2.2.1 (unreleased)
 ------------------
 
-- Fix rendering of empty div blueprint.
-  [rnix]
-
 - Add ``readonly`` as possible attribute of input elements.
   [thet]
 
@@ -18,6 +15,12 @@ History
 - When creating a blueprint chain with a factory, allow blueprints defined
   after blueprints based in ``generic_input_renderer``.
   [thet]
+
+- Consider data attributes in ``div_renderer``.
+  [rnix]
+
+- Fix rendering of empty in div ``div_renderer``.
+  [rnix]
 
 - Explicitely check for ``None`` and ``UNSET`` before rendering empty value in
   ``generic_display_renderer``.
