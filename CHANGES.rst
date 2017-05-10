@@ -5,6 +5,9 @@ History
 2.2.1 (unreleased)
 ------------------
 
+- Fix rendering of empty div blueprint.
+  [rnix]
+
 - Explicitely check for ``None`` and ``UNSET`` before rendering empty value in
   ``generic_display_renderer``.
   [rnix]
