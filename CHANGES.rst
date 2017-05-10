@@ -5,7 +5,10 @@ History
 2.2.1 (unreleased)
 ------------------
 
-- Fix rendering of empty div blueprint.
+- Consider data attributes in div renderer.
+  [rnix]
+
+- Fix rendering of empty div renderer.
   [rnix]
 
 - Explicitely check for ``None`` and ``UNSET`` before rendering empty value in

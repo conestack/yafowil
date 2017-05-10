@@ -6,6 +6,7 @@ from yafowil.utils import attr_value
 from yafowil.utils import css_managed_props
 from yafowil.utils import cssclasses
 from yafowil.utils import cssid
+from yafowil.utils import generic_html5_attrs
 from yafowil.utils import managedprops
 
 
@@ -100,8 +101,9 @@ def hybrid_extractor(widget, data):
 def div_renderer(widget, data):
     attrs = {
         'id': attr_value('id', widget, data),
-        'class_': cssclasses(widget, data),
+        'class_': cssclasses(widget, data)
     }
+    attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
     if len(widget):
         rendered = compound_renderer(widget, data)
     else:
@@ -123,7 +125,17 @@ Like ``compound`` blueprint but renders within '<div>' element.
 
 factory.defaults['div.id'] = None
 factory.doc['props']['div.id'] = """\
-HTML id attribute.
+Id attribute for div tag.
+"""
+
+factory.defaults['div.class'] = None
+factory.doc['props']['div.class'] = """\
+CSS classes for div tag.
+"""
+
+factory.defaults['div.data'] = None
+factory.doc['props']['div.data'] = """\
+Dict containing data attributes for div tag.
 """
 
 

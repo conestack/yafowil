@@ -498,6 +498,18 @@ Div blueprint can act as compound or leaf widget::
     <BLANKLINE>
 
     >>> input = factory(
+    ...     'div',
+    ...     'field',
+    ...     props={
+    ...         'data': {
+    ...             'foo': 'bar'
+    ...         }
+    ...     })
+    >>> pxml(input())
+    <div data-foo="bar"/>
+    <BLANKLINE>
+
+    >>> input = factory(
     ...     'div:text',
     ...     'field',
     ...     value='1',
