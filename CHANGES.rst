@@ -5,6 +5,11 @@ History
 2.2.1 (unreleased)
 ------------------
 
+- Introduce ``hybrid_renderer`` and ``leaf`` widget property which gets
+  considered in ``hybrid_renderer`` and ``hybrid_extractor``. Use
+  ``hybrid_renderer`` in ``div`` blueprint.
+  [rnix]
+
 - Consider data attributes in div renderer.
   [rnix]
 

@@ -427,7 +427,7 @@ Check compound with value callbacks::
 Div
 ---
 
-Div blueprint can act as compound or leaf widget::
+Div blueprint as compound::
 
     >>> div = factory(
     ...     'div',
@@ -463,16 +463,37 @@ Div blueprint can act as compound or leaf widget::
       <RuntimeData WRAPPED_COMPOUND.inner2, value='value2', 
         extracted='2' at ...>
 
+Dic blueprint as compound, but with ``leaf`` property set. Causes
+``hybrid_renderer`` and ``hybrid_extractor`` to skip auto delegating to
+``compound_renderer`` and ``compound_extractor``::
+
     >>> div = factory(
     ...     'div',
     ...     name='WRAPPED_COMPOUND',
     ...     props={
-    ...         'class': 'foo'
-    ...     },
-    ...     mode='display')
+    ...         'leaf': True
+    ...     })
+    >>> div['inner']  = factory(
+    ...     'text',
+    ...     value='value1')
+    >>> div['inner2'] = factory(
+    ...     'text',
+    ...     value='value2',
+    ...     props={
+    ...         'required': True
+    ...     })
     >>> pxml(div())
-    <div class="foo"/>
+    <div/>
     <BLANKLINE>
+
+    >>> data = div.extract({
+    ...     'WRAPPED_COMPOUND.inner': '1',
+    ...     'WRAPPED_COMPOUND.inner2': '2',
+    ... })
+    >>> data.printtree()
+    <RuntimeData WRAPPED_COMPOUND, value=<UNSET>, extracted=<UNSET> at ...>
+
+Div blueprint as leaf::
 
     >>> input = factory(
     ...     'div:text',
@@ -490,12 +511,16 @@ Div blueprint can act as compound or leaf widget::
     >>> data.printtree()
     <RuntimeData field, value='1', extracted='2' at ...>
 
+Empty div::
+
     >>> input = factory(
     ...     'div',
     ...     'field')
     >>> pxml(input())
     <div/>
     <BLANKLINE>
+
+Div with data attributes::
 
     >>> input = factory(
     ...     'div',
@@ -507,6 +532,19 @@ Div blueprint can act as compound or leaf widget::
     ...     })
     >>> pxml(input())
     <div data-foo="bar"/>
+    <BLANKLINE>
+
+Display mode::
+
+    >>> div = factory(
+    ...     'div',
+    ...     name='WRAPPED_COMPOUND',
+    ...     props={
+    ...         'class': 'foo'
+    ...     },
+    ...     mode='display')
+    >>> pxml(div())
+    <div class="foo"/>
     <BLANKLINE>
 
     >>> input = factory(
