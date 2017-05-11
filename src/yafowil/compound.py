@@ -53,6 +53,12 @@ def compound_renderer(widget, data):
             if callable(value):
                 value = value(widget, data)
             if value is not UNSET and childname in value:
+                # XXX: if compound renderer is called multiple times on the
+                #      same widget within one form processing cycle
+                #      ``child.getter`` has been set, so the condition is True
+                #      and ``ValueError`` is raised. Think about widget
+                #      instance annotations to mark value delegation already
+                #      processed.
                 if child.getter is UNSET:
                     child.getter = value[childname]
                 else:
@@ -86,16 +92,49 @@ will not have an own runtime-data.
 
 
 ###############################################################################
-# div
+# hybrid
 ###############################################################################
 
+@managedprops('leaf')
 def hybrid_extractor(widget, data):
     """This extractor can be used if a blueprint can act as compound or leaf.
     """
-    if len(widget):
+    if len(widget) and not attr_value('leaf', widget, data):
         return compound_extractor(widget, data)
     return data.extracted
 
+
+@managedprops('leaf')
+def hybrid_renderer(widget, data):
+    """This renderer can be used if a blueprint can act as compound or leaf.
+    """
+    if len(widget) and not attr_value('leaf', widget, data):
+        rendered = compound_renderer(widget, data)
+    else:
+        rendered = data.rendered
+        if data.rendered is None:
+            rendered = u''
+    return rendered
+
+
+factory.defaults['leaf'] = None
+factory.doc['props']['leaf'] = """\
+Leaf property can be used in conjunction with ``hybrid_extractor`` and
+``hybrid_renderer`` using blueprints in order to mark compound widgets as leaf.
+
+If set True, it causes bypassing auto delegation of extraction and rendering
+to ``compound_renderer`` respective ``compound_extractor`` if widget contains
+children.
+
+This is useful if mixing blueprints which renders and handles compounds on it's
+own with blueprints using hybrid rendering and extraction in order to prevent
+side effects due to multiple child rendering and extraction.
+"""
+
+
+###############################################################################
+# div
+###############################################################################
 
 @managedprops('id', *css_managed_props)
 def div_renderer(widget, data):
@@ -104,23 +143,25 @@ def div_renderer(widget, data):
         'class_': cssclasses(widget, data)
     }
     attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
-    if len(widget):
-        rendered = compound_renderer(widget, data)
-    else:
-        rendered = data.rendered
-        if data.rendered is None:
-            rendered = u''
-    return data.tag('div', rendered, **attrs)
+    return data.tag('div', data.rendered, **attrs)
 
 
 factory.register(
     'div',
     extractors=[hybrid_extractor],
-    edit_renderers=[div_renderer],
-    display_renderers=[div_renderer])
+    edit_renderers=[
+        hybrid_renderer,
+        div_renderer
+    ],
+    display_renderers=[
+        hybrid_renderer,
+        div_renderer
+    ])
 
 factory.doc['blueprint']['div'] = """\
-Like ``compound`` blueprint but renders within '<div>' element.
+Blueprint rendering a '<div>' element.
+
+This is a hybrid blueprint. Check ``leaf`` property for details.
 """
 
 factory.defaults['div.id'] = None

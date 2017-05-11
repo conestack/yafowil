@@ -16,7 +16,12 @@ History
   after blueprints based in ``generic_input_renderer``.
   [thet]
 
-- Consider data attributes in ``div_renderer``.
+- Introduce ``hybrid_renderer`` and ``leaf`` widget property which gets
+  considered in ``hybrid_renderer`` and ``hybrid_extractor``. Use
+  ``hybrid_renderer`` in ``div`` blueprint.
+  [rnix]
+
+- Consider data attributes in div renderer.
   [rnix]
 
 - Fix rendering of empty in div ``div_renderer``.
