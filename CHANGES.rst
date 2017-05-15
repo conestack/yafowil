@@ -2,7 +2,7 @@
 History
 =======
 
-2.2.1 (unreleased)
+2.2.1 (2017-05-15)
 ------------------
 
 - Introduce ``hybrid_renderer`` and ``leaf`` widget property which gets
