@@ -97,12 +97,11 @@ Datatype::
     >>> widget.extract(request={'MYHIDDEN': ''})
     <RuntimeData MYHIDDEN, value=<UNSET>, extracted=0 at ...>
 
-Be aware that working with datatype on hidden without emptyvalue may result in
-extraction errors, which is really unwanted::
+Default emptyvalue extraction::
 
     >>> del widget.attrs['emptyvalue']
     >>> widget.extract(request={'MYHIDDEN': ''})
-    <RuntimeData MYHIDDEN, value=<UNSET>, extracted='', 1 error(s) at ...>
+    <RuntimeData MYHIDDEN, value=<UNSET>, extracted=<EMPTY_VALUE> at ...>
 
 Persist property::
 
@@ -502,7 +501,7 @@ Default emptyvalue::
 
     >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
-    ([], '')
+    ([], <EMPTY_VALUE>)
 
 UNSET emptyvalue::
 
@@ -532,10 +531,6 @@ Unicode emptyvalue::
     >>> data.errors, data.extracted
     ([], <UNSET>)
 
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], '')
-
 Test emptyvalue if ``int`` datatype set::
 
     >>> widget = factory(
@@ -554,7 +549,7 @@ Default emptyvalue::
 
     >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
-    ([ExtractionError('Input is not a valid integer.',)], '')
+    ([], <EMPTY_VALUE>)
 
 UNSET emptyvalue::
 
@@ -607,7 +602,7 @@ Default emptyvalue::
 
     >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
-    ([ExtractionError('Input is not a valid long integer.',)], '')
+    ([], <EMPTY_VALUE>)
 
 UNSET emptyvalue::
 
@@ -660,7 +655,7 @@ Default emptyvalue::
 
     >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
-    ([ExtractionError('Input is not a valid floating point number.',)], '')
+    ([], <EMPTY_VALUE>)
 
 UNSET emptyvalue::
 
@@ -713,7 +708,7 @@ Default emptyvalue::
 
     >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
-    ([ExtractionError('Input is not a valid UUID.',)], '')
+    ([], <EMPTY_VALUE>)
 
 UNSET emptyvalue::
 
@@ -3234,12 +3229,11 @@ Datatype::
     >>> widget.extract(request={'PROXY': ''})
     <RuntimeData PROXY, value='', extracted=1.0 at ...>
 
-Be aware that working with datatype on proxy without emptyvalue may result in
-extraction errors, which is really unwanted::
+Default emptyvalue extraction::
 
     >>> del widget.attrs['emptyvalue']
     >>> widget.extract(request={'PROXY': ''})
-    <RuntimeData PROXY, value='', extracted='', 1 error(s) at ...>
+    <RuntimeData PROXY, value='', extracted=<EMPTY_VALUE> at ...>
 
 Persist::
 

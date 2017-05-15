@@ -401,10 +401,18 @@ Test convert_value_to_datatype
 
 Unknown string identifier::
 
-    >>> convert_value_to_datatype('', 'inexistent')
+    >>> convert_value_to_datatype('val', 'inexistent')
     Traceback (most recent call last):
       ...
     KeyError: 'inexistent'
+
+Function returns ``EMPTY_VALUE`` marker if value is ``None`` or empty string::
+
+    >>> convert_value_to_datatype('', 'uuid')
+    <EMPTY_VALUE>
+
+    >>> convert_value_to_datatype(None, 'uuid')
+    <EMPTY_VALUE>
 
 Convert to string::
 

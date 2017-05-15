@@ -306,6 +306,26 @@ def cssclasses(widget, data, classattr='class', additional=[]):
     return _classes and ' '.join(sorted(_classes)) or None
 
 
+class EmptyValue(object):
+    """Used to identify empty values in conjunction with datatype extraction.
+    """
+
+    def __nonzero__(self):
+        return False
+
+    def __str__(self):
+        return ''
+
+    def __len__(self):
+        return 0
+
+    def __repr__(self):
+        return '<EMPTY_VALUE>'
+
+
+EMPTY_VALUE = EmptyValue()
+
+
 DATATYPE_PRECONVERTERS = {
     float: lambda x: isinstance(x, basestring) and x.replace(',', '.') or x
 }
@@ -330,6 +350,10 @@ def convert_value_to_datatype(value, datatype):
 
     If value is ``UNSET``, return ``UNSET``, regardless of given datatype.
 
+    If value is ``None`` or ``''``, return ``EMPTY_VALUE`` marker. Be aware
+    that empty value marker is even returned if ``str`` datatype, to provide a
+    consistent behavior.
+
     Converter callables must raise one out of the following exceptions if
     conversion fails:
         * ``ValueError``
@@ -337,7 +361,9 @@ def convert_value_to_datatype(value, datatype):
         * ``UnicodeEncodeError``
     """
     if value is UNSET:
-        return value
+        return UNSET
+    if value in [None, '']:
+        return EMPTY_VALUE
     if isinstance(datatype, basestring):
         converter = DATATYPE_CONVERTERS[datatype]
     else:
@@ -358,7 +384,6 @@ def convert_values_to_datatype(value, datatype):
     if isinstance(value, list):
         res = list()
         for item in value:
-            converted = convert_value_to_datatype(item, datatype)
-            res.append(converted)
+            res.append(convert_value_to_datatype(item, datatype))
         return res
     return convert_value_to_datatype(value, datatype)

@@ -5,7 +5,10 @@ History
 2.2.2 (unreleased)
 ------------------
 
-- No changes yet.
+- ``yafowil.utils.convert_value_to_datatype`` returns
+  ``yafowil.utils.EMPTY_VALUE`` marker object if value to convert is None
+  or empty string.
+  [rnix]
 
 
 2.2.1 (2017-05-15)
