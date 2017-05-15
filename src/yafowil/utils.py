@@ -307,7 +307,7 @@ def cssclasses(widget, data, classattr='class', additional=[]):
 
 
 class EmptyValue(object):
-    """Used to identify empty values in conjunction with datatype extraction.
+    """Used to identify empty values in conjunction with data type conversion.
     """
 
     def __nonzero__(self):

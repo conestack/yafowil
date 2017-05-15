@@ -1140,12 +1140,7 @@ def select_exists_marker(widget, data):
     return tag('input', **attrs)
 
 
-@managedprops('data', 'title', 'format', 'vocabulary', 'multivalued',
-              'disabled', 'listing_label_position', 'listing_tag', 'size',
-              'label_checkbox_class', 'label_radio_class', 'block_class',
-              'autofocus', 'placeholder', *css_managed_props)
-def select_edit_renderer(widget, data, custom_attrs={}):
-    tag = data.tag
+def _select_edit_props(widget, data):
     value = fetch_value(widget, data)
     multivalued = attr_value('multivalued', widget, data)
     if isinstance(value, basestring) or not hasattr(value, '__iter__'):
@@ -1156,104 +1151,125 @@ def select_edit_renderer(widget, data, custom_attrs={}):
     if not multivalued and len(value) > 1:
         raise ValueError(u'Multiple values for single selection.')
     disabled = attr_value('disabled', widget, data, False)
-    if attr_value('format', widget, data) == 'block':
-        optiontags = []
-        vocab = attr_value('vocabulary', widget, data, [])
-        for key, term in vocabulary(vocab):
-            if datatype:
-                key = convert_value_to_datatype(key, datatype)
-            attrs = {
-                'selected': (key in value) and 'selected' or None,
-                'value': key,
-                'id': cssid(widget, 'input', key),
-            }
-            if disabled and disabled is not True and key in disabled:
-                attrs['disabled'] = 'disabled'
-            optiontags.append(tag('option', term, **attrs))
-        autofocus = \
-            attr_value('autofocus', widget, data) and 'autofocus' or None
-        required = attr_value('required', widget, data) and 'required' or None
-        block_class = attr_value('block_class', widget, data)
-        select_attrs = {
-            'name_': widget.dottedpath,
-            'id': cssid(widget, 'input'),
-            'title': attr_value('title', widget, data) or None,
-            'class_': cssclasses(widget, data, additional=[block_class]),
-            'multiple': multivalued and 'multiple' or None,
-            'size': attr_value('size', widget, data) or None,
-            'placeholder': attr_value('placeholder', widget, data) or None,
-            'autofocus': autofocus,
-            'required': required,
+    return value, multivalued, datatype, disabled
+
+
+def select_block_edit_renderer(widget, data, custom_attrs={}):
+    value, multivalued, datatype, disabled = _select_edit_props(widget, data)
+    optiontags = []
+    vocab = attr_value('vocabulary', widget, data, [])
+    for key, term in vocabulary(vocab):
+        if datatype:
+            key = convert_value_to_datatype(key, datatype)
+        attrs = {
+            'selected': (key in value) and 'selected' or None,
+            'value': key,
+            'id': cssid(widget, 'input', key),
         }
-        select_attrs.update(
-            generic_html5_attrs(
-                attr_value('data', widget, data)))
-        select_attrs.update(custom_attrs)
-        if disabled is True:
-            select_attrs['disabled'] = 'disabled'
-        rendered = tag('select', *optiontags, **select_attrs)
-        if multivalued:
-            attrs = {
-                'type': 'hidden',
-                'value': 'exists',
-                'name_': '{0}-exists'.format(widget.dottedpath),
-                'id': cssid(widget, 'exists'),
-            }
-            rendered = select_exists_marker(widget, data) + rendered
-        return rendered
+        if disabled and disabled is not True and key in disabled:
+            attrs['disabled'] = 'disabled'
+        optiontags.append(data.tag('option', term, **attrs))
+    autofocus = \
+        attr_value('autofocus', widget, data) and 'autofocus' or None
+    required = attr_value('required', widget, data) and 'required' or None
+    block_class = attr_value('block_class', widget, data)
+    select_attrs = {
+        'name_': widget.dottedpath,
+        'id': cssid(widget, 'input'),
+        'title': attr_value('title', widget, data) or None,
+        'class_': cssclasses(widget, data, additional=[block_class]),
+        'multiple': multivalued and 'multiple' or None,
+        'size': attr_value('size', widget, data) or None,
+        'placeholder': attr_value('placeholder', widget, data) or None,
+        'autofocus': autofocus,
+        'required': required,
+    }
+    select_attrs.update(
+        generic_html5_attrs(
+            attr_value('data', widget, data)))
+    select_attrs.update(custom_attrs)
+    if disabled is True:
+        select_attrs['disabled'] = 'disabled'
+    rendered = data.tag('select', *optiontags, **select_attrs)
+    if multivalued:
+        attrs = {
+            'type': 'hidden',
+            'value': 'exists',
+            'name_': '{0}-exists'.format(widget.dottedpath),
+            'id': cssid(widget, 'exists'),
+        }
+        rendered = select_exists_marker(widget, data) + rendered
+    return rendered
+
+
+def select_cb_edit_renderer(widget, data, custom_attrs={}):
+    value, multivalued, datatype, disabled = _select_edit_props(widget, data)
+    tags = []
+    label_pos = attr_value('listing_label_position', widget, data)
+    if label_pos == 'inner':
+        # deprecated, use explicit inner-after or inner-before
+        label_pos = 'inner-after'
+    listing_tag = attr_value('listing_tag', widget, data)
+    item_tag = listing_tag == 'div' and 'div' or 'li'
+    if multivalued:
+        tagtype = 'checkbox'
+        wrapper_class = attr_value('checkbox_wrapper_class', widget, data)
+        label_class = attr_value('checkbox_label_class', widget, data)
+        # B/C deprecated as of yafowil 2.2
+        if not label_class:
+            label_class = attr_value('label_checkbox_class', widget, data)
     else:
-        tags = []
-        label_pos = attr_value('listing_label_position', widget, data)
-        if label_pos == 'inner':
-            # deprecated, use explicit inner-after or inner-before
-            label_pos = 'inner-after'
-        listing_tag = attr_value('listing_tag', widget, data)
-        item_tag = listing_tag == 'div' and 'div' or 'li'
-        if multivalued:
-            tagtype = 'checkbox'
-            wrapper_class = attr_value('checkbox_wrapper_class', widget, data)
-            label_class = attr_value('checkbox_label_class', widget, data)
-            # B/C deprecated as of yafowil 2.2
-            if not label_class:
-                label_class = attr_value('label_checkbox_class', widget, data)
-        else:
-            tagtype = 'radio'
-            wrapper_class = attr_value('radio_wrapper_class', widget, data)
-            label_class = attr_value('radio_label_class', widget, data)
-            # B/C deprecated as of yafowil 2.2
-            if not label_class:
-                label_class = attr_value('label_radio_class', widget, data)
-        vocab = attr_value('vocabulary', widget, data, [])
-        for key, term in vocabulary(vocab):
-            if datatype:
-                key = convert_value_to_datatype(key, datatype)
-            input_attrs = {
-                'type': tagtype,
-                'value': key,
-                'checked': (key in value) and 'checked' or None,
-                'name_': widget.dottedpath,
-                'id': cssid(widget, 'input', key),
-                'class_': cssclasses(widget, data),
-            }
-            if (disabled and disabled is not True and key in disabled) \
-               or disabled is True:
-                input_attrs['disabled'] = 'disabled'
-            inputtag = tag('input', **input_attrs)
-            label_attrs = dict(for_=input_attrs['id'], _class=label_class)
-            item = generic_positional_rendering_helper(
-                'label', term, label_attrs, inputtag, label_pos, tag)
-            item_wrapper = tag(item_tag, item, **{
-                'id': cssid(widget, tagtype, key),
-                'class': wrapper_class,
-            })
-            tags.append(item_wrapper)
-        wrapper_attrs = {'id': cssid(widget, tagtype, 'wrapper')}
-        wrapper_attrs.update(
-            generic_html5_attrs(
-                attr_value('data', widget, data)))
-        wrapper_attrs.update(custom_attrs)
-        taglisting = tag(listing_tag, *tags, **wrapper_attrs)
-        return select_exists_marker(widget, data) + taglisting
+        tagtype = 'radio'
+        wrapper_class = attr_value('radio_wrapper_class', widget, data)
+        label_class = attr_value('radio_label_class', widget, data)
+        # B/C deprecated as of yafowil 2.2
+        if not label_class:
+            label_class = attr_value('label_radio_class', widget, data)
+    vocab = attr_value('vocabulary', widget, data, [])
+    for key, term in vocabulary(vocab):
+        if datatype:
+            key = convert_value_to_datatype(key, datatype)
+        input_attrs = {
+            'type': tagtype,
+            'value': key,
+            'checked': (key in value) and 'checked' or None,
+            'name_': widget.dottedpath,
+            'id': cssid(widget, 'input', key),
+            'class_': cssclasses(widget, data),
+        }
+        if (disabled and disabled is not True and key in disabled) \
+           or disabled is True:
+            input_attrs['disabled'] = 'disabled'
+        inputtag = data.tag('input', **input_attrs)
+        label_attrs = dict(for_=input_attrs['id'], _class=label_class)
+        item = generic_positional_rendering_helper(
+            'label', term, label_attrs, inputtag, label_pos, data.tag)
+        item_wrapper = data.tag(item_tag, item, **{
+            'id': cssid(widget, tagtype, key),
+            'class': wrapper_class,
+        })
+        tags.append(item_wrapper)
+    wrapper_attrs = {'id': cssid(widget, tagtype, 'wrapper')}
+    wrapper_attrs.update(
+        generic_html5_attrs(
+            attr_value('data', widget, data)))
+    wrapper_attrs.update(custom_attrs)
+    taglisting = data.tag(listing_tag, *tags, **wrapper_attrs)
+    return select_exists_marker(widget, data) + taglisting
+
+
+@managedprops('data', 'title', 'format', 'vocabulary', 'multivalued',
+              'disabled', 'listing_label_position', 'listing_tag', 'size',
+              'label_checkbox_class', 'label_radio_class', 'block_class',
+              'autofocus', 'placeholder', *css_managed_props)
+def select_edit_renderer(widget, data, custom_attrs={}):
+    if attr_value('format', widget, data) == 'block':
+        return select_block_edit_renderer(
+            widget,
+            data,
+            custom_attrs=custom_attrs
+        )
+    return select_cb_edit_renderer(widget, data, custom_attrs=custom_attrs)
 
 
 @managedprops('data', 'template', 'class', 'multivalued')
