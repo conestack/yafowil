@@ -342,7 +342,7 @@ DATATYPE_CONVERTERS = {
 }
 
 
-def convert_value_to_datatype(value, datatype):
+def convert_value_to_datatype(value, datatype, empty_value=EMPTY_VALUE):
     """Convert given value to datatype.
 
     Datatype is either a callable or a string out of ``'str'``, ``'unicode'``,
@@ -350,20 +350,26 @@ def convert_value_to_datatype(value, datatype):
 
     If value is ``UNSET``, return ``UNSET``, regardless of given datatype.
 
-    If value is ``None`` or ``''``, return ``EMPTY_VALUE`` marker. Be aware
-    that empty value marker is even returned if ``str`` datatype, to provide a
-    consistent behavior.
+    If value is ``EMPTY_VALUE``, return ``empty_value``, which defaults to
+    ``EMPTY_VALUE`` marker.
+
+    If value is ``None`` or ``''``, return ``empty_value``, which defaults to
+    ``EMPTY_VALUE`` marker. Be aware that empty value marker is even returned
+    if ``str`` datatype, to provide a consistent behavior.
 
     Converter callables must raise one out of the following exceptions if
     conversion fails:
+
         * ``ValueError``
         * ``UnicodeDecodeError``
         * ``UnicodeEncodeError``
     """
     if value is UNSET:
         return UNSET
+    if value is EMPTY_VALUE:
+        return empty_value
     if value in [None, '']:
-        return EMPTY_VALUE
+        return empty_value
     if isinstance(datatype, basestring):
         converter = DATATYPE_CONVERTERS[datatype]
     else:
@@ -380,10 +386,14 @@ def convert_value_to_datatype(value, datatype):
     return converter(value)
 
 
-def convert_values_to_datatype(value, datatype):
+def convert_values_to_datatype(value, datatype, empty_value=EMPTY_VALUE):
     if isinstance(value, list):
         res = list()
         for item in value:
-            res.append(convert_value_to_datatype(item, datatype))
+            res.append(convert_value_to_datatype(
+                item,
+                datatype,
+                empty_value=empty_value
+            ))
         return res
-    return convert_value_to_datatype(value, datatype)
+    return convert_value_to_datatype(value, datatype, empty_value=empty_value)

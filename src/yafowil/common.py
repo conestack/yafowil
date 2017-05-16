@@ -4,6 +4,7 @@ from yafowil.base import ExtractionError
 from yafowil.base import factory
 from yafowil.base import fetch_value
 from yafowil.tsf import _
+from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import attr_value
 from yafowil.utils import convert_value_to_datatype
 from yafowil.utils import convert_values_to_datatype
@@ -223,7 +224,8 @@ DATATYPE_LABELS['float'] = DATATYPE_LABELS[float]
 DATATYPE_LABELS['uuid'] = DATATYPE_LABELS[uuid.UUID]
 
 
-@managedprops('datatype', 'allowed_datatypes', 'datatype_message')
+@managedprops('datatype', 'allowed_datatypes',
+              'datatype_message', 'emptyvalue')
 def generic_datatype_extractor(widget, data):
     """Convert extracted value to ``datatype``.
 
@@ -245,7 +247,12 @@ def generic_datatype_extractor(widget, data):
     if allowed_datatypes and datatype not in allowed_datatypes:
         raise ValueError('Datatype not allowed: "{0}"'.format(datatype))
     try:
-        return convert_values_to_datatype(extracted, datatype)
+        emptyvalue = attr_value('emptyvalue', widget, data, EMPTY_VALUE)
+        return convert_values_to_datatype(
+            extracted,
+            datatype,
+            empty_value=emptyvalue
+        )
     except KeyError:
         raise ValueError('Datatype unknown: "{0}"'.format(datatype))
     except (ValueError, UnicodeEncodeError, UnicodeDecodeError):
@@ -1140,7 +1147,7 @@ def select_exists_marker(widget, data):
     return tag('input', **attrs)
 
 
-def _select_edit_props(widget, data):
+def select_edit_renderer_props(widget, data):
     value = fetch_value(widget, data)
     multivalued = attr_value('multivalued', widget, data)
     if isinstance(value, basestring) or not hasattr(value, '__iter__'):
@@ -1148,25 +1155,33 @@ def _select_edit_props(widget, data):
     datatype = attr_value('datatype', widget, data)
     if datatype:
         value = convert_values_to_datatype(value, datatype)
+    emptyvalue = attr_value('emptyvalue', widget, data, EMPTY_VALUE)
     if not multivalued and len(value) > 1:
         raise ValueError(u'Multiple values for single selection.')
     disabled = attr_value('disabled', widget, data, False)
-    return value, multivalued, datatype, disabled
+    return value, multivalued, datatype, emptyvalue, disabled
 
 
 def select_block_edit_renderer(widget, data, custom_attrs={}):
-    value, multivalued, datatype, disabled = _select_edit_props(widget, data)
+    value, multivalued, datatype, emptyvalue, disabled = \
+        select_edit_renderer_props(widget, data)
     optiontags = []
     vocab = attr_value('vocabulary', widget, data, [])
     for key, term in vocabulary(vocab):
+        vval = key
         if datatype:
-            key = convert_value_to_datatype(key, datatype)
+            vval = convert_value_to_datatype(
+                key,
+                datatype,
+                empty_value=emptyvalue
+            )
+        key = '' if key is None else key
         attrs = {
-            'selected': (key in value) and 'selected' or None,
+            'selected': 'selected' if vval in value else None,
             'value': key,
             'id': cssid(widget, 'input', key),
         }
-        if disabled and disabled is not True and key in disabled:
+        if disabled and disabled is not True and vval in disabled:
             attrs['disabled'] = 'disabled'
         optiontags.append(data.tag('option', term, **attrs))
     autofocus = \
@@ -1203,7 +1218,8 @@ def select_block_edit_renderer(widget, data, custom_attrs={}):
 
 
 def select_cb_edit_renderer(widget, data, custom_attrs={}):
-    value, multivalued, datatype, disabled = _select_edit_props(widget, data)
+    value, multivalued, datatype, emptyvalue, disabled = \
+        select_edit_renderer_props(widget, data)
     tags = []
     label_pos = attr_value('listing_label_position', widget, data)
     if label_pos == 'inner':
@@ -1227,17 +1243,23 @@ def select_cb_edit_renderer(widget, data, custom_attrs={}):
             label_class = attr_value('label_radio_class', widget, data)
     vocab = attr_value('vocabulary', widget, data, [])
     for key, term in vocabulary(vocab):
+        vval = key
         if datatype:
-            key = convert_value_to_datatype(key, datatype)
+            vval = convert_value_to_datatype(
+                key,
+                datatype,
+                empty_value=emptyvalue
+            )
+        key = '' if key is None else key
         input_attrs = {
             'type': tagtype,
             'value': key,
-            'checked': (key in value) and 'checked' or None,
+            'checked': 'checked' if vval in value else None,
             'name_': widget.dottedpath,
             'id': cssid(widget, 'input', key),
             'class_': cssclasses(widget, data),
         }
-        if (disabled and disabled is not True and key in disabled) \
+        if (disabled and disabled is not True and vval in disabled) \
            or disabled is True:
             input_attrs['disabled'] = 'disabled'
         inputtag = data.tag('input', **input_attrs)
@@ -1261,7 +1283,8 @@ def select_cb_edit_renderer(widget, data, custom_attrs={}):
 @managedprops('data', 'title', 'format', 'vocabulary', 'multivalued',
               'disabled', 'listing_label_position', 'listing_tag', 'size',
               'label_checkbox_class', 'label_radio_class', 'block_class',
-              'autofocus', 'placeholder', *css_managed_props)
+              'autofocus', 'placeholder', 'datatype', 'emptyvalue',
+              *css_managed_props)
 def select_edit_renderer(widget, data, custom_attrs={}):
     if attr_value('format', widget, data) == 'block':
         return select_block_edit_renderer(

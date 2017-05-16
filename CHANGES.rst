@@ -5,9 +5,20 @@ History
 2.2.2 (unreleased)
 ------------------
 
-- ``yafowil.utils.convert_value_to_datatype`` returns
-  ``yafowil.utils.EMPTY_VALUE`` marker object if value to convert is None
-  or empty string.
+- ``yafowil.common.generic_datatype_extractor`` considers ``emptyvalue`` used
+  as default empty value for datatype conversion.
+  [rnix]
+
+- Improve ``yafowil.common.select_edit_renderer``. Split up code and consider
+  ``datatype`` and ``emptyvalue`` when dealing with vocabularies.
+  [rnix]
+
+- ``yafowil.utils.convert_values_to_datatype`` and
+  ``yafowil.utils.convert_value_to_datatype`` considers empty value handling
+  and accept default ``empty_value`` keyword argument.
+  [rnix]
+
+- Introduce ``yafowil.utils.EMPTY_VALUE`` marker.
   [rnix]
 
 

@@ -16,6 +16,7 @@ Imports::
     >>> from yafowil.base import factory
     >>> from yafowil.common import convert_bytes
     >>> from yafowil.persistence import write_mapping_writer
+    >>> from yafowil.utils import EMPTY_VALUE
     >>> from yafowil.utils import Tag
     >>> import uuid
 
@@ -503,6 +504,17 @@ Default emptyvalue::
     >>> data.errors, data.extracted
     ([], <EMPTY_VALUE>)
 
+None emptyvalue::
+
+    >>> widget.attrs['emptyvalue'] = None
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
+    >>> data.errors, data.extracted
+    ([], None)
+
 UNSET emptyvalue::
 
     >>> widget.attrs['emptyvalue'] = UNSET
@@ -550,6 +562,17 @@ Default emptyvalue::
     >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
     ([], <EMPTY_VALUE>)
+
+None emptyvalue::
+
+    >>> widget.attrs['emptyvalue'] = None
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
+    >>> data.errors, data.extracted
+    ([], None)
 
 UNSET emptyvalue::
 
@@ -604,6 +627,17 @@ Default emptyvalue::
     >>> data.errors, data.extracted
     ([], <EMPTY_VALUE>)
 
+None emptyvalue::
+
+    >>> widget.attrs['emptyvalue'] = None
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
+    >>> data.errors, data.extracted
+    ([], None)
+
 UNSET emptyvalue::
 
     >>> widget.attrs['emptyvalue'] = UNSET
@@ -657,6 +691,17 @@ Default emptyvalue::
     >>> data.errors, data.extracted
     ([], <EMPTY_VALUE>)
 
+None emptyvalue::
+
+    >>> widget.attrs['emptyvalue'] = None
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
+    >>> data.errors, data.extracted
+    ([], None)
+
 UNSET emptyvalue::
 
     >>> widget.attrs['emptyvalue'] = UNSET
@@ -709,6 +754,17 @@ Default emptyvalue::
     >>> data = widget.extract({'MYDATATYPEFIELD': ''})
     >>> data.errors, data.extracted
     ([], <EMPTY_VALUE>)
+
+None emptyvalue::
+
+    >>> widget.attrs['emptyvalue'] = None
+    >>> data = widget.extract({})
+    >>> data.errors, data.extracted
+    ([], <UNSET>)
+
+    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
+    >>> data.errors, data.extracted
+    ([], None)
 
 UNSET emptyvalue::
 
@@ -1575,6 +1631,7 @@ Single value selection display mode::
 Single value selection with datatype set::
 
     >>> vocab = [
+    ...     (EMPTY_VALUE, 'Empty value'),
     ...     (1, 'One'),
     ...     (2, 'Two'),
     ...     (3, 'Three'),
@@ -1590,6 +1647,7 @@ Single value selection with datatype set::
     ...     })
     >>> pxml(widget())
     <select class="select" id="input-MYSELECT" name="MYSELECT">
+      <option id="input-MYSELECT-" value="">Empty value</option>
       <option id="input-MYSELECT-1" value="1">One</option>
       <option id="input-MYSELECT-2" selected="selected" value="2">Two</option>
       <option id="input-MYSELECT-3" value="3">Three</option>
@@ -1597,12 +1655,17 @@ Single value selection with datatype set::
     </select>
     <BLANKLINE>
 
+    >>> data = widget.extract({'MYSELECT': ''})
+    >>> data.extracted
+    <EMPTY_VALUE>
+
     >>> data = widget.extract({'MYSELECT': '3'})
     >>> data.extracted
     3
 
     >>> pxml(widget(data=data))
     <select class="select" id="input-MYSELECT" name="MYSELECT">
+      <option id="input-MYSELECT-" value="">Empty value</option>
       <option id="input-MYSELECT-1" value="1">One</option>
       <option id="input-MYSELECT-2" value="2">Two</option>
       <option id="input-MYSELECT-3" selected="selected" 
@@ -1613,15 +1676,6 @@ Single value selection with datatype set::
 
 Single value with datatype set emptyvalue::
 
-    >>> widget.attrs['emptyvalue'] = 0
-    >>> data = widget.extract({})
-    >>> data.extracted
-    <UNSET>
-
-    >>> data = widget.extract({'MYSELECT': ''})
-    >>> data.extracted
-    0
-
     >>> widget.attrs['emptyvalue'] = UNSET
     >>> data = widget.extract({})
     >>> data.extracted
@@ -1631,12 +1685,31 @@ Single value with datatype set emptyvalue::
     >>> data.extracted
     <UNSET>
 
+    >>> widget.attrs['emptyvalue'] = None
+    >>> data = widget.extract({})
+    >>> data.extracted
+    <UNSET>
+
+    >>> data = widget.extract({'MYSELECT': ''})
+    >>> data.extracted is None
+    True
+
+    >>> widget.attrs['emptyvalue'] = 0
+    >>> data = widget.extract({})
+    >>> data.extracted
+    <UNSET>
+
+    >>> data = widget.extract({'MYSELECT': ''})
+    >>> data.extracted
+    0
+
 Single value selection with datatype set completly disabled::
 
     >>> widget.attrs['disabled'] = True
     >>> pxml(widget())
     <select class="select" disabled="disabled" id="input-MYSELECT" 
       name="MYSELECT">
+      <option id="input-MYSELECT-" value="">Empty value</option>
       <option id="input-MYSELECT-1" value="1">One</option>
       <option id="input-MYSELECT-2" selected="selected" value="2">Two</option>
       <option id="input-MYSELECT-3" value="3">Three</option>
@@ -1646,16 +1719,30 @@ Single value selection with datatype set completly disabled::
 
 Single value selection with datatype with specific options disabled::
 
-    >>> widget.attrs['disabled'] = [2, 4]
-    >>> pxml(widget())
+    >>> widget.attrs['emptyvalue'] = None
+    >>> widget.attrs['disabled'] = [None, 2, 4]
+    >>> rendered = widget()
+    >>> pxml(rendered)
     <select class="select" id="input-MYSELECT" name="MYSELECT">
+      <option disabled="disabled" id="input-MYSELECT-" value="">Empty value</option>
       <option id="input-MYSELECT-1" value="1">One</option>
-      <option disabled="disabled" id="input-MYSELECT-2" selected="selected" 
-        value="2">Two</option>
+      <option disabled="disabled" id="input-MYSELECT-2" selected="selected" value="2">Two</option>
       <option id="input-MYSELECT-3" value="3">Three</option>
       <option disabled="disabled" id="input-MYSELECT-4" value="4">Four</option>
     </select>
     <BLANKLINE>
+
+    >>> widget.attrs['emptyvalue'] = UNSET
+    >>> widget.attrs['disabled'] = [UNSET, 2, 4]
+    >>> assert(widget() == rendered)
+
+    >>> widget.attrs['emptyvalue'] = EMPTY_VALUE
+    >>> widget.attrs['disabled'] = [EMPTY_VALUE, 2, 4]
+    >>> assert(widget() == rendered)
+
+    >>> widget.attrs['emptyvalue'] = 0
+    >>> widget.attrs['disabled'] = [0, 2, 4]
+    >>> assert(widget() == rendered)
 
     >>> del widget.attrs['disabled']
 
