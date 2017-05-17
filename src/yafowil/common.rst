@@ -1630,34 +1630,65 @@ Single value selection display mode::
 
 Single value selection with datatype set::
 
-    >>> vocab = [
-    ...     (UNSET, 'Empty value'),
-    ...     (uuid.UUID('1b679ef8-9068-45f5-8bb8-4007264aa7f7'), 'One'),
-    ...     (uuid.UUID('267013fa-b168-4776-aea3-8d5137044488'), 'Two')
-    ... ]
     >>> widget = factory(
     ...     'select',
     ...     name='MYSELECT',
-    ...     value=UNSET,
     ...     props={
-    ...         'vocabulary': vocab,
-    ...         'datatype': uuid.UUID,
-    ...         'emptyvalue': UNSET
+    ...         'datatype': uuid.UUID
     ...     })
-    >>> pxml(widget())
+
+Preselected values::
+
+    >>> widget.getter = UNSET
+    >>> widget.attrs['vocabulary'] = [
+    ...     (UNSET, 'Empty value'),
+    ...     (uuid.UUID('1b679ef8-9068-45f5-8bb8-4007264aa7f7'), 'One')
+    ... ]
+    >>> res = widget()
+    >>> pxml(res)
     <select class="select" id="input-MYSELECT" name="MYSELECT">
       <option id="input-MYSELECT-" selected="selected" value="">Empty value</option>
       <option id="input-MYSELECT-1b679ef8-..." value="1b679ef8-...">One</option>
-      <option id="input-MYSELECT-267013fa-..." value="267013fa-...">Two</option>
     </select>
     <BLANKLINE>
+
+    >>> widget.getter = EMPTY_VALUE
+    >>> widget.attrs['vocabulary'][0] = (EMPTY_VALUE, 'Empty value')
+    >>> assert(res == widget())
+
+    >>> widget.getter = None
+    >>> widget.attrs['vocabulary'][0] = (None, 'Empty value')
+    >>> assert(res == widget())
+
+    >>> widget.getter = ''
+    >>> widget.attrs['vocabulary'][0] = ('', 'Empty value')
+    >>> assert(res == widget())
+
+    >>> widget.getter = uuid.UUID('1b679ef8-9068-45f5-8bb8-4007264aa7f7')
+    >>> res = widget()
+    >>> pxml(res)
+    <select class="select" id="input-MYSELECT" name="MYSELECT">
+      <option id="input-MYSELECT-" value="">Empty value</option>
+      <option id="input-MYSELECT-1b679ef8-..." selected="selected" value="1b679ef8-...">One</option>
+    </select>
+    <BLANKLINE>
+
+Note, vocabulary keys are converted to ``datatype`` while widget value needs to
+be of type defined in ``datatype`` or one from the valid empty values::
+
+    >>> widget.attrs['vocabulary'] = [
+    ...     (UNSET, 'Empty value'),
+    ...     ('1b679ef8-9068-45f5-8bb8-4007264aa7f7', 'One')
+    ... ]
+    >>> res = widget()
+    >>> assert(res == widget())
+
+Test ``datatype`` extraction with selection::
 
     >>> vocab = [
     ...     (EMPTY_VALUE, 'Empty value'),
     ...     (1, 'One'),
     ...     (2, 'Two'),
-    ...     (3, 'Three'),
-    ...     (4, 'Four')
     ... ]
     >>> widget = factory(
     ...     'select',
@@ -1672,60 +1703,47 @@ Single value selection with datatype set::
       <option id="input-MYSELECT-" value="">Empty value</option>
       <option id="input-MYSELECT-1" value="1">One</option>
       <option id="input-MYSELECT-2" selected="selected" value="2">Two</option>
-      <option id="input-MYSELECT-3" value="3">Three</option>
-      <option id="input-MYSELECT-4" value="4">Four</option>
     </select>
     <BLANKLINE>
 
     >>> data = widget.extract({'MYSELECT': ''})
-    >>> data.extracted
-    <EMPTY_VALUE>
+    >>> assert(data.extracted == EMPTY_VALUE)
 
-    >>> data = widget.extract({'MYSELECT': '3'})
-    >>> data.extracted
-    3
+    >>> data = widget.extract({'MYSELECT': '1'})
+    >>> assert(data.extracted == 1)
 
     >>> pxml(widget(data=data))
     <select class="select" id="input-MYSELECT" name="MYSELECT">
       <option id="input-MYSELECT-" value="">Empty value</option>
-      <option id="input-MYSELECT-1" value="1">One</option>
+      <option id="input-MYSELECT-1" selected="selected"  value="1">One</option>
       <option id="input-MYSELECT-2" value="2">Two</option>
-      <option id="input-MYSELECT-3" selected="selected" 
-        value="3">Three</option>
-      <option id="input-MYSELECT-4" value="4">Four</option>
     </select>
     <BLANKLINE>
 
-Single value with datatype set emptyvalue::
+Test extraction with ``emptyvalue`` set::
 
     >>> widget.attrs['emptyvalue'] = UNSET
     >>> data = widget.extract({})
-    >>> data.extracted
-    <UNSET>
+    >>> assert(data.extracted is UNSET)
 
     >>> data = widget.extract({'MYSELECT': ''})
-    >>> data.extracted
-    <UNSET>
+    >>> assert(data.extracted is UNSET)
 
     >>> widget.attrs['emptyvalue'] = None
     >>> data = widget.extract({})
-    >>> data.extracted
-    <UNSET>
+    >>> assert(data.extracted is UNSET)
 
     >>> data = widget.extract({'MYSELECT': ''})
-    >>> data.extracted is None
-    True
+    >>> assert(data.extracted is None)
 
     >>> widget.attrs['emptyvalue'] = 0
     >>> data = widget.extract({})
-    >>> data.extracted
-    <UNSET>
+    >>> assert(data.extracted is UNSET)
 
     >>> data = widget.extract({'MYSELECT': ''})
-    >>> data.extracted
-    0
+    >>> assert(data.extracted  == 0)
 
-Single value selection with datatype set completly disabled::
+Single value selection with ``datatype`` set completly disabled::
 
     >>> widget.attrs['disabled'] = True
     >>> pxml(widget())
@@ -1734,36 +1752,32 @@ Single value selection with datatype set completly disabled::
       <option id="input-MYSELECT-" value="">Empty value</option>
       <option id="input-MYSELECT-1" value="1">One</option>
       <option id="input-MYSELECT-2" selected="selected" value="2">Two</option>
-      <option id="input-MYSELECT-3" value="3">Three</option>
-      <option id="input-MYSELECT-4" value="4">Four</option>
     </select>
     <BLANKLINE>
 
-Single value selection with datatype with specific options disabled::
+Single value selection with ``datatype`` with specific options disabled::
 
     >>> widget.attrs['emptyvalue'] = None
-    >>> widget.attrs['disabled'] = [None, 2, 4]
+    >>> widget.attrs['disabled'] = [None, 2]
     >>> rendered = widget()
     >>> pxml(rendered)
     <select class="select" id="input-MYSELECT" name="MYSELECT">
       <option disabled="disabled" id="input-MYSELECT-" value="">Empty value</option>
       <option id="input-MYSELECT-1" value="1">One</option>
       <option disabled="disabled" id="input-MYSELECT-2" selected="selected" value="2">Two</option>
-      <option id="input-MYSELECT-3" value="3">Three</option>
-      <option disabled="disabled" id="input-MYSELECT-4" value="4">Four</option>
     </select>
     <BLANKLINE>
 
     >>> widget.attrs['emptyvalue'] = UNSET
-    >>> widget.attrs['disabled'] = [UNSET, 2, 4]
+    >>> widget.attrs['disabled'] = [UNSET, 2]
     >>> assert(widget() == rendered)
 
     >>> widget.attrs['emptyvalue'] = EMPTY_VALUE
-    >>> widget.attrs['disabled'] = [EMPTY_VALUE, 2, 4]
+    >>> widget.attrs['disabled'] = [EMPTY_VALUE, 2]
     >>> assert(widget() == rendered)
 
     >>> widget.attrs['emptyvalue'] = 0
-    >>> widget.attrs['disabled'] = [0, 2, 4]
+    >>> widget.attrs['disabled'] = [0, 2]
     >>> assert(widget() == rendered)
 
     >>> del widget.attrs['disabled']
