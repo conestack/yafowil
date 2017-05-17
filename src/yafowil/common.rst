@@ -1631,6 +1631,28 @@ Single value selection display mode::
 Single value selection with datatype set::
 
     >>> vocab = [
+    ...     (UNSET, 'Empty value'),
+    ...     (uuid.UUID('1b679ef8-9068-45f5-8bb8-4007264aa7f7'), 'One'),
+    ...     (uuid.UUID('267013fa-b168-4776-aea3-8d5137044488'), 'Two')
+    ... ]
+    >>> widget = factory(
+    ...     'select',
+    ...     name='MYSELECT',
+    ...     value=UNSET,
+    ...     props={
+    ...         'vocabulary': vocab,
+    ...         'datatype': uuid.UUID,
+    ...         'emptyvalue': UNSET
+    ...     })
+    >>> pxml(widget())
+    <select class="select" id="input-MYSELECT" name="MYSELECT">
+      <option id="input-MYSELECT-" selected="selected" value="">Empty value</option>
+      <option id="input-MYSELECT-1b679ef8-..." value="1b679ef8-...">One</option>
+      <option id="input-MYSELECT-267013fa-..." value="267013fa-...">Two</option>
+    </select>
+    <BLANKLINE>
+
+    >>> vocab = [
     ...     (EMPTY_VALUE, 'Empty value'),
     ...     (1, 'One'),
     ...     (2, 'Two'),

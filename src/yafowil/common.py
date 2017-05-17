@@ -1175,7 +1175,7 @@ def select_block_edit_renderer(widget, data, custom_attrs={}):
                 datatype,
                 empty_value=emptyvalue
             )
-        key = '' if key is None else key
+        key = '' if key in [None, UNSET] else key
         attrs = {
             'selected': 'selected' if vval in value else None,
             'value': key,
@@ -1250,7 +1250,7 @@ def select_cb_edit_renderer(widget, data, custom_attrs={}):
                 datatype,
                 empty_value=emptyvalue
             )
-        key = '' if key is None else key
+        key = '' if key in [None, UNSET] else key
         input_attrs = {
             'type': tagtype,
             'value': key,
