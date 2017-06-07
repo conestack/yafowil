@@ -8,7 +8,7 @@ def read_file(name):
         return f.read()
 
 
-version = '2.2.2.dev0'
+version = '2.2.2'
 shortdesc = 'YAFOWIL - declarative, framework independent, flexible HTML forms'
 longdesc = '\n\n'.join([read_file(name) for name in [
     'README.rst',

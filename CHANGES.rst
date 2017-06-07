@@ -2,7 +2,7 @@
 History
 =======
 
-2.2.2 (unreleased)
+2.2.2 (2017-06-07)
 ------------------
 
 - ``yafowil.common.generic_datatype_extractor`` considers ``emptyvalue`` used
