@@ -51,14 +51,18 @@ We'd be happy to see many forks and pull-requests to make YAFOWIL even better.
 Contributors
 ============
 
-- Jens W. Klein <jk [at] kleinundpartner [dot] at>
+- Jens W. Klein
 
-- Robert Niederrreiter <rnix [at] squarewavea [dot] t>
+- Robert Niederreiter
 
-- Johannes Raggam <johannes [at] raggam [dot] co [dot] at>
+- Johannes Raggam
 
-- Peter Holzer <peter [dot] holzer [at] agitator [dot] com>
+- Peter Holzer
 
 - Attila Olah
 
-- Christian Scholz aka MrTopf (initial discussion)
+- Florian Friesdorf
+
+- Daniel Widerin
+
+- Christian Scholz aka MrTopf

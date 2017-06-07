@@ -2002,6 +2002,7 @@ def error_renderer(widget, data):
                                                attrs, data.rendered,
                                                position, tag)
 
+
 factory.register(
     'error',
     edit_renderers=[error_renderer],

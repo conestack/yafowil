@@ -3,12 +3,18 @@ from setuptools import setup
 from setuptools import find_packages
 
 
+def read_file(name):
+    with open(os.path.join(os.path.dirname(__file__), name)) as f:
+        return f.read()
+
+
 version = '2.2.2.dev0'
-shortdesc = \
-    'YAFOWIL - declarative, flexible html forms, framework independent.'
-longdesc = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
-longdesc += open(os.path.join(os.path.dirname(__file__), 'CHANGES.rst')).read()
-longdesc += open(os.path.join(os.path.dirname(__file__), 'LICENSE.rst')).read()
+shortdesc = 'YAFOWIL - declarative, framework independent, flexible HTML forms'
+longdesc = '\n\n'.join([read_file(name) for name in [
+    'README.rst',
+    'CHANGES.rst',
+    'LICENSE.rst'
+]])
 tests_require = ['interlude', 'lxml']
 
 
@@ -18,12 +24,13 @@ setup(
     description=shortdesc,
     long_description=longdesc,
     classifiers=[
+        'License :: OSI Approved :: BSD License',
+        'Intended Audience :: Developers',
+        'Topic :: Software Development',
+        'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
-        'Topic :: Software Development',
-        'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
-        'License :: OSI Approved :: BSD License',
     ],
     keywords='html input widgets form compound',
     author='BlueDynamics Alliance',

@@ -155,6 +155,7 @@ def _deprecated_null_localization(msg):
                  "tag factory on RuntimeData instead.")
     return msg
 
+
 tag = Tag(_deprecated_null_localization)
 
 
