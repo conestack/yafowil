@@ -5,7 +5,10 @@ History
 2.2.3 (unreleased)
 ------------------
 
-- No changes yet.
+- Fix ``number_extractor``. Return ``UNSET`` if extracted value is ``UNSET``.
+  Check ``min`` and ``max`` for ``None`` explicitely to ensure ``0`` bounds
+  get considered.
+  [rnix]
 
 
 2.2.2 (2017-06-07)

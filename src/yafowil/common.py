@@ -1784,14 +1784,16 @@ factory.defaults['search.class'] = 'search'
 @managedprops('min', 'max', 'step')
 def number_extractor(widget, data):
     val = data.extracted
+    if val is UNSET:
+        return val
     min_val = attr_value('min', widget, data)
-    if min_val and val < min_val:
+    if min_val is not None and val < min_val:
         message = _('input_number_minimum_value',
                     default=u'Value has to be at minimum ${min}.',
                     mapping={'min': min_val})
         raise ExtractionError(message)
     max_val = attr_value('max', widget, data)
-    if max_val and val > max_val:
+    if max_val is not None and val > max_val:
         message = _('input_number_maximum_value',
                     default=u'Value has to be at maximum ${max}.',
                     mapping={'max': max_val})
