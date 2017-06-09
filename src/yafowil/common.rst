@@ -4066,6 +4066,22 @@ Extract with min value set::
     >>> data.errors
     []
 
+Extract min value 0::
+
+    >>> widget = factory(
+    ...     'number',
+    ...     name='NUMBER',
+    ...     props={
+    ...         'min': 0
+    ...     })
+    >>> data = widget.extract({'NUMBER': '-1'})
+    >>> data.errors
+    [ExtractionError('Value has to be at minimum 0.',)]
+
+    >>> data = widget.extract({'NUMBER': '0'})
+    >>> data.errors
+    []
+
 Extract with max value set::
 
     >>> widget = factory(
@@ -4085,6 +4101,22 @@ Extract with max value set::
     >>> data = widget.extract({'NUMBER': '11'})
     >>> data.errors
     [ExtractionError('Value has to be at maximum 10.',)]
+
+Extract max value 0::
+
+    >>> widget = factory(
+    ...     'number',
+    ...     name='NUMBER',
+    ...     props={
+    ...         'max': 0
+    ...     })
+    >>> data = widget.extract({'NUMBER': '1'})
+    >>> data.errors
+    [ExtractionError('Value has to be at maximum 0.',)]
+
+    >>> data = widget.extract({'NUMBER': '0'})
+    >>> data.errors
+    []
 
 Extract with step set::
 
