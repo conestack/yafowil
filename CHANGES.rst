@@ -2,7 +2,7 @@
 History
 =======
 
-2.2.3 (unreleased)
+2.2.3 (2017-06-12)
 ------------------
 
 - Fix ``number_extractor``. Return ``UNSET`` if extracted value is ``UNSET``.
