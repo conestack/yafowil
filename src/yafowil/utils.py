@@ -9,6 +9,12 @@ import unicodedata
 import uuid
 
 
+def safe_decode(value, encoding='utf-8'):
+    if value and not isinstance(value, unicode):
+        value = str(value).decode(encoding)
+    return value
+
+
 class entry_point(object):
     """Decorator for yafowil entry points.
     """
@@ -172,6 +178,8 @@ class managedprops(object):
 def cssid(widget, prefix, postfix=None):
     if widget.attrs.get('structural', False):
         return None
+    prefix = safe_decode(prefix)
+    postfix = safe_decode(postfix)
     path = widget.dottedpath.replace(u'.', u'-')
     cssid = u'{0}-{1}'.format(prefix, path)
     if postfix is not None:

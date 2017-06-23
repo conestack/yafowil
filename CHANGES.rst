@@ -5,7 +5,8 @@ History
 2.2.4 (unreleased)
 ------------------
 
-- No changes yet.
+- Don't fail with ``yafowil.cssid`` if ``prefix`` or ``postfix`` contain non-ascii characters.
+  [thet]
 
 
 2.2.3 (2017-06-12)
