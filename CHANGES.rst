@@ -5,6 +5,9 @@ History
 2.2.5 (unreleased)
 ------------------
 
+- Don't fail with ``yafowil.cssid`` if ``prefix`` or ``postfix`` contain non-ascii characters.
+  [thet]
+
 - Cache results of ``yafowil.utils.get_plugin_names`` by namespace.
   [rnix]
 
