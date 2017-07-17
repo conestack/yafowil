@@ -1316,7 +1316,7 @@ def select_display_renderer(widget, data):
     if multivalued and isinstance(value, basestring):
         value = [value]
     for key in value:
-        content += data.tag('li', vocab[key])
+        content += data.tag('li', vocab.get(key, key))
     return data.tag('ul', content, **attrs)
 
 

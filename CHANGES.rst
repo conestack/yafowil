@@ -5,7 +5,9 @@ History
 2.2.4 (unreleased)
 ------------------
 
-- No changes yet.
+- Prevent ``KeyError`` in ``select_display_renderer`` if multivalued selection
+  and a value no longer available in vocab.
+  [rnix]
 
 
 2.2.3 (2017-06-12)

@@ -2264,6 +2264,24 @@ Multi selection display with empty values list::
     </div>
     <BLANKLINE>
 
+Multi selection display with missing term in vocab::
+
+    >>> widget = factory(
+    ...     'select',
+    ...     name='MYSELECT',
+    ...     value=['one', 'two'],
+    ...     props={
+    ...         'multivalued': True,
+    ...         'vocabulary': [('two', 'Two')]
+    ...     },
+    ...     mode='display')
+    >>> pxml(widget())
+    <ul class="display-select" id="display-MYSELECT">
+      <li>one</li>
+      <li>Two</li>
+    </ul>
+    <BLANKLINE>
+
 Multiple values on single valued selection fails::
 
     >>> vocab = [
