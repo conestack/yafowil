@@ -132,6 +132,11 @@ factory.doc['props']['disabled'] = """\
 Disables input.
 """
 
+factory.defaults['readonly'] = None
+factory.doc['props']['readonly'] = """\
+Readonly input.
+"""
+
 factory.defaults['required_class_default'] = 'required'
 factory.doc['props']['required_class_default'] = """\
 CSS-class to apply if required condition was not met - if no specific class
@@ -160,6 +165,23 @@ factory.doc['props']['display_proxy'] = """\
 If 'True' and widget mode 'display', widget value gets rendered as hidden
 input.
 """
+
+managed_props__input_common = css_managed_props + [
+    'autofocus',
+    'data',
+    'disabled',
+    'maxlength',
+    'placeholder',
+    'readonly',
+    'required',
+    'size',
+    'title'
+]
+
+
+managed_props__input_full = managed_props__input_common + [
+    'autocomplete'
+]
 
 
 ###############################################################################
@@ -283,11 +305,14 @@ def input_attributes_common(widget, data, excludes=list(), value=None):
     autofocus = attr_value('autofocus', widget, data) and 'autofocus' or None
     disabled = attr_value('disabled', widget, data)
     disabled = bool(disabled) and 'disabled' or None
+    readonly = attr_value('readonly', widget, data)
+    readonly = bool(readonly) and 'readonly' or None
     required = attr_value('required', widget, data) and 'required' or None
     input_attrs = {
         'autofocus': autofocus,
         'class_': cssclasses(widget, data),
         'disabled': disabled,
+        'readonly': readonly,
         'id': cssid(widget, 'input'),
         'name_': widget.dottedpath,
         'placeholder': attr_value('placeholder', widget, data),
@@ -315,13 +340,18 @@ def input_attributes_full(widget, data, value=None):
     return input_attrs
 
 
-@managedprops(*css_managed_props)
-def input_generic_renderer(widget, data, custom_attrs={}):
+@managedprops(*managed_props__input_full)
+def input_generic_renderer(widget, data, pos='before', custom_attrs={}):
     """Generic HTML ``input`` tag render.
     """
     input_attrs = input_attributes_full(widget, data)
     input_attrs.update(custom_attrs)
-    return data.tag('input', **input_attrs)
+    rendered = data.tag('input', **input_attrs)
+    if pos == 'before':
+        rendered = rendered + (data.rendered or u'')
+    else:
+        rendered = (data.rendered or u'') + rendered
+    return rendered
 
 
 # multivalued is not documented, because its only valid for specific blueprints
@@ -340,7 +370,7 @@ def display_proxy_renderer(widget, data):
                 input_attrs = input_attributes_full(widget, data, value=val)
                 rendered += data.tag('input', **input_attrs)
         else:
-            rendered += input_generic_renderer(widget, data)
+            rendered = input_generic_renderer(widget, data, pos='after')
         if orgin_type:
             widget.attrs['type'] = orgin_type
         else:
@@ -396,10 +426,11 @@ def generic_positional_rendering_helper(tagname, message, attrs, rendered, pos,
     pos
         position how to place the newtag relative to the prior rendered:
         'before'='<newtag>message</newtag>rendered',
-        'after' ='<newtag>message</newtag>'
+        'after' ='rendered<newtag>message</newtag>'
         'inner-before'= <newtag>message rendered</newtag>
         'inner-after'= <newtag>rendered message</newtag>
     """
+    rendered = rendered or u''
     if pos not in ['before', 'after', 'inner-before', 'inner-after']:
         raise ValueError('Invalid value for position "{0}"'.format(pos))
     if pos.startswith('inner'):
@@ -455,8 +486,7 @@ Tag contents.
 # text
 ###############################################################################
 
-@managedprops('data', 'title', 'size', 'disabled', 'autofocus',
-              'placeholder', 'autocomplete', *css_managed_props)
+@managedprops(*managed_props__input_full)
 def text_edit_renderer(widget, data):
     return input_generic_renderer(widget, data)
 
@@ -491,9 +521,6 @@ factory.defaults['text.default'] = ''
 factory.defaults['text.class'] = 'text'
 
 factory.defaults['text.disabled'] = False
-factory.doc['props']['text.disabled'] = """\
-Flag  input field is disabled.
-"""
 
 factory.defaults['text.persist'] = True
 
@@ -863,8 +890,7 @@ def _pwd_value(widget, data):
     return attr_value('default', widget, data)
 
 
-@managedprops('data', 'title', 'size', 'disabled', 'autofocus',
-              'placeholder', 'autocomplete', *css_managed_props)
+@managedprops(*managed_props__input_common)
 def password_edit_renderer(widget, data):
     """Render password widget.
     """
@@ -965,8 +991,7 @@ def checkbox_extractor(widget, data):
     )
 
 
-@managedprops('data', 'title', 'size', 'disabled', 'autofocus',
-              'format', 'disabled', 'checked', *css_managed_props)
+@managedprops('format', *managed_props__input_common)
 def checkbox_edit_renderer(widget, data):
     tag = data.tag
     input_attrs = input_attributes_common(widget, data)
@@ -1058,9 +1083,6 @@ Data-type of the extracted value. One out of ``bool`` or ``string``.
 factory.defaults['checkbox.class'] = 'checkbox'
 
 factory.defaults['checkbox.disabled'] = False
-factory.doc['props']['checkbox.disabled'] = """\
-Flag whether checkbox is disabled.
-"""
 
 factory.defaults['checkbox.checked'] = None
 factory.doc['props']['checkbox.checked'] = """\
@@ -1474,8 +1496,7 @@ def file_extractor(widget, data):
     return value
 
 
-@managedprops('accept', 'placeholder', 'autofocus',
-              'required', *css_managed_props)
+@managedprops('accept', *managed_props__input_common)
 def input_file_edit_renderer(widget, data):
     tag = data.tag
     input_attrs = input_attributes_common(widget, data, excludes=['value'])
@@ -1592,8 +1613,8 @@ factory.defaults['file.vocabulary'] = [
 # submit
 ###############################################################################
 
-@managedprops('label', 'class', 'action', 'handler',
-              'next', 'skip', 'expression')
+@managedprops('label', 'action', 'handler', 'next', 'skip', 'expression',
+              *managed_props__input_common)
 def submit_renderer(widget, data):
     expression = attr_value('expression', widget, data)
     if not expression:
@@ -1824,6 +1845,11 @@ def number_extractor(widget, data):
     return val
 
 
+@managedprops('min', 'max', 'step', *managed_props__input_full)
+def number_edit_renderer(widget, data):
+    return input_generic_renderer(widget, data)
+
+
 factory.register(
     'number',
     extractors=[
@@ -1833,7 +1859,7 @@ factory.register(
         generic_datatype_extractor,
         number_extractor,
     ],
-    edit_renderers=[input_generic_renderer],
+    edit_renderers=[number_edit_renderer],
     display_renderers=[
         generic_display_renderer,
         display_proxy_renderer

@@ -42,6 +42,17 @@ History
 2.2.1 (2017-05-15)
 ------------------
 
+- Add ``readonly`` as possible attribute of input elements.
+  [thet]
+
+- Use predefined lists of managed attributes for documentation where common or
+  full generic input renderer are used.
+  [thet]
+
+- When creating a blueprint chain with a factory, allow blueprints defined
+  after blueprints based in ``generic_input_renderer``.
+  [thet]
+
 - Introduce ``hybrid_renderer`` and ``leaf`` widget property which gets
   considered in ``hybrid_renderer`` and ``hybrid_extractor``. Use
   ``hybrid_renderer`` in ``div`` blueprint.
@@ -50,7 +61,7 @@ History
 - Consider data attributes in div renderer.
   [rnix]
 
-- Fix rendering of empty div renderer.
+- Fix rendering of empty in div ``div_renderer``.
   [rnix]
 
 - Explicitely check for ``None`` and ``UNSET`` before rendering empty value in
