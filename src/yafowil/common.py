@@ -569,7 +569,7 @@ Bypass arguments out of form namespace using a hidden field.
 
 factory.defaults['proxy.class'] = None
 
-factory.defaults['proxy.persist'] = True
+factory.defaults['proxy.persist'] = False
 
 
 ###############################################################################

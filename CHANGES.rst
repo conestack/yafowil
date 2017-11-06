@@ -5,6 +5,9 @@ History
 2.2.4 (unreleased)
 ------------------
 
+- ``persist`` property defaults to ``False`` for ``proxy`` blueprint.
+  [rnix]
+
 - Translate datatype label used to generate extraction error in
   ``generic_datatype_extractor`` if datatype conversion fails.
   [rnix]

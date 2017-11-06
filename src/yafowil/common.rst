@@ -3376,7 +3376,7 @@ Default emptyvalue extraction::
     >>> widget.extract(request={'PROXY': ''})
     <RuntimeData PROXY, value='', extracted=<EMPTY_VALUE> at ...>
 
-Persist::
+Persist defaults to false::
 
     >>> widget = factory(
     ...     'proxy',
@@ -3386,6 +3386,15 @@ Persist::
     ...     })
     >>> data = widget.extract(request={'PROXY': '10'})
     >>> model = dict()
+    >>> data.write(model)
+    >>> model
+    {}
+
+If proxy widgets really need to be persisted, ``persist`` property needs to be
+set explicitely::
+
+    >>> widget.attrs['persist'] = True
+    >>> data = widget.extract(request={'PROXY': '10'})
     >>> data.write(model)
     >>> model
     {'PROXY': '10'}
