@@ -3868,6 +3868,26 @@ Emptyvalue::
     >>> widget.extract(request={'EMAIL': 'foo@baz.bam'})
     <RuntimeData EMAIL, value=<UNSET>, extracted='foo@baz.bam' at ...>
 
+Datatype::
+
+    >>> widget = factory(
+    ...     'email',
+    ...     name='EMAIL',
+    ...     props={
+    ...         'datatype': unicode
+    ...     })
+    >>> widget.extract(request={'EMAIL': 'foo@example.com'})
+    <RuntimeData EMAIL, value=<UNSET>, extracted=u'foo@example.com' at ...>
+
+    >>> widget = factory(
+    ...     'email',
+    ...     name='EMAIL',
+    ...     props={
+    ...         'datatype': str
+    ...     })
+    >>> widget.extract(request={'EMAIL': u'foo@example.com'})
+    <RuntimeData EMAIL, value=<UNSET>, extracted='foo@example.com' at ...>
+
 Persist::
 
     >>> widget = factory(

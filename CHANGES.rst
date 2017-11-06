@@ -5,6 +5,14 @@ History
 2.2.4 (unreleased)
 ------------------
 
+- Translate datatype label used to generate extraction error in
+  ``generic_datatype_extractor`` if datatype conversion fails.
+  [rnix]
+
+- Add ``generic_datatype_extractor`` to ``email`` blueprint. Allowed datatypes
+  are ``str`` and ``unicode``.
+  [rnix]
+
 - Prevent ``KeyError`` in ``select_display_renderer`` if multivalued selection
   and a value no longer available in vocab.
   [rnix]

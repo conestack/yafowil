@@ -265,6 +265,8 @@ def generic_datatype_extractor(widget, data):
                     default=u'Input conversion failed.'
                 )
             else:
+                if data.tag.translate:
+                    datatype_label = data.tag.translate(datatype_label)
                 datatype_message = _(
                     'standard_datatype_message',
                     default=u'Input is not a valid ${datatype}.',
@@ -1676,6 +1678,7 @@ factory.register(
         generic_extractor,
         generic_required_extractor,
         generic_emptyvalue_extractor,
+        generic_datatype_extractor,
         email_extractor
     ],
     edit_renderers=[input_generic_renderer],
@@ -1698,6 +1701,9 @@ factory.defaults['email.class'] = 'email'
 
 factory.defaults['email.persist'] = True
 
+factory.defaults['email.allowed_datatypes'] = [
+    str, unicode,
+]
 
 ###############################################################################
 # url
