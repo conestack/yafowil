@@ -5,7 +5,7 @@ History
 2.2.4 (unreleased)
 ------------------
 
-- ``persist`` property defaults to ``False`` for ``proxy`` blueprint.
+- Do not set ``persist`` property for ``proxy`` blueprint in factory defaults.
   [rnix]
 
 - Translate datatype label used to generate extraction error in
