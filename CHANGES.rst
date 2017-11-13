@@ -2,7 +2,7 @@
 History
 =======
 
-2.2.4 (unreleased)
+2.2.4 (2017-11-13)
 ------------------
 
 - Do not set ``persist`` property for ``proxy`` blueprint in factory defaults.
