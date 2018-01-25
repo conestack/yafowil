@@ -879,353 +879,366 @@ class TestCommon(NodeTestCase):
         )
         self.assertEqual(str(err), 'Datatype unknown: "inexistent"')
 
+    def test_checkbox_blueprint(self):
+        # A boolean checkbox widget (default)
+        widget = factory(
+            'checkbox',
+            name='MYCHECKBOX')
+        self.check_output("""
+        <div>
+          <input class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX"
+                 type="checkbox" value=""/>
+          <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists"
+                 type="hidden" value="checkboxexists"/>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        widget.mode = 'display'
+        self.assertEqual(
+            widget(),
+            '<div class="display-checkbox" id="display-MYCHECKBOX">No</div>'
+        )
+
+        widget = factory(
+            'checkbox',
+            name='MYCHECKBOX',
+            value='True')
+        self.check_output("""
+        <div>
+          <input checked="checked" class="checkbox" id="input-MYCHECKBOX"
+                 name="MYCHECKBOX" type="checkbox" value=""/>
+          <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists"
+                 type="hidden" value="checkboxexists"/>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        widget.mode = 'display'
+        self.assertEqual(
+            widget(),
+            '<div class="display-checkbox" id="display-MYCHECKBOX">Yes</div>'
+        )
+
+        # A checkbox with label
+        widget = factory(
+            'checkbox',
+            name='MYCHECKBOX',
+            props={
+                'with_label': True
+            })
+        self.check_output("""
+        <input class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX"
+        type="checkbox" value="" /><label class="checkbox_label"
+        for="input-MYCHECKBOX">&nbsp;</label><input
+        id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden"
+        value="checkboxexists" />
+        """, widget())
+
+        # A checkbox widget with a value or an empty string
+        widget = factory(
+            'checkbox',
+            name='MYCHECKBOX',
+            value='',
+            props={
+                'format': 'string'
+            })
+        self.check_output("""
+        <div>
+          <input class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX"
+                 type="checkbox" value=""/>
+          <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists"
+                 type="hidden" value="checkboxexists"/>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        widget.mode = 'display'
+        self.assertEqual(
+            widget(),
+            '<div class="display-checkbox" id="display-MYCHECKBOX">No</div>'
+        )
+
+        widget = factory(
+            'checkbox',
+            name='MYCHECKBOX',
+            value='Test Checkbox',
+            props={
+                'format': 'string'
+            })
+        self.check_output("""
+        <div>
+          <input checked="checked" class="checkbox" id="input-MYCHECKBOX"
+                 name="MYCHECKBOX" type="checkbox" value="Test Checkbox"/>
+          <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists"
+                 type="hidden" value="checkboxexists"/>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        widget.mode = 'display'
+        self.assertEqual(widget(), (
+            '<div class="display-checkbox" id="display-MYCHECKBOX">'
+            'Test Checkbox</div>'
+        ))
+
+        # Checkbox with manually set 'checked' attribute
+        widget = factory(
+            'checkbox',
+            name='MYCHECKBOX',
+            value='',
+            props={
+                'format': 'string',
+                'checked': True,
+            })
+        self.check_output("""
+        <div>
+          <input checked="checked" class="checkbox" id="input-MYCHECKBOX"
+                 name="MYCHECKBOX" type="checkbox" value=""/>
+          <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists"
+                 type="hidden" value="checkboxexists"/>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        widget = factory(
+            'checkbox',
+            name='MYCHECKBOX',
+            value='Test Checkbox',
+            props={
+                'format': 'string',
+                'checked': False,
+            })
+        self.check_output("""
+        <div>
+          <input class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX"
+                 type="checkbox" value="Test Checkbox"/>
+          <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists"
+                 type="hidden" value="checkboxexists"/>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        # Checkbox extraction
+        request = {
+            'MYCHECKBOX': '1',
+            'MYCHECKBOX-exists': 'checkboxexists'
+        }
+        data = widget.extract(request)
+        self.check_output("""
+        <RuntimeData MYCHECKBOX, value='Test Checkbox', extracted='1' at ...>
+        """, data.treerepr())
+
+        request = {
+            'MYCHECKBOX': '',
+            'MYCHECKBOX-exists': 'checkboxexists'
+        }
+        data = widget.extract(request)
+        self.check_output("""
+        <RuntimeData MYCHECKBOX, value='Test Checkbox', extracted='' at ...>
+        """, data.treerepr())
+
+        request = {
+            'MYCHECKBOX': 1,
+        }
+        data = widget.extract(request)
+        self.check_output("""
+        <RuntimeData MYCHECKBOX, value='Test Checkbox', extracted=<UNSET> at ...>
+        """, data.treerepr())
+
+        model = dict()
+        data.persist_writer = write_mapping_writer
+        data.write(model)
+        self.assertEqual(model, {'MYCHECKBOX': UNSET})
+
+        # bool extraction
+        widget = factory(
+            'checkbox',
+            name='MYCHECKBOX',
+            value='Test Checkbox',
+            props={
+                'format': 'bool'
+            })
+        request = {
+            'MYCHECKBOX': '',
+            'MYCHECKBOX-exists': 'checkboxexists'
+        }
+        data = widget.extract(request)
+        self.check_output("""
+        <RuntimeData MYCHECKBOX, value='Test Checkbox', extracted=True at ...>
+        """, data.treerepr())
+
+        request = {
+            'MYCHECKBOX-exists': 'checkboxexists'
+        }
+        data = widget.extract(request)
+        self.check_output("""
+        <RuntimeData MYCHECKBOX, value='Test Checkbox', extracted=False at ...>
+        """, data.treerepr())
+
+        model = dict()
+        data.persist_writer = write_mapping_writer
+        data.write(model)
+        self.assertEqual(model, {'MYCHECKBOX': False})
+
+        # invalid format
+        widget = factory(
+            'checkbox',
+            name='MYCHECKBOX',
+            props={
+                'format': 'invalid'
+            })
+        request = {
+            'MYCHECKBOX': '',
+            'MYCHECKBOX-exists': 'checkboxexists'
+        }
+        err = self.expect_error(
+            ValueError,
+            widget.extract,
+            request
+        )
+        msg = "Checkbox widget has invalid format 'invalid' set"
+        self.assertEqual(str(err), msg)
+
+        # Render in display mode
+        widget = factory(
+            'checkbox',
+            name='MYCHECKBOX',
+            value=False,
+            mode='display',
+            props={
+                'format': 'bool'
+            })
+        self.check_output("""
+        <div>
+          <div class="display-checkbox" id="display-MYCHECKBOX">No</div>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        widget = factory(
+            'checkbox',
+            name='MYCHECKBOX',
+            value=True,
+            mode='display',
+            props={
+                'format': 'bool'
+            })
+        self.check_output("""
+        <div>
+          <div class="display-checkbox" id="display-MYCHECKBOX">Yes</div>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        # Display mode and display proxy bool format
+        widget = factory(
+            'checkbox',
+            name='MYCHECKBOX',
+            value=True,
+            props={
+                'format': 'bool',
+                'display_proxy': True
+            },
+            mode='display')
+        self.check_output("""
+        <div class="display-checkbox" id="display-MYCHECKBOX">Yes<input
+        class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden"
+        value="" /><input id="checkboxexists-MYCHECKBOX"
+        name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" /></div>
+        """, widget())
+
+        data = widget.extract(request={'MYCHECKBOX-exists': 'checkboxexists'})
+        self.assertEqual(data.name, 'MYCHECKBOX')
+        self.assertEqual(data.value, True)
+        self.assertEqual(data.extracted, False)
+
+        self.check_output("""
+        <div class="display-checkbox" id="display-MYCHECKBOX">No<input
+        id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden"
+        value="checkboxexists" /></div>
+        """, widget(data=data))
+
+        data = widget.extract(request={
+            'MYCHECKBOX-exists': 'checkboxexists',
+            'MYCHECKBOX': ''
+        })
+        self.assertEqual(data.name, 'MYCHECKBOX')
+        self.assertEqual(data.value, True)
+        self.assertEqual(data.extracted, True)
+
+        self.check_output("""
+        <div class="display-checkbox" id="display-MYCHECKBOX">Yes<input
+        class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX"
+        type="hidden" value="" /><input id="checkboxexists-MYCHECKBOX"
+        name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" /></div>
+        """, widget(data=data))
+
+        # Display mode and display proxy string format
+        widget = factory(
+            'checkbox',
+            name='MYCHECKBOX',
+            value='yes',
+            props={
+                'format': 'string',
+                'display_proxy': True
+            },
+            mode='display')
+        self.check_output("""
+        <div class="display-checkbox" id="display-MYCHECKBOX">yes<input
+        class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX"
+        type="hidden" value="yes" /><input id="checkboxexists-MYCHECKBOX"
+        name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" /></div>
+        """, widget())
+
+        data = widget.extract(request={'MYCHECKBOX-exists': 'checkboxexists'})
+        self.assertEqual(data.name, 'MYCHECKBOX')
+        self.assertEqual(data.value, 'yes')
+        self.assertEqual(data.extracted, '')
+
+        self.check_output("""
+        <div class="display-checkbox" id="display-MYCHECKBOX">No<input
+        class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden"
+        value="" /><input id="checkboxexists-MYCHECKBOX"
+        name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" /></div>
+        """, widget(data=data))
+
+        data = widget.extract(request={
+            'MYCHECKBOX-exists': 'checkboxexists',
+            'MYCHECKBOX': ''
+        })
+        self.assertEqual(data.name, 'MYCHECKBOX')
+        self.assertEqual(data.value, 'yes')
+        self.assertEqual(data.extracted, '')
+
+        self.check_output("""
+        <div class="display-checkbox" id="display-MYCHECKBOX">No<input
+        class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden"
+        value="" /><input id="checkboxexists-MYCHECKBOX"
+        name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" /></div>
+        """, widget(data=data))
+
+        data = widget.extract(request={'MYCHECKBOX-exists': 'checkboxexists',
+                                       'MYCHECKBOX': 'foo'})
+        self.assertEqual(data.name, 'MYCHECKBOX')
+        self.assertEqual(data.value, 'yes')
+        self.assertEqual(data.extracted, 'foo')
+
+        self.check_output("""
+        <div class="display-checkbox" id="display-MYCHECKBOX">foo<input
+        class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX"
+        type="hidden" value="foo" /><input id="checkboxexists-MYCHECKBOX"
+        name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" /></div>
+        """, widget(data=data))
+
+        # Generic HTML5 Data
+        widget = factory(
+            'checkbox',
+            name='MYCHECKBOX',
+            value='Test Checkbox',
+            props={
+                'data': {'foo': 'bar'}
+            })
+        self.check_output("""
+        <input checked="checked" class="checkbox" data-foo=\'bar\'
+        id="input-MYCHECKBOX" name="MYCHECKBOX" type="checkbox"
+        value="" /><input id="checkboxexists-MYCHECKBOX"
+        name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />
+        """, widget())
+
 """
-Checkbox
---------
-
-A boolean checkbox widget (default)::
-
-    >>> widget = factory(
-    ...     'checkbox',
-    ...     name='MYCHECKBOX')
-    >>> wrapped_pxml(widget())
-    <div>
-      <input class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" 
-        type="checkbox" value=""/>
-      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
-        type="hidden" value="checkboxexists"/>
-    </div>
-    <BLANKLINE>
-
-    >>> widget.mode = 'display'
-    >>> widget()
-    u'<div class="display-checkbox" id="display-MYCHECKBOX">No</div>'
-
-    >>> widget = factory(
-    ...     'checkbox',
-    ...     name='MYCHECKBOX',
-    ...     value='True')
-    >>> wrapped_pxml(widget())
-    <div>
-      <input checked="checked" class="checkbox" id="input-MYCHECKBOX" 
-        name="MYCHECKBOX" type="checkbox" value=""/>
-      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
-        type="hidden" value="checkboxexists"/>
-    </div>
-    <BLANKLINE>
-
-    >>> widget.mode = 'display'
-    >>> widget()
-    u'<div class="display-checkbox" id="display-MYCHECKBOX">Yes</div>'
-
-A checkbox with label::
-
-    >>> widget = factory(
-    ...     'checkbox',
-    ...     name='MYCHECKBOX',
-    ...     props={
-    ...         'with_label': True
-    ...     })
-    >>> widget()
-    u'<input class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" 
-    type="checkbox" value="" /><label class="checkbox_label" 
-    for="input-MYCHECKBOX">&nbsp;</label><input id="checkboxexists-MYCHECKBOX" 
-    name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />'
-
-A checkbox widget with a value or an empty string::
-
-    >>> widget = factory(
-    ...     'checkbox',
-    ...     name='MYCHECKBOX',
-    ...     value='',
-    ...     props={
-    ...         'format': 'string'
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <input class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" 
-      type="checkbox" value=""/>
-      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
-      type="hidden" value="checkboxexists"/>
-    </div>
-    <BLANKLINE>
-
-    >>> widget.mode = 'display'
-    >>> widget()
-    u'<div class="display-checkbox" id="display-MYCHECKBOX">No</div>'
-
-    >>> widget = factory(
-    ...     'checkbox',
-    ...     name='MYCHECKBOX',
-    ...     value='Test Checkbox',
-    ...     props={
-    ...         'format': 'string'
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <input checked="checked" class="checkbox" id="input-MYCHECKBOX" 
-      name="MYCHECKBOX" type="checkbox" value="Test Checkbox"/>
-      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
-      type="hidden" value="checkboxexists"/>
-    </div>
-    <BLANKLINE>
-
-    >>> widget.mode = 'display'
-    >>> widget()
-    u'<div class="display-checkbox" id="display-MYCHECKBOX">Test Checkbox</div>'
-
-    >>> widget.mode = 'edit'
-
-Checkbox with manually set 'checked' attribute::
-
-    >>> widget = factory(
-    ...     'checkbox',
-    ...     name='MYCHECKBOX',
-    ...     value='',
-    ...     props={
-    ...         'format': 'string',
-    ...         'checked': True,
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <input checked="checked" class="checkbox" id="input-MYCHECKBOX" 
-      name="MYCHECKBOX" type="checkbox" value=""/>
-      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
-      type="hidden" value="checkboxexists"/>
-    </div>
-    <BLANKLINE>
-
-    >>> widget = factory(
-    ...     'checkbox',
-    ...     name='MYCHECKBOX',
-    ...     value='Test Checkbox',
-    ...     props={
-    ...         'format': 'string',
-    ...         'checked': False,
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <input class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" 
-      type="checkbox" value="Test Checkbox"/>
-      <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
-      type="hidden" value="checkboxexists"/>
-    </div>
-    <BLANKLINE>
-
-Checkbox extraction::
-
-    >>> request = {
-    ...     'MYCHECKBOX': '1',
-    ...     'MYCHECKBOX-exists': 'checkboxexists'
-    ... }
-    >>> data = widget.extract(request)
-    >>> data.printtree()
-    <RuntimeData MYCHECKBOX, value='Test Checkbox', extracted='1' at ...>
-
-    >>> request = {
-    ...     'MYCHECKBOX': '',
-    ...     'MYCHECKBOX-exists': 'checkboxexists'
-    ... }
-    >>> data = widget.extract(request)
-    >>> data.printtree()
-    <RuntimeData MYCHECKBOX, value='Test Checkbox', extracted='' at ...>
-
-    >>> request = {
-    ...     'MYCHECKBOX': 1,
-    ... }
-    >>> data = widget.extract(request)
-    >>> data.printtree()
-    <RuntimeData MYCHECKBOX, value='Test Checkbox', extracted=<UNSET> at ...>
-
-    >>> model = dict()
-    >>> data.persist_writer = write_mapping_writer
-    >>> data.write(model)
-    >>> model
-    {'MYCHECKBOX': <UNSET>}
-
-bool extraction::
-
-    >>> widget = factory(
-    ...     'checkbox',
-    ...     name='MYCHECKBOX',
-    ...     value='Test Checkbox',
-    ...     props={
-    ...         'format': 'bool'
-    ...     })
-    >>> request = {
-    ...     'MYCHECKBOX': '',
-    ...     'MYCHECKBOX-exists': 'checkboxexists'
-    ... }
-    >>> data = widget.extract(request)
-    >>> data.printtree()
-    <RuntimeData MYCHECKBOX, value='Test Checkbox', extracted=True at ...>
-
-    >>> request = {
-    ...     'MYCHECKBOX-exists': 'checkboxexists'
-    ... }
-    >>> data = widget.extract(request)
-    >>> data.printtree()
-    <RuntimeData MYCHECKBOX, value='Test Checkbox', extracted=False at ...>
-
-    >>> model = dict()
-    >>> data.persist_writer = write_mapping_writer
-    >>> data.write(model)
-    >>> model
-    {'MYCHECKBOX': False}
-
-invalid format::
-
-    >>> widget = factory(
-    ...     'checkbox',
-    ...     name='MYCHECKBOX',
-    ...     props={
-    ...         'format': 'invalid'
-    ...     })
-    >>> request = {
-    ...     'MYCHECKBOX': '',
-    ...     'MYCHECKBOX-exists': 'checkboxexists'
-    ... }
-    >>> data = widget.extract(request)
-    Traceback (most recent call last):
-      ...
-    ValueError: Checkbox widget has invalid format 'invalid' set
-
-Render in display mode::
-
-    >>> widget = factory(
-    ...     'checkbox',
-    ...     name='MYCHECKBOX',
-    ...     value=False,
-    ...     mode='display',
-    ...     props={
-    ...         'format': 'bool'
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <div class="display-checkbox" id="display-MYCHECKBOX">No</div>
-    </div>
-    <BLANKLINE>
-
-    >>> widget = factory(
-    ...     'checkbox',
-    ...     name='MYCHECKBOX',
-    ...     value=True,
-    ...     mode='display',
-    ...     props={
-    ...         'format': 'bool'
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <div class="display-checkbox" id="display-MYCHECKBOX">Yes</div>
-    </div>
-    <BLANKLINE>
-
-Display mode and display proxy bool format::
-
-    >>> widget = factory(
-    ...     'checkbox',
-    ...     name='MYCHECKBOX',
-    ...     value=True,
-    ...     props={
-    ...         'format': 'bool',
-    ...         'display_proxy': True
-    ...     },
-    ...     mode='display')
-    >>> widget()
-    u'<div class="display-checkbox" id="display-MYCHECKBOX">Yes<input 
-    class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden" 
-    value="" /><input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
-    type="hidden" value="checkboxexists" /></div>'
-
-    >>> data = widget.extract(request={'MYCHECKBOX-exists': 'checkboxexists'})
-    >>> data
-    <RuntimeData MYCHECKBOX, value=True, extracted=False at ...>
-
-    >>> widget(data=data)
-    u'<div class="display-checkbox" id="display-MYCHECKBOX">No<input 
-    id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden" 
-    value="checkboxexists" /></div>'
-
-    >>> data = widget.extract(request={
-    ...     'MYCHECKBOX-exists': 'checkboxexists',
-    ...     'MYCHECKBOX': ''
-    ... })
-    >>> data
-    <RuntimeData MYCHECKBOX, value=True, extracted=True at ...>
-
-    >>> widget(data=data)
-    u'<div class="display-checkbox" id="display-MYCHECKBOX">Yes<input 
-    class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" 
-    type="hidden" value="" /><input id="checkboxexists-MYCHECKBOX" 
-    name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" /></div>'
-
-Display mode and display proxy string format::
-
-    >>> widget = factory(
-    ...     'checkbox',
-    ...     name='MYCHECKBOX',
-    ...     value='yes',
-    ...     props={
-    ...         'format': 'string',
-    ...         'display_proxy': True
-    ...     },
-    ...     mode='display')
-    >>> widget()
-    u'<div class="display-checkbox" id="display-MYCHECKBOX">yes<input 
-    class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" 
-    type="hidden" value="yes" /><input id="checkboxexists-MYCHECKBOX" 
-    name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" /></div>'
-
-    >>> data = widget.extract(request={'MYCHECKBOX-exists': 'checkboxexists'})
-    >>> data
-    <RuntimeData MYCHECKBOX, value='yes', extracted='' at ...>
-
-    >>> widget(data=data)
-    u'<div class="display-checkbox" id="display-MYCHECKBOX">No<input 
-    class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden" 
-    value="" /><input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
-    type="hidden" value="checkboxexists" /></div>'
-
-    >>> data = widget.extract(request={
-    ...     'MYCHECKBOX-exists': 'checkboxexists',
-    ...     'MYCHECKBOX': ''
-    ... })
-    >>> data
-    <RuntimeData MYCHECKBOX, value='yes', extracted='' at ...>
-
-    >>> widget(data=data)
-    u'<div class="display-checkbox" id="display-MYCHECKBOX">No<input 
-    class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden" 
-    value="" /><input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" 
-    type="hidden" value="checkboxexists" /></div>'
-
-    >>> data = widget.extract(request={'MYCHECKBOX-exists': 'checkboxexists',
-    ...                                'MYCHECKBOX': 'foo'})
-    >>> data
-    <RuntimeData MYCHECKBOX, value='yes', extracted='foo' at ...>
-
-    >>> widget(data=data)
-    u'<div class="display-checkbox" id="display-MYCHECKBOX">foo<input 
-    class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" 
-    type="hidden" value="foo" /><input id="checkboxexists-MYCHECKBOX" 
-    name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" /></div>'
-
-Generic HTML5 Data::
-
-    >>> widget = factory(
-    ...     'checkbox',
-    ...     name='MYCHECKBOX',
-    ...     value='Test Checkbox',
-    ...     props={
-    ...         'data': {'foo': 'bar'}
-    ...     })
-    >>> widget()
-    u'<input checked="checked" class="checkbox" data-foo=\'bar\' 
-    id="input-MYCHECKBOX" name="MYCHECKBOX" type="checkbox" value="" /><input 
-    id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden" 
-    value="checkboxexists" />'
-
-
 Textarea
 --------
 
