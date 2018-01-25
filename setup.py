@@ -48,7 +48,7 @@ setup(
         'plumber>=1.3',
     ],
     tests_require=tests_require,
-    test_suite="yafowil.tests.test_suite",
+    test_suite='yafowil.tests.test_suite',
     extras_require=dict(
         test=tests_require,
     ),

@@ -1997,7 +1997,7 @@ def error_renderer(widget, data):
     for error in data.errors:
         message_tag = attr_value('message_tag', widget, data)
         if message_tag:
-            msgs += tag(message_tag, error.message,
+            msgs += tag(message_tag, error,
                         class_=attr_value('message_class', widget, data))
         else:
             msgs += error.message

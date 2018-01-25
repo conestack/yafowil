@@ -5,7 +5,9 @@ History
 2.2.5 (unreleased)
 ------------------
 
-- No changes yet.
+- Do not access deprecated ``Exception.message`` any more in
+  ``common.error_renderer``.
+  [rnix]
 
 
 2.2.4 (2017-11-13)
