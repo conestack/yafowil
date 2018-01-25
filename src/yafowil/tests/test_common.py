@@ -1238,262 +1238,265 @@ class TestCommon(NodeTestCase):
         name="MYCHECKBOX-exists" type="hidden" value="checkboxexists" />
         """, widget())
 
+    def test_textarea_blueprint(self):
+        # Textarea widget
+        widget = factory(
+            'textarea',
+            name='MYTEXTAREA',
+            value=None)
+        self.assertEqual(widget(), (
+            '<textarea class="textarea" cols="80" id="input-MYTEXTAREA" '
+            'name="MYTEXTAREA" rows="25"></textarea>'
+        ))
+
+        widget = factory(
+            'textarea',
+            name='MYTEXTAREA',
+            value=None,
+            props={
+                'data': {
+                    'foo': 'bar'
+                },
+            })
+        self.assertEqual(widget(), (
+            '<textarea class="textarea" cols="80" data-foo=\'bar\' '
+            'id="input-MYTEXTAREA" name="MYTEXTAREA" rows="25"></textarea>'
+        ))
+
+        widget.mode = 'display'
+        self.assertEqual(widget(), (
+            '<div class="display-textarea" data-foo=\'bar\' '
+            'id="display-MYTEXTAREA"></div>'
+        ))
+
+        # Emptyvalue
+        widget = factory(
+            'textarea',
+            name='MYTEXTAREA',
+            props={
+                'emptyvalue': 'EMPTYVALUE',
+            })
+        data = widget.extract(request={'MYTEXTAREA': ''})
+        self.assertEqual(data.name, 'MYTEXTAREA')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, 'EMPTYVALUE')
+        self.assertEqual(data.errors, [])
+
+        data = widget.extract(request={'MYTEXTAREA': 'NOEMPTY'})
+        self.assertEqual(data.name, 'MYTEXTAREA')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, 'NOEMPTY')
+        self.assertEqual(data.errors, [])
+
+        # Persist
+        widget = factory(
+            'textarea',
+            name='MYTEXTAREA',
+            props={
+                'persist_writer': write_mapping_writer
+            })
+        data = widget.extract(request={'MYTEXTAREA': 'Text'})
+        model = dict()
+        data.write(model)
+        self.assertEqual(model, {'MYTEXTAREA': 'Text'})
+
+    def test_lines_blueprint(self):
+        # Render empty
+        widget = factory(
+            'lines',
+            name='MYLINES',
+            value=None)
+        self.assertEqual(widget(), (
+            '<textarea class="lines" cols="40" id="input-MYLINES" '
+            'name="MYLINES" rows="8"></textarea>'
+        ))
+
+        # Render with preset value, expected as list
+        widget = factory(
+            'lines',
+            name='MYLINES',
+            value=['a', 'b', 'c'])
+        self.check_output("""
+        <textarea class="lines" cols="40" id="input-MYLINES"
+                  name="MYLINES" rows="8">a
+        b
+        c</textarea>
+        """, fxml(widget()))
+
+        # Extract empty
+        data = widget.extract({'MYLINES': ''})
+        self.assertEqual(data.extracted, [])
+
+        # Extract with data
+        data = widget.extract({'MYLINES': 'a\nb'})
+        self.assertEqual(data.extracted, ['a', 'b'])
+
+        # Render with extracted data
+        self.check_output("""
+        <textarea class="lines" cols="40" id="input-MYLINES"
+                  name="MYLINES" rows="8">a
+        b</textarea>
+        """, fxml(widget(data=data)))
+
+        # Display mode with preset value
+        widget = factory(
+            'lines',
+            name='MYLINES',
+            value=['a', 'b', 'c'],
+            mode='display')
+        self.check_output("""
+        <ul class="display-lines" id="display-MYLINES">
+          <li>a</li>
+          <li>b</li>
+          <li>c</li>
+        </ul>
+        """, fxml(widget()))
+
+        # Display mode with empty preset value
+        widget = factory(
+            'lines',
+            name='MYLINES',
+            value=[],
+            mode='display')
+        self.check_output("""
+        <ul class="display-lines" id="display-MYLINES"/>
+        """, fxml(widget()))
+
+        # Display mode with ``display_proxy``
+        widget = factory(
+            'lines',
+            name='MYLINES',
+            value=['a', 'b', 'c'],
+            props={
+                'display_proxy': True,
+            },
+            mode='display')
+        self.check_output("""
+        <div>
+          <ul class="display-lines" id="display-MYLINES">
+            <li>a</li>
+            <li>b</li>
+            <li>c</li>
+          </ul>
+          <input class="lines" id="input-MYLINES" name="MYLINES" type="hidden"
+                 value="a"/>
+          <input class="lines" id="input-MYLINES" name="MYLINES" type="hidden"
+                 value="b"/>
+          <input class="lines" id="input-MYLINES" name="MYLINES" type="hidden"
+                 value="c"/>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        data = widget.extract({'MYLINES': 'a\nb'})
+        self.assertEqual(data.name, 'MYLINES')
+        self.assertEqual(data.value, ['a', 'b', 'c'])
+        self.assertEqual(data.extracted, ['a', 'b'])
+        self.assertEqual(data.errors, [])
+
+        self.check_output("""
+        <div>
+          <ul class="display-lines" id="display-MYLINES">
+            <li>a</li>
+            <li>b</li>
+          </ul>
+          <input class="lines" id="input-MYLINES" name="MYLINES" type="hidden"
+                 value="a"/>
+          <input class="lines" id="input-MYLINES" name="MYLINES" type="hidden"
+                 value="b"/>
+        </div>
+        """, wrapped_fxml(widget(data=data)))
+
+        # Generic HTML5 Data
+        widget = factory(
+            'lines',
+            name='MYLINES',
+            value=['a', 'b', 'c'],
+            props={
+                'data': {'foo': 'bar'}
+            })
+        self.check_output("""
+        <textarea class="lines" cols="40" data-foo="bar" id="input-MYLINES"
+                  name="MYLINES" rows="8">a
+        b
+        c</textarea>
+        """, fxml(widget()))
+
+        widget = factory(
+            'lines',
+            name='MYLINES',
+            value=['a', 'b', 'c'],
+            props={
+                'data': {'foo': 'bar'}
+            },
+            mode='display')
+        self.check_output("""
+        <ul class="display-lines" data-foo="bar" id="display-MYLINES">
+          <li>a</li>
+          <li>b</li>
+          <li>c</li>
+        </ul>
+        """, fxml(widget()))
+
+        # Emptyvalue
+        widget = factory(
+            'lines',
+            name='MYLINES',
+            value=['a', 'b', 'c'],
+            props={
+                'emptyvalue': ['1']
+            })
+        data = widget.extract(request={'MYLINES': ''})
+        self.assertEqual(data.name, 'MYLINES')
+        self.assertEqual(data.value, ['a', 'b', 'c'])
+        self.assertEqual(data.extracted, ['1'])
+        self.assertEqual(data.errors, [])
+
+        data = widget.extract(request={'MYLINES': '1\n2'})
+        self.assertEqual(data.name, 'MYLINES')
+        self.assertEqual(data.value, ['a', 'b', 'c'])
+        self.assertEqual(data.extracted, ['1', '2'])
+        self.assertEqual(data.errors, [])
+
+        # Datatype
+        widget = factory(
+            'lines',
+            name='MYLINES',
+            props={
+                'emptyvalue': [1],
+                'datatype': int
+            })
+        data = widget.extract(request={'MYLINES': ''})
+        self.assertEqual(data.name, 'MYLINES')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, [1])
+        self.assertEqual(data.errors, [])
+
+        data = widget.extract(request={'MYLINES': '1\n2'})
+        self.assertEqual(data.name, 'MYLINES')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, [1, 2])
+        self.assertEqual(data.errors, [])
+
+        widget.attrs['emptyvalue'] = ['1']
+        data = widget.extract(request={'MYLINES': ''})
+        self.assertEqual(data.name, 'MYLINES')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, [1])
+        self.assertEqual(data.errors, [])
+
+        # Persist
+        widget = factory(
+            'lines',
+            name='MYLINES',
+            props={
+                'persist_writer': write_mapping_writer
+            })
+        data = widget.extract(request={'MYLINES': '1\n2'})
+        model = dict()
+        data.write(model)
+        self.assertEqual(model, {'MYLINES': ['1', '2']})
+
 """
-Textarea
---------
-
-Textarea widget::
-
-    >>> widget = factory(
-    ...     'textarea',
-    ...     name='MYTEXTAREA',
-    ...     value=None)
-    >>> widget()
-    u'<textarea class="textarea" cols="80" id="input-MYTEXTAREA" 
-    name="MYTEXTAREA" rows="25"></textarea>'
-
-    >>> widget = factory(
-    ...     'textarea',
-    ...     name='MYTEXTAREA',
-    ...     value=None,
-    ...     props={
-    ...         'data': {
-    ...             'foo': 'bar'
-    ...         },
-    ...     })
-    >>> widget()
-    u'<textarea class="textarea" cols="80" data-foo=\'bar\' 
-    id="input-MYTEXTAREA" name="MYTEXTAREA" rows="25"></textarea>'
-
-    >>> widget.mode = 'display'
-    >>> widget()
-    u'<div class="display-textarea" data-foo=\'bar\' 
-    id="display-MYTEXTAREA"></div>'
-
-Emptyvalue::
-
-    >>> widget = factory(
-    ...     'textarea',
-    ...     name='MYTEXTAREA',
-    ...     props={
-    ...         'emptyvalue': 'EMPTYVALUE',
-    ...     })
-    >>> widget.extract(request={'MYTEXTAREA': ''})
-    <RuntimeData MYTEXTAREA, value=<UNSET>, extracted='EMPTYVALUE' at ...>
-
-    >>> widget.extract(request={'MYTEXTAREA': 'NOEMPTY'})
-    <RuntimeData MYTEXTAREA, value=<UNSET>, extracted='NOEMPTY' at ...>
-
-Persist::
-
-    >>> widget = factory(
-    ...     'textarea',
-    ...     name='MYTEXTAREA',
-    ...     props={
-    ...         'persist_writer': write_mapping_writer
-    ...     })
-    >>> data = widget.extract(request={'MYTEXTAREA': 'Text'})
-    >>> model = dict()
-    >>> data.write(model)
-    >>> model
-    {'MYTEXTAREA': 'Text'}
-
-
-Lines
------
-
-Render empty::
-
-    >>> widget = factory(
-    ...     'lines',
-    ...     name='MYLINES',
-    ...     value=None)
-    >>> widget()
-    u'<textarea class="lines" cols="40" id="input-MYLINES" name="MYLINES" 
-    rows="8"></textarea>'
-
-Render with preset value, expected as list::
-
-    >>> widget = factory(
-    ...     'lines',
-    ...     name='MYLINES',
-    ...     value=['a', 'b', 'c'])
-    >>> pxml(widget())
-    <textarea class="lines" cols="40" id="input-MYLINES" name="MYLINES" 
-    rows="8">a
-    b
-    c</textarea>
-    <BLANKLINE>
-
-Extract empty::
-
-    >>> data = widget.extract({'MYLINES': ''})
-    >>> data.extracted
-    []
-
-Extract with data::
-
-    >>> data = widget.extract({'MYLINES': 'a\nb'})
-    >>> data.extracted
-    ['a', 'b']
-
-Render with extracted data::
-
-    >>> pxml(widget(data=data))
-    <textarea class="lines" cols="40" id="input-MYLINES" name="MYLINES" 
-    rows="8">a
-    b</textarea>
-    <BLANKLINE>
-
-Display mode with preset value::
-
-    >>> widget = factory(
-    ...     'lines',
-    ...     name='MYLINES',
-    ...     value=['a', 'b', 'c'],
-    ...     mode='display')
-    >>> pxml(widget())
-    <ul class="display-lines" id="display-MYLINES">
-      <li>a</li>
-      <li>b</li>
-      <li>c</li>
-    </ul>
-    <BLANKLINE>
-
-Display mode with empty preset value::
-
-    >>> widget = factory(
-    ...     'lines',
-    ...     name='MYLINES',
-    ...     value=[],
-    ...     mode='display')
-    >>> pxml(widget())
-    <ul class="display-lines" id="display-MYLINES"/>
-    <BLANKLINE>
-
-Display mode with ``display_proxy``::
-
-    >>> widget = factory(
-    ...     'lines',
-    ...     name='MYLINES',
-    ...     value=['a', 'b', 'c'],
-    ...     props={
-    ...         'display_proxy': True,
-    ...     },
-    ...     mode='display')
-    >>> wrapped_pxml(widget())
-    <div>
-      <ul class="display-lines" id="display-MYLINES">
-        <li>a</li>
-        <li>b</li>
-        <li>c</li>
-      </ul>
-      <input class="lines" id="input-MYLINES" name="MYLINES" type="hidden" 
-        value="a"/>
-      <input class="lines" id="input-MYLINES" name="MYLINES" type="hidden" 
-        value="b"/>
-      <input class="lines" id="input-MYLINES" name="MYLINES" type="hidden" 
-        value="c"/>
-    </div>
-    <BLANKLINE>
-
-    >>> data = widget.extract({'MYLINES': 'a\nb'})
-    >>> data
-    <RuntimeData MYLINES, value=['a', 'b', 'c'], extracted=['a', 'b'] at ...>
-
-    >>> wrapped_pxml(widget(data=data))
-    <div>
-      <ul class="display-lines" id="display-MYLINES">
-        <li>a</li>
-        <li>b</li>
-      </ul>
-      <input class="lines" id="input-MYLINES" name="MYLINES" type="hidden" 
-        value="a"/>
-      <input class="lines" id="input-MYLINES" name="MYLINES" type="hidden" 
-        value="b"/>
-    </div>
-    <BLANKLINE>
-
-Generic HTML5 Data::
-
-    >>> widget = factory(
-    ...     'lines',
-    ...     name='MYLINES',
-    ...     value=['a', 'b', 'c'],
-    ...     props={
-    ...         'data': {'foo': 'bar'}
-    ...     })
-    >>> pxml(widget())
-    <textarea class="lines" cols="40" data-foo="bar" id="input-MYLINES" 
-    name="MYLINES" rows="8">a
-    b
-    c</textarea>
-    <BLANKLINE>
-
-    >>> widget = factory(
-    ...     'lines',
-    ...     name='MYLINES',
-    ...     value=['a', 'b', 'c'],
-    ...     props={
-    ...         'data': {'foo': 'bar'}
-    ...     },
-    ...     mode='display')
-    >>> pxml(widget())
-    <ul class="display-lines" data-foo="bar" id="display-MYLINES">
-      <li>a</li>
-      <li>b</li>
-      <li>c</li>
-    </ul>
-    <BLANKLINE>
-
-Emptyvalue::
-
-    >>> widget = factory(
-    ...     'lines',
-    ...     name='MYLINES',
-    ...     value=['a', 'b', 'c'],
-    ...     props={
-    ...         'emptyvalue': ['1']
-    ...     })
-    >>> widget.extract(request={'MYLINES': ''})
-    <RuntimeData MYLINES, value=['a', 'b', 'c'], extracted=['1'] at ...>
-
-    >>> widget.extract(request={'MYLINES': '1\n2'})
-    <RuntimeData MYLINES, value=['a', 'b', 'c'], extracted=['1', '2'] at ...>
-
-Datatype::
-
-    >>> widget = factory(
-    ...     'lines',
-    ...     name='MYLINES',
-    ...     props={
-    ...         'emptyvalue': [1],
-    ...         'datatype': int
-    ...     })
-    >>> widget.extract(request={'MYLINES': ''})
-    <RuntimeData MYLINES, value=<UNSET>, extracted=[1] at ...>
-
-    >>> widget.extract(request={'MYLINES': '1\n2'})
-    <RuntimeData MYLINES, value=<UNSET>, extracted=[1, 2] at ...>
-
-    >>> widget.attrs['emptyvalue'] = ['1']
-    >>> widget.extract(request={'MYLINES': ''})
-    <RuntimeData MYLINES, value=<UNSET>, extracted=[1] at ...>
-
-Persist::
-
-    >>> widget = factory(
-    ...     'lines',
-    ...     name='MYLINES',
-    ...     props={
-    ...         'persist_writer': write_mapping_writer
-    ...     })
-    >>> data = widget.extract(request={'MYLINES': '1\n2'})
-    >>> model = dict()
-    >>> data.write(model)
-    >>> model
-    {'MYLINES': ['1', '2']}
-
 
 Selection
 ---------
