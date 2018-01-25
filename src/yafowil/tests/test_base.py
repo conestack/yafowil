@@ -11,25 +11,12 @@ import traceback
 
 
 ###############################################################################
-# Test helpers
+# Helpers
 ###############################################################################
 
 def test_extractor(widget, data):
     return 'e1'
 
-def test_extractor2(widget, data):
-    return 'e2'
-
-def test_extractor3(widget, data):
-    number = data.request[widget.__name__]
-    try:
-        return int(number)
-    except:
-        raise ExtractionError('e3: Integer expected, got %s' % number)
-    return value
-
-def fail_extractor(widget, data):
-    raise ValueError('extractor has to fail')
 
 def test_edit_renderer(widget, data):
     return 'r1, {}, {}, {}'.format(
@@ -38,35 +25,14 @@ def test_edit_renderer(widget, data):
         str(widget.attributes)
     )
 
-def test_edit_renderer2(widget, data):
-    return 'r2, {}, {}, {}'.format(
-        widget.__name__,
-        str(data),
-        str(widget.attributes)
-    )
-
-def fail_edit_renderer(widget, data):
-    raise ValueError('renderer has to fail')
-
-def test_display_renderer(widget, data):
-    return 'disr1, {}, {}, {}'.format(
-        widget.__name__,
-        str(data),
-        str(widget.attributes)
-    )
-
-def fail_display_renderer(widget, data):
-    raise ValueError('display renderer has to fail')
-
-def test_preprocessor(widget, data):
-    data.attrs['test_preprocessor'] = 'called'
-    return data
 
 def test_getter(widget, data):
     return 'Test Value'
 
-def test_getter2(widget, data):
-    return 999
+
+def test_preprocessor(widget, data):
+    data.attrs['test_preprocessor'] = 'called'
+    return data
 
 
 ###############################################################################
@@ -144,6 +110,43 @@ class TestBase(NodeTestCase):
             raise Exception('Exception expected but not thrown')
 
     def test_Widget(self):
+        def test_extractor2(widget, data):
+            return 'e2'
+
+        def test_extractor3(widget, data):
+            number = data.request[widget.__name__]
+            try:
+                return int(number)
+            except:
+                raise ExtractionError('e3: Integer expected, got %s' % number)
+            return value
+
+        def fail_extractor(widget, data):
+            raise ValueError('extractor has to fail')
+
+        def test_edit_renderer2(widget, data):
+            return 'r2, {}, {}, {}'.format(
+                widget.__name__,
+                str(data),
+                str(widget.attributes)
+            )
+
+        def fail_edit_renderer(widget, data):
+            raise ValueError('renderer has to fail')
+
+        def test_display_renderer(widget, data):
+            return 'disr1, {}, {}, {}'.format(
+                widget.__name__,
+                str(data),
+                str(widget.attributes)
+            )
+
+        def fail_display_renderer(widget, data):
+            raise ValueError('display renderer has to fail')
+
+        def test_getter2(widget, data):
+            return 999
+
         # The widget class
         test_request = {'MYUID': 'New Test Value'}
         testwidget = Widget(
