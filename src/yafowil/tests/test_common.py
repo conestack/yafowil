@@ -3,6 +3,7 @@ from StringIO import StringIO
 from node.tests import NodeTestCase
 from node.utils import UNSET
 from yafowil.base import factory
+from yafowil.base import ExtractionError
 from yafowil.common import convert_bytes
 from yafowil.persistence import write_mapping_writer
 from yafowil.utils import EMPTY_VALUE
@@ -29,7 +30,7 @@ class TestCommon(NodeTestCase):
 
     # This test creates widgets from ist blueprints with different properties.
 
-    def test_hidden(self):
+    def test_hidden_blueprint(self):
         # Hidden input blueprint
         widget = factory(
             'hidden',
@@ -122,7 +123,7 @@ class TestCommon(NodeTestCase):
         data.write(model)
         self.assertEqual(model, {'myhidden': 10})
 
-    def test_generic_tag(self):
+    def test_tag_blueprint(self):
         # Custom tag widget
         widget = factory(
             'tag',
@@ -149,244 +150,232 @@ class TestCommon(NodeTestCase):
             mode='skip')
         self.assertEqual(widget(), '')
 
+    def test_text_blueprint(self):
+        # Regular text input
+        widget = factory(
+            'text',
+            name='MYTEXT',
+            value='Test Text "Some Text"')
+        self.assertEqual(widget(), (
+            '<input class="text" id="input-MYTEXT" name="MYTEXT" type="text" '
+            'value="Test Text &quot;Some Text&quot;" />'
+        ))
+
+        widget.mode = 'display'
+        self.assertEqual(widget(), (
+            '<div class="display-text" id="display-MYTEXT">'
+            'Test Text "Some Text"</div>'
+        ))
+
+        # Render with title attribute
+        widget = factory(
+            'text',
+            name='MYTEXT',
+            value='ja ha!',
+            props={
+                'title': 'My awesome title'
+            })
+        self.assertEqual(widget(), (
+            '<input class="text" id="input-MYTEXT" name="MYTEXT" '
+            'title="My awesome title" type="text" value="ja ha!" />'
+        ))
+
+        # Generic HTML5 Data
+        widget = factory(
+            'text',
+            name='MYTEXT',
+            value='ja ha!',
+            props={
+                'title': 'My awesome title',
+                'data': {'foo': 'bar'}
+            })
+        self.assertEqual(widget(), (
+            '<input class="text" data-foo=\'bar\' id="input-MYTEXT" '
+            'name="MYTEXT" title="My awesome title" type="text" '
+            'value="ja ha!" />'
+        ))
+
+        # Extract and persist
+        widget = factory(
+            'text',
+            name='MYTEXT',
+            props={
+                'persist_writer': write_mapping_writer
+            })
+        data = widget.extract(request={'MYTEXT': '10'})
+        self.assertEqual(data.name, 'MYTEXT')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, '10')
+
+        model = dict()
+        data.write(model)
+        self.assertEqual(model, {'MYTEXT': '10'})
+
+    def test_emptyvalue_extraction(self):
+        # Empty values
+        widget = factory(
+            'text',
+            name='MYTEXT',
+            props={
+                'title': 'Default tests',
+                'data': {'foo': 'bar'},
+                'default': 'defaultvalue'
+            })
+        self.assertEqual(widget(), (
+            '<input class="text" data-foo=\'bar\' id="input-MYTEXT" '
+            'name="MYTEXT" title="Default tests" type="text" '
+            'value="defaultvalue" />'
+        ))
+
+        data = widget.extract(request={})
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract(request={'MYTEXT': ''})
+        self.assertEqual(data.extracted, '')
+
+        widget.attrs['emptyvalue'] = 'emptyvalue'
+        data = widget.extract(request={'MYTEXT': ''})
+        self.assertEqual(data.extracted, 'emptyvalue')
+
+        widget.attrs['emptyvalue'] = False
+        data = widget.extract(request={})
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract(request={'MYTEXT': ''})
+        self.assertFalse(data.extracted, False)
+
+        widget.attrs['emptyvalue'] = UNSET
+        data = widget.extract(request={})
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract(request={'MYTEXT': ''})
+        self.assertEqual(data.extracted, UNSET)
+
+    def test_autofocus_property(self):
+        # Widget with autofocus property
+        widget = factory(
+            'text',
+            name='AUTOFOCUS',
+            value='',
+            props={
+                'autofocus': True
+            })
+        self.assertEqual(widget(), (
+            '<input autofocus="autofocus" class="text" id="input-AUTOFOCUS" '
+            'name="AUTOFOCUS" type="text" value="" />'
+        ))
+
+    def test_placeholder_property(self):
+        # Widget with placeholder property
+        widget = factory(
+            'text',
+            name='PLACEHOLDER',
+            value='',
+            props={
+                'placeholder': 'This is a placeholder.'
+            })
+        self.assertEqual(widget(), (
+            '<input class="text" id="input-PLACEHOLDER" name="PLACEHOLDER" '
+            'placeholder="This is a placeholder." type="text" value="" />'
+        ))
+
+    def test_required_extractor(self):
+        # Widget with requires input
+        widget = factory(
+            'text',
+            name='REQUIRED',
+            value='',
+            props={
+                'required': True,
+                'error_class': True
+            })
+        self.assertEqual(widget(), (
+            '<input class="required text" id="input-REQUIRED" name="REQUIRED" '
+            'required="required" type="text" value="" />'
+        ))
+
+        # Extract with empty request, key not in request therefore no error
+        data = widget.extract({})
+        self.assertEqual(data.name, 'REQUIRED')
+        self.assertEqual(data.value, '')
+        self.assertEqual(data.extracted, UNSET)
+        self.assertEqual(data.errors, [])
+
+        # Extract with empty input sent, required error expected
+        data = widget.extract({'REQUIRED': ''})
+        self.assertEqual(data.name, 'REQUIRED')
+        self.assertEqual(data.value, '')
+        self.assertEqual(data.extracted, '')
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Mandatory field was empty')]
+        )
+
+        # With getter value set, empty request, no error expected
+        widget = factory(
+            'text',
+            name='REQUIRED',
+            value='Test Text',
+            props={
+                'required': True,
+                'error_class': True
+            })
+        data = widget.extract({})
+        self.assertEqual(data.name, 'REQUIRED')
+        self.assertEqual(data.value, 'Test Text')
+        self.assertEqual(data.extracted, UNSET)
+        self.assertEqual(data.errors, [])
+        self.assertEqual(widget(data=data), (
+            '<input class="required text" id="input-REQUIRED" name="REQUIRED" '
+            'required="required" type="text" value="Test Text" />'
+        ))
+
+        # With getter value set, request given, error expected
+        data = widget.extract({'REQUIRED': ''})
+        self.assertEqual(data.name, 'REQUIRED')
+        self.assertEqual(data.value, 'Test Text')
+        self.assertEqual(data.extracted, '')
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Mandatory field was empty')]
+        )
+        self.assertEqual(widget(data=data), (
+            '<input class="error required text" id="input-REQUIRED" '
+            'name="REQUIRED" required="required" type="text" value="" />'
+        ))
+
+        # Create a custom error message
+        widget = factory(
+            'text',
+            name='REQUIRED',
+            value='',
+            props={
+                'required': 'You fool, fill in a value!'
+            })
+        data = widget.extract({'REQUIRED': ''})
+        self.assertEqual(data.name, 'REQUIRED')
+        self.assertEqual(data.value, '')
+        self.assertEqual(data.extracted, '')
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('You fool, fill in a value!')]
+        )
+
+        # ``required`` property could be a callable as well
+        def required_callback(widget, data):
+            return u"Foooo"
+
+        widget = factory(
+            'text',
+            name='REQUIRED',
+            value='',
+            props={
+                'required': required_callback
+            })
+        data = widget.extract({'REQUIRED': ''})
+        self.assertEqual(data.errors, [ExtractionError('Foooo')])
+
 """
-Text Input
-----------
-
-Regular text input::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='MYTEXT',
-    ...     value='Test Text "Some Text"')
-    >>> widget()
-    u'<input class="text" id="input-MYTEXT" name="MYTEXT" type="text" 
-    value="Test Text &quot;Some Text&quot;" />'
-
-    >>> widget.mode = 'display'
-    >>> widget()
-    u'<div class="display-text" id="display-MYTEXT">Test Text "Some Text"</div>'
-
-Render with title attribute::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='MYTEXT',
-    ...     value='ja ha!',
-    ...     props={
-    ...         'title': 'My awesome title'
-    ...     })
-    >>> widget()
-    u'<input class="text" id="input-MYTEXT" name="MYTEXT" 
-    title="My awesome title" type="text" value="ja ha!" />'
-
-Generic HTML5 Data::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='MYTEXT',
-    ...     value='ja ha!',
-    ...     props={
-    ...         'title': 'My awesome title',
-    ...         'data': {'foo': 'bar'}
-    ...     })
-    >>> widget()
-    u'<input class="text" data-foo=\'bar\' id="input-MYTEXT" 
-    name="MYTEXT" title="My awesome title" type="text" value="ja ha!" />'
-
-Extract and persist::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='MYTEXT',
-    ...     props={
-    ...         'persist_writer': write_mapping_writer
-    ...     })
-    >>> data = widget.extract(request={'MYTEXT': '10'})
-    >>> data
-    <RuntimeData MYTEXT, value=<UNSET>, extracted='10' at ...>
-
-    >>> model = dict()
-    >>> data.write(model)
-    >>> model
-    {'MYTEXT': '10'}
-
-
-Empty values
-------------
-
-::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='MYTEXT',
-    ...     props={
-    ...         'title': 'Default tests',
-    ...         'data': {'foo': 'bar'},
-    ...         'default': 'defaultvalue'
-    ...     })
-    >>> widget()
-    u'<input class="text" data-foo=\'bar\' id="input-MYTEXT" name="MYTEXT" 
-    title="Default tests" type="text" value="defaultvalue" />'
-
-    >>> data = widget.extract(request={})
-    >>> data.extracted
-    <UNSET>
-
-    >>> data = widget.extract(request={'MYTEXT': ''})
-    >>> data.extracted
-    ''
-
-    >>> widget.attrs['emptyvalue'] = 'emptyvalue'
-    >>> data = widget.extract(request={'MYTEXT': ''})
-    >>> data.extracted
-    'emptyvalue'
-
-    >>> widget.attrs['emptyvalue'] = False
-    >>> data = widget.extract(request={})
-    >>> data.extracted
-    <UNSET>
-
-    >>> data = widget.extract(request={'MYTEXT': ''})
-    >>> data.extracted
-    False
-
-    >>> widget.attrs['emptyvalue'] = UNSET
-    >>> data = widget.extract(request={})
-    >>> data.extracted
-    <UNSET>
-
-    >>> data = widget.extract(request={'MYTEXT': ''})
-    >>> data.extracted
-    <UNSET>
-
-
-Autofocus Text Input
---------------------
-
-Widget with autofocus property::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='AUTOFOCUS',
-    ...     value='',
-    ...     props={
-    ...         'autofocus': True
-    ...     })
-    >>> widget()
-    u'<input autofocus="autofocus" class="text" id="input-AUTOFOCUS"
-    name="AUTOFOCUS" type="text" value="" />'
-
-
-Placeholder Text Input
-----------------------
-
-Widget with placeholder property::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='PLACEHOLDER',
-    ...     value='',
-    ...     props={
-    ...         'placeholder': 'This is a placeholder.'
-    ...     })
-    >>> widget()
-    u'<input class="text" id="input-PLACEHOLDER" name="PLACEHOLDER"
-    placeholder="This is a placeholder." type="text" value="" />'
-
-
-Required Input
---------------
-
-Widget with requires input::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='REQUIRED',
-    ...     value='',
-    ...     props={
-    ...         'required': True,
-    ...         'error_class': True
-    ...     })
-    >>> widget()
-    u'<input class="required text" id="input-REQUIRED" name="REQUIRED"
-    required="required" type="text" value="" />'
-
-Extract with empty request, key not in request therefore no error::
-
-    >>> data = widget.extract({})
-    >>> data
-    <RuntimeData REQUIRED, value='', extracted=<UNSET> at ...>
-
-Extract with empty input sent, required error expected::
-
-    >>> data = widget.extract({'REQUIRED': ''})
-    >>> data
-    <RuntimeData REQUIRED, value='', extracted='', 1 error(s) at ...>
-
-    >>> data.errors
-    [ExtractionError('Mandatory field was empty',)]
-
-With getter value set, empty request, no error expected::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='REQUIRED',
-    ...     value='Test Text',
-    ...     props={
-    ...         'required': True,
-    ...         'error_class': True
-    ...     })
-    >>> data = widget.extract({})
-    >>> data
-    <RuntimeData REQUIRED, value='Test Text', extracted=<UNSET> at ...>
-
-    >>> widget(data=data)
-    u'<input class="required text" id="input-REQUIRED" name="REQUIRED"
-    required="required" type="text" value="Test Text" />'
-
-With getter value set, request given, error expected::
-
-    >>> data = widget.extract({'REQUIRED': ''})
-    >>> data
-    <RuntimeData REQUIRED, value='Test Text', extracted='', 1 error(s) at ...>
-
-    >>> widget(data=data)
-    u'<input class="error required text" id="input-REQUIRED" name="REQUIRED"
-    required="required" type="text" value="" />'
-
-Create a custom error message::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='REQUIRED',
-    ...     value='',
-    ...     props={
-    ...         'required': 'You fool, fill in a value!'
-    ...     })
-    >>> data = widget.extract({'REQUIRED': ''})
-    >>> data
-    <RuntimeData REQUIRED, value='', extracted='', 1 error(s) at ...>
-
-    >>> data.errors
-    [ExtractionError('You fool, fill in a value!',)]
-
-``required`` property could be a callable as well::
-
-    >>> def required_callback(widget, data):
-    ...     return u"Foooo"
-    >>> widget = factory(
-    ...     'text',
-    ...     name='REQUIRED',
-    ...     value='',
-    ...     props={
-    ...         'required': required_callback
-    ...     })
-    >>> data = widget.extract({'REQUIRED': ''})
-    >>> data.errors
-    [ExtractionError('Foooo',)]
-
-
 Generic display renderer
 ------------------------
 

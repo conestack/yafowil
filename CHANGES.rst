@@ -5,6 +5,9 @@ History
 2.2.5 (unreleased)
 ------------------
 
+- Implement ``ExtractionError.__eq__`` to make them comparable.
+  [rnix]
+
 - Do not access deprecated ``Exception.message`` any more in
   ``common.error_renderer``.
   [rnix]

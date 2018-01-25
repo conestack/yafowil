@@ -184,6 +184,9 @@ class ExtractionError(Exception):
     def __repr__(self):
         return u"ExtractionError('{0}',)".format(str(self))
 
+    def __eq__(self, other):
+        return repr(self) == repr(other)
+
 
 class TBSupplementWidget(object):
     """Supplement for Tracebacks in case a widget chain part fails.
