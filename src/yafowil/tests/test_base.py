@@ -725,251 +725,239 @@ class TestBase(NodeTestCase):
                 'yafowil.widget.someaddon', copy_resources=False)
         )
 
+    def test_widget_tree_manipulation(self):
+        # Widget trees provide functionality described in
+        # ``node.interfaces.IOrder``, which makes it possible to insert widgets
+        # at a specific place in an existing widget tree
+
+        factory = Factory()
+        factory.register('widget_test', [test_extractor], [test_edit_renderer])
+
+        widget = factory('widget_test', name='root')
+        widget['1'] = factory('widget_test')
+        widget['2'] = factory('widget_test')
+        self.check_output("""
+        <class 'yafowil.base.Widget'>: root
+        <class 'yafowil.base.Widget'>: 1
+        <class 'yafowil.base.Widget'>: 2
+        """, widget.treerepr())
+
+        new = factory('widget_test', name='3')
+        ref = widget['1']
+        widget.insertbefore(new, ref)
+        new = factory('widget_test', name='4')
+        widget.insertafter(new, ref)
+        self.check_output("""
+        <class 'yafowil.base.Widget'>: root
+        <class 'yafowil.base.Widget'>: 3
+        <class 'yafowil.base.Widget'>: 1
+        <class 'yafowil.base.Widget'>: 4
+        <class 'yafowil.base.Widget'>: 2
+        """, widget.treerepr())
+
+    def test_factory_chain(self):
+        # Sometimes we want to wrap inputs by UI candy, primary for usability
+        # reasons. This might be a label, some error output or div around. We
+        # dont want to register an amount of X possible widgets with an amount
+        # of Y possible wrappers. Therefore we can factor a widget in a chain
+        # defined colon-separated, i.e 'outer:inner' or 'field:error:text'.
+        # Chaining works for all parts: edit_renderers, display_renderes,
+        # extractors, preprocessors and builders. Most inner and first executed
+        # is right (we prefix with wrappers)!. The chain can be defined as list
+        # instead of a colon seperated string as well
+
+        def inner_renderer(widget, data):
+            return u'<INNER />'
+
+        def inner_display_renderer(widget, data):
+            return u'<INNERDISPLAY />'
+
+        def inner_extractor(widget, data):
+            return ['extracted inner']
+
+        def outer_renderer(widget, data):
+            return u'<OUTER>%s</OUTER>' % data.rendered
+
+        def outer_display_renderer(widget, data):
+            return u'<OUTERDISPLAY>%s</OUTERDISPLAY>' % data.rendered
+
+        def outer_extractor(widget, data):
+            return data.extracted + ['extracted outer']
+
+        factory = Factory()
+        factory.register(
+            'inner',
+            [inner_extractor],
+            [inner_renderer],
+            [],
+            [],
+            [inner_display_renderer])
+        factory.register(
+            'outer',
+            [outer_extractor],
+            [outer_renderer],
+            [],
+            [],
+            [outer_display_renderer])
+        self.assertEqual(
+            factory.display_renderers('inner'),
+            [inner_display_renderer]
+        )
+        self.assertEqual(
+            factory.edit_renderers('inner'),
+            [inner_renderer]
+        )
+        err = self.expect_error(
+            RuntimeError,
+            factory.renderers,
+            'inner'
+        )
+        msg = 'Deprecated since 1.2, use edit_renderers or display_renderers'
+        self.assertEqual(str(err), msg)
+
+        # Colon seperated blueprint chain definition
+        widget = factory('outer:inner', name='OUTER_INNER')
+        data = widget.extract({})
+        self.assertEqual(data.extracted, ['extracted inner', 'extracted outer'])
+        self.assertEqual(widget(data), u'<OUTER><INNER /></OUTER>')
+
+        # Blueprint chain definition as list
+        widget = factory(['outer', 'inner'], name='OUTER_INNER')
+        data = widget.extract({})
+        self.assertEqual(data.extracted, ['extracted inner', 'extracted outer'])
+        self.assertEqual(widget(data), u'<OUTER><INNER /></OUTER>')
+
+        # Inject custom specials blueprints into chain
+
+        # You may need an behavior just one time and just for one special
+        # widget. Here you can inject your custom special render or extractor
+        # into the chain
+
+        def special_renderer(widget, data):
+            return u'<SPECIAL>%s</SPECIAL>' % data.rendered
+
+        def special_extractor(widget, data):
+            return data.extracted + ['extracted special']
+
+        # Inject as dict
+        widget = factory(
+            'outer:*special:inner',
+            name='OUTER_SPECIAL_INNER',
+            custom={
+                'special': {
+                    'extractors': [special_extractor],
+                    'edit_renderers': [special_renderer]
+                }
+            })
+        data = widget.extract({})
+        self.assertEqual(
+            data.extracted,
+            ['extracted inner', 'extracted special', 'extracted outer']
+        )
+        self.assertEqual(
+            widget(data),
+            u'<OUTER><SPECIAL><INNER /></SPECIAL></OUTER>'
+        )
+
+        # Inject as list
+        widget = factory(
+            'outer:*special:inner',
+            name='OUTER_SPECIAL_INNER',
+            custom={
+                'special': (
+                    [special_extractor],
+                    [special_renderer],
+                    [],
+                    [],
+                    []
+                )
+            })
+        data = widget.extract({})
+        self.assertEqual(
+            data.extracted,
+            ['extracted inner', 'extracted special', 'extracted outer']
+        )
+        self.assertEqual(
+            widget(data),
+            u'<OUTER><SPECIAL><INNER /></SPECIAL></OUTER>'
+        )
+
+        # BBB, w/o display_renderer
+        widget = factory(
+            'outer:*special:inner',
+            name='OUTER_SPECIAL_INNER',
+            custom={
+                'special': (
+                    [special_extractor],
+                    [special_renderer],
+                    [],
+                    []
+                )
+            })
+        data = widget.extract({})
+        self.assertEqual(
+            data.extracted,
+            ['extracted inner', 'extracted special', 'extracted outer']
+        )
+
+    def test_prefixes_and_defaults(self):
+        # Prefixes with widgets and factories
+        # Factory called widget attributes should know about its factory name
+        # with a prefix
+
+        def prefix_renderer(widget, data):
+            return u'<ID>%s</ID>' % widget.attrs['id']
+
+        factory = Factory()
+        factory.register('prefix', [], [prefix_renderer])
+        widget = factory('prefix', props={'prefix.id': 'Test'})
+        self.assertEqual(widget(), u'<ID>Test</ID>')
+
+        widget = factory('prefix', name='test', props={'id': 'Test2'})
+        self.assertEqual(widget(), u'<ID>Test2</ID>')
+
+        # modify defaults for widgets attributes via factory
+
+        # We have the following value resolution order for properties:
+
+        # 1) prefixed property
+        # 2) unprefixed property
+        # 3) prefixed default
+        # 4) unprefixed default
+        # 5) KeyError
+
+        # Case for (5): We have only some unprefixed default
+        widget = factory('prefix', name='test')
+        try:
+            widget()
+        except KeyError, e:
+            msg = (
+                "'Property with key \"id\" is not given on "
+                "widget \"test\" (no default)'"
+            )
+            self.assertEqual(str(e), msg)
+        else:
+            raise Exception('Exception expected but not thrown')
+
+        # Case for (4): Unprefixed default
+        factory.defaults['id'] = 'Test4'
+        widget = factory('prefix', name='test')
+        self.assertEqual(widget(), u'<ID>Test4</ID>')
+
+        # Case for (3): Prefixed default overrides unprefixed
+        factory.defaults['prefix.id'] = 'Test3'
+        widget = factory('prefix', name='test')
+        self.assertEqual(widget(), u'<ID>Test3</ID>')
+
+        # Case for (2): Unprefixed property overides any default
+        widget = factory('prefix', name='test', props={'id': 'Test2'})
+        self.assertEqual(widget(), u'<ID>Test2</ID>')
+
+        # Case for (1): Prefixed property overrules all others
+        widget = factory('prefix', name='test', props={'prefix.id': 'Test1'})
+        self.assertEqual(widget(), u'<ID>Test1</ID>')
+
 """
-Widget tree manipulation
-------------------------
-
-Widget trees provide functionality described in ``node.interfaces.IOrder``,
-which makes it possible to insert widgets at a specific place in an existing
-widget tree::
-
-    >>> widget = factory('widget_test', name='root')
-    >>> widget['1'] = factory('widget_test')
-    >>> widget['2'] = factory('widget_test')
-    >>> widget.printtree()
-    <class 'yafowil.base.Widget'>: root
-      <class 'yafowil.base.Widget'>: 1
-      <class 'yafowil.base.Widget'>: 2
-
-    >>> new = factory('widget_test', name='3')
-    >>> ref = widget['1']
-    >>> widget.insertbefore(new, ref)
-    >>> new = factory('widget_test', name='4')
-    >>> widget.insertafter(new, ref)
-    >>> widget.printtree()
-    <class 'yafowil.base.Widget'>: root
-      <class 'yafowil.base.Widget'>: 3
-      <class 'yafowil.base.Widget'>: 1
-      <class 'yafowil.base.Widget'>: 4
-      <class 'yafowil.base.Widget'>: 2
-
-
-Request chains via factory
---------------------------
-
-Sometimes we want to wrap inputs by UI candy, primary for usability reasons.
-This might be a label, some error output or div around. We dont want to register
-an amount of X possible widgets with an amount of Y possible wrappers. Therefore
-we can factor a widget in a chain defined colon-separated, i.e 'outer:inner' or
-'field:error:text'. Chaining works for all parts: edit_renderers,
-display_renderes, extractors, preprocessors and builders. Most inner and first
-executed is right (we prefix with wrappers)!. The chain can be defined as list
-instead of a colon seperated string as well::
-
-    >>> def inner_renderer(widget, data):
-    ...     return u'<INNER />'
-
-    >>> def inner_display_renderer(widget, data):
-    ...     return u'<INNERDISPLAY />'
-
-    >>> def inner_extractor(widget, data):
-    ...     return ['extracted inner']
-
-    >>> def outer_renderer(widget, data):
-    ...     return u'<OUTER>%s</OUTER>' % data.rendered
-
-    >>> def outer_display_renderer(widget, data):
-    ...     return u'<OUTERDISPLAY>%s</OUTERDISPLAY>' % data.rendered
-
-    >>> def outer_extractor(widget, data):
-    ...     return data.extracted + ['extracted outer']
-
-    >>> factory.register(
-    ...     'inner',
-    ...     [inner_extractor],
-    ...     [inner_renderer],
-    ...     [],
-    ...     [],
-    ...     [inner_display_renderer])
-    >>> factory.register(
-    ...     'outer',
-    ...     [outer_extractor],
-    ...     [outer_renderer],
-    ...     [],
-    ...     [],
-    ...     [outer_display_renderer])
-    >>> factory.display_renderers('inner')
-    [<function inner_display_renderer at ...>]
-
-    >>> factory.edit_renderers('inner')
-    [<function inner_renderer at ...>]
-
-    >>> factory.renderers('inner')
-    Traceback (most recent call last):
-    ...
-    RuntimeError: Deprecated since 1.2, use edit_renderers or display_renderers
-
-Colon seperated blueprint chain definition::
-
-    >>> widget = factory('outer:inner', name='OUTER_INNER')
-    >>> data = widget.extract({})
-    >>> data.extracted
-    ['extracted inner', 'extracted outer']
-
-    >>> widget(data)
-    u'<OUTER><INNER /></OUTER>'
-
-Blueprint chain definition as list::
-
-    >>> widget = factory(['outer', 'inner'], name='OUTER_INNER')
-    >>> data = widget.extract({})
-    >>> data.extracted
-    ['extracted inner', 'extracted outer']
-
-    >>> widget(data)
-    u'<OUTER><INNER /></OUTER>'
-
-
-Inject custom specials blueprints into chain
---------------------------------------------
-
-You may need an behavior just one time and just for one special widget. Here
-you can inject your custom special render or extractor into the chain::
-
-    >>> def special_renderer(widget, data):
-    ...     return u'<SPECIAL>%s</SPECIAL>' % data.rendered
-
-    >>> def special_extractor(widget, data):
-    ...     return data.extracted + ['extracted special']
-
-Inject as dict::
-
-    >>> widget = factory(
-    ...     'outer:*special:inner',
-    ...     name='OUTER_SPECIAL_INNER',
-    ...     custom={
-    ...         'special': {
-    ...             'extractors': [special_extractor],
-    ...             'edit_renderers': [special_renderer]
-    ...         }
-    ...     })
-    >>> data = widget.extract({})
-    >>> data.extracted
-    ['extracted inner', 'extracted special', 'extracted outer']
-
-    >>> widget(data)
-    u'<OUTER><SPECIAL><INNER /></SPECIAL></OUTER>'
-
-Inject as list::
-
-    >>> widget = factory(
-    ...     'outer:*special:inner',
-    ...     name='OUTER_SPECIAL_INNER',
-    ...     custom={
-    ...         'special': (
-    ...             [special_extractor],
-    ...             [special_renderer],
-    ...             [],
-    ...             [],
-    ...             []
-    ...         )
-    ...     })
-    >>> data = widget.extract({})
-    >>> data.extracted
-    ['extracted inner', 'extracted special', 'extracted outer']
-
-    >>> widget(data)
-    u'<OUTER><SPECIAL><INNER /></SPECIAL></OUTER>'
-
-BBB, w/o display_renderer::  
-      
-    >>> widget = factory(
-    ...     'outer:*special:inner',
-    ...     name='OUTER_SPECIAL_INNER',
-    ...     custom={
-    ...         'special': (
-    ...             [special_extractor],
-    ...             [special_renderer],
-    ...             [],
-    ...             []
-    ...         )
-    ...     })
-    >>> data = widget.extract({})
-    >>> data.extracted
-    ['extracted inner', 'extracted special', 'extracted outer']
-
-
-Prefixes with widgets and factories
------------------------------------
-
-Factory called widget attributes should know about its factory name with a
-prefix:: 
-
-    >>> def prefix_renderer(widget, data):
-    ...     return u'<ID>%s</ID>' % widget.attrs['id']
-
-    >>> factory.register('prefix', [], [prefix_renderer])
-    >>> widget = factory('prefix', props={'prefix.id': 'Test'})
-    >>> widget()
-    u'<ID>Test</ID>'
-
-    >>> widget = factory('prefix', name='test', props={'id': 'Test2'})
-    >>> widget()
-    u'<ID>Test2</ID>'
-
-
-modify defaults for widgets attributes via factory
---------------------------------------------------
-
-We have the following value resolution order for properties:
-
-1) prefixed property
-2) unprefixed property
-3) prefixed default
-4) unprefixed default
-5) KeyError
-
-Case for (5): We have only some unprefixed default:: 
-
-    >>> widget = factory('prefix', name='test')
-    >>> try:
-    ...     widget()
-    ... except KeyError, e:
-    ...     print e
-    'Property with key "id" is not given on widget "test" (no default)'
-
-Case for (4): Unprefixed default::
-
-    >>> factory.defaults['id'] = 'Test4'
-    >>> widget = factory('prefix', name='test')
-    >>> widget()
-    u'<ID>Test4</ID>'
-
-Case for (3): Prefixed default overrides unprefixed::
-
-    >>> factory.defaults['prefix.id'] = 'Test3'
-    >>> widget = factory('prefix', name='test')
-    >>> widget()
-    u'<ID>Test3</ID>'
-
-Case for (2): Unprefixed property overides any default:: 
-
-    >>> widget = factory('prefix', name='test', props={'id': 'Test2'})
-    >>> widget()
-    u'<ID>Test2</ID>'
-
-Case for (1): Prefixed property overrules all others::
-
-    >>> widget = factory('prefix', name='test', props={'prefix.id': 'Test1'})
-    >>> widget()
-    u'<ID>Test1</ID>'
-
-Clean up::
-
-    >>> del factory.defaults['id']
-    >>> del factory.defaults['prefix.id']
-
-
 fetch value
 -----------
 
