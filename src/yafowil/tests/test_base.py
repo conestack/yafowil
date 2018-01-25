@@ -509,201 +509,223 @@ class TestBase(NodeTestCase):
         self.assertFalse(data['child_0'].has_errors, False)
         self.assertTrue(data['child_1'].has_errors, True)
 
+    def test_factory(self):
+        # Fill factory with test blueprints
+        factory = Factory()
+        factory.register('widget_test', [test_extractor], [test_edit_renderer])
+        self.assertEqual(
+            factory.extractors('widget_test'),
+            [test_extractor]
+        )
+        self.assertEqual(
+            factory.edit_renderers('widget_test'),
+            [test_edit_renderer]
+        )
+
+        testwidget = factory(
+            'widget_test',
+            name='MYFAC',
+            value=test_getter,
+            props=dict(foo='bar'))
+        self.check_output("""
+        r1,
+        MYFAC,
+        <RuntimeData MYFAC, value='Test Value', extracted=<UNSET> at ...>,
+        {'foo': 'bar'}
+        """, testwidget())
+
+        factory.register(
+            'widget_test',
+            [test_extractor],
+            [test_edit_renderer],
+            preprocessors=[test_preprocessor])
+        self.assertEqual(
+            factory.preprocessors('widget_test'),
+            [test_preprocessor]
+        )
+
+        def test_global_preprocessor(widget, data):
+            return data
+
+        factory.register_global_preprocessors([test_global_preprocessor])
+        self.assertEqual(
+            factory.preprocessors('widget_test'),
+            [test_global_preprocessor, test_preprocessor]
+        )
+
+        testwidget = factory(
+            'widget_test',
+            name='MYFAC',
+            value=test_getter,
+            props=dict(foo='bar'), mode='display')
+        data = testwidget.extract({})
+        self.assertEqual(data.mode, 'display')
+
+        # We can create sets of static builders, i.e. to have a validating
+        # password field with two input fields in. Here a simpler example
+        def create_static_compound(widget, factory):
+            widget['one'] = factory('widget_test', widget.attrs)
+            widget['two'] = factory('widget_test', widget.attrs)
+
+        factory.register(
+            'static_compound', [], [], builders=[create_static_compound])
+        widget = factory('static_compound', props={})
+        self.assertEqual(widget.keys(), ['one', 'two'])
+        self.assertEqual(
+            factory.builders('static_compound'),
+            [create_static_compound]
+        )
+
+        # Some basic name checks are done
+        err = self.expect_error(ValueError, factory._name_check, '*notallowed')
+        self.assertEqual(str(err), '"*" as char not allowed as name.')
+
+        err = self.expect_error(ValueError, factory._name_check, 'not:allowed')
+        self.assertEqual(str(err), '":" as char not allowed as name.')
+
+        err = self.expect_error(ValueError, factory._name_check, '#notallowed')
+        self.assertEqual(str(err), '"#" as char not allowed as name.')
+
+        # Test the macros
+        factory.register_macro(
+            'test_macro', 'foo:*bar:baz', {'foo.newprop': 'abc'})
+
+        self.assertEqual(
+            factory._macros,
+            {'test_macro': (['foo', '*bar', 'baz'], {'foo.newprop': 'abc'})}
+        )
+        self.assertEqual(
+            factory._expand_blueprints('#test_macro', {'foo.newprop' : '123'}),
+            (['foo', '*bar', 'baz'], {'foo.newprop': '123'})
+        )
+        self.assertEqual(
+            factory._expand_blueprints('#test_macro', {'foo.newprop2' : '123'}),
+            (['foo', '*bar', 'baz'], {'foo.newprop': 'abc', 'foo.newprop2': '123'})
+        )
+
+        err = self.expect_error(
+            ValueError,
+            factory._expand_blueprints,
+            '#nonexisting', {}
+        )
+        msg = "Macro named 'nonexisting' is not registered in factory"
+        self.assertEqual(str(err), msg)
+
+        factory.register_macro('test_macro2', 'alpha:#test_macro:beta', {})
+
+        self.assertEqual(
+            factory._expand_blueprints('#test_macro2', {}),
+            (['alpha', 'foo', '*bar', 'baz', 'beta'], {'foo.newprop': 'abc'})
+        )
+
+    def test_theme_registry(self):
+        # Theme to use
+        factory = Factory()
+        self.assertEqual(factory.theme, 'default')
+
+        # Register addon widget resources for default theme
+        factory.register_theme(
+            'default',
+            'yafowil.widget.someaddon',
+            '/foo/bar/resources',
+            js=[{'resource': 'default/widget.js',
+                 'thirdparty': False,
+                 'order': 10,
+                 'merge': False}],
+            css=[{'resource': 'default/widget.css',
+                  'thirdparty': False,
+                  'order': 10,
+                  'merge': False}])
+
+        # Register addon widget resources for custom theme
+        factory.register_theme(
+            'custom',
+            'yafowil.widget.someaddon',
+            '/foo/bar/resources',
+            js=[{'resource': 'custom/widget.js',
+                 'thirdparty': False,
+                 'order': 10,
+                 'merge': False}],
+            css=[{'resource': 'custom/widget.css',
+                  'thirdparty': False,
+                  'order': 10,
+                  'merge': False}])
+
+        # Lookup resouces for addon widget
+        self.assertEqual(factory.resources_for('yafowil.widget.someaddon'), {
+            'resourcedir': '/foo/bar/resources',
+            'css': [{
+                'merge': False,
+                'thirdparty': False,
+                'resource': 'default/widget.css',
+                'order': 10
+            }],
+            'js': [{
+                'merge': False,
+                'thirdparty': False,
+                'resource': 'default/widget.js',
+                'order': 10
+            }]
+        })
+
+        # Set theme on factory
+        factory.theme = 'custom'
+        self.assertEqual(factory.resources_for('yafowil.widget.someaddon'), {
+            'resourcedir': '/foo/bar/resources',
+            'css': [{
+                'merge': False,
+                'thirdparty': False,
+                'resource': 'custom/widget.css',
+                'order': 10
+            }],
+            'js': [{
+                'merge': False,
+                'thirdparty': False,
+                'resource': 'custom/widget.js',
+                'order': 10
+            }]
+        })
+
+        # If no resources found for theme name, return default resources
+        factory.theme = 'inexistent'
+        self.assertEqual(factory.resources_for('yafowil.widget.someaddon'), {
+            'resourcedir': '/foo/bar/resources',
+            'css': [{
+                'merge': False,
+                'thirdparty': False,
+                'resource': 'default/widget.css',
+                'order': 10
+            }],
+            'js': [{
+                'merge': False,
+                'thirdparty': False,
+                'resource': 'default/widget.js',
+                'order': 10
+            }]
+        })
+
+        # If no resources registered at all for widget, None is returned
+        factory.theme = 'default'
+        self.assertTrue(
+            factory.resources_for('yafowil.widget.inexistent') is None
+        )
+
+        # Resources are returned as deepcopy of the original resources
+        # definition by default
+        resources = factory.resources_for('yafowil.widget.someaddon')
+        self.assertFalse(
+            resources is factory.resources_for('yafowil.widget.someaddon')
+        )
+
+        # Some might want the resource definitions as original instance
+        resources = factory.resources_for(
+            'yafowil.widget.someaddon', copy_resources=False)
+        self.assertTrue(
+            resources is factory.resources_for(
+                'yafowil.widget.someaddon', copy_resources=False)
+        )
+
 """
-factory
--------
-
-Fill factory with test blueprints::
-
-    >>> factory = Factory()
-    >>> factory.register('widget_test', [test_extractor], [test_edit_renderer])
-    >>> factory.extractors('widget_test')
-    [<function test_extractor at ...>]
-
-    >>> factory.edit_renderers('widget_test')
-    [<function test_edit_renderer at ...>]
-
-    >>> testwidget = factory(
-    ...     'widget_test',
-    ...     name='MYFAC',
-    ...     value=test_getter,
-    ...     props=dict(foo='bar'))
-    >>> testwidget()
-    ('r1', 'MYFAC', "<RuntimeData MYFAC, value='Test Value', extracted=<UNSET> 
-    at ...>", "{'foo': 'bar'}")
-
-    >>> factory.register(
-    ...     'widget_test',
-    ...     [test_extractor],
-    ...     [test_edit_renderer],
-    ...     preprocessors=[test_preprocessor])
-    >>> factory.preprocessors('widget_test')
-    [<function test_preprocessor at 0x...>]
-
-    >>> def test_global_preprocessor(widget, data):
-    ...     return data
-
-    >>> factory.register_global_preprocessors([test_global_preprocessor])
-    >>> factory.preprocessors('widget_test')
-    [<function test_global_preprocessor at 0x...>, 
-    <function test_preprocessor at 0x...>]
-
-    >>> testwidget = factory(
-    ...     'widget_test',
-    ...     name='MYFAC',
-    ...     value=test_getter,
-    ...     props=dict(foo='bar'), mode='display')
-    >>> data = testwidget.extract({})
-    >>> data.mode
-    'display'    
-
-We can create sets of static builders, i.e. to have a validating password
-field with two input fields in. Here a simpler example:: 
-
-    >>> def create_static_compound(widget, factory):
-    ...     widget['one'] = factory('widget_test', widget.attrs)
-    ...     widget['two'] = factory('widget_test', widget.attrs)
-
-    >>> factory.register(
-    ...     'static_compound', [], [], builders=[create_static_compound])
-
-    >>> widget = factory('static_compound', props={})
-    >>> widget.keys()
-    ['one', 'two']
-
-    >>> factory.builders('static_compound')
-    [<function create_static_compound at 0x...>]
-
-Some basic name checks are done::
-
-    >>> factory._name_check('*notallowed')
-    Traceback (most recent call last):
-    ...
-    ValueError: "*" as char not allowed as name.
-
-    >>> factory._name_check('not:allowed')
-    Traceback (most recent call last):
-    ...
-    ValueError: ":" as char not allowed as name.
-
-    >>> factory._name_check('#notallowed')
-    Traceback (most recent call last):
-    ...
-    ValueError: "#" as char not allowed as name.
-
-Test the macros::
-
-    >>> factory.register_macro(
-    ...     'test_macro', 'foo:*bar:baz', {'foo.newprop': 'abc'})
-    >>> factory._macros
-    {'test_macro': (['foo', '*bar', 'baz'], {'foo.newprop': 'abc'})}
-
-    >>> factory._expand_blueprints('#test_macro', {'foo.newprop' : '123'})
-    (['foo', '*bar', 'baz'], {'foo.newprop': '123'})
-
-    >>> ex = factory._expand_blueprints('#test_macro', {'foo.newprop2' : '123'})
-    >>> pprint(ex)
-    (['foo', '*bar', 'baz'], {'foo.newprop': 'abc', 'foo.newprop2': '123'})
-
-    >>> factory._expand_blueprints('#nonexisting', {})
-    Traceback (most recent call last):
-    ...
-    ValueError: Macro named 'nonexisting' is not registered in factory
-
-    >>> factory.register_macro('test_macro2', 'alpha:#test_macro:beta', {})
-    >>> factory._expand_blueprints('#test_macro2', {})
-    (['alpha', 'foo', '*bar', 'baz', 'beta'], {'foo.newprop': 'abc'})
-
-
-Test theme registry
--------------------
-
-Theme to use::
-
-    >>> factory.theme
-    'default'
-
-Register addon widget resources for default theme::
-
-    >>> factory.register_theme(
-    ...     'default',
-    ...     'yafowil.widget.someaddon',
-    ...     '/foo/bar/resources',
-    ...     js=[{'resource': 'default/widget.js',
-    ...          'thirdparty': False,
-    ...          'order': 10,
-    ...          'merge': False}],
-    ...     css=[{'resource': 'default/widget.css',
-    ...           'thirdparty': False,
-    ...           'order': 10,
-    ...           'merge': False}])
-
-Register addon widget resources for custom theme::
-
-    >>> factory.register_theme(
-    ...     'custom',
-    ...     'yafowil.widget.someaddon',
-    ...     '/foo/bar/resources',
-    ...     js=[{'resource': 'custom/widget.js',
-    ...          'thirdparty': False,
-    ...          'order': 10,
-    ...          'merge': False}],
-    ...     css=[{'resource': 'custom/widget.css',
-    ...           'thirdparty': False,
-    ...           'order': 10,
-    ...           'merge': False}])
-
-Lookup resouces for addon widget::
-
-    >>> factory.resources_for('yafowil.widget.someaddon')
-    {'resourcedir': '/foo/bar/resources', 
-    'css': [{'merge': False, 'thirdparty': False, 
-    'resource': 'default/widget.css', 'order': 10}], 
-    'js': [{'merge': False, 'thirdparty': False, 
-    'resource': 'default/widget.js', 'order': 10}]}
-
-Set theme on factory::
-
-    >>> factory.theme = 'custom'
-    >>> factory.resources_for('yafowil.widget.someaddon')
-    {'resourcedir': '/foo/bar/resources', 
-    'css': [{'merge': False, 'thirdparty': False, 
-    'resource': 'custom/widget.css', 'order': 10}], 
-    'js': [{'merge': False, 'thirdparty': False, 
-    'resource': 'custom/widget.js', 'order': 10}]}
-
-If no resources found for theme name, return default resources::
-
-    >>> factory.theme = 'inexistent'
-    >>> factory.resources_for('yafowil.widget.someaddon')
-    {'resourcedir': '/foo/bar/resources', 
-    'css': [{'merge': False, 'thirdparty': False, 
-    'resource': 'default/widget.css', 'order': 10}], 
-    'js': [{'merge': False, 'thirdparty': False, 
-    'resource': 'default/widget.js', 'order': 10}]}
-
-If no resources registered at all for widget, None is returned::
-
-    >>> factory.theme = 'default'
-    >>> factory.resources_for('yafowil.widget.inexistent') is None
-    True
-
-Resources are returned as deepcopy of the original resources definition by
-default::
-
-    >>> resources = factory.resources_for('yafowil.widget.someaddon')
-    >>> resources is factory.resources_for('yafowil.widget.someaddon')
-    False
-
-Some might want the resource definitions as original instance::
-
-    >>> resources = factory.resources_for(
-    ...     'yafowil.widget.someaddon', copy_resources=False)
-    >>> resources is factory.resources_for(
-    ...     'yafowil.widget.someaddon', copy_resources=False)
-    True
-
-
 Widget tree manipulation
 ------------------------
 
