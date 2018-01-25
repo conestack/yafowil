@@ -307,7 +307,7 @@ b.3) extractor with request, but mode display::
     >>> testwidget.extract({'MYUID2': '123'})
     <RuntimeData MYUID2, value=999, extracted=<UNSET> ...>    
 
-b.3) two extractors with request::
+b.4) two extractors with request::
 
     >>> testwidget = Widget(
     ...     'blueprint_names_goes_here',

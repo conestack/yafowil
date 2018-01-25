@@ -502,7 +502,7 @@ class Widget(object):
         if data.mode not in ('edit', 'display', 'skip'):
             raise ValueError(
                 "mode must be one out of 'edit', 'display', 'skip', but "
-                "'{0}' was given ".format(data.mode)
+                "'{0}' was given".format(data.mode)
             )
         for pp_name, pp in self.preprocessors:
             data.current_prefix = pp_name

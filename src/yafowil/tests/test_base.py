@@ -10,6 +10,69 @@ import sys
 import traceback
 
 
+###############################################################################
+# Test helpers
+###############################################################################
+
+def test_extractor(widget, data):
+    return 'e1'
+
+def test_extractor2(widget, data):
+    return 'e2'
+
+def test_extractor3(widget, data):
+    number = data.request[widget.__name__]
+    try:
+        return int(number)
+    except:
+        raise ExtractionError('e3: Integer expected, got %s' % number)
+    return value
+
+def fail_extractor(widget, data):
+    raise ValueError('extractor has to fail')
+
+def test_edit_renderer(widget, data):
+    return 'r1, {}, {}, {}'.format(
+        widget.__name__,
+        str(data),
+        str(widget.attributes)
+    )
+
+def test_edit_renderer2(widget, data):
+    return 'r2, {}, {}, {}'.format(
+        widget.__name__,
+        str(data),
+        str(widget.attributes)
+    )
+
+def fail_edit_renderer(widget, data):
+    raise ValueError('renderer has to fail')
+
+def test_display_renderer(widget, data):
+    return 'disr1, {}, {}, {}'.format(
+        widget.__name__,
+        str(data),
+        str(widget.attributes)
+    )
+
+def fail_display_renderer(widget, data):
+    raise ValueError('display renderer has to fail')
+
+def test_preprocessor(widget, data):
+    data.attrs['test_preprocessor'] = 'called'
+    return data
+
+def test_getter(widget, data):
+    return 'Test Value'
+
+def test_getter2(widget, data):
+    return 999
+
+
+###############################################################################
+# Tests
+###############################################################################
+
 class TestBase(NodeTestCase):
 
     def test_RuntimeData(self):
@@ -22,32 +85,41 @@ class TestBase(NodeTestCase):
         self.assertEqual(data.errors, [])
         self.assertEqual(data.keys(), [])
         self.assertEqual(repr(data.__name__), 'None')
+
         # Initial RuntimeData can get its name passed in
         data = RuntimeData('root')
         self.assertEqual(data.__name__, 'root')
+
         # RuntimeData can have children
         data['surname'] = RuntimeData()
         data['fieldset'] = RuntimeData()
         self.assertEqual(data.keys(), ['surname', 'fieldset'])
         self.assertEqual(data['surname'].__name__, 'surname')
+
         # And each child can have children again
         data['fieldset']['age'] = RuntimeData()
         data['fieldset']['age'].value = 36
+
         # RuntimeData can have arbitrary attributes
         data['surname'].attrs['somekey'] = 'somevalue'
         self.assertEqual(data['surname'].attrs['somekey'], 'somevalue')
+
         # You can fetch other data also by its dotted absolute path
         fetched = data.fetch('root.fieldset.age')
         self.assertEqual(fetched.value , 36)
+
         # Or by the absolute path as an list of strings
         fetched = data.fetch(['root', 'fieldset', 'age'])
         self.assertEqual(fetched.value, 36)
+
         # It works on children::
         fetched = data['fieldset']['age'].fetch('root.surname')
         self.assertEqual(fetched.__name__, 'surname')
+
         # Same with path as a list
         fetched = data['fieldset']['age'].fetch(['root', 'surname'])
         self.assertEqual(fetched.__name__, 'surname')
+
         # It fails if if root element name is wrong
         err = self.expect_error(
             KeyError,
@@ -55,6 +127,7 @@ class TestBase(NodeTestCase):
             ['foobar', 'surname']
         )
         self.assertEqual(str(err), "'Invalid name of root element'")
+
         # It fails if sub path element is wrong
         try:
             data['fieldset']['age'].fetch('root.unknown')
@@ -70,410 +143,373 @@ class TestBase(NodeTestCase):
         else:
             raise Exception('Exception expected but not thrown')
 
+    def test_Widget(self):
+        # The widget class
+        test_request = {'MYUID': 'New Test Value'}
+        testwidget = Widget(
+            'blueprint_names_goes_here',
+            [('1', test_extractor)],
+            [('1', test_edit_renderer)],
+            [('1', test_display_renderer)],
+            [('1', test_preprocessor)],
+            'MYUID',
+            test_getter,
+            dict(test1='Test1', test2='Test2'))
+
+        self.check_output("""
+        r1,
+        MYUID,
+        <RuntimeData MYUID, value='Test Value', extracted=<UNSET>,
+        attrs={'test_preprocessor': 'called'} at ...>,
+        {'test1': 'Test1', 'test2': 'Test2'}
+        """, testwidget())
+
+        # A passed in request does not trigger extraction
+        self.check_output("""
+        r1,
+        MYUID,
+        <RuntimeData MYUID, value='Test Value', extracted=<UNSET>,
+        attrs={'test_preprocessor': 'called'} at ...>,
+        {'test1': 'Test1', 'test2': 'Test2'}
+        """, testwidget(request=test_request))
+
+        # Extraction is an explicit task
+        data = testwidget.extract(test_request)
+        self.check_output("""
+        <RuntimeData MYUID, value='Test Value', extracted='e1',
+        attrs={'test_preprocessor': 'called'} at ...>
+        """, str(data))
+
+        self.assertEqual(data.attrs['test_preprocessor'], 'called')
+
+        # Preprocessor is only called once!
+        data.attrs['test_preprocessor'] = 'reset'
+        data = testwidget._runpreprocessors(data)
+        self.assertEqual(data.attrs['test_preprocessor'], 'reset')
+
+        # Different cases
+
+        # a.1) defaults: edit
+        testwidget = Widget(
+            'blueprint_names_goes_here',
+            [('1', test_extractor)],
+            [('1', test_edit_renderer)],
+            [('1', test_display_renderer)],
+            [],
+            'MYUID',
+            test_getter,
+            dict(test1='Test1', test2='Test2'))
+        self.check_output("""
+        r1,
+        MYUID,
+        <RuntimeData MYUID, value='Test Value', extracted=<UNSET> at ...>,
+        {'test1': 'Test1', 'test2': 'Test2'}
+        """, testwidget())
+
+        # a.2) mode display
+        testwidget = Widget(
+            'blueprint_names_goes_here',
+            [('1', test_extractor)],
+            [('1', test_edit_renderer)],
+            [('1', test_display_renderer)],
+            [],
+            'MYUID',
+            test_getter,
+            dict(test1='Test1', test2='Test2'),
+            mode='display')
+        self.check_output("""
+        disr1,
+        MYUID,
+        <RuntimeData MYUID, value='Test Value', extracted=<UNSET> at ...>,
+        {'test1': 'Test1', 'test2': 'Test2'}
+        """, testwidget())
+
+        # a.3) mode skip
+        testwidget = Widget(
+            'blueprint_names_goes_here',
+            [('1', test_extractor)],
+            [('1', test_edit_renderer)],
+            [('1', test_display_renderer)],
+            [],
+            'MYUID',
+            test_getter,
+            dict(test1='Test1', test2='Test2'),
+            mode='skip')
+        self.assertEqual(testwidget(), u'')
+
+        # a.4) mode w/o renderer
+        testwidget = Widget(
+            'blueprint_names_goes_here',
+            [('1', test_extractor)],
+            [],
+            [],
+            [],
+            'MYUID',
+            test_getter,
+            dict(test1='Test1', test2='Test2'),
+            mode='display')
+        err = self.expect_error(ValueError, testwidget)
+        msg = "no renderers given for widget 'MYUID' at mode 'display'"
+        self.assertEqual(str(err), msg)
+
+        # b.1) two extractors w/o request
+        testwidget = Widget(
+            'blueprint_names_goes_here',
+            [('1', test_extractor), ('2', test_extractor2)],
+            [('1', test_edit_renderer), ('2', test_edit_renderer2)],
+            [('1', test_display_renderer)],
+            [],
+            'MYUID2',
+            test_getter,
+            dict(test1='Test1', test2='Test2'))
+        self.check_output("""
+        r2,
+        MYUID2,
+        <RuntimeData MYUID2, value='Test Value', extracted=<UNSET> at ...>,
+        {'test1': 'Test1', 'test2': 'Test2'}
+        """, testwidget())
+
+        # b.2) extractor with request, non int has to fail
+        testwidget = Widget(
+            'blueprint_names_goes_here',
+            [('1', test_extractor3)],
+            [('1', test_edit_renderer)],
+            [('1', test_display_renderer)],
+            [],
+            'MYUID2',
+            test_getter2,
+            dict(test1='Test1', test2='Test2'))
+
+        self.check_output("""
+        <RuntimeData MYUID2, value=999, extracted=<UNSET>, 1 error(s) at ...>
+        """, str(testwidget.extract({'MYUID2': 'ABC'})))
+
+        # b.3) extractor with request, but mode display
+        testwidget = Widget(
+            'blueprint_names_goes_here',
+            [('1', test_extractor3)],
+            [('1', test_edit_renderer)],
+            [('1', test_display_renderer)],
+            [],
+            'MYUID2',
+            test_getter2,
+            dict(test1='Test1', test2='Test2'),
+            mode='display')
+        self.check_output("""
+        <RuntimeData MYUID2, value=999, extracted=<UNSET> ...>
+        """, str(testwidget.extract({'MYUID2': '123'})))
+
+        # b.4) two extractors with request
+        testwidget = Widget(
+            'blueprint_names_goes_here',
+            [('1', test_extractor3)],
+            [('1', test_edit_renderer)],
+            [('1', test_display_renderer)],
+            [],
+            'MYUID2',
+            test_getter2,
+            dict(test1='Test1', test2='Test2'))
+        self.check_output("""
+        <RuntimeData MYUID2, value=999, extracted=123 at ...>
+        """, str(testwidget.extract({'MYUID2': '123'})))
+
+        # A failing widget
+        testwidget = Widget(
+            'blueprint_names_goes_here',
+            [('1', fail_extractor)],
+            [('1', fail_edit_renderer)],
+            [('1', test_display_renderer)],
+            [],
+            'MYFAIL',
+            '',
+            dict())
+
+        try:
+            testwidget.extract({})
+        except Exception, e:
+            self.check_output("""
+            Traceback (most recent call last):
+            ...
+                data.extracted = extractor(self, data)
+                yafowil widget processing info:
+                - path      : MYFAIL
+                - blueprints: blueprint_names_goes_here
+                - task      : extract
+                - descr     : failed at '1'
+            ...
+            ValueError: extractor has to fail
+            """, traceback.format_exc())
+        else:
+            raise Exception('Exception expected but not thrown')
+
+        try:
+            testwidget()
+        except Exception, e:
+            self.check_output("""
+            Traceback (most recent call last):
+            ...
+                yafowil widget processing info:
+                - path      : MYFAIL
+                - blueprints: blueprint_names_goes_here
+                - task      : render
+                - descr     : failed at '1' in mode 'edit'
+            ...
+            ValueError: renderer has to fail
+            """, traceback.format_exc())
+        else:
+            raise Exception('Exception expected but not thrown')
+
+        # Plausability
+        err = self.expect_error(
+            ValueError,
+            testwidget,
+            data=data,
+            request={}
+        )
+        msg = "if data is passed in, don't pass in request!"
+        self.assertEqual(str(err), msg)
+
+        # Widget dottedpath
+
+        # Fails with no name in root
+        testwidget = Widget('blueprint_names_goes_here', [], [], [], [])
+        err = self.expect_error(
+            ValueError,
+            lambda: testwidget.dottedpath
+        )
+        msg = 'Root widget has no name! Pass it to factory.'
+        self.assertEqual(str(err), msg)
+
+        # At this test level the factory is not used,
+        # so we pass it directly to Widget
+        testwidget = Widget(
+            'blueprint_names_goes_here', [], [], [], [], uniquename='root')
+        self.assertEqual(testwidget.dottedpath, 'root')
+
+        testwidget['child'] = Widget(
+            'blueprint_names_goes_here', [], [], [], [])
+        self.assertEqual(testwidget['child'].dottedpath, 'root.child')
+
+        testwidget['child']['level3'] = Widget(
+            'blueprint_names_goes_here', [], [], [], [])
+        self.assertEqual(
+            testwidget['child']['level3'].dottedpath,
+            'root.child.level3'
+        )
+
+        # The mode
+        testwidget = Widget(
+            'blueprint_names_goes_here', [], [], [], [], uniquename='root')
+        data = testwidget.extract({})
+        self.assertEqual(data.mode, 'edit')
+
+        testwidget = Widget(
+            'blueprint_names_goes_here',
+            [], [], [], [],
+            uniquename='root',
+            mode='display')
+        data = testwidget.extract({})
+        self.assertEqual(data.mode, 'display')
+
+        testwidget = Widget(
+            'blueprint_names_goes_here',
+            [], [], [], [],
+            uniquename='root',
+            mode='skip')
+        data = testwidget.extract({})
+        self.assertEqual(data.mode, 'skip')
+
+        testwidget = Widget(
+            'blueprint_names_goes_here',
+            [], [], [], [],
+            uniquename='root',
+            mode='other')
+        err = self.expect_error(
+            ValueError,
+            testwidget.extract,
+            {}
+        )
+        msg = (
+            "mode must be one out of 'edit', 'display', 'skip', "
+            "but 'other' was given"
+        )
+        self.assertEqual(str(err), msg)
+
+        def mode(widget, data):
+            return 'edit'
+        testwidget = Widget(
+            'blueprint_names_goes_here',
+            [], [], [], [],
+            uniquename='root',
+            mode=mode)
+        data = testwidget.extract({})
+        self.assertEqual(data.mode, 'edit')
+
+        def mode(widget, data):
+            return 'display'
+        testwidget = Widget(
+            'blueprint_names_goes_here',
+            [], [], [], [],
+            uniquename='root',
+            mode=mode)
+        data = testwidget.extract({})
+        self.assertEqual(data.mode, 'display')
+
+        # Check whether error occurred somewhere in Tree::
+
+        def value_extractor(widget, data):
+            return data.request[widget.dottedpath]
+
+        def child_extractor(widget, data):
+            for child in widget.values():
+                 child.extract(request=data.request, parent=data)
+
+        def error_extractor(widget, data):
+            raise ExtractionError(widget.dottedpath)
+
+        root = Widget(
+            'root_blueprint',
+            [('child_extractor', child_extractor)],
+            [],
+            [],
+            [],
+            uniquename='root')
+        child_0 = root['child_0'] = Widget(
+            'child_blueprint',
+            [('value_extractor', value_extractor)],
+            [],
+            [],
+            [])
+        child_1 = root['child_1'] = Widget(
+            'child_blueprint',
+            [('error_extractor', error_extractor)],
+            [],
+            [],
+            [])
+
+        self.check_output("""
+        <class 'yafowil.base.Widget'>: root
+        <class 'yafowil.base.Widget'>: child_0
+        <class 'yafowil.base.Widget'>: child_1
+        """, root.treerepr())
+
+        data = root.extract({
+            'root.child_0': 'a',
+            'root.child_1': 'b',
+        })
+        self.check_output("""
+        <RuntimeData root, value=<UNSET>, extracted=None at ...>
+        <RuntimeData root.child_0,
+            value=<UNSET>, extracted='a' at ...>
+        <RuntimeData root.child_1,
+            value=<UNSET>, extracted=<UNSET>, 1 error(s) at ...>
+        """, data.treerepr())
+
+        self.assertTrue(data.has_errors, True)
+        self.assertFalse(data['child_0'].has_errors, False)
+        self.assertTrue(data['child_1'].has_errors, True)
+
 """
-Base Widget
------------
-
-Create some test dummies::
-
-    >>> def test_extractor(widget, data):
-    ...     return 'e1'
-
-    >>> def test_extractor2(widget, data):
-    ...     return 'e2'
-
-    >>> def test_extractor3(widget, data):
-    ...     number = data.request[widget.__name__]
-    ...     try:
-    ...         return int(number)
-    ...     except:
-    ...         raise ExtractionError('e3: Integer expected, got %s' % number)
-    ...     return value
-
-    >>> def fail_extractor(widget, data):
-    ...     raise ValueError, 'extractor has to fail'
-
-    >>> def test_edit_renderer(widget, data):
-    ...     return 'r1', widget.__name__, str(data), str(widget.attributes)
-
-    >>> def test_edit_renderer2(widget, data):
-    ...     return 'r2', widget.__name__, str(data), str(widget.attributes)
-
-    >>> def fail_edit_renderer(widget, data):
-    ...     raise ValueError, 'renderer has to fail'
-
-    >>> def test_display_renderer(widget, data):
-    ...     return 'disr1', widget.__name__, str(data), str(widget.attributes)
-
-    >>> def fail_display_renderer(widget, data):
-    ...     raise ValueError, 'display renderer has to fail'
-
-    >>> def test_preprocessor(widget, data):
-    ...     data.attrs['test_preprocessor'] = 'called'
-    ...     return data
-
-    >>> def test_getter(widget, data):
-    ...     return 'Test Value'
-
-    >>> def test_getter2(widget, data):
-    ...     return 999
-
-The widget class::    
-
-    >>> test_request = {'MYUID': 'New Test Value'}
-    >>> testwidget = Widget(
-    ...     'blueprint_names_goes_here',
-    ...     [('1', test_extractor)],
-    ...     [('1', test_edit_renderer)],
-    ...     [('1', test_display_renderer)],
-    ...     [('1', test_preprocessor)],
-    ...     'MYUID',
-    ...     test_getter,
-    ...     dict(test1='Test1', test2='Test2'))
-
-    >>> testwidget() 
-    ('r1', 'MYUID', "<RuntimeData MYUID, value='Test Value', extracted=<UNSET>, 
-    attrs={'test_preprocessor': 'called'} at ...>", "{'test1': 'Test1', 
-    'test2': 'Test2'}")
-
-A passed in request does not trigger extraction::    
-
-    >>> testwidget(request=test_request) 
-    ('r1', 'MYUID', "<RuntimeData MYUID, value='Test Value', extracted=<UNSET>, 
-    attrs={'test_preprocessor': 'called'} at ...>", "{'test1': 'Test1', 
-    'test2': 'Test2'}")
-
-Extraction is an explicit task::    
-
-    >>> data = testwidget.extract(test_request)
-    >>> data
-    <RuntimeData MYUID, value='Test Value', extracted='e1', 
-    attrs={'test_preprocessor': 'called'} at ...>
-
-    >>> data.attrs['test_preprocessor']
-    'called'
-
-Preprocessor is only called once!::    
-
-    >>> data.attrs['test_preprocessor'] = 'reset'
-    >>> data = testwidget._runpreprocessors(data)
-    >>> data.attrs['test_preprocessor']
-    'reset'    
-
-Different cases.
-
-a.1) defaults: edit::     
-
-    >>> testwidget = Widget(
-    ...     'blueprint_names_goes_here',
-    ...     [('1', test_extractor)],
-    ...     [('1', test_edit_renderer)],
-    ...     [('1', test_display_renderer)],
-    ...     [],
-    ...     'MYUID',
-    ...     test_getter,
-    ...     dict(test1='Test1', test2='Test2'))
-    >>> testwidget()
-    ('r1', 'MYUID', "<RuntimeData MYUID, value='Test Value', extracted=<UNSET> 
-    at ...>", "{'test1': 'Test1', 'test2': 'Test2'}")
-
-a.2) mode display::   
-
-    >>> testwidget = Widget(
-    ...     'blueprint_names_goes_here',
-    ...     [('1', test_extractor)],
-    ...     [('1', test_edit_renderer)],
-    ...     [('1', test_display_renderer)],
-    ...     [],
-    ...     'MYUID',
-    ...     test_getter,
-    ...     dict(test1='Test1', test2='Test2'),
-    ...     mode='display')
-    >>> testwidget()
-    ('disr1', 'MYUID', "<RuntimeData MYUID, value='Test Value', 
-    extracted=<UNSET> at ...>", "{'test1': 'Test1', 'test2': 'Test2'}")
-
-a.3) mode skip::   
-
-    >>> testwidget = Widget(
-    ...     'blueprint_names_goes_here',
-    ...     [('1', test_extractor)],
-    ...     [('1', test_edit_renderer)],
-    ...     [('1', test_display_renderer)],
-    ...     [],
-    ...     'MYUID',
-    ...     test_getter,
-    ...     dict(test1='Test1', test2='Test2'),
-    ...     mode='skip')
-    >>> testwidget()
-    u''
-
-a.4) mode w/o renderer:: 
-
-    >>> testwidget = Widget(
-    ...     'blueprint_names_goes_here',
-    ...     [('1', test_extractor)],
-    ...     [],
-    ...     [],
-    ...     [],
-    ...     'MYUID',
-    ...     test_getter,
-    ...     dict(test1='Test1', test2='Test2'),
-    ...     mode='display')
-    >>> testwidget()
-    Traceback (most recent call last):
-    ...
-    ValueError: no renderers given for widget 'MYUID' at mode 'display'
-
-b.1) two extractors w/o request:: 
-
-    >>> testwidget = Widget(
-    ...     'blueprint_names_goes_here',
-    ...     [('1', test_extractor), ('2', test_extractor2)],
-    ...     [('1', test_edit_renderer), ('2', test_edit_renderer2)],
-    ...     [('1', test_display_renderer)],
-    ...     [],
-    ...     'MYUID2',
-    ...     test_getter,
-    ...     dict(test1='Test1', test2='Test2'))
-    >>> testwidget()
-    ('r2', 'MYUID2', "<RuntimeData MYUID2, value='Test Value', 
-    extracted=<UNSET> at ...>", "{'test1': 'Test1', 'test2': 'Test2'}")
-
-b.2) extractor with request, non int has to fail::
-
-    >>> testwidget = Widget(
-    ...     'blueprint_names_goes_here',
-    ...     [('1', test_extractor3)],
-    ...     [('1', test_edit_renderer)],
-    ...     [('1', test_display_renderer)],
-    ...     [],
-    ...     'MYUID2',
-    ...     test_getter2,
-    ...     dict(test1='Test1', test2='Test2'))
-    >>> testwidget.extract({'MYUID2': 'ABC'})
-    <RuntimeData MYUID2, value=999, extracted=<UNSET>, 1 error(s) at ...>    
-
-b.3) extractor with request, but mode display::
-
-    >>> testwidget = Widget(
-    ...     'blueprint_names_goes_here',
-    ...     [('1', test_extractor3)],
-    ...     [('1', test_edit_renderer)],
-    ...     [('1', test_display_renderer)],
-    ...     [],
-    ...     'MYUID2',
-    ...     test_getter2,
-    ...     dict(test1='Test1', test2='Test2'),
-    ...     mode='display')
-    >>> testwidget.extract({'MYUID2': '123'})
-    <RuntimeData MYUID2, value=999, extracted=<UNSET> ...>    
-
-b.3) two extractors with request::
-
-    >>> testwidget = Widget(
-    ...     'blueprint_names_goes_here',
-    ...     [('1', test_extractor3)],
-    ...     [('1', test_edit_renderer)],
-    ...     [('1', test_display_renderer)],
-    ...     [],
-    ...     'MYUID2',
-    ...     test_getter2,
-    ...     dict(test1='Test1', test2='Test2'))
-    >>> testwidget.extract({'MYUID2': '123'})
-    <RuntimeData MYUID2, value=999, extracted=123 at ...>
-
-A failing widget::
-
-    >>> testwidget = Widget(
-    ...     'blueprint_names_goes_here',
-    ...     [('1', fail_extractor)],
-    ...     [('1', fail_edit_renderer)],
-    ...     [('1', test_display_renderer)],
-    ...     [],
-    ...     'MYFAIL',
-    ...     '',
-    ...     dict())
-    >>> try:
-    ...    testwidget.extract({})
-    ... except Exception, e:
-    ...    traceback.print_exc(file=sys.stdout)
-    Traceback (most recent call last):
-      ...
-        data.extracted = extractor(self, data)
-        yafowil widget processing info:
-        - path      : MYFAIL
-        - blueprints: blueprint_names_goes_here
-        - task      : extract
-        - descr     : failed at '1'
-      ...
-    ValueError: extractor has to fail
-
-    >>> try:
-    ...    testwidget()
-    ... except Exception, e:
-    ...    traceback.print_exc(file=sys.stdout)
-    Traceback (most recent call last):
-    ...
-        yafowil widget processing info:
-        - path      : MYFAIL
-        - blueprints: blueprint_names_goes_here
-        - task      : render
-        - descr     : failed at '1' in mode 'edit'
-    ...
-    ValueError: renderer has to fail        
-
-Plausability::
-
-    >>> testwidget(data=data, request={})
-    Traceback (most recent call last):
-    ...
-    ValueError: if data is passed in, don't pass in request!
-
-Widget dottedpath.
-
-Fails with no name in root::
-
-    >>> testwidget = Widget('blueprint_names_goes_here', [], [], [], [])
-    >>> testwidget.dottedpath
-    Traceback (most recent call last):
-    ...
-    ValueError: Root widget has no name! Pass it to factory.
-
-At this test level the factory is not used, so we pass it directly to Widget::    
-
-    >>> testwidget = Widget(
-    ...     'blueprint_names_goes_here', [], [], [], [], uniquename='root')
-    >>> testwidget.dottedpath
-    'root'
-
-    >>> testwidget['child'] = Widget(
-    ...     'blueprint_names_goes_here', [], [], [], [])
-    >>> testwidget['child'].dottedpath
-    'root.child'
-
-    >>> testwidget['child']['level3'] = Widget(
-    ...     'blueprint_names_goes_here', [], [], [], [])
-    >>> testwidget['child']['level3'].dottedpath
-    'root.child.level3'
-
-The mode::
-
-    >>> testwidget = Widget(
-    ...     'blueprint_names_goes_here', [], [], [], [], uniquename='root')
-    >>> data = testwidget.extract({})
-    >>> data.mode
-    'edit'    
-
-    >>> testwidget = Widget(
-    ...     'blueprint_names_goes_here',
-    ...     [], [], [], [],
-    ...     uniquename='root',
-    ...     mode='display')
-    >>> data = testwidget.extract({})
-    >>> data.mode
-    'display'    
-
-    >>> testwidget = Widget(
-    ...     'blueprint_names_goes_here',
-    ...     [], [], [], [],
-    ...     uniquename='root',
-    ...     mode='skip')
-    >>> data = testwidget.extract({})
-    >>> data.mode
-    'skip'    
-
-    >>> testwidget = Widget(
-    ...     'blueprint_names_goes_here',
-    ...     [], [], [], [],
-    ...     uniquename='root',
-    ...     mode='other')
-    >>> data = testwidget.extract({})
-    Traceback (most recent call last):
-    ...      
-    ValueError: mode must be one out of 'edit', 'display', 'skip', but 
-    'other' was given
-
-    >>> def mode(widget, data):
-    ...     return 'edit'
-    >>> testwidget = Widget(
-    ...     'blueprint_names_goes_here',
-    ...     [], [], [], [],
-    ...     uniquename='root',
-    ...     mode=mode)
-    >>> data = testwidget.extract({})
-    >>> data.mode
-    'edit'    
-
-    >>> def mode(widget, data):
-    ...     return 'display'
-    >>> testwidget = Widget(
-    ...     'blueprint_names_goes_here',
-    ...     [], [], [], [],
-    ...     uniquename='root',
-    ...     mode=mode)
-    >>> data = testwidget.extract({})
-    >>> data.mode
-    'display'    
-
-Check whether error occurred somewhere in Tree::
-
-    >>> def value_extractor(widget, data):
-    ...     return data.request[widget.dottedpath]
-
-    >>> def child_extractor(widget, data):
-    ...     for child in widget.values():
-    ...          child.extract(request=data.request, parent=data)
-
-    >>> def error_extractor(widget, data):
-    ...     raise ExtractionError(widget.dottedpath)
-
-    >>> root = Widget(
-    ...     'root_blueprint',
-    ...     [('child_extractor', child_extractor)],
-    ...     [],
-    ...     [],
-    ...     [],
-    ...     uniquename='root')
-    >>> child_0 = root['child_0'] = Widget(
-    ...     'child_blueprint',
-    ...     [('value_extractor', value_extractor)],
-    ...     [],
-    ...     [],
-    ...     [])
-    >>> child_1 = root['child_1'] = Widget(
-    ...     'child_blueprint',
-    ...     [('error_extractor', error_extractor)],
-    ...     [],
-    ...     [],
-    ...     [])
-
-    >>> root.printtree()
-    <class 'yafowil.base.Widget'>: root
-      <class 'yafowil.base.Widget'>: child_0
-      <class 'yafowil.base.Widget'>: child_1
-
-    >>> data = root.extract({
-    ...     'root.child_0': 'a',
-    ...     'root.child_1': 'b',
-    ... })
-    >>> data.printtree()
-    <RuntimeData root, value=<UNSET>, extracted=None at ...>
-      <RuntimeData root.child_0, 
-        value=<UNSET>, extracted='a' at ...>
-      <RuntimeData root.child_1, 
-        value=<UNSET>, extracted=<UNSET>, 1 error(s) at ...>
-
-    >>> data.has_errors
-    True
-
-    >>> data['child_0'].has_errors
-    False
-
-    >>> data['child_1'].has_errors
-    True
-
-
 factory
 -------
 
