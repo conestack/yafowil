@@ -6,6 +6,7 @@ from yafowil.base import factory
 from yafowil.base import ExtractionError
 from yafowil.common import convert_bytes
 from yafowil.persistence import write_mapping_writer
+from yafowil.tests import fxml
 from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import Tag
 import uuid
@@ -17,8 +18,8 @@ import uuid
 
 tag = Tag(lambda msg: msg)
 
-def wrapped_pxml(value):
-    pxml(u'<div>' + value + u'</div>')
+def wrapped_fxml(value):
+    return fxml(u'<div>' + value + u'</div>')
 
 
 ###############################################################################
@@ -375,534 +376,510 @@ class TestCommon(NodeTestCase):
         data = widget.extract({'REQUIRED': ''})
         self.assertEqual(data.errors, [ExtractionError('Foooo')])
 
+    def test_generic_display_renderer(self):
+        # Display mode of text widget uses ``generic_display_renderer``
+        widget = factory(
+            'text',
+            name='DISPLAY',
+            value='lorem ipsum',
+            mode='display')
+        self.assertEqual(
+            widget(),
+            '<div class="display-text" id="display-DISPLAY">lorem ipsum</div>'
+        )
+
+        widget = factory(
+            'text',
+            name='DISPLAY',
+            value=123.4567890,
+            mode='display',
+            props={
+                'template': '%0.3f'
+            })
+        self.assertEqual(
+            widget(),
+            '<div class="display-text" id="display-DISPLAY">123.457</div>'
+        )
+
+        def mytemplate(widget, data):
+            return '<TEMPLATE>%s</TEMPLATE>' % data.value
+
+        widget = factory(
+            'text',
+            name='DISPLAY',
+            value='lorem ipsum',
+            mode='display',
+            props={
+                'template': mytemplate
+            })
+        self.check_output("""
+        <div class="display-text" id="display-DISPLAY">
+          <TEMPLATE>lorem ipsum</TEMPLATE>
+        </div>
+        """, fxml(widget()))
+
+        # ``display_proxy`` can be used if mode is 'display' to proxy the value
+        # in a hidden field
+        widget = factory(
+            'text',
+            name='DISPLAY',
+            value='lorem ipsum',
+            mode='display',
+            props={
+                'display_proxy': True
+            })
+        self.check_output("""
+        <div>
+          <div class="display-text" id="display-DISPLAY">lorem ipsum</div>
+          <input class="text" id="input-DISPLAY" name="DISPLAY" type="hidden"
+                 value="lorem ipsum"/>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        # On widgets with display mode display_proxy property set, the data
+        # gets extracted
+        data = widget.extract(request={'DISPLAY': 'lorem ipsum'})
+        self.assertEqual(data.name, 'DISPLAY')
+        self.assertEqual(data.value, 'lorem ipsum')
+        self.assertEqual(data.extracted, 'lorem ipsum')
+
+        # Skip mode renders empty string
+        widget = factory(
+            'text',
+            name='SKIP',
+            value='lorem ipsum',
+            mode='skip')
+        self.assertEqual(widget(), '')
+
+    def test_datatype_extractor(self):
+        # No datatype given, no datatype conversion happens at all
+        widget = factory(
+            'text',
+            name='MYFIELD',
+            value='')
+        data = widget.extract({'MYFIELD': u''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, '')
+
+        # Test emptyvalue if ``str`` datatype set
+        widget = factory(
+            'text',
+            name='MYDATATYPEFIELD',
+            value='',
+            props={
+                'datatype': 'str',
+            })
+
+        # Default emptyvalue
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, EMPTY_VALUE)
+
+        # None emptyvalue
+        widget.attrs['emptyvalue'] = None
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, None)
+
+        # UNSET emptyvalue
+        widget.attrs['emptyvalue'] = UNSET
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        # String emptyvalue
+        widget.attrs['emptyvalue'] = 'abc'
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, 'abc')
+
+        # Unicode emptyvalue
+        widget.attrs['emptyvalue'] = u''
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        # Test emptyvalue if ``int`` datatype set
+        widget = factory(
+            'text',
+            name='MYDATATYPEFIELD',
+            value='',
+            props={
+                'datatype': 'int',
+            })
+
+        # Default emptyvalue
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, EMPTY_VALUE)
+
+        # None emptyvalue
+        widget.attrs['emptyvalue'] = None
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, None)
+
+        # UNSET emptyvalue
+        widget.attrs['emptyvalue'] = UNSET
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        # Int emptyvalue
+        widget.attrs['emptyvalue'] = -1
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, -1)
+
+        # String emptyvalue. If convertable still fine
+        widget.attrs['emptyvalue'] = '0'
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, 0)
+
+        # Test emptyvalue if ``long`` datatype set
+        widget = factory(
+            'text',
+            name='MYDATATYPEFIELD',
+            value='',
+            props={
+                'datatype': 'long',
+            })
+
+        # Default emptyvalue
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, EMPTY_VALUE)
+
+        # None emptyvalue
+        widget.attrs['emptyvalue'] = None
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, None)
+
+        # UNSET emptyvalue
+        widget.attrs['emptyvalue'] = UNSET
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        # Int emptyvalue
+        widget.attrs['emptyvalue'] = -1
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, -1L)
+
+        # String emptyvalue. If convertable still fine
+        widget.attrs['emptyvalue'] = '0'
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, 0L)
+
+        # Test emptyvalue if ``float`` datatype set
+        widget = factory(
+            'text',
+            name='MYDATATYPEFIELD',
+            value='',
+            props={
+                'datatype': 'float',
+            })
+
+        # Default emptyvalue
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, EMPTY_VALUE)
+
+        # None emptyvalue
+        widget.attrs['emptyvalue'] = None
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, None)
+
+        # UNSET emptyvalue
+        widget.attrs['emptyvalue'] = UNSET
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        # Float emptyvalue
+        widget.attrs['emptyvalue'] = 0.1
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, 0.1)
+
+        # String emptyvalue. If convertable still fine
+        widget.attrs['emptyvalue'] = '0,2'
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, 0.2)
+
+        # Test emptyvalue if ``uuid`` datatype set
+        widget = factory(
+            'text',
+            name='MYDATATYPEFIELD',
+            value='',
+            props={
+                'datatype': 'uuid',
+            })
+
+        # Default emptyvalue
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, EMPTY_VALUE)
+
+        # None emptyvalue
+        widget.attrs['emptyvalue'] = None
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, None)
+
+        # UNSET emptyvalue
+        widget.attrs['emptyvalue'] = UNSET
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        # UUID emptyvalue
+        uid = uuid.uuid4()
+        widget.attrs['emptyvalue'] = uid
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, uid)
+
+        # String emptyvalue. If convertable still fine
+        widget.attrs['emptyvalue'] = str(uid)
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYDATATYPEFIELD': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, uid)
+
+        # Integer datatype
+        widget = factory(
+            'text',
+            name='MYDATATYPEFIELD',
+            value='',
+            props={
+                'datatype': 'int',
+            })
+        data = widget.extract({'MYDATATYPEFIELD': '1'})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, 1)
+
+        data = widget.extract({'MYDATATYPEFIELD': 'a'})
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Input is not a valid integer.')]
+        )
+
+        # Float extraction
+        widget = factory(
+            'text',
+            name='MYDATATYPEFIELD',
+            value='',
+            props={
+                'datatype': 'float',
+            })
+        data = widget.extract({'MYDATATYPEFIELD': '1.2'})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, 1.2)
+
+        data = widget.extract({'MYDATATYPEFIELD': 'a'})
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Input is not a valid floating point number.')]
+        )
+
+        # UUID extraction
+        widget = factory(
+            'text',
+            name='MYDATATYPEFIELD',
+            value='',
+            props={
+                'datatype': 'uuid',
+            })
+        data = widget.extract({
+            'MYDATATYPEFIELD': '3b8449f3-0456-4baa-a670-3066b0fcbda0'
+        })
+        self.assertEqual(data.errors, [])
+        self.assertEqual(
+            data.extracted,
+            uuid.UUID('3b8449f3-0456-4baa-a670-3066b0fcbda0')
+        )
+
+        data = widget.extract({'MYDATATYPEFIELD': 'a'})
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Input is not a valid UUID.')]
+        )
+
+        # Test ``datatype`` not allowed
+        widget = factory(
+            'text',
+            name='MYDATATYPEFIELD',
+            value='',
+            props={
+                'datatype': 'uuid',
+                'allowed_datatypes': [int],
+            })
+
+        request = {
+            'MYDATATYPEFIELD': '3b8449f3-0456-4baa-a670-3066b0fcbda0'
+        }
+        err = self.expect_error(
+            ValueError,
+            widget.extract,
+            request
+        )
+        self.assertEqual(str(err), 'Datatype not allowed: "uuid"')
+
+        # Test ``datatype_message``
+        widget = factory(
+            'text',
+            name='MYDATATYPEFIELD',
+            value='',
+            props={
+                'datatype': int,
+                'datatype_message': 'This did not work'
+            })
+        request = {
+            'MYDATATYPEFIELD': 'a'
+        }
+        data = widget.extract(request)
+        self.assertEqual(data.errors, [ExtractionError('This did not work')])
+        self.assertEqual(data.extracted, 'a')
+
+        # Test default error message if custom converter given but no
+        # ``datatype_message`` defined
+        def custom_converter(val):
+            raise ValueError
+
+        widget = factory(
+            'text',
+            name='MYDATATYPEFIELD',
+            value='',
+            props={
+                'datatype': custom_converter,
+            })
+        request = {
+            'MYDATATYPEFIELD': 'a'
+        }
+        data = widget.extract(request)
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Input conversion failed.')]
+        )
+        self.assertEqual(data.extracted, 'a')
+
+        # Test unknown string ``datatype`` identifier
+        widget = factory(
+            'text',
+            name='MYDATATYPEFIELD',
+            value='',
+            props={
+                'datatype': 'inexistent',
+            })
+        err = self.expect_error(
+            ValueError,
+            widget.extract,
+            {'MYDATATYPEFIELD': 'a'}
+        )
+        self.assertEqual(str(err), 'Datatype unknown: "inexistent"')
+
 """
-Generic display renderer
-------------------------
-
-Display mode of text widget uses ``generic_display_renderer``::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='DISPLAY',
-    ...     value='lorem ipsum',
-    ...     mode='display')
-    >>> widget()
-    u'<div class="display-text" id="display-DISPLAY">lorem ipsum</div>'
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='DISPLAY',
-    ...     value=123.4567890,
-    ...     mode='display',
-    ...     props={
-    ...         'template': '%0.3f'
-    ...     })
-    >>> widget()
-    u'<div class="display-text" id="display-DISPLAY">123.457</div>'
-
-    >>> def mytemplate(widget, data):
-    ...     return '<TEMPLATE>%s</TEMPLATE>' % data.value
-    >>> widget = factory(
-    ...     'text',
-    ...     name='DISPLAY',
-    ...     value='lorem ipsum',
-    ...     mode='display',
-    ...     props={
-    ...         'template': mytemplate
-    ...     })
-    >>> pxml(widget())
-    <div class="display-text" id="display-DISPLAY">
-      <TEMPLATE>lorem ipsum</TEMPLATE>
-    </div>
-    <BLANKLINE>
-
-``display_proxy`` can be used if mode is 'display' to proxy the value in a
-hidden field::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='DISPLAY',
-    ...     value='lorem ipsum',
-    ...     mode='display',
-    ...     props={
-    ...         'display_proxy': True
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <div class="display-text" id="display-DISPLAY">lorem ipsum</div>
-      <input class="text" id="input-DISPLAY" name="DISPLAY" type="hidden" 
-        value="lorem ipsum"/>
-    </div>
-    <BLANKLINE>
-
-On widgets with display mode display_proxy property set, the data gets
-extracted::
-
-    >>> widget.extract(request={'DISPLAY': 'lorem ipsum'})
-    <RuntimeData DISPLAY, value='lorem ipsum', extracted='lorem ipsum' at ...>
-
-Skip mode renders empty string.::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='SKIP',
-    ...     value='lorem ipsum',
-    ...     mode='skip')
-    >>> widget()
-    u''
-
-
-Datatype extraction
--------------------
-
-No datatype given, no datatype conversion happens at all::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='MYFIELD',
-    ...     value='')
-    >>> data = widget.extract({'MYFIELD': u''})
-    >>> data.errors, data.extracted
-    ([], u'')
-
-Test emptyvalue if ``str`` datatype set::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='MYDATATYPEFIELD',
-    ...     value='',
-    ...     props={
-    ...         'datatype': 'str',
-    ...     })
-
-Default emptyvalue::
-
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], <EMPTY_VALUE>)
-
-None emptyvalue::
-
-    >>> widget.attrs['emptyvalue'] = None
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], None)
-
-UNSET emptyvalue::
-
-    >>> widget.attrs['emptyvalue'] = UNSET
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-String emptyvalue::
-
-    >>> widget.attrs['emptyvalue'] = 'abc'
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], 'abc')
-
-Unicode emptyvalue::
-
-    >>> widget.attrs['emptyvalue'] = u''
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-Test emptyvalue if ``int`` datatype set::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='MYDATATYPEFIELD',
-    ...     value='',
-    ...     props={
-    ...         'datatype': 'int',
-    ...     })
-
-Default emptyvalue::
-
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], <EMPTY_VALUE>)
-
-None emptyvalue::
-
-    >>> widget.attrs['emptyvalue'] = None
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], None)
-
-UNSET emptyvalue::
-
-    >>> widget.attrs['emptyvalue'] = UNSET
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-Int emptyvalue::
-
-    >>> widget.attrs['emptyvalue'] = -1
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], -1)
-
-String emptyvalue. If convertable still fine::
-
-    >>> widget.attrs['emptyvalue'] = '0'
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], 0)
-
-Test emptyvalue if ``long`` datatype set::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='MYDATATYPEFIELD',
-    ...     value='',
-    ...     props={
-    ...         'datatype': 'long',
-    ...     })
-
-Default emptyvalue::
-
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], <EMPTY_VALUE>)
-
-None emptyvalue::
-
-    >>> widget.attrs['emptyvalue'] = None
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], None)
-
-UNSET emptyvalue::
-
-    >>> widget.attrs['emptyvalue'] = UNSET
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-Int emptyvalue::
-
-    >>> widget.attrs['emptyvalue'] = -1
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], -1L)
-
-String emptyvalue. If convertable still fine::
-
-    >>> widget.attrs['emptyvalue'] = '0'
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], 0L)
-
-Test emptyvalue if ``float`` datatype set::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='MYDATATYPEFIELD',
-    ...     value='',
-    ...     props={
-    ...         'datatype': 'float',
-    ...     })
-
-Default emptyvalue::
-
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], <EMPTY_VALUE>)
-
-None emptyvalue::
-
-    >>> widget.attrs['emptyvalue'] = None
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], None)
-
-UNSET emptyvalue::
-
-    >>> widget.attrs['emptyvalue'] = UNSET
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-Float emptyvalue::
-
-    >>> widget.attrs['emptyvalue'] = 0.1
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], 0.1)
-
-String emptyvalue. If convertable still fine::
-
-    >>> widget.attrs['emptyvalue'] = '0,2'
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], 0.2)
-
-Test emptyvalue if ``uuid`` datatype set::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='MYDATATYPEFIELD',
-    ...     value='',
-    ...     props={
-    ...         'datatype': 'uuid',
-    ...     })
-
-Default emptyvalue::
-
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], <EMPTY_VALUE>)
-
-None emptyvalue::
-
-    >>> widget.attrs['emptyvalue'] = None
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], None)
-
-UNSET emptyvalue::
-
-    >>> widget.attrs['emptyvalue'] = UNSET
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-UUID emptyvalue::
-
-    >>> widget.attrs['emptyvalue'] = uuid.uuid4()
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], UUID('...'))
-
-String emptyvalue. If convertable still fine::
-
-    >>> widget.attrs['emptyvalue'] = str(uuid.uuid4())
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': ''})
-    >>> data.errors, data.extracted
-    ([], UUID('...'))
-
-Integer datatype::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='MYDATATYPEFIELD',
-    ...     value='',
-    ...     props={
-    ...         'datatype': 'int',
-    ...     })
-    >>> data = widget.extract({'MYDATATYPEFIELD': '1'})
-    >>> data.errors, data.extracted
-    ([], 1)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': 'a'})
-    >>> data.errors
-    [ExtractionError('Input is not a valid integer.',)]
-
-Float extraction::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='MYDATATYPEFIELD',
-    ...     value='',
-    ...     props={
-    ...         'datatype': 'float',
-    ...     })
-    >>> data = widget.extract({'MYDATATYPEFIELD': '1.2'})
-    >>> data.errors, data.extracted
-    ([], 1.2)
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': 'a'})
-    >>> data.errors
-    [ExtractionError('Input is not a valid floating point number.',)]
-
-UUID extraction::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='MYDATATYPEFIELD',
-    ...     value='',
-    ...     props={
-    ...         'datatype': 'uuid',
-    ...     })
-    >>> data = widget.extract({
-    ...     'MYDATATYPEFIELD': '3b8449f3-0456-4baa-a670-3066b0fcbda0'
-    ... })
-    >>> data.errors, data.extracted
-    ([], UUID('3b8449f3-0456-4baa-a670-3066b0fcbda0'))
-
-    >>> data = widget.extract({'MYDATATYPEFIELD': 'a'})
-    >>> data.errors
-    [ExtractionError('Input is not a valid UUID.',)]
-
-Test ``datatype`` not allowed::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='MYDATATYPEFIELD',
-    ...     value='',
-    ...     props={
-    ...         'datatype': 'uuid',
-    ...         'allowed_datatypes': [int],
-    ...     })
-
-    >>> request = {
-    ...     'MYDATATYPEFIELD': '3b8449f3-0456-4baa-a670-3066b0fcbda0'
-    ... }
-    >>> data = widget.extract(request)
-    Traceback (most recent call last):
-      ...
-    ValueError: Datatype not allowed: "uuid"
-
-Test ``datatype_message``::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='MYDATATYPEFIELD',
-    ...     value='',
-    ...     props={
-    ...         'datatype': int,
-    ...         'datatype_message': 'This did not work'
-    ...     })
-    >>> request = {
-    ...     'MYDATATYPEFIELD': 'a'
-    ... }
-    >>> data = widget.extract(request)
-    >>> data.errors, data.extracted
-    ([ExtractionError('This did not work',)], 'a')
-
-Test default error message if custom converter given but no
-``datatype_message`` defined::
-
-    >>> def custom_converter(val):
-    ...     raise ValueError
-    >>> widget = factory(
-    ...     'text',
-    ...     name='MYDATATYPEFIELD',
-    ...     value='',
-    ...     props={
-    ...         'datatype': custom_converter,
-    ...     })
-    >>> request = {
-    ...     'MYDATATYPEFIELD': 'a'
-    ... }
-    >>> data = widget.extract(request)
-    >>> data.errors, data.extracted
-    ([ExtractionError('Input conversion failed.',)], 'a')
-
-Test unknown string ``datatype`` identifier::
-
-    >>> widget = factory(
-    ...     'text',
-    ...     name='MYDATATYPEFIELD',
-    ...     value='',
-    ...     props={
-    ...         'datatype': 'inexistent',
-    ...     })
-    >>> data = widget.extract({'MYDATATYPEFIELD': 'a'})
-    Traceback (most recent call last):
-      ...
-    ValueError: Datatype unknown: "inexistent"
-
-
 Checkbox
 --------
 
