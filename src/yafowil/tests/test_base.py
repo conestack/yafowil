@@ -957,110 +957,117 @@ class TestBase(NodeTestCase):
         widget = factory('prefix', name='test', props={'prefix.id': 'Test1'})
         self.assertEqual(widget(), u'<ID>Test1</ID>')
 
-"""
-fetch value
------------
+    def test_fetch_value(self):
+        dmarker = list()
+        defaults = dict(default=dmarker)
+        widget_no_return = Widget(
+            'blueprint_names_goes_here', [],[],[], 'empty', defaults=defaults)
+        widget_with_value = Widget(
+            'blueprint_names_goes_here',
+            [], [], [],
+            'value',
+            value_or_getter='withvalue',
+            defaults=defaults)
+        widget_with_default = Widget(
+            'blueprint_names_goes_here',
+            [], [], [],
+            'default',
+            properties=dict(default='defaultvalue'),
+            defaults=defaults)
+        widget_with_both = Widget(
+            'blueprint_names_goes_here',
+            [], [], [],
+            'both',
+            value_or_getter='valueboth',
+            properties=dict(default='defaultboth'),
+            defaults=defaults)
+        data_empty = RuntimeData()
+        data_filled = RuntimeData()
+        data_filled.extracted = 'extractedvalue'
 
-::
+        data_empty.value = widget_no_return.getter
+        self.assertTrue(fetch_value(widget_no_return, data_empty) is dmarker)
 
-    >>> dmarker = list()
-    >>> defaults = dict(default=dmarker)
-    >>> widget_no_return = Widget(
-    ...     'blueprint_names_goes_here', [],[],[], 'empty', defaults=defaults)
-    >>> widget_with_value = Widget(
-    ...     'blueprint_names_goes_here',
-    ...     [], [], [],
-    ...     'value',
-    ...     value_or_getter='withvalue',
-    ...     defaults=defaults)
-    >>> widget_with_default = Widget(
-    ...     'blueprint_names_goes_here',
-    ...     [], [], [],
-    ...     'default',
-    ...     properties=dict(default='defaultvalue'),
-    ...     defaults=defaults)
-    >>> widget_with_both = Widget(
-    ...     'blueprint_names_goes_here',
-    ...     [], [], [],
-    ...     'both',
-    ...     value_or_getter='valueboth',
-    ...     properties=dict(default='defaultboth'),
-    ...     defaults=defaults)
-    >>> data_empty = RuntimeData()
-    >>> data_filled = RuntimeData()
-    >>> data_filled.extracted = 'extractedvalue'    
-    
-    >>> data_empty.value = widget_no_return.getter
-    >>> fetch_value(widget_no_return, data_empty) is dmarker
-    True
+        data_filled.value = widget_no_return.getter
+        self.assertEqual(
+            fetch_value(widget_no_return, data_filled),
+            'extractedvalue'
+        )
 
-    >>> data_filled.value = widget_no_return.getter
-    >>> fetch_value(widget_no_return, data_filled)
-    'extractedvalue'
+        data_empty.value = widget_with_value.getter
+        self.assertEqual(
+            fetch_value(widget_with_value, data_empty),
+            'withvalue'
+        )
 
-    >>> data_empty.value = widget_with_value.getter
-    >>> fetch_value(widget_with_value, data_empty)
-    'withvalue'
+        data_filled.value = widget_with_value.getter
+        self.assertEqual(
+            fetch_value(widget_with_value, data_filled),
+            'extractedvalue'
+        )
 
-    >>> data_filled.value = widget_with_value.getter
-    >>> fetch_value(widget_with_value, data_filled)
-    'extractedvalue'    
+        data_empty.value = widget_with_default.getter
+        self.assertEqual(
+            fetch_value(widget_with_default, data_empty),
+            'defaultvalue'
+        )
 
-    >>> data_empty.value = widget_with_default.getter
-    >>> fetch_value(widget_with_default, data_empty)
-    'defaultvalue'
+        data_filled.value = widget_with_default.getter
+        self.assertEqual(
+            fetch_value(widget_with_default, data_filled),
+            'extractedvalue'
+        )
 
-    >>> data_filled.value = widget_with_default.getter
-    >>> fetch_value(widget_with_default, data_filled)
-    'extractedvalue'        
+        data_empty.value = widget_with_both.getter
+        self.assertEqual(
+            fetch_value(widget_with_both, data_empty),
+            'valueboth'
+        )
 
-    >>> data_empty.value = widget_with_both.getter
-    >>> fetch_value(widget_with_both, data_empty)
-    'valueboth'
+        data_filled.value = widget_with_both.getter
+        self.assertEqual(
+            fetch_value(widget_with_default, data_filled),
+            'extractedvalue'
+        )
 
-    >>> data_filled.value = widget_with_both.getter
-    >>> fetch_value(widget_with_default, data_filled)
-    'extractedvalue'        
+    def test_TBSupplementWidget(self):
+        class NoNameMock(object):
+            blueprints='blue:prints:here'
+            @property
+            def dottedpath(self):
+                 raise ValueError('fail')
 
+        mock = NoNameMock()
+        suppl = TBSupplementWidget(
+            mock, lambda x:x, 'testtask', 'some description')
 
-TraceBack Supplment
--------------------
-
-::
-
-    >>> class NoNameMock(object):
-    ...     blueprints='blue:prints:here'
-    ...     @property
-    ...     def dottedpath(self):
-    ...          raise ValueError('fail')
-    >>> mock = NoNameMock()
-    >>> suppl = TBSupplementWidget(
-    ...     mock, lambda x:x, 'testtask', 'some description')
-    >>> print suppl.getInfo()
-    yafowil widget processing info:
-        - path      : (name not set)
-        - blueprints: blue:prints:here
-        - task      : testtask
-        - descr     : some description
-
-    >>> class Mock(object): 
-    ...     dottedpath='test.path.abc'
-    ...     blueprints='blue:prints:here'
-    >>> mock = Mock()
-    >>> suppl = TBSupplementWidget(mock, lambda x:x, 'testtask',
-    ...                            'some description')
-    >>> print suppl.getInfo()
+        self.check_output("""
         yafowil widget processing info:
-        - path      : test.path.abc
-        - blueprints: blue:prints:here
-        - task      : testtask
-        - descr     : some description
+            - path      : (name not set)
+            - blueprints: blue:prints:here
+            - task      : testtask
+            - descr     : some description
+        """, suppl.getInfo())
 
-    >>> suppl.getInfo(as_html=1)
-    u'<p>yafowil widget processing info:<ul><li>path: 
-    <strong>test.path.abc</strong></li><li>blueprints: 
-    <strong>blue:prints:here</strong></li><li>task: 
-    <strong>testtask</strong></li><li>description: <strong>some 
-    description</strong></li></ul></p>'
+        class Mock(object):
+            dottedpath='test.path.abc'
+            blueprints='blue:prints:here'
+        mock = Mock()
+        suppl = TBSupplementWidget(mock, lambda x:x, 'testtask',
+                                   'some description')
 
-"""
+        self.check_output("""
+        yafowil widget processing info:
+            - path      : test.path.abc
+            - blueprints: blue:prints:here
+            - task      : testtask
+            - descr     : some description
+        """, suppl.getInfo())
+
+        self.check_output("""
+        <p>yafowil widget processing info:<ul><li>path:
+        <strong>test.path.abc</strong></li><li>blueprints:
+        <strong>blue:prints:here</strong></li><li>task:
+        <strong>testtask</strong></li><li>description: <strong>some
+        description</strong></li></ul></p>
+        """, suppl.getInfo(as_html=1))
