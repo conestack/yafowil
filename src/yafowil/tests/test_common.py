@@ -1825,1211 +1825,1211 @@ class TestCommon(NodeTestCase):
         data.write(model)
         self.assertEqual(model, {'MYSELECT': 'one'})
 
+    def test_select_blueprint_single_radio(self):
+        # Render single selection as radio inputs
+        vocab = [
+            ('one','One'),
+            ('two', 'Two'),
+            ('three', 'Three'),
+            ('four', 'Four')
+        ]
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value='one',
+            props={
+                'vocabulary': vocab,
+                'format': 'single',
+                'listing_label_position': 'before'
+            })
+        self.check_output("""
+        <div>
+          <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
+                 value="exists"/>
+          <div id="radio-MYSELECT-wrapper">
+            <div id="radio-MYSELECT-one">
+              <label for="input-MYSELECT-one">One</label>
+              <input checked="checked" class="select" id="input-MYSELECT-one"
+                     name="MYSELECT" type="radio" value="one"/>
+            </div>
+            <div id="radio-MYSELECT-two">
+              <label for="input-MYSELECT-two">Two</label>
+              <input class="select" id="input-MYSELECT-two" name="MYSELECT"
+                     type="radio" value="two"/>
+            </div>
+            <div id="radio-MYSELECT-three">
+              <label for="input-MYSELECT-three">Three</label>
+              <input class="select" id="input-MYSELECT-three" name="MYSELECT"
+                     type="radio" value="three"/>
+            </div>
+            <div id="radio-MYSELECT-four">
+              <label for="input-MYSELECT-four">Four</label>
+              <input class="select" id="input-MYSELECT-four" name="MYSELECT"
+                     type="radio" value="four"/>
+            </div>
+          </div>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        # Render single selection as radio inputs, disables all
+        widget.attrs['disabled'] = True
+        self.check_output("""
+        <div>
+          <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
+                 value="exists"/>
+          <div id="radio-MYSELECT-wrapper">
+            <div id="radio-MYSELECT-one">
+              <label for="input-MYSELECT-one">One</label>
+              <input checked="checked" class="select" disabled="disabled"
+                     id="input-MYSELECT-one" name="MYSELECT" type="radio"
+                     value="one"/>
+            </div>
+            <div id="radio-MYSELECT-two">
+              <label for="input-MYSELECT-two">Two</label>
+              <input class="select" disabled="disabled" id="input-MYSELECT-two"
+                     name="MYSELECT" type="radio" value="two"/>
+            </div>
+            <div id="radio-MYSELECT-three">
+              <label for="input-MYSELECT-three">Three</label>
+              <input class="select" disabled="disabled"
+                     id="input-MYSELECT-three" name="MYSELECT" type="radio"
+                     value="three"/>
+            </div>
+            <div id="radio-MYSELECT-four">
+              <label for="input-MYSELECT-four">Four</label>
+              <input class="select" disabled="disabled"
+                     id="input-MYSELECT-four" name="MYSELECT" type="radio"
+                     value="four"/>
+            </div>
+          </div>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        # Render single selection as radio inputs, disables some
+        widget.attrs['disabled'] = ['one', 'three']
+        self.check_output("""
+        <div>
+          <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
+                 value="exists"/>
+          <div id="radio-MYSELECT-wrapper">
+            <div id="radio-MYSELECT-one">
+              <label for="input-MYSELECT-one">One</label>
+              <input checked="checked" class="select" disabled="disabled"
+                     id="input-MYSELECT-one" name="MYSELECT" type="radio"
+                     value="one"/>
+            </div>
+            <div id="radio-MYSELECT-two">
+              <label for="input-MYSELECT-two">Two</label>
+              <input class="select" id="input-MYSELECT-two" name="MYSELECT"
+                     type="radio" value="two"/>
+            </div>
+            <div id="radio-MYSELECT-three">
+              <label for="input-MYSELECT-three">Three</label>
+              <input class="select" disabled="disabled"
+                     id="input-MYSELECT-three"
+                     name="MYSELECT" type="radio" value="three"/>
+            </div>
+            <div id="radio-MYSELECT-four">
+              <label for="input-MYSELECT-four">Four</label>
+              <input class="select" id="input-MYSELECT-four" name="MYSELECT"
+                     type="radio" value="four"/>
+            </div>
+          </div>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        del widget.attrs['disabled']
+
+        # Radio single valued display mode
+        widget.mode = 'display'
+        self.assertEqual(
+            widget(),
+            '<div class="display-select" id="display-MYSELECT">One</div>'
+        )
+
+        widget.attrs['display_proxy'] = True
+        self.check_output("""
+        <div>
+          <div class="display-select" id="display-MYSELECT">One</div>
+          <input class="select" id="input-MYSELECT" name="MYSELECT"
+                 type="hidden" value="one"/>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        data = widget.extract(request={'MYSELECT': 'two'})
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, 'one')
+        self.assertEqual(data.extracted, 'two')
+        self.assertEqual(data.errors, [])
+
+        self.check_output("""
+        <div>
+          <div class="display-select" id="display-MYSELECT">Two</div>
+          <input class="select" id="input-MYSELECT" name="MYSELECT"
+                 type="hidden" value="two"/>
+        </div>
+        """, wrapped_fxml(widget(data=data)))
+
+        # Radio single value selection with uuid datatype set
+        vocab = [
+            ('3762033b-7118-4bad-89ed-7cb71f5ab6d1', 'One'),
+            ('74ef603d-29d0-4016-a003-334719dde835', 'Two'),
+            ('b1116392-4a80-496d-86f1-3a2c87e09c59', 'Three'),
+            ('e09471dc-625d-463b-be03-438d7089ec13', 'Four')
+        ]
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value='b1116392-4a80-496d-86f1-3a2c87e09c59',
+            props={
+                'vocabulary': vocab,
+                'datatype': 'uuid',
+                'format': 'single',
+            })
+        self.check_output("""
+        <div>
+          <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
+                 value="exists"/>
+          <div id="radio-MYSELECT-wrapper">
+            <div id="radio-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1">
+              <label
+                for="input-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1"><input
+                class="select"
+                id="input-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1"
+                name="MYSELECT" type="radio"
+                value="3762033b-7118-4bad-89ed-7cb71f5ab6d1"/>One</label>
+            </div>
+            <div id="radio-MYSELECT-74ef603d-29d0-4016-a003-334719dde835">
+              <label
+                for="input-MYSELECT-74ef603d-29d0-4016-a003-334719dde835"><input
+                class="select"
+                id="input-MYSELECT-74ef603d-29d0-4016-a003-334719dde835"
+                name="MYSELECT" type="radio"
+                value="74ef603d-29d0-4016-a003-334719dde835"/>Two</label>
+            </div>
+            <div id="radio-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59">
+              <label
+                for="input-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59"><input
+                checked="checked"
+                class="select"
+                id="input-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59"
+                name="MYSELECT" type="radio"
+                value="b1116392-4a80-496d-86f1-3a2c87e09c59"/>Three</label>
+            </div>
+            <div id="radio-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13">
+              <label
+                for="input-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13"><input
+                class="select"
+                id="input-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13"
+                name="MYSELECT" type="radio"
+                value="e09471dc-625d-463b-be03-438d7089ec13"/>Four</label>
+            </div>
+          </div>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        data = widget.extract({
+            'MYSELECT': 'e09471dc-625d-463b-be03-438d7089ec13'
+        })
+        self.assertEqual(
+            data.extracted,
+            uuid.UUID('e09471dc-625d-463b-be03-438d7089ec13')
+        )
+
+        self.check_output("""
+        <div>
+          <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
+                 value="exists"/>
+          <div id="radio-MYSELECT-wrapper">
+            <div id="radio-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1">
+              <label
+                for="input-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1"><input
+                class="select"
+                id="input-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1"
+                name="MYSELECT" type="radio"
+                value="3762033b-7118-4bad-89ed-7cb71f5ab6d1"/>One</label>
+            </div>
+            <div id="radio-MYSELECT-74ef603d-29d0-4016-a003-334719dde835">
+              <label
+                for="input-MYSELECT-74ef603d-29d0-4016-a003-334719dde835"><input
+                class="select"
+                id="input-MYSELECT-74ef603d-29d0-4016-a003-334719dde835"
+                name="MYSELECT" type="radio"
+                value="74ef603d-29d0-4016-a003-334719dde835"/>Two</label>
+            </div>
+            <div id="radio-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59">
+              <label
+                for="input-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59"><input
+                class="select"
+                id="input-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59"
+                name="MYSELECT" type="radio"
+                value="b1116392-4a80-496d-86f1-3a2c87e09c59"/>Three</label>
+            </div>
+            <div id="radio-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13">
+              <label
+                for="input-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13"><input
+                checked="checked" class="select"
+                id="input-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13"
+                name="MYSELECT" type="radio"
+                value="e09471dc-625d-463b-be03-438d7089ec13"/>Four</label>
+            </div>
+          </div>
+        </div>
+        """, wrapped_fxml(widget(data=data)))
+
+        # Generic HTML5 Data
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value='one',
+            props={
+                'vocabulary': [('one','One')],
+                'format': 'single',
+                'listing_label_position': 'before',
+                'data': {'foo': 'bar'}
+            })
+        self.check_output("""
+        <div>
+          <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
+                 value="exists"/>
+          <div data-foo="bar" id="radio-MYSELECT-wrapper">
+            <div id="radio-MYSELECT-one">
+              <label for="input-MYSELECT-one">One</label>
+              <input checked="checked" class="select" id="input-MYSELECT-one"
+                     name="MYSELECT" type="radio" value="one"/>
+            </div>
+          </div>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value='one',
+            props={
+                'vocabulary': [('one','One')],
+                'format': 'single',
+                'listing_label_position': 'before',
+                'data': {'foo': 'bar'}
+            },
+            mode='display')
+        self.check_output("""
+        <div>
+          <div class="display-select" data-foo="bar"
+               id="display-MYSELECT">One</div>
+        </div>
+        """, wrapped_fxml(widget()))
+
+    def test_select_blueprint_multi(self):
+        # Default multi valued
+        vocab = [
+            ('one','One'),
+            ('two', 'Two'),
+            ('three', 'Three'),
+            ('four', 'Four')
+        ]
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value=['one', 'two'],
+            props={
+                'multivalued': True,
+                'vocabulary': vocab
+            })
+        self.check_output("""
+        <div>
+          <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
+                 value="exists"/>
+          <select class="select" id="input-MYSELECT" multiple="multiple"
+                  name="MYSELECT">
+            <option id="input-MYSELECT-one" selected="selected"
+                    value="one">One</option>
+            <option id="input-MYSELECT-two" selected="selected"
+                    value="two">Two</option>
+            <option id="input-MYSELECT-three" value="three">Three</option>
+            <option id="input-MYSELECT-four" value="four">Four</option>
+          </select>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        # Extract multi valued selection and render widget with extracted data
+        data = widget.extract(request={'MYSELECT': ['one', 'four']})
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, ['one', 'two'])
+        self.assertEqual(data.extracted, ['one', 'four'])
+        self.assertEqual(data.errors, [])
+
+        self.check_output("""
+        <div>
+          <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
+                 value="exists"/>
+          <select class="select" id="input-MYSELECT" multiple="multiple"
+                  name="MYSELECT">
+            <option id="input-MYSELECT-one" selected="selected"
+                    value="one">One</option>
+            <option id="input-MYSELECT-two" value="two">Two</option>
+            <option id="input-MYSELECT-three" value="three">Three</option>
+            <option id="input-MYSELECT-four" selected="selected"
+                    value="four">Four</option>
+          </select>
+        </div>
+        """, wrapped_fxml(widget(data=data)))
+
+        # Multi selection display mode
+        widget.mode = 'display'
+        self.check_output("""
+        <ul class="display-select" id="display-MYSELECT">
+          <li>One</li>
+          <li>Two</li>
+        </ul>
+        """, fxml(widget()))
+
+        # Multi selection display mode with display proxy
+        widget.attrs['display_proxy'] = True
+        self.check_output("""
+        <div>
+          <ul class="display-select" id="display-MYSELECT">
+            <li>One</li>
+            <li>Two</li>
+          </ul>
+          <input class="select" id="input-MYSELECT" name="MYSELECT"
+                 type="hidden" value="one"/>
+          <input class="select" id="input-MYSELECT" name="MYSELECT"
+                 type="hidden" value="two"/>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        # Multi selection display mode with display proxy and extracted data
+        data = widget.extract(request={'MYSELECT': ['one']})
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, ['one', 'two'])
+        self.assertEqual(data.extracted, ['one'])
+        self.assertEqual(data.errors, [])
+
+        self.check_output("""
+        <div>
+          <ul class="display-select" id="display-MYSELECT">
+            <li>One</li>
+          </ul>
+          <input class="select" id="input-MYSELECT" name="MYSELECT"
+                 type="hidden" value="one"/>
+        </div>
+        """, wrapped_fxml(widget(data=data)))
+
+        # Multi selection display with empty values list
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value=[],
+            props={
+                'vocabulary': [],
+                'multivalued': True
+            },
+            mode='display')
+        self.check_output("""
+        <div>
+          <div class="display-select" id="display-MYSELECT"/>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        # Multi selection display with missing term in vocab
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value=['one', 'two'],
+            props={
+                'multivalued': True,
+                'vocabulary': [('two', 'Two')]
+            },
+            mode='display')
+        self.check_output("""
+        <ul class="display-select" id="display-MYSELECT">
+          <li>one</li>
+          <li>Two</li>
+        </ul>
+        """, fxml(widget()))
+
+        # Multiple values on single valued selection fails
+        vocab = [
+            ('one','One'),
+            ('two', 'Two'),
+            ('three', 'Three'),
+            ('four', 'Four')
+        ]
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value=['one', 'two'],
+            props={
+                'vocabulary': vocab
+            })
+        err = self.expect_error(
+            ValueError,
+            widget
+        )
+        self.assertEqual(str(err), 'Multiple values for single selection.')
+
+        # Multi value selection with float datatype set
+        vocab = [
+            (1.0,'One'),
+            (2.0, 'Two'),
+            (3.0, 'Three'),
+            (4.0, 'Four')
+        ]
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value=[1.0, 2.0],
+            props={
+                'datatype': 'float',
+                'multivalued': True,
+                'vocabulary': vocab,
+                'emptyvalue': []
+            })
+        self.check_output("""
+        <div>
+          <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
+                 value="exists"/>
+          <select class="select" id="input-MYSELECT" multiple="multiple"
+                  name="MYSELECT">
+            <option id="input-MYSELECT-1.0" selected="selected"
+                    value="1.0">One</option>
+            <option id="input-MYSELECT-2.0" selected="selected"
+                    value="2.0">Two</option>
+            <option id="input-MYSELECT-3.0" value="3.0">Three</option>
+            <option id="input-MYSELECT-4.0" value="4.0">Four</option>
+          </select>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        request = {
+            'MYSELECT': ['2.0', '3.0']
+        }
+        data = widget.extract(request=request)
+        self.assertEqual(data.extracted, [2.0, 3.0])
+
+        self.check_output("""
+        <div>
+          <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
+                 value="exists"/>
+          <select class="select" id="input-MYSELECT" multiple="multiple"
+                  name="MYSELECT">
+            <option id="input-MYSELECT-1.0" value="1.0">One</option>
+            <option id="input-MYSELECT-2.0" selected="selected"
+                    value="2.0">Two</option>
+            <option id="input-MYSELECT-3.0" selected="selected"
+                    value="3.0">Three</option>
+            <option id="input-MYSELECT-4.0" value="4.0">Four</option>
+          </select>
+        </div>
+        """, wrapped_fxml(widget(data=data)))
+
+        request = {
+            'MYSELECT': '4.0'
+        }
+        data = widget.extract(request=request)
+        self.assertEqual(data.extracted, [4.0])
+
+        request = {
+            'MYSELECT': ''
+        }
+        data = widget.extract(request=request)
+        self.assertEqual(data.extracted, [])
+
+        # Generic HTML5 Data
+        vocab = [
+            ('one','One'),
+            ('two', 'Two')
+        ]
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value=['one', 'two'],
+            props={
+                'multivalued': True,
+                'data': {'foo': 'bar'},
+                'vocabulary': vocab
+            })
+        self.check_output("""
+        <div>
+          <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
+            value="exists"/>
+          <select class="select" data-foo="bar" id="input-MYSELECT"
+                  multiple="multiple" name="MYSELECT">
+            <option id="input-MYSELECT-one" selected="selected"
+                    value="one">One</option>
+            <option id="input-MYSELECT-two" selected="selected"
+                    value="two">Two</option>
+          </select>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        widget.mode = 'display'
+        self.check_output("""
+        <ul class="display-select" data-foo="bar" id="display-MYSELECT">
+          <li>One</li>
+          <li>Two</li>
+        </ul>
+        """, fxml(widget()))
+
+        # Persist
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value=['one', 'two'],
+            props={
+                'multivalued': True,
+                'vocabulary': vocab
+            })
+        data = widget.extract({'MYSELECT': ['one', 'two', 'three']})
+        model = dict()
+        data.persist_writer = write_mapping_writer
+        data.write(model)
+        self.assertEqual(model, {'MYSELECT': ['one', 'two', 'three']})
+
+    def test_select_blueprint_multi_checkboxes(self):
+        # Render multi selection as checkboxes
+        vocab = [
+            ('one','One'),
+            ('two', 'Two'),
+            ('three', 'Three'),
+            ('four', 'Four')
+        ]
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value='one',
+            props={
+                'multivalued': True,
+                'vocabulary': vocab,
+                'format': 'single'
+            })
+        self.check_output("""
+        <div>
+          <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
+                 value="exists"/>
+          <div id="checkbox-MYSELECT-wrapper">
+            <div id="checkbox-MYSELECT-one">
+              <label for="input-MYSELECT-one"><input checked="checked"
+                     class="select" id="input-MYSELECT-one" name="MYSELECT"
+                     type="checkbox" value="one"/>One</label>
+            </div>
+            <div id="checkbox-MYSELECT-two">
+              <label for="input-MYSELECT-two"><input class="select"
+                     id="input-MYSELECT-two" name="MYSELECT" type="checkbox"
+                     value="two"/>Two</label>
+            </div>
+            <div id="checkbox-MYSELECT-three">
+              <label for="input-MYSELECT-three"><input class="select"
+                     id="input-MYSELECT-three" name="MYSELECT" type="checkbox"
+                     value="three"/>Three</label>
+            </div>
+            <div id="checkbox-MYSELECT-four">
+              <label for="input-MYSELECT-four"><input class="select"
+                     id="input-MYSELECT-four" name="MYSELECT" type="checkbox"
+                     value="four"/>Four</label>
+            </div>
+          </div>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        # Checkbox multi selection display mode. Note, other as above, preset
+        # value for multivalued widget is set as string, which is treaten as
+        # one item selected and covered with the below tests
+        widget.mode = 'display'
+        self.check_output("""
+        <ul class="display-select" id="display-MYSELECT">
+          <li>One</li>
+        </ul>
+        """, fxml(widget()))
+
+        # Checkbox multi selection display mode with display proxy
+        widget.attrs['display_proxy'] = True
+        self.check_output("""
+        <div>
+          <ul class="display-select" id="display-MYSELECT">
+            <li>One</li>
+          </ul>
+          <input class="select" id="input-MYSELECT" name="MYSELECT"
+                 type="hidden" value="one"/>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        # Checkbox multi selection display mode with display proxy and
+        # extracted data
+        data = widget.extract(request={'MYSELECT': ['two']})
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, 'one')
+        self.assertEqual(data.extracted, ['two'])
+        self.assertEqual(data.errors, [])
+
+        self.check_output("""
+        <div>
+          <ul class="display-select" id="display-MYSELECT">
+            <li>Two</li>
+          </ul>
+          <input class="select" id="input-MYSELECT" name="MYSELECT"
+                 type="hidden" value="two"/>
+        </div>
+        """, wrapped_fxml(widget(data=data)))
+
+        # Generic HTML5 Data
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value='one',
+            props={
+                'multivalued': True,
+                'data': {'foo': 'bar'},
+                'vocabulary': [('one','One')],
+                'format': 'single'
+            })
+        self.check_output("""
+        <div>
+          <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
+                 value="exists"/>
+          <div data-foo="bar" id="checkbox-MYSELECT-wrapper">
+            <div id="checkbox-MYSELECT-one">
+              <label for="input-MYSELECT-one"><input checked="checked"
+                     class="select" id="input-MYSELECT-one" name="MYSELECT"
+                     type="checkbox" value="one"/>One</label>
+            </div>
+          </div>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        widget.mode = 'display'
+        self.check_output("""
+        <ul class="display-select" data-foo="bar" id="display-MYSELECT">
+          <li>One</li>
+        </ul>
+        """, fxml(widget()))
+
+    def test_select_blueprint_misc(self):
+        # Using 'ul' instead of 'div' for rendering radio or checkbox
+        # selections
+        vocab = [
+            ('one','One'),
+            ('two', 'Two'),
+            ('three', 'Three'),
+            ('four', 'Four')
+        ]
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value='one',
+            props={
+                'multivalued': True,
+                'vocabulary': vocab,
+                'format': 'single',
+                'listing_tag': 'ul'
+            })
+        self.check_output("""
+        <div>
+          <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
+                 value="exists"/>
+          <ul id="checkbox-MYSELECT-wrapper">
+            <li id="checkbox-MYSELECT-one">
+              <label for="input-MYSELECT-one"><input checked="checked"
+                     class="select" id="input-MYSELECT-one" name="MYSELECT"
+                     type="checkbox" value="one"/>One</label>
+            </li>
+            <li id="checkbox-MYSELECT-two">
+              <label for="input-MYSELECT-two"><input class="select"
+                     id="input-MYSELECT-two" name="MYSELECT" type="checkbox"
+                     value="two"/>Two</label>
+            </li>
+            <li id="checkbox-MYSELECT-three">
+              <label for="input-MYSELECT-three"><input class="select"
+                     id="input-MYSELECT-three" name="MYSELECT" type="checkbox"
+                     value="three"/>Three</label>
+            </li>
+            <li id="checkbox-MYSELECT-four">
+              <label for="input-MYSELECT-four"><input class="select"
+                     id="input-MYSELECT-four" name="MYSELECT" type="checkbox"
+                     value="four"/>Four</label>
+            </li>
+          </ul>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        # Render single format selection with label after input
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value='one',
+            props={
+                'multivalued': True,
+                'vocabulary': [
+                    ('one','One'),
+                    ('two', 'Two'),
+                ],
+                'format': 'single',
+                'listing_tag': 'ul',
+                'listing_label_position': 'after'
+            })
+        self.check_output("""
+        <div>
+          <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
+                 value="exists"/>
+          <ul id="checkbox-MYSELECT-wrapper">
+            <li id="checkbox-MYSELECT-one">
+              <input checked="checked" class="select" id="input-MYSELECT-one"
+                     name="MYSELECT" type="checkbox" value="one"/>
+              <label for="input-MYSELECT-one">One</label>
+            </li>
+            <li id="checkbox-MYSELECT-two">
+              <input class="select" id="input-MYSELECT-two" name="MYSELECT"
+                     type="checkbox" value="two"/>
+              <label for="input-MYSELECT-two">Two</label>
+            </li>
+          </ul>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        # Render single format selection with input inside label before checkbox
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value='one',
+            props={
+                'multivalued': True,
+                'vocabulary': [
+                    ('one','One'),
+                    ('two', 'Two'),
+                ],
+                'format': 'single',
+                'listing_tag': 'ul',
+                'listing_label_position': 'inner-before'
+            })
+        self.check_output("""
+        <div>
+          <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
+                 value="exists"/>
+          <ul id="checkbox-MYSELECT-wrapper">
+            <li id="checkbox-MYSELECT-one">
+              <label for="input-MYSELECT-one">One<input checked="checked"
+                     class="select" id="input-MYSELECT-one" name="MYSELECT"
+                     type="checkbox" value="one"/></label>
+            </li>
+            <li id="checkbox-MYSELECT-two">
+              <label for="input-MYSELECT-two">Two<input class="select"
+                     id="input-MYSELECT-two" name="MYSELECT" type="checkbox"
+                     value="two"/></label>
+            </li>
+          </ul>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        # Check BBB 'inner' for 'listing_label_position' which behaves like
+        # 'inner-after'
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value='one',
+            props={
+                'vocabulary': [('one','One')],
+                'format': 'single',
+                'listing_label_position': 'inner'
+            })
+        self.check_output("""
+        <div>
+          <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
+                 value="exists"/>
+          <div id="radio-MYSELECT-wrapper">
+            <div id="radio-MYSELECT-one">
+              <label for="input-MYSELECT-one"><input checked="checked"
+                     class="select" id="input-MYSELECT-one" name="MYSELECT"
+                     type="radio" value="one"/>One</label>
+            </div>
+          </div>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        # Check selection required
+        vocab = [
+            ('one','One'),
+            ('two', 'Two'),
+            ('three', 'Three'),
+            ('four', 'Four')
+        ]
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            props={
+                'required': 'Selection required',
+                'vocabulary': vocab
+            })
+        self.check_output("""
+        <select class="select" id="input-MYSELECT" name="MYSELECT"
+                required="required">
+          <option id="input-MYSELECT-one" value="one">One</option>
+          <option id="input-MYSELECT-two" value="two">Two</option>
+          <option id="input-MYSELECT-three" value="three">Three</option>
+          <option id="input-MYSELECT-four" value="four">Four</option>
+        </select>
+        """, fxml(widget()))
+
+        data = widget.extract(request={'MYSELECT': ''})
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, '')
+        self.assertEqual(data.errors, [ExtractionError('Selection required')])
+
+        vocab = [
+            ('one','One'),
+            ('two', 'Two'),
+            ('three', 'Three'),
+            ('four', 'Four')
+        ]
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            props={
+                'required': 'Selection required',
+                'multivalued': True,
+                'vocabulary': vocab
+            })
+        self.check_output("""
+        <div>
+          <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
+                 value="exists"/>
+          <select class="select" id="input-MYSELECT" multiple="multiple"
+                  name="MYSELECT" required="required">
+            <option id="input-MYSELECT-one" value="one">One</option>
+            <option id="input-MYSELECT-two" value="two">Two</option>
+            <option id="input-MYSELECT-three" value="three">Three</option>
+            <option id="input-MYSELECT-four" value="four">Four</option>
+          </select>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        data = widget.extract(request={'MYSELECT-exists': 'exists'})
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, [])
+        self.assertEqual(data.errors, [ExtractionError('Selection required')])
+
+        # Check selection required with datatype set
+        vocab = [
+            (1,'One'),
+            (2, 'Two'),
+            (3, 'Three'),
+            (4, 'Four')
+        ]
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            props={
+                'required': 'Selection required',
+                'multivalued': True,
+                'vocabulary': vocab,
+                'datatype': int,
+            })
+        data = widget.extract(request={'MYSELECT-exists': 'exists'})
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, [])
+        self.assertEqual(data.errors, [ExtractionError('Selection required')])
+
+        data = widget.extract(request={'MYSELECT': ['1', '2']})
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, [1, 2])
+        self.assertEqual(data.errors, [])
+
+        # Single selection extraction without value
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            props={
+                'vocabulary': [
+                    ('one','One'),
+                    ('two', 'Two')
+                ]
+            })
+        request = {
+            'MYSELECT': 'one',
+            'MYSELECT-exists': True,
+        }
+        data = widget.extract(request)
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, 'one')
+        self.assertEqual(data.errors, [])
+
+        # Single selection extraction with value
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value='two',
+            props={
+                'vocabulary': [
+                    ('one','One'),
+                    ('two', 'Two')
+                ]
+            })
+        request = {
+            'MYSELECT': 'one',
+        }
+        data = widget.extract(request)
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, 'two')
+        self.assertEqual(data.extracted, 'one')
+        self.assertEqual(data.errors, [])
+
+        # Single selection extraction disabled (means browser does not post the
+        # value) with value
+        widget.attrs['disabled'] = True
+        data = widget.extract({'MYSELECT-exists': True})
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, 'two')
+        self.assertEqual(data.extracted, 'two')
+        self.assertEqual(data.errors, [])
+
+        # Disabled can be also the value itself
+        widget.attrs['disabled'] = 'two'
+        data = widget.extract({'MYSELECT-exists': True})
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, 'two')
+        self.assertEqual(data.extracted, 'two')
+        self.assertEqual(data.errors, [])
+
+        # Single selection extraction required
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value='two',
+            props={
+                'required': True,
+                'vocabulary': [
+                    ('one','One'),
+                    ('two', 'Two')
+                ]
+            })
+        request = {
+            'MYSELECT': '',
+        }
+        data = widget.extract(request)
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, 'two')
+        self.assertEqual(data.extracted, '')
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Mandatory field was empty')]
+        )
+
+        # A disabled and required returns value itself
+        widget.attrs['disabled'] = True
+        data = widget.extract({'MYSELECT-exists': True})
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, 'two')
+        self.assertEqual(data.extracted, 'two')
+        self.assertEqual(data.errors, [])
+
+        # Multiple selection extraction without value
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            props={
+                'multivalued': True,
+                'vocabulary': [
+                    ('one','One'),
+                    ('two', 'Two')
+                ]
+            })
+        request = {
+            'MYSELECT': ['one', 'two'],
+        }
+        data = widget.extract(request)
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, ['one', 'two'])
+        self.assertEqual(data.errors, [])
+
+        # Multiple selection extraction with value
+        vocab = [
+            ('one','One'),
+            ('two', 'Two'),
+            ('three', 'Three')
+        ]
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value='three',
+            props={
+                'multivalued': True,
+                'vocabulary': vocab
+            })
+        request = {
+            'MYSELECT': 'one',
+            'MYSELECT-exists': True,
+        }
+        data = widget.extract(request)
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, 'three')
+        self.assertEqual(data.extracted, ['one'])
+        self.assertEqual(data.errors, [])
+
+        # Multiselection, completly disabled
+        widget.attrs['disabled'] = True
+        data = widget.extract({'MYSELECT-exists': True})
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, 'three')
+        self.assertEqual(data.extracted, ['three'])
+        self.assertEqual(data.errors, [])
+
+        # Multiselection, partly disabled, empty request
+        vocab = [
+            ('one','One'),
+            ('two', 'Two'),
+            ('three', 'Three'),
+            ('four', 'Four')
+        ]
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value=['one', 'three'],
+            props={
+                'multivalued': True,
+                'disabled': ['two', 'three'],
+                'vocabulary': vocab
+            })
+        data = widget.extract({})
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, ['one', 'three'])
+        self.assertEqual(data.extracted, UNSET)
+        self.assertEqual(data.errors, [])
+
+        # Multiselection, partly disabled, non-empty request
+        vocab = [
+            ('one','One'),
+            ('two', 'Two'),
+            ('three', 'Three'),
+            ('four', 'Four'),
+            ('five', 'Five')
+        ]
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value=['one', 'two', 'four'],
+            props={
+                'multivalued': True,
+                'disabled': ['two', 'three', 'four', 'five'],
+                'vocabulary': vocab,
+                'datatype': unicode,
+            })
+        request = {
+            'MYSELECT': ['one', 'two', 'five'],
+            'MYSELECT-exists': True,
+        }
+
+        # Explanation:
+        # 
+        # * one is a simple value as usal,
+        # * two is disabled and in value, so it should be kept in.
+        # * three is disabled and not in value, so it should kept out,
+        # * four is disabled and in value, but someone removed it in the request, it
+        #   should get recovered,
+        # * five is disabled and not in value, but someone put it in the request. it
+        #   should get removed.
+
+        # Check extraction
+
+        data = widget.extract(request)
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, ['one', 'two', 'four'])
+        self.assertEqual(data.extracted, [u'one', u'two', u'four'])
+        self.assertEqual(data.errors, [])
+
+        # Single selection radio extraction
+        vocab = [
+            ('one','One'),
+            ('two', 'Two'),
+            ('three', 'Three')
+        ]
+        widget = factory(
+            'select',
+            'MYSELECT',
+            props={
+                'format': 'single',
+                'vocabulary': vocab
+            })
+
+        # No exists marker in request. Extracts to UNSET
+        request = {}
+        data = widget.extract(request)
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, UNSET)
+        self.assertEqual(data.errors, [])
+
+        # Exists marker in request. Extracts to empty string
+        request = {
+            'MYSELECT-exists': '1',
+        }
+        data = widget.extract(request)
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, '')
+        self.assertEqual(data.errors, [])
+
+        # Select value
+        request = {
+            'MYSELECT-exists': '1',
+            'MYSELECT': 'one',
+        }
+        data = widget.extract(request)
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, 'one')
+        self.assertEqual(data.errors, [])
+
+        # Multi selection radio extraction
+        vocab = [
+            ('one','One'),
+            ('two', 'Two'),
+            ('three', 'Three')
+        ]
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            props={
+                'multivalued': True,
+                'format': 'single',
+                'vocabulary': vocab
+            })
+
+        # No exists marker in request. Extracts to UNSET
+        request = {}
+        data = widget.extract(request)
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, UNSET)
+        self.assertEqual(data.errors, [])
+
+        # Exists marker in request. Extracts to empty list
+        request = {
+            'MYSELECT-exists': '1',
+        }
+        data = widget.extract(request)
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, [])
+        self.assertEqual(data.errors, [])
+
+        # Select values
+        request = {
+            'MYSELECT-exists': '1',
+            'MYSELECT': ['one', 'two'],
+        }
+        data = widget.extract(request)
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, ['one', 'two'])
+        self.assertEqual(data.errors, [])
+
 """
-With Radio
-..........
-
-Render single selection as radio inputs::
-
-    >>> vocab = [
-    ...     ('one','One'),
-    ...     ('two', 'Two'),
-    ...     ('three', 'Three'),
-    ...     ('four', 'Four')
-    ... ]
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value='one',
-    ...     props={
-    ...         'vocabulary': vocab,
-    ...         'format': 'single',
-    ...         'listing_label_position': 'before'
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
-        value="exists"/>
-      <div id="radio-MYSELECT-wrapper">
-        <div id="radio-MYSELECT-one">
-          <label for="input-MYSELECT-one">One</label>
-          <input checked="checked" class="select" id="input-MYSELECT-one" 
-            name="MYSELECT" type="radio" value="one"/>
-        </div>
-        <div id="radio-MYSELECT-two">
-          <label for="input-MYSELECT-two">Two</label>
-          <input class="select" id="input-MYSELECT-two" name="MYSELECT" 
-            type="radio" value="two"/>
-        </div>
-        <div id="radio-MYSELECT-three">
-          <label for="input-MYSELECT-three">Three</label>
-          <input class="select" id="input-MYSELECT-three" name="MYSELECT" 
-            type="radio" value="three"/>
-        </div>
-        <div id="radio-MYSELECT-four">
-          <label for="input-MYSELECT-four">Four</label>
-          <input class="select" id="input-MYSELECT-four" name="MYSELECT" 
-            type="radio" value="four"/>
-        </div>
-      </div>
-    </div>
-    <BLANKLINE>
-
-Render single selection as radio inputs, disables all::
-
-    >>> widget.attrs['disabled'] = True
-    >>> wrapped_pxml(widget())
-    <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
-        value="exists"/>
-      <div id="radio-MYSELECT-wrapper">
-        <div id="radio-MYSELECT-one">
-          <label for="input-MYSELECT-one">One</label>
-          <input checked="checked" class="select" disabled="disabled" 
-            id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>
-        </div>
-        <div id="radio-MYSELECT-two">
-          <label for="input-MYSELECT-two">Two</label>
-          <input class="select" disabled="disabled" id="input-MYSELECT-two" 
-            name="MYSELECT" type="radio" value="two"/>
-        </div>
-        <div id="radio-MYSELECT-three">
-          <label for="input-MYSELECT-three">Three</label>
-          <input class="select" disabled="disabled" id="input-MYSELECT-three" 
-            name="MYSELECT" type="radio" value="three"/>
-        </div>
-        <div id="radio-MYSELECT-four">
-          <label for="input-MYSELECT-four">Four</label>
-          <input class="select" disabled="disabled" id="input-MYSELECT-four" 
-            name="MYSELECT" type="radio" value="four"/>
-        </div>
-      </div>
-    </div>
-    <BLANKLINE>
-
-Render single selection as radio inputs, disables some::
-
-    >>> widget.attrs['disabled'] = ['one', 'three']
-    >>> wrapped_pxml(widget())
-    <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
-        value="exists"/>
-      <div id="radio-MYSELECT-wrapper">
-        <div id="radio-MYSELECT-one">
-          <label for="input-MYSELECT-one">One</label>
-          <input checked="checked" class="select" disabled="disabled" 
-            id="input-MYSELECT-one" name="MYSELECT" type="radio" value="one"/>
-        </div>
-        <div id="radio-MYSELECT-two">
-          <label for="input-MYSELECT-two">Two</label>
-          <input class="select" id="input-MYSELECT-two" name="MYSELECT" 
-            type="radio" value="two"/>
-        </div>
-        <div id="radio-MYSELECT-three">
-          <label for="input-MYSELECT-three">Three</label>
-          <input class="select" disabled="disabled" id="input-MYSELECT-three" 
-            name="MYSELECT" type="radio" value="three"/>
-        </div>
-        <div id="radio-MYSELECT-four">
-          <label for="input-MYSELECT-four">Four</label>
-          <input class="select" id="input-MYSELECT-four" name="MYSELECT" 
-            type="radio" value="four"/>
-        </div>
-      </div>
-    </div>
-    <BLANKLINE>
-
-    >>> del widget.attrs['disabled']
-
-Radio single valued display mode::
-
-    >>> widget.mode = 'display'
-    >>> widget()
-    u'<div class="display-select" id="display-MYSELECT">One</div>'
-
-    >>> widget.attrs['display_proxy'] = True
-    >>> wrapped_pxml(widget())
-    <div>
-      <div class="display-select" id="display-MYSELECT">One</div>
-      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" 
-        value="one"/>
-    </div>
-    <BLANKLINE>
-
-    >>> data = widget.extract(request={'MYSELECT': 'two'})
-    >>> data
-    <RuntimeData MYSELECT, value='one', extracted='two' at ...>
-
-    >>> wrapped_pxml(widget(data=data))
-    <div>
-      <div class="display-select" id="display-MYSELECT">Two</div>
-      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" 
-        value="two"/>
-    </div>
-    <BLANKLINE>
-
-Radio single value selection with uuid datatype set::
-
-    >>> vocab = [
-    ...     ('3762033b-7118-4bad-89ed-7cb71f5ab6d1', 'One'),
-    ...     ('74ef603d-29d0-4016-a003-334719dde835', 'Two'),
-    ...     ('b1116392-4a80-496d-86f1-3a2c87e09c59', 'Three'),
-    ...     ('e09471dc-625d-463b-be03-438d7089ec13', 'Four')
-    ... ]
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value='b1116392-4a80-496d-86f1-3a2c87e09c59',
-    ...     props={
-    ...         'vocabulary': vocab,
-    ...         'datatype': 'uuid',
-    ...         'format': 'single',
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
-        value="exists"/>
-      <div id="radio-MYSELECT-wrapper">
-        <div id="radio-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1">
-          <label 
-            for="input-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1"><input 
-              class="select" 
-              id="input-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1" 
-              name="MYSELECT" type="radio" 
-              value="3762033b-7118-4bad-89ed-7cb71f5ab6d1"/>One</label>
-        </div>
-        <div id="radio-MYSELECT-74ef603d-29d0-4016-a003-334719dde835">
-          <label 
-            for="input-MYSELECT-74ef603d-29d0-4016-a003-334719dde835"><input 
-              class="select" 
-              id="input-MYSELECT-74ef603d-29d0-4016-a003-334719dde835" 
-              name="MYSELECT" type="radio" 
-              value="74ef603d-29d0-4016-a003-334719dde835"/>Two</label>
-        </div>
-        <div id="radio-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59">
-          <label 
-            for="input-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59"><input 
-              checked="checked" 
-              class="select" 
-              id="input-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59" 
-              name="MYSELECT" type="radio" 
-              value="b1116392-4a80-496d-86f1-3a2c87e09c59"/>Three</label>
-        </div>
-        <div id="radio-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13">
-          <label 
-            for="input-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13"><input 
-              class="select" 
-              id="input-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13" 
-              name="MYSELECT" type="radio" 
-              value="e09471dc-625d-463b-be03-438d7089ec13"/>Four</label>
-        </div>
-      </div>
-    </div>
-    <BLANKLINE>
-
-    >>> data = widget.extract({
-    ...     'MYSELECT': 'e09471dc-625d-463b-be03-438d7089ec13'
-    ... })
-    >>> data.extracted
-    UUID('e09471dc-625d-463b-be03-438d7089ec13')
-
-    >>> wrapped_pxml(widget(data=data))
-    <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
-        value="exists"/>
-      <div id="radio-MYSELECT-wrapper">
-        <div id="radio-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1">
-          <label 
-            for="input-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1"><input 
-              class="select" 
-              id="input-MYSELECT-3762033b-7118-4bad-89ed-7cb71f5ab6d1" 
-              name="MYSELECT" type="radio" 
-              value="3762033b-7118-4bad-89ed-7cb71f5ab6d1"/>One</label>
-        </div>
-        <div id="radio-MYSELECT-74ef603d-29d0-4016-a003-334719dde835">
-          <label 
-            for="input-MYSELECT-74ef603d-29d0-4016-a003-334719dde835"><input 
-              class="select" 
-              id="input-MYSELECT-74ef603d-29d0-4016-a003-334719dde835" 
-              name="MYSELECT" type="radio" 
-              value="74ef603d-29d0-4016-a003-334719dde835"/>Two</label>
-        </div>
-        <div id="radio-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59">
-          <label 
-            for="input-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59"><input 
-              class="select" 
-              id="input-MYSELECT-b1116392-4a80-496d-86f1-3a2c87e09c59" 
-              name="MYSELECT" type="radio" 
-              value="b1116392-4a80-496d-86f1-3a2c87e09c59"/>Three</label>
-        </div>
-        <div id="radio-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13">
-          <label 
-            for="input-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13"><input 
-              checked="checked" class="select" 
-              id="input-MYSELECT-e09471dc-625d-463b-be03-438d7089ec13" 
-              name="MYSELECT" type="radio" 
-              value="e09471dc-625d-463b-be03-438d7089ec13"/>Four</label>
-        </div>
-      </div>
-    </div>
-    <BLANKLINE>
-
-Generic HTML5 Data::
-
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value='one',
-    ...     props={
-    ...         'vocabulary': [('one','One')],
-    ...         'format': 'single',
-    ...         'listing_label_position': 'before',
-    ...         'data': {'foo': 'bar'}
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
-        value="exists"/>
-      <div data-foo="bar" id="radio-MYSELECT-wrapper">
-        <div id="radio-MYSELECT-one">
-          <label for="input-MYSELECT-one">One</label>
-          <input checked="checked" class="select" id="input-MYSELECT-one" 
-            name="MYSELECT" type="radio" value="one"/>
-        </div>
-      </div>
-    </div>
-    <BLANKLINE>
-
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value='one',
-    ...     props={
-    ...         'vocabulary': [('one','One')],
-    ...         'format': 'single',
-    ...         'listing_label_position': 'before',
-    ...         'data': {'foo': 'bar'}
-    ...     },
-    ...     mode='display')
-    >>> wrapped_pxml(widget())
-    <div>
-      <div class="display-select" data-foo="bar" 
-        id="display-MYSELECT">One</div>
-    </div>
-    <BLANKLINE>
-
-
-Multi valued
-............
-
-Default multi valued::
-
-    >>> vocab = [
-    ...     ('one','One'),
-    ...     ('two', 'Two'),
-    ...     ('three', 'Three'),
-    ...     ('four', 'Four')
-    ... ]
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value=['one', 'two'],
-    ...     props={
-    ...         'multivalued': True,
-    ...         'vocabulary': vocab
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
-        value="exists"/>
-      <select class="select" id="input-MYSELECT" multiple="multiple" 
-        name="MYSELECT">
-        <option id="input-MYSELECT-one" selected="selected" 
-          value="one">One</option>
-        <option id="input-MYSELECT-two" selected="selected" 
-          value="two">Two</option>
-        <option id="input-MYSELECT-three" value="three">Three</option>
-        <option id="input-MYSELECT-four" value="four">Four</option>
-      </select>
-    </div>
-    <BLANKLINE>
-
-Extract multi valued selection and render widget with extracted data::
-
-    >>> data = widget.extract(request={'MYSELECT': ['one', 'four']})
-    >>> data
-    <RuntimeData MYSELECT, value=['one', 'two'], extracted=['one', 'four'] at ...>
-
-    >>> wrapped_pxml(widget(data=data))
-    <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
-        value="exists"/>
-      <select class="select" id="input-MYSELECT" multiple="multiple" 
-        name="MYSELECT">
-        <option id="input-MYSELECT-one" selected="selected" 
-          value="one">One</option>
-        <option id="input-MYSELECT-two" value="two">Two</option>
-        <option id="input-MYSELECT-three" value="three">Three</option>
-        <option id="input-MYSELECT-four" selected="selected" 
-          value="four">Four</option>
-      </select>
-    </div>
-    <BLANKLINE>
-
-Multi selection display mode::
-
-    >>> widget.mode = 'display'
-    >>> pxml(widget())
-    <ul class="display-select" id="display-MYSELECT">
-      <li>One</li>
-      <li>Two</li>
-    </ul>
-    <BLANKLINE>
-
-Multi selection display mode with display proxy::
-
-    >>> widget.attrs['display_proxy'] = True
-    >>> wrapped_pxml(widget())
-    <div>
-      <ul class="display-select" id="display-MYSELECT">
-        <li>One</li>
-        <li>Two</li>
-      </ul>
-      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" 
-        value="one"/>
-      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" 
-        value="two"/>
-    </div>
-    <BLANKLINE>
-
-Multi selection display mode with display proxy and extracted data::
-
-    >>> data = widget.extract(request={'MYSELECT': ['one']})
-    >>> data
-    <RuntimeData MYSELECT, value=['one', 'two'], extracted=['one'] at ...>
-
-    >>> wrapped_pxml(widget(data=data))
-    <div>
-      <ul class="display-select" id="display-MYSELECT">
-        <li>One</li>
-      </ul>
-      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" 
-        value="one"/>
-    </div>
-    <BLANKLINE>
-
-Multi selection display with empty values list::
-
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value=[],
-    ...     props={
-    ...         'vocabulary': [],
-    ...         'multivalued': True
-    ...     },
-    ...     mode='display')
-    >>> wrapped_pxml(widget())
-    <div>
-      <div class="display-select" id="display-MYSELECT"/>
-    </div>
-    <BLANKLINE>
-
-Multi selection display with missing term in vocab::
-
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value=['one', 'two'],
-    ...     props={
-    ...         'multivalued': True,
-    ...         'vocabulary': [('two', 'Two')]
-    ...     },
-    ...     mode='display')
-    >>> pxml(widget())
-    <ul class="display-select" id="display-MYSELECT">
-      <li>one</li>
-      <li>Two</li>
-    </ul>
-    <BLANKLINE>
-
-Multiple values on single valued selection fails::
-
-    >>> vocab = [
-    ...     ('one','One'),
-    ...     ('two', 'Two'),
-    ...     ('three', 'Three'),
-    ...     ('four', 'Four')
-    ... ]
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value=['one', 'two'],
-    ...     props={
-    ...         'vocabulary': vocab
-    ...     })
-    >>> pxml(widget())
-    Traceback (most recent call last):
-      ...
-    ValueError: Multiple values for single selection.
-
-Multi value selection with float datatype set::
-
-    >>> vocab = [
-    ...     (1.0,'One'),
-    ...     (2.0, 'Two'),
-    ...     (3.0, 'Three'),
-    ...     (4.0, 'Four')
-    ... ]
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value=[1.0, 2.0],
-    ...     props={
-    ...         'datatype': 'float',
-    ...         'multivalued': True,
-    ...         'vocabulary': vocab,
-    ...         'emptyvalue': []
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
-        value="exists"/>
-      <select class="select" id="input-MYSELECT" multiple="multiple" 
-        name="MYSELECT">
-        <option id="input-MYSELECT-1.0" selected="selected" 
-          value="1.0">One</option>
-        <option id="input-MYSELECT-2.0" selected="selected" 
-          value="2.0">Two</option>
-        <option id="input-MYSELECT-3.0" value="3.0">Three</option>
-        <option id="input-MYSELECT-4.0" value="4.0">Four</option>
-      </select>
-    </div>
-    <BLANKLINE>
-
-    >>> request = {
-    ...     'MYSELECT': ['2.0', '3.0']
-    ... }
-    >>> data = widget.extract(request=request)
-    >>> data.extracted
-    [2.0, 3.0]
-
-    >>> wrapped_pxml(widget(data=data))
-    <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
-        value="exists"/>
-      <select class="select" id="input-MYSELECT" multiple="multiple" 
-        name="MYSELECT">
-        <option id="input-MYSELECT-1.0" value="1.0">One</option>
-        <option id="input-MYSELECT-2.0" selected="selected" 
-          value="2.0">Two</option>
-        <option id="input-MYSELECT-3.0" selected="selected" 
-          value="3.0">Three</option>
-        <option id="input-MYSELECT-4.0" value="4.0">Four</option>
-      </select>
-    </div>
-    <BLANKLINE>
-
-    >>> request = {
-    ...     'MYSELECT': '4.0'
-    ... }
-    >>> data = widget.extract(request=request)
-    >>> data.extracted
-    [4.0]
-
-    >>> request = {
-    ...     'MYSELECT': ''
-    ... }
-    >>> data = widget.extract(request=request)
-    >>> data.extracted
-    []
-
-Generic HTML5 Data::
-
-    >>> vocab = [
-    ...     ('one','One'),
-    ...     ('two', 'Two')
-    ... ]
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value=['one', 'two'],
-    ...     props={
-    ...         'multivalued': True,
-    ...         'data': {'foo': 'bar'},
-    ...         'vocabulary': vocab
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
-        value="exists"/>
-      <select class="select" data-foo="bar" id="input-MYSELECT" 
-        multiple="multiple" name="MYSELECT">
-        <option id="input-MYSELECT-one" selected="selected" 
-          value="one">One</option>
-        <option id="input-MYSELECT-two" selected="selected" 
-          value="two">Two</option>
-      </select>
-    </div>
-    <BLANKLINE>
-
-    >>> widget.mode = 'display'
-    >>> pxml(widget())
-    <ul class="display-select" data-foo="bar" id="display-MYSELECT">
-      <li>One</li>
-      <li>Two</li>
-    </ul>
-    <BLANKLINE>
-
-Persist::
-
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value=['one', 'two'],
-    ...     props={
-    ...         'multivalued': True,
-    ...         'vocabulary': vocab
-    ...     })
-    >>> data = widget.extract({'MYSELECT': ['one', 'two', 'three']})
-    >>> model = dict()
-    >>> data.persist_writer = write_mapping_writer
-    >>> data.write(model)
-    >>> model
-    {'MYSELECT': ['one', 'two', 'three']}
-
-
-With Checkboxes
-...............
-
-Render multi selection as checkboxes::
-
-    >>> vocab = [
-    ...     ('one','One'),
-    ...     ('two', 'Two'),
-    ...     ('three', 'Three'),
-    ...     ('four', 'Four')
-    ... ]
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value='one',
-    ...     props={
-    ...         'multivalued': True,
-    ...         'vocabulary': vocab,
-    ...         'format': 'single'
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
-        value="exists"/>
-      <div id="checkbox-MYSELECT-wrapper">
-        <div id="checkbox-MYSELECT-one">
-          <label for="input-MYSELECT-one"><input checked="checked" 
-            class="select" id="input-MYSELECT-one" name="MYSELECT" 
-            type="checkbox" value="one"/>One</label>
-        </div>
-        <div id="checkbox-MYSELECT-two">
-          <label for="input-MYSELECT-two"><input class="select" 
-            id="input-MYSELECT-two" name="MYSELECT" type="checkbox" 
-            value="two"/>Two</label>
-        </div>
-        <div id="checkbox-MYSELECT-three">
-          <label for="input-MYSELECT-three"><input class="select" 
-            id="input-MYSELECT-three" name="MYSELECT" type="checkbox" 
-            value="three"/>Three</label>
-        </div>
-        <div id="checkbox-MYSELECT-four">
-          <label for="input-MYSELECT-four"><input class="select" 
-            id="input-MYSELECT-four" name="MYSELECT" type="checkbox" 
-            value="four"/>Four</label>
-        </div>
-      </div>
-    </div>
-    <BLANKLINE>
-
-Checkbox multi selection display mode. Note, other as above, preset value for
-multivalued widget is set as string, which is treaten as one item selected and
-covered with the below tests::
-
-    >>> widget.mode = 'display'
-    >>> pxml(widget())
-    <ul class="display-select" id="display-MYSELECT">
-      <li>One</li>
-    </ul>
-    <BLANKLINE>
-
-Checkbox multi selection display mode with display proxy::
-
-    >>> widget.attrs['display_proxy'] = True
-    >>> wrapped_pxml(widget())
-    <div>
-      <ul class="display-select" id="display-MYSELECT">
-        <li>One</li>
-      </ul>
-      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" 
-        value="one"/>
-    </div>
-    <BLANKLINE>
-
-Checkbox multi selection display mode with display proxy and extracted data::
-
-    >>> data = widget.extract(request={'MYSELECT': ['two']})
-    >>> data
-    <RuntimeData MYSELECT, value='one', extracted=['two'] at ...>
-    
-    >>> wrapped_pxml(widget(data=data))
-    <div>
-      <ul class="display-select" id="display-MYSELECT">
-        <li>Two</li>
-      </ul>
-      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" 
-        value="two"/>
-    </div>
-    <BLANKLINE>
-
-Generic HTML5 Data::
-
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value='one',
-    ...     props={
-    ...         'multivalued': True,
-    ...         'data': {'foo': 'bar'},
-    ...         'vocabulary': [('one','One')],
-    ...         'format': 'single'
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
-        value="exists"/>
-      <div data-foo="bar" id="checkbox-MYSELECT-wrapper">
-        <div id="checkbox-MYSELECT-one">
-          <label for="input-MYSELECT-one"><input checked="checked" 
-            class="select" id="input-MYSELECT-one" name="MYSELECT" 
-            type="checkbox" value="one"/>One</label>
-        </div>
-      </div>
-    </div>
-    <BLANKLINE>
-
-    >>> widget.mode = 'display'
-    >>> pxml(widget())
-    <ul class="display-select" data-foo="bar" id="display-MYSELECT">
-      <li>One</li>
-    </ul>
-    <BLANKLINE>
-
-
-Specials
-........
-
-Using 'ul' instead of 'div' for rendering radio or checkbox selections::
-
-    >>> vocab = [
-    ...     ('one','One'),
-    ...     ('two', 'Two'),
-    ...     ('three', 'Three'),
-    ...     ('four', 'Four')
-    ... ]
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value='one',
-    ...     props={
-    ...         'multivalued': True,
-    ...         'vocabulary': vocab,
-    ...         'format': 'single',
-    ...         'listing_tag': 'ul'
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
-        value="exists"/>
-      <ul id="checkbox-MYSELECT-wrapper">
-        <li id="checkbox-MYSELECT-one">
-          <label for="input-MYSELECT-one"><input checked="checked" 
-            class="select" id="input-MYSELECT-one" name="MYSELECT" 
-            type="checkbox" value="one"/>One</label>
-        </li>
-        <li id="checkbox-MYSELECT-two">
-          <label for="input-MYSELECT-two"><input class="select" 
-            id="input-MYSELECT-two" name="MYSELECT" type="checkbox" 
-            value="two"/>Two</label>
-        </li>
-        <li id="checkbox-MYSELECT-three">
-          <label for="input-MYSELECT-three"><input class="select" 
-            id="input-MYSELECT-three" name="MYSELECT" type="checkbox" 
-            value="three"/>Three</label>
-        </li>
-        <li id="checkbox-MYSELECT-four">
-          <label for="input-MYSELECT-four"><input class="select" 
-            id="input-MYSELECT-four" name="MYSELECT" type="checkbox" 
-            value="four"/>Four</label>
-        </li>
-      </ul>
-    </div>
-    <BLANKLINE>
-
-Render single format selection with label after input::
-
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value='one',
-    ...     props={
-    ...         'multivalued': True,
-    ...         'vocabulary': [
-    ...             ('one','One'),
-    ...             ('two', 'Two'),
-    ...         ],
-    ...         'format': 'single',
-    ...         'listing_tag': 'ul',
-    ...         'listing_label_position': 'after'
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
-        value="exists"/>
-      <ul id="checkbox-MYSELECT-wrapper">
-        <li id="checkbox-MYSELECT-one">
-          <input checked="checked" class="select" id="input-MYSELECT-one" 
-            name="MYSELECT" type="checkbox" value="one"/>
-          <label for="input-MYSELECT-one">One</label>
-        </li>
-        <li id="checkbox-MYSELECT-two">
-          <input class="select" id="input-MYSELECT-two" name="MYSELECT" 
-            type="checkbox" value="two"/>
-          <label for="input-MYSELECT-two">Two</label>
-        </li>
-      </ul>
-    </div>
-    <BLANKLINE>
-
-Render single format selection with input inside label before checkbox::
-
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value='one',
-    ...     props={
-    ...         'multivalued': True,
-    ...         'vocabulary': [
-    ...             ('one','One'),
-    ...             ('two', 'Two'),
-    ...         ],
-    ...         'format': 'single',
-    ...         'listing_tag': 'ul',
-    ...         'listing_label_position': 'inner-before'
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
-        value="exists"/>
-      <ul id="checkbox-MYSELECT-wrapper">
-        <li id="checkbox-MYSELECT-one">
-          <label for="input-MYSELECT-one">One<input checked="checked" 
-            class="select" id="input-MYSELECT-one" name="MYSELECT" 
-            type="checkbox" value="one"/></label>
-        </li>
-        <li id="checkbox-MYSELECT-two">
-          <label for="input-MYSELECT-two">Two<input class="select" 
-            id="input-MYSELECT-two" name="MYSELECT" type="checkbox" 
-            value="two"/></label>
-        </li>
-      </ul>
-    </div>
-    <BLANKLINE>
-
-Check BBB 'inner' for 'listing_label_position' which behaves like
-'inner-after'::
-
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value='one',
-    ...     props={
-    ...         'vocabulary': [('one','One')],
-    ...         'format': 'single',
-    ...         'listing_label_position': 'inner'
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
-        value="exists"/>
-      <div id="radio-MYSELECT-wrapper">
-        <div id="radio-MYSELECT-one">
-          <label for="input-MYSELECT-one"><input checked="checked" 
-            class="select" id="input-MYSELECT-one" name="MYSELECT" 
-            type="radio" value="one"/>One</label>
-        </div>
-      </div>
-    </div>
-    <BLANKLINE>
-
-Check selection required::
-
-    >>> vocab = [
-    ...     ('one','One'),
-    ...     ('two', 'Two'),
-    ...     ('three', 'Three'),
-    ...     ('four', 'Four')
-    ... ]
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     props={
-    ...         'required': 'Selection required',
-    ...         'vocabulary': vocab
-    ...     })
-    >>> pxml(widget())
-    <select class="select" id="input-MYSELECT" name="MYSELECT" 
-      required="required">
-      <option id="input-MYSELECT-one" value="one">One</option>
-      <option id="input-MYSELECT-two" value="two">Two</option>
-      <option id="input-MYSELECT-three" value="three">Three</option>
-      <option id="input-MYSELECT-four" value="four">Four</option>
-    </select>
-    <BLANKLINE>
-
-    >>> data = widget.extract(request={'MYSELECT': ''})
-    >>> data.printtree()
-    <RuntimeData MYSELECT, value=<UNSET>, extracted='', 1 error(s) at ...>
-
-    >>> vocab = [
-    ...     ('one','One'),
-    ...     ('two', 'Two'),
-    ...     ('three', 'Three'),
-    ...     ('four', 'Four')
-    ... ]
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     props={
-    ...         'required': 'Selection required',
-    ...         'multivalued': True,
-    ...         'vocabulary': vocab
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden" 
-        value="exists"/>
-      <select class="select" id="input-MYSELECT" multiple="multiple" 
-        name="MYSELECT" required="required">
-        <option id="input-MYSELECT-one" value="one">One</option>
-        <option id="input-MYSELECT-two" value="two">Two</option>
-        <option id="input-MYSELECT-three" value="three">Three</option>
-        <option id="input-MYSELECT-four" value="four">Four</option>
-      </select>
-    </div>
-    <BLANKLINE>
-
-    >>> data = widget.extract(request={'MYSELECT-exists': 'exists'})
-    >>> data.printtree()
-    <RuntimeData MYSELECT, value=<UNSET>, extracted=[], 1 error(s) at ...>
-
-Check selection required with datatype set::
-
-    >>> vocab = [
-    ...     (1,'One'),
-    ...     (2, 'Two'),
-    ...     (3, 'Three'),
-    ...     (4, 'Four')
-    ... ]
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     props={
-    ...         'required': 'Selection required',
-    ...         'multivalued': True,
-    ...         'vocabulary': vocab,
-    ...         'datatype': int,
-    ...     })
-    >>> data = widget.extract(request={'MYSELECT-exists': 'exists'})
-    >>> data.printtree()
-    <RuntimeData MYSELECT, value=<UNSET>, extracted=[], 1 error(s) at ...>
-
-    >>> data = widget.extract(request={'MYSELECT': ['1', '2']})
-    >>> data.printtree()
-    <RuntimeData MYSELECT, value=<UNSET>, extracted=[1, 2] at ...>
-
-Single selection extraction without value::
-
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     props={
-    ...         'vocabulary': [
-    ...             ('one','One'),
-    ...             ('two', 'Two')
-    ...         ]
-    ...     })
-    >>> request = {
-    ...     'MYSELECT': 'one',
-    ...     'MYSELECT-exists': True,
-    ... }
-    >>> data = widget.extract(request)
-    >>> data.printtree()
-    <RuntimeData MYSELECT, value=<UNSET>, extracted='one' at ...>
-
-Single selection extraction with value::
-
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value='two',
-    ...     props={
-    ...         'vocabulary': [
-    ...             ('one','One'),
-    ...             ('two', 'Two')
-    ...         ]
-    ...     })
-    >>> request = {
-    ...     'MYSELECT': 'one',
-    ... }
-    >>> data = widget.extract(request)
-    >>> data.printtree()
-    <RuntimeData MYSELECT, value='two', extracted='one' at ...>
-
-Single selection extraction disabled (means browser does not post the value)
-with value::
-
-    >>> widget.attrs['disabled'] = True
-    >>> data = widget.extract({'MYSELECT-exists': True})
-    >>> data.printtree()
-    <RuntimeData MYSELECT, value='two', extracted='two' at ...>
-
-Disabled can be also the value itself::
-
-    >>> widget.attrs['disabled'] = 'two'
-    >>> data = widget.extract({'MYSELECT-exists': True})
-    >>> data.printtree()
-    <RuntimeData MYSELECT, value='two', extracted='two' at ...>
-
-Single selection extraction required::
-
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value='two',
-    ...     props={
-    ...         'required': True,
-    ...         'vocabulary': [
-    ...             ('one','One'),
-    ...             ('two', 'Two')
-    ...         ]
-    ...     })
-    >>> request = {
-    ...     'MYSELECT': '',
-    ... }
-    >>> data = widget.extract(request)
-    >>> data.printtree()
-    <RuntimeData MYSELECT, value='two', extracted='', 1 error(s) at ...>
-
-A disabled and required returns value itself::
-
-    >>> widget.attrs['disabled'] = True
-    >>> data = widget.extract({'MYSELECT-exists': True})
-    >>> data.printtree()
-    <RuntimeData MYSELECT, value='two', extracted='two' at ...>
-
-Multiple selection extraction without value::
-
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     props={
-    ...         'multivalued': True,
-    ...         'vocabulary': [
-    ...             ('one','One'),
-    ...             ('two', 'Two')
-    ...         ]
-    ...     })
-    >>> request = {
-    ...     'MYSELECT': ['one', 'two'],
-    ... }
-    >>> data = widget.extract(request)
-    >>> data.printtree()
-    <RuntimeData MYSELECT, value=<UNSET>, extracted=['one', 'two'] at ...>
-
-Multiple selection extraction with value::
-
-    >>> vocab = [
-    ...     ('one','One'),
-    ...     ('two', 'Two'),
-    ...     ('three', 'Three')
-    ... ]
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value='three',
-    ...     props={
-    ...         'multivalued': True,
-    ...         'vocabulary': vocab
-    ...     })
-    >>> request = {
-    ...     'MYSELECT': 'one',
-    ...     'MYSELECT-exists': True,
-    ... }
-    >>> data = widget.extract(request)
-    >>> data.printtree()
-    <RuntimeData MYSELECT, value='three', extracted=['one'] at ...>
-
-Multiselection, completly disabled::
-
-    >>> widget.attrs['disabled'] = True
-    >>> data = widget.extract({'MYSELECT-exists': True})
-    >>> data.printtree()
-    <RuntimeData MYSELECT, value='three', extracted=['three'] at ...>
-
-Multiselection, partly disabled, empty request::
-
-    >>> vocab = [
-    ...     ('one','One'),
-    ...     ('two', 'Two'),
-    ...     ('three', 'Three'),
-    ...     ('four', 'Four')
-    ... ]
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value=['one', 'three'],
-    ...     props={
-    ...         'multivalued': True,
-    ...         'disabled': ['two', 'three'],
-    ...         'vocabulary': vocab
-    ...     })
-    >>> data = widget.extract({})
-    >>> data.printtree()
-    <RuntimeData MYSELECT, value=['one', 'three'], extracted=<UNSET> at ...>
-
-Multiselection, partly disabled, non-empty request::
-
-    >>> vocab = [
-    ...     ('one','One'),
-    ...     ('two', 'Two'),
-    ...     ('three', 'Three'),
-    ...     ('four', 'Four'),
-    ...     ('five', 'Five')
-    ... ]
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value=['one', 'two', 'four'],
-    ...     props={
-    ...         'multivalued': True,
-    ...         'disabled': ['two', 'three', 'four', 'five'],
-    ...         'vocabulary': vocab,
-    ...         'datatype': unicode,
-    ...     })
-    >>> request = {
-    ...     'MYSELECT': ['one', 'two', 'five'],
-    ...     'MYSELECT-exists': True,
-    ... }
-
-Explanation:
-
-* one is a simple value as usal,
-* two is disabled and in value, so it should be kept in.
-* three is disabled and not in value, so it should kept out,
-* four is disabled and in value, but someone removed it in the request, it
-  should get recovered,
-* five is disabled and not in value, but someone put it in the request. it
-  should get removed.
-
-Check extraction::
-
-    >>> data = widget.extract(request)
-    >>> data.printtree()
-    <RuntimeData MYSELECT, value=['one', 'two', 'four'], 
-    extracted=[u'one', u'two', u'four'] at ...>
-
-Single selection radio extraction::
-
-    >>> vocab = [
-    ...     ('one','One'),
-    ...     ('two', 'Two'),
-    ...     ('three', 'Three')
-    ... ]
-    >>> widget = factory(
-    ...     'select',
-    ...     'MYSELECT',
-    ...     props={
-    ...         'format': 'single',
-    ...         'vocabulary': vocab
-    ...     })
-
-No exists marker in request. Extracts to UNSET::
-
-    >>> request = {}
-    >>> data = widget.extract(request)
-    >>> data.printtree()
-    <RuntimeData MYSELECT, value=<UNSET>, extracted=<UNSET> at ...>
-
-Exists marker in request. Extracts to empty string::
-
-    >>> request = {
-    ...     'MYSELECT-exists': '1',
-    ... }
-    >>> data = widget.extract(request)
-    >>> data.printtree()
-    <RuntimeData MYSELECT, value=<UNSET>, extracted='' at ...>
-
-Select value::
-
-    >>> request = {
-    ...     'MYSELECT-exists': '1',
-    ...     'MYSELECT': 'one',
-    ... }
-    >>> data = widget.extract(request)
-    >>> data.printtree()
-    <RuntimeData MYSELECT, value=<UNSET>, extracted='one' at ...>
-
-Multi selection radio extraction::
-
-    >>> vocab = [
-    ...     ('one','One'),
-    ...     ('two', 'Two'),
-    ...     ('three', 'Three')
-    ... ]
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     props={
-    ...         'multivalued': True,
-    ...         'format': 'single',
-    ...         'vocabulary': vocab
-    ...     })
-
-No exists marker in request. Extracts to UNSET::
-
-    >>> request = {
-    ... }
-    >>> data = widget.extract(request)
-    >>> data.printtree()
-    <RuntimeData MYSELECT, value=<UNSET>, extracted=<UNSET> at ...>
-
-Exists marker in request. Extracts to empty list::
-
-    >>> request = {
-    ...     'MYSELECT-exists': '1',
-    ... }
-    >>> data = widget.extract(request)
-    >>> data.printtree()
-    <RuntimeData MYSELECT, value=<UNSET>, extracted=[] at ...>
-
-Select values::
-
-    >>> request = {
-    ...     'MYSELECT-exists': '1',
-    ...     'MYSELECT': ['one', 'two'],
-    ... }
-    >>> data = widget.extract(request)
-    >>> data.printtree()
-    <RuntimeData MYSELECT, value=<UNSET>, extracted=['one', 'two'] at ...>
-
-
 File
 ----
 
