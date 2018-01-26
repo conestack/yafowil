@@ -3224,273 +3224,261 @@ class TestCommon(NodeTestCase):
         widget.mode = 'display'
         self.assertEqual(widget(), "<div data-foo='bar'>No file</div>")
 
+    def test_submit_blueprint(self):
+        # Render submit button
+        widget = factory(
+            'submit',
+            name='SAVE',
+            props={
+                'action': True,
+                'label': 'Action name',
+            })
+        self.assertEqual(widget(), (
+            '<input id="input-SAVE" name="action.SAVE" type="submit" '
+            'value="Action name" />'
+        ))
+
+        # If expression is or evaluates to False, skip rendering
+        widget = factory(
+            'submit',
+            name='SAVE',
+            props={
+                'action': True,
+                'label': 'Action name',
+                'expression': False,
+            })
+        self.assertEqual(widget(), '')
+
+        widget = factory(
+            'submit',
+            name='SAVE',
+            props={
+                'action': True,
+                'label': 'Action name',
+                'expression': lambda: False,
+            })
+        self.assertEqual(widget(), '')
+
+        # Generic HTML5 Data
+        widget = factory(
+            'submit',
+            name='SAVE',
+            props={
+                'action': True,
+                'label': 'Action name',
+                'data': {'foo': 'bar'},
+            })
+        self.assertEqual(widget(), (
+            '<input data-foo=\'bar\' id="input-SAVE" name="action.SAVE" '
+            'type="submit" value="Action name" />'
+        ))
+
+    def test_proxy_blueprint(self):
+        # Used to pass hidden arguments out of form namespace
+        widget = factory(
+            'proxy',
+            name='PROXY',
+            value='1')
+        self.assertEqual(widget(), (
+            '<input id="input-PROXY" name="PROXY" type="hidden" value="1" />'
+        ))
+        self.assertEqual(widget(request={'PROXY': '2'}), (
+            '<input id="input-PROXY" name="PROXY" type="hidden" value="2" />'
+        ))
+
+        # Emptyvalue
+        widget = factory(
+            'proxy',
+            name='PROXY',
+            value='',
+            props={
+                'emptyvalue': '1.0'
+            })
+        data = widget.extract(request={'PROXY': ''})
+        self.assertEqual(data.name, 'PROXY')
+        self.assertEqual(data.value, '')
+        self.assertEqual(data.extracted, '1.0')
+        self.assertEqual(data.errors, [])
+
+        # Datatype
+        widget = factory(
+            'proxy',
+            name='PROXY',
+            value='',
+            props={
+                'emptyvalue': '1.0',
+                'datatype': float
+            })
+        data = widget.extract(request={'PROXY': '2.0'})
+        self.assertEqual(data.name, 'PROXY')
+        self.assertEqual(data.value, '')
+        self.assertEqual(data.extracted, 2.0)
+        self.assertEqual(data.errors, [])
+
+        data = widget.extract(request={'PROXY': ''})
+        self.assertEqual(data.name, 'PROXY')
+        self.assertEqual(data.value, '')
+        self.assertEqual(data.extracted, 1.0)
+        self.assertEqual(data.errors, [])
+
+        # Default emptyvalue extraction
+        del widget.attrs['emptyvalue']
+        data = widget.extract(request={'PROXY': ''})
+        self.assertEqual(data.name, 'PROXY')
+        self.assertEqual(data.value, '')
+        self.assertEqual(data.extracted, EMPTY_VALUE)
+        self.assertEqual(data.errors, [])
+
+        # Persist defaults to false
+        widget = factory(
+            'proxy',
+            name='PROXY',
+            props={
+                'persist_writer': write_mapping_writer
+            })
+        data = widget.extract(request={'PROXY': '10'})
+        model = dict()
+        data.write(model)
+        self.assertEqual(model, {})
+
+        # If proxy widgets really need to be persisted, ``persist`` property
+        # needs to be set explicitely
+        widget.attrs['persist'] = True
+        data = widget.extract(request={'PROXY': '10'})
+        data.write(model)
+        self.assertEqual(model, {'PROXY': '10'})
+
+    def test_label_blueprint(self):
+        # Default
+        widget = factory(
+            'label:file',
+            name='MYFILE',
+            props={
+                'label': 'MY FILE'
+            })
+        self.check_output("""
+        <div>
+          <label for="input-MYFILE">MY FILE</label>
+          <input id="input-MYFILE" name="MYFILE" type="file"/>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        # Label after widget
+        widget = factory(
+            'label:file',
+            name='MYFILE',
+            props={
+                'label': 'MY FILE',
+                'label.position': 'after'
+            })
+        self.check_output("""
+        <div>
+          <input id="input-MYFILE" name="MYFILE" type="file"/>
+          <label for="input-MYFILE">MY FILE</label>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        # Same with inner label
+        widget = factory(
+            'label:file',
+            name='MYFILE',
+            props={
+                'label': 'MY FILE',
+                'label.position': 'inner'
+            })
+        self.check_output("""
+        <div>
+          <label for="input-MYFILE">MY FILE<input id="input-MYFILE"
+                 name="MYFILE" type="file"/></label>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        # Invalid position
+        widget = factory(
+            'label:file',
+            name='MYFILE',
+            props={
+                'label': 'MY FILE',
+                'label.position': 'inexistent'
+            })
+        err = self.expect_error(
+            ValueError,
+            widget
+        )
+        self.assertEqual(str(err), 'Invalid value for position "inexistent"')
+
+        # Render with title attribute
+        widget = factory(
+            'label',
+            name='MYFILE', \
+            props={
+                'title': 'My awesome title',
+            })
+        self.assertEqual(widget(), (
+            '<label for="input-MYFILE" title="My awesome title">MYFILE</label>'
+        ))
+
+        # Label Text can be a callable
+        widget = factory(
+            'label',
+            name='MYFILE', \
+            props={
+                'label': lambda: 'Fooo',
+            })
+        self.assertEqual(widget(), (
+            '<label for="input-MYFILE">Fooo</label>'
+        ))
+
+        # Position can be callable
+        widget = factory(
+            'label',
+            name='MYFILE', \
+            props={
+                'label': 'Fooo',
+                'position': lambda x, y: 'inner',
+            })
+        self.assertEqual(widget(), '<label for="input-MYFILE">Fooo</label>')
+
+    def test_field_blueprint(self):
+        # Chained file inside field with label
+        widget = factory(
+            'field:label:file',
+            name='MYFILE',
+            props={
+                'label': 'MY FILE'
+            })
+        self.check_output("""
+        <div class="field" id="field-MYFILE">
+          <label for="input-MYFILE">MY FILE</label>
+          <input id="input-MYFILE" name="MYFILE" type="file"/>
+        </div>
+        """, fxml(widget()))
+
+        # Render error class directly on field
+        widget = factory(
+            'field:text',
+            name='MYFIELD',
+            props={
+                'required': True,
+                'witherror': 'fielderrorclass'
+            })
+        data = widget.extract({'MYFIELD': ''})
+        self.assertEqual(data.name, 'MYFIELD')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, '')
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Mandatory field was empty')]
+        )
+
+        self.check_output("""
+        <div class="field fielderrorclass" id="field-MYFIELD">
+          <input class="required text" id="input-MYFIELD" name="MYFIELD"
+                 required="required" type="text" value=""/>
+        </div>
+        """, fxml(widget(data)))
+
 """
-Submit(action)
---------------
-
-Render submit button::
-
-    >>> widget = factory(
-    ...     'submit',
-    ...     name='SAVE',
-    ...     props={
-    ...         'action': True,
-    ...         'label': 'Action name',
-    ...     })
-    >>> widget()
-    u'<input id="input-SAVE" name="action.SAVE" type="submit" 
-    value="Action name" />'
-
-If expression is or evaluates to False, skip rendering::
-
-    >>> widget = factory(
-    ...     'submit',
-    ...     name='SAVE',
-    ...     props={
-    ...         'action': True,
-    ...         'label': 'Action name',
-    ...         'expression': False,
-    ...     })
-    >>> widget()
-    u''
-
-    >>> widget = factory(
-    ...     'submit',
-    ...     name='SAVE',
-    ...     props={
-    ...         'action': True,
-    ...         'label': 'Action name',
-    ...         'expression': lambda: False,
-    ...     })
-    >>> widget()
-    u''
-
-Generic HTML5 Data::
-
-    >>> widget = factory(
-    ...     'submit',
-    ...     name='SAVE',
-    ...     props={
-    ...         'action': True,
-    ...         'label': 'Action name',
-    ...         'data': {'foo': 'bar'},
-    ...     })
-    >>> widget()
-    u'<input data-foo=\'bar\' id="input-SAVE" name="action.SAVE" 
-    type="submit" value="Action name" />'
-
-
-Proxy
------
-
-Used to pass hidden arguments out of form namespace::
-
-    >>> widget = factory(
-    ...     'proxy',
-    ...     name='PROXY',
-    ...     value='1')
-    >>> widget()
-    u'<input id="input-PROXY" name="PROXY" type="hidden" value="1" />'
-
-    >>> widget(request={'PROXY': '2'})
-    u'<input id="input-PROXY" name="PROXY" type="hidden" value="2" />'
-
-Emptyvalue::
-
-    >>> widget = factory(
-    ...     'proxy',
-    ...     name='PROXY',
-    ...     value='',
-    ...     props={
-    ...         'emptyvalue': '1.0'
-    ...     })
-    >>> widget.extract(request={'PROXY': ''})
-    <RuntimeData PROXY, value='', extracted='1.0' at ...>
-
-Datatype::
-
-    >>> widget = factory(
-    ...     'proxy',
-    ...     name='PROXY',
-    ...     value='',
-    ...     props={
-    ...         'emptyvalue': '1.0',
-    ...         'datatype': float
-    ...     })
-    >>> widget.extract(request={'PROXY': '2.0'})
-    <RuntimeData PROXY, value='', extracted=2.0 at ...>
-
-    >>> widget.extract(request={'PROXY': ''})
-    <RuntimeData PROXY, value='', extracted=1.0 at ...>
-
-Default emptyvalue extraction::
-
-    >>> del widget.attrs['emptyvalue']
-    >>> widget.extract(request={'PROXY': ''})
-    <RuntimeData PROXY, value='', extracted=<EMPTY_VALUE> at ...>
-
-Persist defaults to false::
-
-    >>> widget = factory(
-    ...     'proxy',
-    ...     name='PROXY',
-    ...     props={
-    ...         'persist_writer': write_mapping_writer
-    ...     })
-    >>> data = widget.extract(request={'PROXY': '10'})
-    >>> model = dict()
-    >>> data.write(model)
-    >>> model
-    {}
-
-If proxy widgets really need to be persisted, ``persist`` property needs to be
-set explicitely::
-
-    >>> widget.attrs['persist'] = True
-    >>> data = widget.extract(request={'PROXY': '10'})
-    >>> data.write(model)
-    >>> model
-    {'PROXY': '10'}
-
-
-Label
------
-
-Default::
-
-    >>> widget = factory(
-    ...     'label:file',
-    ...     name='MYFILE',
-    ...     props={
-    ...         'label': 'MY FILE'
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <label for="input-MYFILE">MY FILE</label>
-      <input id="input-MYFILE" name="MYFILE" type="file"/>
-    </div>
-    <BLANKLINE>
-
-Label after widget::
-
-    >>> widget = factory(
-    ...     'label:file',
-    ...     name='MYFILE',
-    ...     props={
-    ...         'label': 'MY FILE',
-    ...         'label.position': 'after'
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <input id="input-MYFILE" name="MYFILE" type="file"/>
-      <label for="input-MYFILE">MY FILE</label>
-    </div>
-    <BLANKLINE>
-
-Same with inner label::
-
-    >>> widget = factory(
-    ...     'label:file',
-    ...     name='MYFILE',
-    ...     props={
-    ...         'label': 'MY FILE',
-    ...         'label.position': 'inner'
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <label for="input-MYFILE">MY FILE<input id="input-MYFILE" name="MYFILE" 
-        type="file"/></label>
-    </div>
-    <BLANKLINE>
-
-Invalid position::
-
-    >>> widget = factory(
-    ...     'label:file',
-    ...     name='MYFILE',
-    ...     props={
-    ...         'label': 'MY FILE',
-    ...         'label.position': 'inexistent'
-    ...     })
-    >>> wrapped_pxml(widget())
-    Traceback (most recent call last):
-      ...
-    ValueError: Invalid value for position "inexistent"
-
-Render with title attribute::
-
-    >>> widget = factory(
-    ...     'label',
-    ...     name='MYFILE', \
-    ...     props={
-    ...         'title': 'My awesome title',
-    ...     })
-    >>> widget()
-    u'<label for="input-MYFILE" title="My awesome title">MYFILE</label>'
-
-Label Text can be a callable::
-
-    >>> widget = factory(
-    ...     'label',
-    ...     name='MYFILE', \
-    ...     props={
-    ...         'label': lambda: 'Fooo',
-    ...     })
-    >>> widget()
-    u'<label for="input-MYFILE">Fooo</label>'
-
-Position can be callable::
-
-    >>> widget = factory(
-    ...     'label',
-    ...     name='MYFILE', \
-    ...     props={
-    ...         'label': 'Fooo',
-    ...         'position': lambda x, y: 'inner',
-    ...     })
-    >>> widget()
-    u'<label for="input-MYFILE">Fooo</label>'
-
-
-Field
------
-
-Chained file inside field with label::
-
-    >>> widget = factory(
-    ...     'field:label:file',
-    ...     name='MYFILE',
-    ...     props={
-    ...         'label': 'MY FILE'
-    ...     })
-    >>> pxml(widget())
-    <div class="field" id="field-MYFILE">
-      <label for="input-MYFILE">MY FILE</label>
-      <input id="input-MYFILE" name="MYFILE" type="file"/>
-    </div>
-    <BLANKLINE>
-
-Render error class directly on field::
-
-    >>> widget = factory(
-    ...     'field:text',
-    ...     name='MYFIELD',
-    ...     props={
-    ...         'required': True,
-    ...         'witherror': 'fielderrorclass'
-    ...     })
-    >>> data = widget.extract({'MYFIELD': ''})
-    >>> data.printtree()
-    <RuntimeData MYFIELD, value=<UNSET>, extracted='', 1 error(s) at ...>
-
-    >>> pxml(widget(data))
-    <div class="field fielderrorclass" id="field-MYFIELD">
-      <input class="required text" id="input-MYFIELD" name="MYFIELD" 
-        required="required" type="text" value=""/>
-    </div>
-    <BLANKLINE>
-
-
 Password
 --------
 
