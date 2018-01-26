@@ -2,13 +2,14 @@
 from StringIO import StringIO
 from node.tests import NodeTestCase
 from node.utils import UNSET
-from yafowil.base import factory
 from yafowil.base import ExtractionError
+from yafowil.base import factory
 from yafowil.common import convert_bytes
 from yafowil.persistence import write_mapping_writer
 from yafowil.tests import fxml
 from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import Tag
+import StringIO
 import uuid
 
 
@@ -3029,220 +3030,201 @@ class TestCommon(NodeTestCase):
         self.assertEqual(data.extracted, ['one', 'two'])
         self.assertEqual(data.errors, [])
 
+    def test_file_blueprint(self):
+        # Render file input
+        widget = factory(
+            'file',
+            name='MYFILE')
+        self.assertEqual(
+            widget(),
+            '<input id="input-MYFILE" name="MYFILE" type="file" />'
+        )
+
+        # Extract empty
+        request = {}
+        data = widget.extract(request)
+        self.assertEqual(data.extracted, UNSET)
+
+        # Extract ``new``
+        request = {
+            'MYFILE': {'file': StringIO.StringIO('123')},
+        }
+        data = widget.extract(request)
+
+        self.assertEqual(data.name, 'MYFILE')
+
+        self.assertEqual(data.value, UNSET)
+
+        self.assertEqual(sorted(data.extracted.keys()), ['action', 'file'])
+        self.assertEqual(data.extracted['action'], 'new')
+        self.assertTrue(isinstance(data.extracted['file'], StringIO.StringIO))
+        self.assertEqual(data.extracted['file'].read(), '123')
+
+        self.assertEqual(data.errors, [])
+
+        # File with value preset
+        widget = factory(
+            'file',
+            name='MYFILE',
+            value={
+                'file': StringIO.StringIO('321'),
+            })
+        self.check_output("""
+        <div>
+          <input id="input-MYFILE" name="MYFILE" type="file"/>
+          <div id="radio-MYFILE-keep">
+            <input checked="checked" id="input-MYFILE-keep"
+                   name="MYFILE-action" type="radio" value="keep"/>
+            <span>Keep Existing file</span>
+          </div>
+          <div id="radio-MYFILE-replace">
+            <input id="input-MYFILE-replace" name="MYFILE-action"
+                   type="radio" value="replace"/>
+            <span>Replace existing file</span>
+          </div>
+          <div id="radio-MYFILE-delete">
+            <input id="input-MYFILE-delete" name="MYFILE-action"
+                   type="radio" value="delete"/>
+            <span>Delete existing file</span>
+          </div>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        # Extract ``keep`` returns original value
+        request = {
+            'MYFILE': {'file': StringIO.StringIO('123')},
+            'MYFILE-action': 'keep'
+        }
+        data = widget.extract(request)
+
+        self.assertEqual(data.name, 'MYFILE')
+
+        self.assertEqual(sorted(data.value.keys()), ['action', 'file'])
+        self.assertEqual(data.value['action'], 'keep')
+        self.assertTrue(isinstance(data.value['file'], StringIO.StringIO))
+
+        self.assertEqual(sorted(data.extracted.keys()), ['action', 'file'])
+        self.assertEqual(data.extracted['action'], 'keep')
+        self.assertTrue(isinstance(data.extracted['file'], StringIO.StringIO))
+        self.assertEqual(data.extracted['file'].read(), '321')
+
+        self.assertEqual(data.errors, [])
+
+        # Extract ``replace`` returns new value
+        request['MYFILE-action'] = 'replace'
+        data = widget.extract(request)
+
+        self.assertEqual(sorted(data.extracted.keys()), ['action', 'file'])
+        self.assertEqual(data.extracted['action'], 'replace')
+        self.assertEqual(data.extracted['file'].read(), '123')
+
+        # Extract empty ``replace`` results in ``kepp action``
+        request = {
+            'MYFILE': '',
+            'MYFILE-action': 'replace'
+        }
+        data = widget.extract(request)
+
+        self.assertEqual(sorted(data.extracted.keys()), ['action', 'file'])
+        self.assertEqual(data.extracted['action'], 'keep')
+        self.assertEqual(data.extracted['file'].read(), '')
+
+        # Extract ``delete`` returns UNSET
+        request['MYFILE-action'] = 'delete'
+        data = widget.extract(request)
+        self.assertEqual(
+            data.extracted,
+            {'action': 'delete', 'file': UNSET}
+        )
+
+        self.assertEqual(data.extracted['action'], 'delete')
+
+        self.check_output("""
+        <div>
+          <input id="input-MYFILE" name="MYFILE" type="file"/>
+          <div id="radio-MYFILE-keep">
+            <input id="input-MYFILE-keep" name="MYFILE-action" type="radio"
+                   value="keep"/>
+            <span>Keep Existing file</span>
+          </div>
+          <div id="radio-MYFILE-replace">
+            <input id="input-MYFILE-replace" name="MYFILE-action" type="radio"
+                   value="replace"/>
+            <span>Replace existing file</span>
+          </div>
+          <div id="radio-MYFILE-delete">
+            <input checked="checked" id="input-MYFILE-delete"
+                   name="MYFILE-action" type="radio" value="delete"/>
+            <span>Delete existing file</span>
+          </div>
+        </div>
+        """, wrapped_fxml(widget(request=request)))
+
+        widget = factory(
+            'file',
+            name='MYFILE',
+            props={
+                'accept': 'foo/bar'
+            })
+        self.assertEqual(widget(), (
+            '<input accept="foo/bar" id="input-MYFILE" '
+            'name="MYFILE" type="file" />'
+        ))
+
+        # File display renderer
+        self.assertEqual(convert_bytes(1 * 1024 * 1024 * 1024 * 1024), '1.00T')
+        self.assertEqual(convert_bytes(1 * 1024 * 1024 * 1024), '1.00G')
+        self.assertEqual(convert_bytes(1 * 1024 * 1024), '1.00M')
+        self.assertEqual(convert_bytes(1 * 1024), '1.00K')
+        self.assertEqual(convert_bytes(1), '1.00b')
+
+        widget = factory(
+            'file',
+            name='MYFILE',
+            mode='display')
+        self.check_output("""
+        <div>No file</div>
+        """, fxml(widget()))
+
+        value = {
+            'file': StringIO.StringIO('12345'),
+            'mimetype': 'text/plain',
+            'filename': 'foo.txt',
+        }
+        widget = factory(
+            'file',
+            name='MYFILE',
+            value=value,
+            mode='display')
+        self.check_output("""
+        <div>
+          <ul>
+            <li><strong>Filename: </strong>foo.txt</li>
+            <li><strong>Mimetype: </strong>text/plain</li>
+            <li><strong>Size: </strong>5.00b</li>
+          </ul>
+        </div>
+        """, fxml(widget()))
+
+        # Generic HTML5 Data
+        widget = factory(
+            'file',
+            name='MYFILE',
+            props={
+                'accept': 'foo/bar',
+                'data': {
+                    'foo': 'bar'
+                }
+            })
+        self.assertEqual(widget(), (
+            '<input accept="foo/bar" data-foo=\'bar\' id="input-MYFILE" '
+            'name="MYFILE" type="file" />'
+        ))
+
+        widget.mode = 'display'
+        self.assertEqual(widget(), "<div data-foo='bar'>No file</div>")
+
 """
-File
-----
-
-Render file input::
-
-    >>> widget = factory(
-    ...     'file',
-    ...     name='MYFILE')
-    >>> widget()
-    u'<input id="input-MYFILE" name="MYFILE" type="file" />'
-
-Extract empty::
-
-    >>> request = {}
-    >>> data = widget.extract(request)
-    >>> data.extracted
-    <UNSET>
-
-Extract ``new``::
-
-    >>> request = {
-    ...     'MYFILE': {'file': StringIO('123')},
-    ... }
-    >>> data = widget.extract(request)
-    >>> data.printtree()
-    <RuntimeData MYFILE, value=<UNSET>,
-    extracted={'action': 'new', 'file': <StringIO.StringIO instance at ...>}
-    at ...>
-
-    >>> data.extracted['action']
-    'new'
-
-    >>> data.extracted['file'].read()
-    '123'
-
-File with value preset::
-
-    >>> widget = factory(
-    ...     'file',
-    ...     name='MYFILE',
-    ...     value={
-    ...         'file': StringIO('321'),
-    ...     })
-    >>> wrapped_pxml(widget())
-    <div>
-      <input id="input-MYFILE" name="MYFILE" type="file"/>
-      <div id="radio-MYFILE-keep">
-        <input checked="checked" id="input-MYFILE-keep" name="MYFILE-action" 
-          type="radio" value="keep"/>
-        <span>Keep Existing file</span>
-      </div>
-      <div id="radio-MYFILE-replace">
-        <input id="input-MYFILE-replace" name="MYFILE-action" type="radio" 
-          value="replace"/>
-        <span>Replace existing file</span>
-      </div>
-      <div id="radio-MYFILE-delete">
-        <input id="input-MYFILE-delete" name="MYFILE-action" type="radio" 
-          value="delete"/>
-        <span>Delete existing file</span>
-      </div>
-    </div>
-    <BLANKLINE>
-
-Extract ``keep`` returns original value::
-
-    >>> request = {
-    ...     'MYFILE': {'file': StringIO('123')},
-    ...     'MYFILE-action': 'keep'
-    ... }
-    >>> data = widget.extract(request)
-    >>> data.printtree()
-    <RuntimeData MYFILE,
-    value={'action': 'keep', 'file': <StringIO.StringIO instance at ...>},
-    extracted={'action': 'keep', 'file': <StringIO.StringIO instance at ...>}
-    at ...>
-
-    >>> data.extracted['file'].read()
-    '321'
-
-    >>> data.extracted['action']
-    'keep'
-
-Extract ``replace`` returns new value::
-
-    >>> request['MYFILE-action'] = 'replace'
-    >>> data = widget.extract(request)
-    >>> data.extracted
-    {'action': 'replace', 'file': <StringIO.StringIO instance at ...>}
-
-    >>> data.extracted['file'].read()
-    '123'
-
-    >>> data.extracted['action']
-    'replace'
-
-Extract empty ``replace`` results in ``kepp action``::
-
-    >>> request = {
-    ...     'MYFILE': '',
-    ...     'MYFILE-action': 'replace'
-    ... }
-    >>> data = widget.extract(request)
-    >>> data.extracted
-    {'action': 'keep', 
-    'file': <StringIO.StringIO instance at ...>}
-
-Extract ``delete`` returns UNSET::
-
-    >>> request['MYFILE-action'] = 'delete'
-    >>> data = widget.extract(request)
-    >>> data.extracted
-    {'action': 'delete', 'file': <UNSET>}
-
-    >>> data.extracted['action']
-    'delete'
-
-    >>> wrapped_pxml(widget(request=request))
-    <div>
-      <input id="input-MYFILE" name="MYFILE" type="file"/>
-      <div id="radio-MYFILE-keep">
-        <input id="input-MYFILE-keep" name="MYFILE-action" type="radio" 
-          value="keep"/>
-        <span>Keep Existing file</span>
-      </div>
-      <div id="radio-MYFILE-replace">
-        <input id="input-MYFILE-replace" name="MYFILE-action" type="radio" 
-          value="replace"/>
-        <span>Replace existing file</span>
-      </div>
-      <div id="radio-MYFILE-delete">
-        <input checked="checked" id="input-MYFILE-delete" name="MYFILE-action" 
-          type="radio" value="delete"/>
-        <span>Delete existing file</span>
-      </div>
-    </div>
-    <BLANKLINE>
-
-    >>> widget = factory(
-    ...     'file',
-    ...     name='MYFILE',
-    ...     props={
-    ...         'accept': 'foo/bar'
-    ...     })
-    >>> widget()
-    u'<input accept="foo/bar" id="input-MYFILE" name="MYFILE"
-    type="file" />'
-
-File display renderer::
-
-    >>> convert_bytes(1 * 1024 * 1024 * 1024 * 1024)
-    '1.00T'
-
-    >>> convert_bytes(1 * 1024 * 1024 * 1024)
-    '1.00G'
-
-    >>> convert_bytes(1 * 1024 * 1024)
-    '1.00M'
-
-    >>> convert_bytes(1 * 1024)
-    '1.00K'
-
-    >>> convert_bytes(1)
-    '1.00b'
-
-    >>> widget = factory(
-    ...     'file',
-    ...     name='MYFILE',
-    ...     mode='display')
-    >>> pxml(widget())
-    <div>No file</div>
-    <BLANKLINE>
-
-    >>> value = {
-    ...     'file': StringIO('12345'),
-    ...     'mimetype': 'text/plain',
-    ...     'filename': 'foo.txt',
-    ... }
-    >>> widget = factory(
-    ...     'file',
-    ...     name='MYFILE',
-    ...     value=value,
-    ...     mode='display')
-    >>> pxml(widget())
-    <div>
-      <ul>
-        <li><strong>Filename: </strong>foo.txt</li>
-        <li><strong>Mimetype: </strong>text/plain</li>
-        <li><strong>Size: </strong>5.00b</li>
-      </ul>
-    </div>
-    <BLANKLINE>
-
-Generic HTML5 Data::
-
-    >>> widget = factory(
-    ...     'file',
-    ...     name='MYFILE',
-    ...     props={
-    ...         'accept': 'foo/bar',
-    ...         'data': {
-    ...             'foo': 'bar'
-    ...         }
-    ...     })
-    >>> widget()
-    u'<input accept="foo/bar" data-foo=\'bar\' 
-    id="input-MYFILE" name="MYFILE" type="file" />'
-
-    >>> widget.mode = 'display'
-    >>> widget()
-    u"<div data-foo='bar'>No file</div>"
-
-
 Submit(action)
 --------------
 
