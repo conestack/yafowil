@@ -1496,339 +1496,336 @@ class TestCommon(NodeTestCase):
         data.write(model)
         self.assertEqual(model, {'MYLINES': ['1', '2']})
 
+    def test_select_blueprint_single_value(self):
+        # Default single value selection
+        vocab = [
+            ('one','One'),
+            ('two', 'Two'),
+            ('three', 'Three'),
+            ('four', 'Four')
+        ]
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value='one',
+            props={
+                'vocabulary': vocab
+            })
+        self.check_output("""
+        <select class="select" id="input-MYSELECT" name="MYSELECT">
+          <option id="input-MYSELECT-one" selected="selected"
+                  value="one">One</option>
+          <option id="input-MYSELECT-two" value="two">Two</option>
+          <option id="input-MYSELECT-three" value="three">Three</option>
+          <option id="input-MYSELECT-four" value="four">Four</option>
+        </select>
+        """, fxml(widget()))
+
+        data = widget.extract({'MYSELECT': 'two'})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, 'two')
+
+        self.check_output("""
+        <select class="select" id="input-MYSELECT" name="MYSELECT">
+          <option id="input-MYSELECT-one" value="one">One</option>
+          <option id="input-MYSELECT-two" selected="selected"
+                  value="two">Two</option>
+          <option id="input-MYSELECT-three" value="three">Three</option>
+          <option id="input-MYSELECT-four" value="four">Four</option>
+        </select>
+        """, fxml(widget(data=data)))
+
+        # Single value selection completly disabled
+        widget.attrs['disabled'] = True
+        self.check_output("""
+        <select class="select" disabled="disabled" id="input-MYSELECT"
+                name="MYSELECT">
+          <option id="input-MYSELECT-one" selected="selected"
+                  value="one">One</option>
+          <option id="input-MYSELECT-two" value="two">Two</option>
+          <option id="input-MYSELECT-three" value="three">Three</option>
+          <option id="input-MYSELECT-four" value="four">Four</option>
+        </select>
+        """, fxml(widget()))
+
+        # Single value selection with specific options disabled
+        widget.attrs['disabled'] = ['two', 'four']
+        self.check_output("""
+        <select class="select" id="input-MYSELECT" name="MYSELECT">
+          <option id="input-MYSELECT-one" selected="selected"
+                  value="one">One</option>
+          <option disabled="disabled" id="input-MYSELECT-two"
+                  value="two">Two</option>
+          <option id="input-MYSELECT-three" value="three">Three</option>
+          <option disabled="disabled" id="input-MYSELECT-four"
+                  value="four">Four</option>
+        </select>
+        """, fxml(widget()))
+
+        del widget.attrs['disabled']
+
+        # Single value selection display mode
+        widget.mode = 'display'
+        self.assertEqual(
+            widget(),
+            '<div class="display-select" id="display-MYSELECT">One</div>'
+        )
+
+        widget.attrs['display_proxy'] = True
+        self.check_output("""
+        <div>
+          <div class="display-select" id="display-MYSELECT">One</div>
+          <input class="select" id="input-MYSELECT" name="MYSELECT"
+                 type="hidden" value="one"/>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        data = widget.extract(request={'MYSELECT': 'two'})
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, 'one')
+        self.assertEqual(data.extracted, 'two')
+        self.assertEqual(data.errors, [])
+
+        self.check_output("""
+        <div>
+          <div class="display-select" id="display-MYSELECT">Two</div>
+          <input class="select" id="input-MYSELECT" name="MYSELECT"
+                 type="hidden" value="two"/>
+        </div>
+        """, wrapped_fxml(widget(data=data)))
+
+        # Single value selection with datatype set
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            props={
+                'datatype': uuid.UUID
+            })
+
+        # Preselected values
+        widget.getter = UNSET
+        widget.attrs['vocabulary'] = [
+            (UNSET, 'Empty value'),
+            (uuid.UUID('1b679ef8-9068-45f5-8bb8-4007264aa7f7'), 'One')
+        ]
+        res = widget()
+        self.check_output("""
+        <select class="select" id="input-MYSELECT" name="MYSELECT">
+          <option id="input-MYSELECT-" selected="selected"
+                  value="">Empty value</option>
+          <option id="input-MYSELECT-1b679ef8-..."
+                  value="1b679ef8-...">One</option>
+        </select>
+        """, fxml(res))
+
+        widget.getter = EMPTY_VALUE
+        widget.attrs['vocabulary'][0] = (EMPTY_VALUE, 'Empty value')
+        self.assertEqual(res, widget())
+
+        widget.getter = None
+        widget.attrs['vocabulary'][0] = (None, 'Empty value')
+        self.assertEqual(res, widget())
+
+        widget.getter = ''
+        widget.attrs['vocabulary'][0] = ('', 'Empty value')
+        self.assertEqual(res, widget())
+
+        widget.getter = uuid.UUID('1b679ef8-9068-45f5-8bb8-4007264aa7f7')
+        res = widget()
+        self.check_output("""
+        <select class="select" id="input-MYSELECT" name="MYSELECT">
+          <option id="input-MYSELECT-"
+                  value="">Empty value</option>
+          <option id="input-MYSELECT-1b679ef8-..."
+                  selected="selected" value="1b679ef8-...">One</option>
+        </select>
+        """, fxml(res))
+
+        # Note, vocabulary keys are converted to ``datatype`` while widget
+        # value needs to be of type defined in ``datatype`` or one from the
+        # valid empty values
+        widget.attrs['vocabulary'] = [
+            (UNSET, 'Empty value'),
+            ('1b679ef8-9068-45f5-8bb8-4007264aa7f7', 'One')
+        ]
+        res = widget()
+        self.assertEqual(res, widget())
+
+        # Test ``datatype`` extraction with selection
+        vocab = [
+            (EMPTY_VALUE, 'Empty value'),
+            (1, 'One'),
+            (2, 'Two'),
+        ]
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value=2,
+            props={
+                'vocabulary': vocab,
+                'datatype': 'int'
+            })
+        self.check_output("""
+        <select class="select" id="input-MYSELECT" name="MYSELECT">
+          <option id="input-MYSELECT-" value="">Empty value</option>
+          <option id="input-MYSELECT-1" value="1">One</option>
+          <option id="input-MYSELECT-2" selected="selected"
+                  value="2">Two</option>
+        </select>
+        """, fxml(widget()))
+
+        data = widget.extract({'MYSELECT': ''})
+        self.assertEqual(data.extracted, EMPTY_VALUE)
+
+        data = widget.extract({'MYSELECT': '1'})
+        self.assertEqual(data.extracted, 1)
+
+        self.check_output("""
+        <select class="select" id="input-MYSELECT" name="MYSELECT">
+          <option id="input-MYSELECT-" value="">Empty value</option>
+          <option id="input-MYSELECT-1" selected="selected"
+                  value="1">One</option>
+          <option id="input-MYSELECT-2" value="2">Two</option>
+        </select>
+        """, fxml(widget(data=data)))
+
+        # Test extraction with ``emptyvalue`` set
+        widget.attrs['emptyvalue'] = UNSET
+        data = widget.extract({})
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYSELECT': ''})
+        self.assertEqual(data.extracted, UNSET)
+
+        widget.attrs['emptyvalue'] = None
+        data = widget.extract({})
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYSELECT': ''})
+        self.assertEqual(data.extracted, None)
+
+        widget.attrs['emptyvalue'] = 0
+        data = widget.extract({})
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'MYSELECT': ''})
+        self.assertEqual(data.extracted, 0)
+
+        # Single value selection with ``datatype`` set completly disabled
+        widget.attrs['disabled'] = True
+        self.check_output("""
+        <select class="select" disabled="disabled" id="input-MYSELECT"
+                name="MYSELECT">
+          <option id="input-MYSELECT-" value="">Empty value</option>
+          <option id="input-MYSELECT-1" value="1">One</option>
+          <option id="input-MYSELECT-2" selected="selected"
+                  value="2">Two</option>
+        </select>
+        """, fxml(widget()))
+
+        # Single value selection with ``datatype`` with specific options disabled
+        widget.attrs['emptyvalue'] = None
+        widget.attrs['disabled'] = [None, 2]
+        rendered = widget()
+        self.check_output("""
+        <select class="select" id="input-MYSELECT" name="MYSELECT">
+          <option disabled="disabled" id="input-MYSELECT-"
+                  value="">Empty value</option>
+          <option id="input-MYSELECT-1" value="1">One</option>
+          <option disabled="disabled" id="input-MYSELECT-2"
+                  selected="selected" value="2">Two</option>
+        </select>
+        """, fxml(rendered))
+
+        widget.attrs['emptyvalue'] = UNSET
+        widget.attrs['disabled'] = [UNSET, 2]
+        self.assertEqual(widget(), rendered)
+
+        widget.attrs['emptyvalue'] = EMPTY_VALUE
+        widget.attrs['disabled'] = [EMPTY_VALUE, 2]
+        self.assertEqual(widget(), rendered)
+
+        widget.attrs['emptyvalue'] = 0
+        widget.attrs['disabled'] = [0, 2]
+        self.assertEqual(widget(), rendered)
+
+        del widget.attrs['disabled']
+
+        # Single value selection with datatype display mode
+        widget.mode = 'display'
+        self.assertEqual(
+            widget(),
+            '<div class="display-select" id="display-MYSELECT">Two</div>'
+        )
+
+        widget.attrs['display_proxy'] = True
+        self.check_output("""
+        <div>
+          <div class="display-select" id="display-MYSELECT">Two</div>
+          <input class="select" id="input-MYSELECT" name="MYSELECT"
+                 type="hidden" value="2"/>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        data = widget.extract(request={'MYSELECT': '1'})
+        self.assertEqual(data.name, 'MYSELECT')
+        self.assertEqual(data.value, 2)
+        self.assertEqual(data.extracted, 1)
+        self.assertEqual(data.errors, [])
+
+        self.check_output("""
+        <div>
+          <div class="display-select" id="display-MYSELECT">One</div>
+          <input class="select" id="input-MYSELECT" name="MYSELECT"
+                 type="hidden" value="1"/>
+        </div>
+        """, wrapped_fxml(widget(data=data)))
+
+        # Generic HTML5 Data
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value='one',
+            props={
+                'data': {'foo': 'bar'},
+                'vocabulary': [('one', 'One')]
+            })
+        self.check_output("""
+        <select class="select" data-foo="bar" id="input-MYSELECT"
+                name="MYSELECT">
+          <option id="input-MYSELECT-one" selected="selected"
+                  value="one">One</option>
+        </select>
+        """, fxml(widget()))
+
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            value='one',
+            props={
+                'data': {'foo': 'bar'},
+                'vocabulary': [('one', 'One')]
+            },
+            mode='display')
+        self.check_output("""
+        <div class="display-select" data-foo="bar"
+             id="display-MYSELECT">One</div>
+        """, fxml(widget()))
+
+        # Persist
+        widget = factory(
+            'select',
+            name='MYSELECT',
+            props={
+                'vocabulary': [('one', 'One')]
+            })
+        data = widget.extract({'MYSELECT': 'one'})
+        model = dict()
+        data.persist_writer = write_mapping_writer
+        data.write(model)
+        self.assertEqual(model, {'MYSELECT': 'one'})
+
 """
-
-Selection
----------
-
-
-Single Valued
-.............
-
-Default single value selection::
-
-    >>> vocab = [
-    ...     ('one','One'),
-    ...     ('two', 'Two'),
-    ...     ('three', 'Three'),
-    ...     ('four', 'Four')
-    ... ]
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value='one',
-    ...     props={
-    ...         'vocabulary': vocab
-    ...     })
-    >>> pxml(widget())
-    <select class="select" id="input-MYSELECT" name="MYSELECT">
-      <option id="input-MYSELECT-one" selected="selected" 
-        value="one">One</option>
-      <option id="input-MYSELECT-two" value="two">Two</option>
-      <option id="input-MYSELECT-three" value="three">Three</option>
-      <option id="input-MYSELECT-four" value="four">Four</option>
-    </select>
-    <BLANKLINE>
-
-    >>> data = widget.extract({'MYSELECT': 'two'})
-    >>> data.errors, data.extracted
-    ([], 'two')
-
-    >>> pxml(widget(data=data))
-    <select class="select" id="input-MYSELECT" name="MYSELECT">
-      <option id="input-MYSELECT-one" value="one">One</option>
-      <option id="input-MYSELECT-two" selected="selected" 
-        value="two">Two</option>
-      <option id="input-MYSELECT-three" value="three">Three</option>
-      <option id="input-MYSELECT-four" value="four">Four</option>
-    </select>
-    <BLANKLINE>
-
-Single value selection completly disabled::
-
-    >>> widget.attrs['disabled'] = True
-    >>> pxml(widget())
-    <select class="select" disabled="disabled" id="input-MYSELECT" 
-      name="MYSELECT">
-      <option id="input-MYSELECT-one" selected="selected" 
-        value="one">One</option>
-      <option id="input-MYSELECT-two" value="two">Two</option>
-      <option id="input-MYSELECT-three" value="three">Three</option>
-      <option id="input-MYSELECT-four" value="four">Four</option>
-    </select>
-    <BLANKLINE>
-
-Single value selection with specific options disabled::
-
-    >>> widget.attrs['disabled'] = ['two', 'four']
-    >>> pxml(widget())
-    <select class="select" id="input-MYSELECT" name="MYSELECT">
-      <option id="input-MYSELECT-one" selected="selected" 
-        value="one">One</option>
-      <option disabled="disabled" id="input-MYSELECT-two" 
-        value="two">Two</option>
-      <option id="input-MYSELECT-three" value="three">Three</option>
-      <option disabled="disabled" id="input-MYSELECT-four" 
-        value="four">Four</option>
-    </select>
-    <BLANKLINE>
-
-    >>> del widget.attrs['disabled']
-
-Single value selection display mode::
-
-    >>> widget.mode = 'display'
-    >>> widget()
-    u'<div class="display-select" id="display-MYSELECT">One</div>'
-
-    >>> widget.attrs['display_proxy'] = True
-    >>> wrapped_pxml(widget())
-    <div>
-      <div class="display-select" id="display-MYSELECT">One</div>
-      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" 
-        value="one"/>
-    </div>
-    <BLANKLINE>
-
-    >>> data = widget.extract(request={'MYSELECT': 'two'})
-    >>> data
-    <RuntimeData MYSELECT, value='one', extracted='two' at ...>
-
-    >>> wrapped_pxml(widget(data=data))
-    <div>
-      <div class="display-select" id="display-MYSELECT">Two</div>
-      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" 
-        value="two"/>
-    </div>
-    <BLANKLINE>
-
-Single value selection with datatype set::
-
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     props={
-    ...         'datatype': uuid.UUID
-    ...     })
-
-Preselected values::
-
-    >>> widget.getter = UNSET
-    >>> widget.attrs['vocabulary'] = [
-    ...     (UNSET, 'Empty value'),
-    ...     (uuid.UUID('1b679ef8-9068-45f5-8bb8-4007264aa7f7'), 'One')
-    ... ]
-    >>> res = widget()
-    >>> pxml(res)
-    <select class="select" id="input-MYSELECT" name="MYSELECT">
-      <option id="input-MYSELECT-" selected="selected" value="">Empty value</option>
-      <option id="input-MYSELECT-1b679ef8-..." value="1b679ef8-...">One</option>
-    </select>
-    <BLANKLINE>
-
-    >>> widget.getter = EMPTY_VALUE
-    >>> widget.attrs['vocabulary'][0] = (EMPTY_VALUE, 'Empty value')
-    >>> assert(res == widget())
-
-    >>> widget.getter = None
-    >>> widget.attrs['vocabulary'][0] = (None, 'Empty value')
-    >>> assert(res == widget())
-
-    >>> widget.getter = ''
-    >>> widget.attrs['vocabulary'][0] = ('', 'Empty value')
-    >>> assert(res == widget())
-
-    >>> widget.getter = uuid.UUID('1b679ef8-9068-45f5-8bb8-4007264aa7f7')
-    >>> res = widget()
-    >>> pxml(res)
-    <select class="select" id="input-MYSELECT" name="MYSELECT">
-      <option id="input-MYSELECT-" value="">Empty value</option>
-      <option id="input-MYSELECT-1b679ef8-..." selected="selected" value="1b679ef8-...">One</option>
-    </select>
-    <BLANKLINE>
-
-Note, vocabulary keys are converted to ``datatype`` while widget value needs to
-be of type defined in ``datatype`` or one from the valid empty values::
-
-    >>> widget.attrs['vocabulary'] = [
-    ...     (UNSET, 'Empty value'),
-    ...     ('1b679ef8-9068-45f5-8bb8-4007264aa7f7', 'One')
-    ... ]
-    >>> res = widget()
-    >>> assert(res == widget())
-
-Test ``datatype`` extraction with selection::
-
-    >>> vocab = [
-    ...     (EMPTY_VALUE, 'Empty value'),
-    ...     (1, 'One'),
-    ...     (2, 'Two'),
-    ... ]
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value=2,
-    ...     props={
-    ...         'vocabulary': vocab,
-    ...         'datatype': 'int'
-    ...     })
-    >>> pxml(widget())
-    <select class="select" id="input-MYSELECT" name="MYSELECT">
-      <option id="input-MYSELECT-" value="">Empty value</option>
-      <option id="input-MYSELECT-1" value="1">One</option>
-      <option id="input-MYSELECT-2" selected="selected" value="2">Two</option>
-    </select>
-    <BLANKLINE>
-
-    >>> data = widget.extract({'MYSELECT': ''})
-    >>> assert(data.extracted == EMPTY_VALUE)
-
-    >>> data = widget.extract({'MYSELECT': '1'})
-    >>> assert(data.extracted == 1)
-
-    >>> pxml(widget(data=data))
-    <select class="select" id="input-MYSELECT" name="MYSELECT">
-      <option id="input-MYSELECT-" value="">Empty value</option>
-      <option id="input-MYSELECT-1" selected="selected"  value="1">One</option>
-      <option id="input-MYSELECT-2" value="2">Two</option>
-    </select>
-    <BLANKLINE>
-
-Test extraction with ``emptyvalue`` set::
-
-    >>> widget.attrs['emptyvalue'] = UNSET
-    >>> data = widget.extract({})
-    >>> assert(data.extracted is UNSET)
-
-    >>> data = widget.extract({'MYSELECT': ''})
-    >>> assert(data.extracted is UNSET)
-
-    >>> widget.attrs['emptyvalue'] = None
-    >>> data = widget.extract({})
-    >>> assert(data.extracted is UNSET)
-
-    >>> data = widget.extract({'MYSELECT': ''})
-    >>> assert(data.extracted is None)
-
-    >>> widget.attrs['emptyvalue'] = 0
-    >>> data = widget.extract({})
-    >>> assert(data.extracted is UNSET)
-
-    >>> data = widget.extract({'MYSELECT': ''})
-    >>> assert(data.extracted  == 0)
-
-Single value selection with ``datatype`` set completly disabled::
-
-    >>> widget.attrs['disabled'] = True
-    >>> pxml(widget())
-    <select class="select" disabled="disabled" id="input-MYSELECT" 
-      name="MYSELECT">
-      <option id="input-MYSELECT-" value="">Empty value</option>
-      <option id="input-MYSELECT-1" value="1">One</option>
-      <option id="input-MYSELECT-2" selected="selected" value="2">Two</option>
-    </select>
-    <BLANKLINE>
-
-Single value selection with ``datatype`` with specific options disabled::
-
-    >>> widget.attrs['emptyvalue'] = None
-    >>> widget.attrs['disabled'] = [None, 2]
-    >>> rendered = widget()
-    >>> pxml(rendered)
-    <select class="select" id="input-MYSELECT" name="MYSELECT">
-      <option disabled="disabled" id="input-MYSELECT-" value="">Empty value</option>
-      <option id="input-MYSELECT-1" value="1">One</option>
-      <option disabled="disabled" id="input-MYSELECT-2" selected="selected" value="2">Two</option>
-    </select>
-    <BLANKLINE>
-
-    >>> widget.attrs['emptyvalue'] = UNSET
-    >>> widget.attrs['disabled'] = [UNSET, 2]
-    >>> assert(widget() == rendered)
-
-    >>> widget.attrs['emptyvalue'] = EMPTY_VALUE
-    >>> widget.attrs['disabled'] = [EMPTY_VALUE, 2]
-    >>> assert(widget() == rendered)
-
-    >>> widget.attrs['emptyvalue'] = 0
-    >>> widget.attrs['disabled'] = [0, 2]
-    >>> assert(widget() == rendered)
-
-    >>> del widget.attrs['disabled']
-
-Single value selection with datatype display mode::
-
-    >>> widget.mode = 'display'
-    >>> widget()
-    u'<div class="display-select" id="display-MYSELECT">Two</div>'
-
-    >>> widget.attrs['display_proxy'] = True
-    >>> wrapped_pxml(widget())
-    <div>
-      <div class="display-select" id="display-MYSELECT">Two</div>
-      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" 
-        value="2"/>
-    </div>
-    <BLANKLINE>
-
-    >>> data = widget.extract(request={'MYSELECT': '1'})
-    >>> data
-    <RuntimeData MYSELECT, value=2, extracted=1 at ...>
-
-    >>> wrapped_pxml(widget(data=data))
-    <div>
-      <div class="display-select" id="display-MYSELECT">One</div>
-      <input class="select" id="input-MYSELECT" name="MYSELECT" type="hidden" 
-        value="1"/>
-    </div>
-    <BLANKLINE>
-
-Generic HTML5 Data::
-
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value='one',
-    ...     props={
-    ...         'data': {'foo': 'bar'},
-    ...         'vocabulary': [('one', 'One')]
-    ...     })
-    >>> pxml(widget())
-    <select class="select" data-foo="bar" id="input-MYSELECT" name="MYSELECT">
-      <option id="input-MYSELECT-one" selected="selected" 
-        value="one">One</option>
-    </select>
-    <BLANKLINE>
-
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     value='one',
-    ...     props={
-    ...         'data': {'foo': 'bar'},
-    ...         'vocabulary': [('one', 'One')]
-    ...     },
-    ...     mode='display')
-    >>> pxml(widget())
-    <div class="display-select" data-foo="bar" id="display-MYSELECT">One</div>
-    <BLANKLINE>
-
-Persist::
-
-    >>> widget = factory(
-    ...     'select',
-    ...     name='MYSELECT',
-    ...     props={
-    ...         'vocabulary': [('one', 'One')]
-    ...     })
-    >>> data = widget.extract({'MYSELECT': 'one'})
-    >>> model = dict()
-    >>> data.persist_writer = write_mapping_writer
-    >>> data.write(model)
-    >>> model
-    {'MYSELECT': 'one'}
-
-
 With Radio
 ..........
 
