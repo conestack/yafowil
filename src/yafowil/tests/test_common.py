@@ -3478,700 +3478,677 @@ class TestCommon(NodeTestCase):
         </div>
         """, fxml(widget(data)))
 
-"""
-Password
---------
-
-Password widget has some additional properties, ``strength``, ``minlength``
-and ``ascii``.
-
-Use in add forms, no password set yet::
-
-    >>> widget = factory(
-    ...     'password',
-    ...     name='PWD')
-    >>> widget()
-    u'<input class="password" id="input-PWD" name="PWD" type="password" 
-    value="" />'
-
-    >>> data = widget.extract({})
-    >>> data.extracted
-    <UNSET>
-
-    >>> data = widget.extract({'PWD': 'xx'})
-    >>> data.extracted
-    'xx'
-
-    >>> widget.mode = 'display'
-    >>> widget()
-    u''
-
-Use in edit forms. note that password is never shown up in markup, but a
-placeholder is used when a password is already set. Thus, if a extracted
-password value is UNSET, this means that password was not changed::
-
-    >>> widget = factory(
-    ...     'password',
-    ...     name='PASSWORD',
-    ...     value='secret')
-    >>> widget()
-    u'<input class="password" id="input-PASSWORD" name="PASSWORD" 
-    type="password" value="_NOCHANGE_" />'
-
-    >>> data = widget.extract({'PASSWORD': '_NOCHANGE_'})
-    >>> data.extracted
-    <UNSET>
-
-    >>> data = widget.extract({'PASSWORD': 'foo'})
-    >>> data.extracted
-    'foo'
-
-    >>> widget(data=data)
-    u'<input class="password" id="input-PASSWORD" name="PASSWORD" 
-    type="password" value="foo" />'
-
-    >>> widget.mode = 'display'
-    >>> widget()
-    u'********'
-
-Password validation::
-
-    >>> widget = factory(
-    ...     'password',
-    ...     name='PWD',
-    ...     props={
-    ...         'strength': 5, # max 4, does not matter, max is used
-    ...     })
-    >>> data = widget.extract({'PWD': ''})
-    >>> data.errors
-    [ExtractionError('Password too weak',)]
-
-    >>> data = widget.extract({'PWD': 'A0*'})
-    >>> data.errors
-    [ExtractionError('Password too weak',)]
-
-    >>> data = widget.extract({'PWD': 'a0*'})
-    >>> data.errors
-    [ExtractionError('Password too weak',)]
-
-    >>> data = widget.extract({'PWD': 'aA*'})
-    >>> data.errors
-    [ExtractionError('Password too weak',)]
-
-    >>> data = widget.extract({'PWD': 'aA0'})
-    >>> data.errors
-    [ExtractionError('Password too weak',)]
-
-    >>> data = widget.extract({'PWD': 'aA0*'})
-    >>> data.errors
-    []
-
-Minlength validation::
-
-    >>> widget = factory(
-    ...     'password',
-    ...     name='PWD',
-    ...     props={
-    ...         'minlength': 3,
-    ...     })
-    >>> data = widget.extract({'PWD': 'xx'})
-    >>> data.errors
-    [ExtractionError('Input must have at least 3 characters.',)]
-
-    >>> data = widget.extract({'PWD': 'xxx'})
-    >>> data.errors
-    []
-
-Ascii validation::
-
-    >>> widget = factory(
-    ...     'password',
-    ...     name='PWD',
-    ...     props={
-    ...         'ascii': True,
-    ...     })
-    >>> data = widget.extract({'PWD': u'äää'})
-    >>> data.errors
-    [ExtractionError('Input contains illegal characters.',)]
-
-    >>> data = widget.extract({'PWD': u'xx'})
-    >>> data.errors
-    []
-
-Combine all validations::
-
-    >>> widget = factory(
-    ...     'password',
-    ...     name='PWD',
-    ...     props={
-    ...         'required': 'No Password given',
-    ...         'minlength': 6,
-    ...         'ascii': True,
-    ...         'strength': 4,
-    ...     })
-    >>> data = widget.extract({'PWD': u''})
-    >>> data.errors
-    [ExtractionError('No Password given',)]
-
-    >>> data = widget.extract({'PWD': u'xxxxx'})
-    >>> data.errors
-    [ExtractionError('Input must have at least 6 characters.',)]
-
-    >>> data = widget.extract({'PWD': u'xxxxxä'})
-    >>> data.errors
-    [ExtractionError('Input contains illegal characters.',)]
-
-    >>> data = widget.extract({'PWD': u'xxxxxx'})
-    >>> data.errors
-    [ExtractionError('Password too weak',)]
-
-    >>> data = widget.extract({'PWD': u'xX1*00'})
-    >>> data.errors
-    []
-
-Emptyvalue::
-
-    >>> widget = factory(
-    ...     'password',
-    ...     name='PWD',
-    ...     props={
-    ...         'emptyvalue': 'DEFAULTPWD',  # <- not a good idea, but works
-    ...     })
-    >>> widget.extract(request={'PWD': ''})
-    <RuntimeData PWD, value=<UNSET>, extracted='DEFAULTPWD' at ...>
-
-    >>> widget.extract(request={'PWD': 'NOEMPTY'})
-    <RuntimeData PWD, value=<UNSET>, extracted='NOEMPTY' at ...>
-
-Persist::
-
-    >>> widget = factory(
-    ...     'password',
-    ...     name='PWD',
-    ...     props={
-    ...         'persist_writer': write_mapping_writer
-    ...     })
-    >>> data = widget.extract(request={'PWD': '1234'})
-    >>> model = dict()
-    >>> data.write(model)
-    >>> model
-    {'PWD': '1234'}
-
-
-Error
------
-
-Chained password inside error inside field::
-
-    >>> widget = factory(
-    ...     'field:error:password',
-    ...     name='PASSWORD',
-    ...     props={
-    ...         'label': 'Password',
-    ...         'required': 'No password given!'
-    ...     })
-    >>> data = widget.extract({'PASSWORD': ''})
-    >>> pxml(widget(data=data))
-    <div class="field" id="field-PASSWORD">
-      <div class="error">
-        <div class="errormessage">No password given!</div>
-        <input class="password required" id="input-PASSWORD" name="PASSWORD" 
-          required="required" type="password" value=""/>
-      </div>
-    </div>
-    <BLANKLINE>
-
-    >>> data = widget.extract({'PASSWORD': 'secret'})
-    >>> pxml(widget(data=data))
-    <div class="field" id="field-PASSWORD">
-      <input class="password required" id="input-PASSWORD" name="PASSWORD" 
-        required="required" type="password" value="secret"/>
-    </div>
-    <BLANKLINE>
-
-    >>> widget = factory(
-    ...     'error:text',
-    ...     name='MYDISPLAY',
-    ...     value='somevalue',
-    ...     mode='display')
-    >>> widget()
-    u'<div class="display-text" id="display-MYDISPLAY">somevalue</div>'
-
-Error wrapping in div element can be suppressed::
-
-    >>> widget = factory(
-    ...     'field:error:password',
-    ...     name='PASSWORD',
-    ...     props={
-    ...         'label': 'Password',
-    ...         'required': 'No password given!',
-    ...         'message_tag': None
-    ...     })
-    >>> data = widget.extract({'PASSWORD': ''})
-    >>> pxml(widget(data=data))
-    <div class="field" id="field-PASSWORD">
-      <div class="error">No password given!<input class="password required" 
-        id="input-PASSWORD" name="PASSWORD" required="required" 
-        type="password" value=""/></div>
-    </div>
-    <BLANKLINE>
-
-
-Help
-----
-
-Render some additional help text::
-
-    >>> widget = factory(
-    ...     'field:help:text',
-    ...     name='HELPEXAMPLE',
-    ...     props={
-    ...         'label': 'Help',
-    ...         'help': 'Shout out loud here'
-    ...     })
-    >>> pxml(widget())
-    <div class="field" id="field-HELPEXAMPLE">
-      <div class="help">Shout out loud here</div>
-      <input class="text" id="input-HELPEXAMPLE" name="HELPEXAMPLE" 
-        type="text" value=""/>
-    </div>
-    <BLANKLINE>
-
-Render empty (WHAT'S THIS GOOD FOR?)::
-
-    >>> widget = factory(
-    ...     'field:help:text',
-    ...     name='HELPEXAMPLE',
-    ...     props={
-    ...         'label': 'Help',
-    ...         'help': False,
-    ...         'render_empty': False
-    ...     })
-    >>> pxml(widget())
-    <div class="field" id="field-HELPEXAMPLE">
-      <input class="text" id="input-HELPEXAMPLE" name="HELPEXAMPLE" 
-        type="text" value=""/>
-    </div>
-    <BLANKLINE>
-
-
-E-Mail
-------
-
-Render email input field::
-
-    >>> widget = factory(
-    ...     'email',
-    ...     name='EMAIL')
-    >>> pxml(widget())
-    <input class="email" id="input-EMAIL" name="EMAIL" type="email" value=""/>
-
-Extract not required and empty::
-
-    >>> data = widget.extract({'EMAIL': ''})
-    >>> data.errors
-    []
-
-Extract invalid email input::
-
-    >>> data = widget.extract({'EMAIL': 'foo@bar'})
-    >>> data.errors
-    [ExtractionError('Input not a valid email address.',)]
-
-    >>> data = widget.extract({'EMAIL': '@bar.com'})
-    >>> data.errors
-    [ExtractionError('Input not a valid email address.',)]
-
-Extract valid email input::
-
-    >>> data = widget.extract({'EMAIL': 'foo@bar.com'})
-    >>> data.errors
-    []
-
-Extract required email input::
-
-    >>> widget = factory(
-    ...     'email',
-    ...     name='EMAIL',
-    ...     props={
-    ...         'required': 'E-Mail Address is required'
-    ...     })
-    >>> data = widget.extract({'EMAIL': ''})
-    >>> data.errors
-    [ExtractionError('E-Mail Address is required',)]
-
-    >>> data = widget.extract({'EMAIL': 'foo@bar.com'})
-    >>> data.errors
-    []
-
-Emptyvalue::
-
-    >>> widget = factory(
-    ...     'email',
-    ...     name='EMAIL',
-    ...     props={
-    ...         'emptyvalue': 'foo@bar.baz',
-    ...     })
-    >>> widget.extract(request={'EMAIL': ''})
-    <RuntimeData EMAIL, value=<UNSET>, extracted='foo@bar.baz' at ...>
-
-    >>> widget.extract(request={'EMAIL': 'foo@baz.bam'})
-    <RuntimeData EMAIL, value=<UNSET>, extracted='foo@baz.bam' at ...>
-
-Datatype::
-
-    >>> widget = factory(
-    ...     'email',
-    ...     name='EMAIL',
-    ...     props={
-    ...         'datatype': unicode
-    ...     })
-    >>> widget.extract(request={'EMAIL': 'foo@example.com'})
-    <RuntimeData EMAIL, value=<UNSET>, extracted=u'foo@example.com' at ...>
-
-    >>> widget = factory(
-    ...     'email',
-    ...     name='EMAIL',
-    ...     props={
-    ...         'datatype': str
-    ...     })
-    >>> widget.extract(request={'EMAIL': u'foo@example.com'})
-    <RuntimeData EMAIL, value=<UNSET>, extracted='foo@example.com' at ...>
-
-Persist::
-
-    >>> widget = factory(
-    ...     'email',
-    ...     name='EMAIL')
-    >>> data = widget.extract({'EMAIL': 'foo@bar.baz'})
-    >>> model = dict()
-    >>> data.persist_writer = write_mapping_writer
-    >>> data.write(model)
-    >>> model
-    {'EMAIL': 'foo@bar.baz'}
-
-
-URL
----
-
-Render URL input field::
-
-    >>> widget = factory(
-    ...     'url',
-    ...     name='URL')
-    >>> pxml(widget())
-    <input class="url" id="input-URL" name="URL" type="url" value=""/>
-
-Extract not required and empty::
-
-    >>> data = widget.extract({'URL': ''})
-    >>> data.errors
-    []
-
-Extract invalid URL input::
-
-    >>> data = widget.extract({'URL': 'htt:/bla'})
-    >>> data.errors
-    [ExtractionError('Input not a valid web address.',)]
-
-    >>> data = widget.extract({'URL': 'invalid'})
-    >>> data.errors
-    [ExtractionError('Input not a valid web address.',)]
-
-Extract value URL input::
-
-    >>> data = widget.extract({
-    ...     'URL': 'http://www.foo.bar.com:8080/bla#fasel?blubber=bla&bla=fasel'
-    ... })
-    >>> data.errors
-    []
-
-Emptyvalue::
-
-    >>> widget = factory(
-    ...     'url',
-    ...     name='URL',
-    ...     props={
-    ...         'emptyvalue': 'http://www.example.com',
-    ...     })
-    >>> widget.extract(request={'URL': ''})
-    <RuntimeData URL, value=<UNSET>, extracted='http://www.example.com' at ...>
-
-    >>> widget.extract(request={'URL': 'http://www.example.org'})
-    <RuntimeData URL, value=<UNSET>, extracted='http://www.example.org' at ...>
-
-Persist::
-
-    >>> widget = factory(
-    ...     'url',
-    ...     name='URL')
-    >>> data = widget.extract({'URL': 'http://www.example.org'})
-    >>> model = dict()
-    >>> data.persist_writer = write_mapping_writer
-    >>> data.write(model)
-    >>> model
-    {'URL': 'http://www.example.org'}
-
-
-Search
-------
-
-Render search input field::
-
-    >>> widget = factory(
-    ...     'search',
-    ...     name='SEARCH')
-    >>> pxml(widget())
-    <input class="search" id="input-SEARCH" name="SEARCH" 
-    type="search" value=""/>
-
-Extract not required and empty::
-
-    >>> data = widget.extract({'SEARCH': ''})
-    >>> data.errors
-    []
-
-Extract required empty::
-
-    >>> widget.attrs['required'] = True
-    >>> widget.extract({'SEARCH': ''})
-    <RuntimeData SEARCH, value=<UNSET>, extracted='', 1 error(s) at ...>
-
-    >>> del widget.attrs['required']
-
-Emptyvalue::
-
-    >>> widget.attrs['emptyvalue'] = 'defaultsearch'
-    >>> widget.extract(request={'SEARCH': ''})
-    <RuntimeData SEARCH, value=<UNSET>, extracted='defaultsearch' at ...>
-
-    >>> widget.extract(request={'SEARCH': 'searchstr'})
-    <RuntimeData SEARCH, value=<UNSET>, extracted='searchstr' at ...>
-
-
-Number
-------
-
-Display renderer::
-
-    >>> widget = factory(
-    ...     'number',
-    ...     name='NUMBER',
-    ...     value=3,
-    ...     mode='display')
-    >>> pxml(widget())
-    <div class="display-number" id="display-NUMBER">3</div>
-    <BLANKLINE>
-
-Render number input::
-
-    >>> widget = factory(
-    ...     'number',
-    ...     name='NUMBER',
-    ...     value=lambda w,d:3)
-    >>> pxml(widget())
-    <input class="number" id="input-NUMBER" 
-    name="NUMBER" type="number" value="3"/>
-    <BLANKLINE>
-
-Extract unset::
-
-    >>> data = widget.extract({})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-    >>> data.printtree()
-    <RuntimeData NUMBER, value=3, extracted=<UNSET> at ...>
-
-Extract not required and empty::
-
-    >>> data = widget.extract({'NUMBER': ''})
-    >>> data.errors, data.extracted
-    ([], <UNSET>)
-
-Extract invalid floating point input::
-
-    >>> data = widget.extract({'NUMBER': 'abc'})
-    >>> data.errors
-    [ExtractionError('Input is not a valid floating point number.',)]
-
-Extract valid floating point input::
-
-    >>> data = widget.extract({'NUMBER': '10'})
-    >>> data.errors, data.extracted
-    ([], 10.0)
-
-    >>> data = widget.extract({'NUMBER': '10.0'})
-    >>> data.errors, data.extracted
-    ([], 10.0)
-
-    >>> data = widget.extract({'NUMBER': '10,0'})
-    >>> data.errors, data.extracted
-    ([], 10.0)
-
-Instanciate with invalid datatype::
-
-    >>> widget = factory(
-    ...     'number',
-    ...     name='NUMBER',
-    ...     props={
-    ...         'datatype': 'invalid'
-    ...     })
-    >>> widget.extract({'NUMBER': '10.0'})
-    Traceback (most recent call last):
-      ...
-    ValueError: Datatype not allowed: "invalid"
-
-Extract invalid integer input::
-
-    >>> widget = factory(
-    ...     'number',
-    ...     name='NUMBER',
-    ...     props={
-    ...         'datatype': 'integer'
-    ...     })
-    >>> data = widget.extract({'NUMBER': '10.0'})
-    >>> data.errors
-    [ExtractionError('Input is not a valid integer.',)]
-
-Extract with min value set::
-
-    >>> widget = factory(
-    ...     'number',
-    ...     name='NUMBER',
-    ...     props={
-    ...         'min': 10
-    ...     })
-    >>> data = widget.extract({'NUMBER': '9'})
-    >>> data.errors
-    [ExtractionError('Value has to be at minimum 10.',)]
-
-    >>> data = widget.extract({'NUMBER': '10'})
-    >>> data.errors
-    []
-
-    >>> data = widget.extract({'NUMBER': '11'})
-    >>> data.errors
-    []
-
-Extract min value 0::
-
-    >>> widget = factory(
-    ...     'number',
-    ...     name='NUMBER',
-    ...     props={
-    ...         'min': 0
-    ...     })
-    >>> data = widget.extract({'NUMBER': '-1'})
-    >>> data.errors
-    [ExtractionError('Value has to be at minimum 0.',)]
-
-    >>> data = widget.extract({'NUMBER': '0'})
-    >>> data.errors
-    []
-
-Extract with max value set::
-
-    >>> widget = factory(
-    ...     'number',
-    ...     name='NUMBER',
-    ...     props={
-    ...         'max': lambda w,d: 10
-    ...     })
-    >>> data = widget.extract({'NUMBER': '9'})
-    >>> data.errors
-    []
-
-    >>> data = widget.extract({'NUMBER': '10'})
-    >>> data.errors
-    []
-
-    >>> data = widget.extract({'NUMBER': '11'})
-    >>> data.errors
-    [ExtractionError('Value has to be at maximum 10.',)]
-
-Extract max value 0::
-
-    >>> widget = factory(
-    ...     'number',
-    ...     name='NUMBER',
-    ...     props={
-    ...         'max': 0
-    ...     })
-    >>> data = widget.extract({'NUMBER': '1'})
-    >>> data.errors
-    [ExtractionError('Value has to be at maximum 0.',)]
-
-    >>> data = widget.extract({'NUMBER': '0'})
-    >>> data.errors
-    []
-
-Extract with step set::
-
-    >>> widget = factory(
-    ...     'number',
-    ...     name='NUMBER',
-    ...     props={
-    ...         'step': 2
-    ...     })
-    >>> data = widget.extract({'NUMBER': '9'})
-    >>> data.errors
-    [ExtractionError('Value 9.0 has to be in stepping of 2',)]
-
-    >>> data = widget.extract({'NUMBER': '6'})
-    >>> data.errors
-    []
-
-Extract with step and min value set::
-
-    >>> widget = factory(
-    ...     'number',
-    ...     name='NUMBER',
-    ...     props={
-    ...         'step': 2,
-    ...         'min': 3
-    ...     })
-    >>> data = widget.extract({'NUMBER': '7'})
-    >>> data.errors
-    []
-
-    >>> data = widget.extract({'NUMBER': '6'})
-    >>> data.errors
-    [ExtractionError('Value 6.0 has to be in stepping of 2 based on a 
-    floor value of 3',)]
-
-Extract 0 value::
-
-    >>> widget = factory(
-    ...     'number',
-    ...     name='NUMBER')
-    >>> data = widget.extract({'NUMBER': '0'})
-    >>> data.extracted
-    0.0
-
-    >>> widget = factory(
-    ...     'number',
-    ...     name='NUMBER',
-    ...     props={
-    ...         'datatype': 'int'
-    ...     })
-    >>> data = widget.extract({'NUMBER': '0'})
-    >>> data.extracted
-    0
-
-Persist::
-
-    >>> widget = factory(
-    ...     'number',
-    ...     name='NUMBER',
-    ...     props={
-    ...         'datatype': 'int'
-    ...     })
-    >>> data = widget.extract({'NUMBER': '0'})
-    >>> model = dict()
-    >>> data.persist_writer = write_mapping_writer
-    >>> data.write(model)
-    >>> model
-    {'NUMBER': 0}
-
-"""
+    def test_password_blueprint(self):
+        # Password widget has some additional properties, ``strength``,
+        # ``minlength`` and ``ascii``.
+
+        # Use in add forms, no password set yet
+        widget = factory(
+            'password',
+            name='PWD')
+        self.assertEqual(widget(), (
+            '<input class="password" id="input-PWD" name="PWD" '
+            'type="password" value="" />'
+        ))
+
+        data = widget.extract({})
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'PWD': 'xx'})
+        self.assertEqual(data.extracted, 'xx')
+
+        widget.mode = 'display'
+        self.assertEqual(widget(), '')
+
+        # Use in edit forms. note that password is never shown up in markup,
+        # but a placeholder is used when a password is already set. Thus, if a
+        # extracted password value is UNSET, this means that password was not changed
+        widget = factory(
+            'password',
+            name='PASSWORD',
+            value='secret')
+        self.assertEqual(widget(), (
+            '<input class="password" id="input-PASSWORD" name="PASSWORD" '
+            'type="password" value="_NOCHANGE_" />'
+        ))
+
+        data = widget.extract({'PASSWORD': '_NOCHANGE_'})
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'PASSWORD': 'foo'})
+        self.assertEqual(data.extracted, 'foo')
+
+        self.assertEqual(widget(data=data), (
+            '<input class="password" id="input-PASSWORD" name="PASSWORD" '
+            'type="password" value="foo" />'
+        ))
+
+        widget.mode = 'display'
+        self.assertEqual(widget(), '********')
+
+        # Password validation
+        widget = factory(
+            'password',
+            name='PWD',
+            props={
+                'strength': 5, # max 4, does not matter, max is used
+            })
+        data = widget.extract({'PWD': ''})
+        self.assertEqual(data.errors, [ExtractionError('Password too weak')])
+
+        data = widget.extract({'PWD': 'A0*'})
+        self.assertEqual(data.errors, [ExtractionError('Password too weak')])
+
+        data = widget.extract({'PWD': 'a0*'})
+        self.assertEqual(data.errors, [ExtractionError('Password too weak')])
+
+        data = widget.extract({'PWD': 'aA*'})
+        self.assertEqual(data.errors, [ExtractionError('Password too weak')])
+
+        data = widget.extract({'PWD': 'aA0'})
+        self.assertEqual(data.errors, [ExtractionError('Password too weak')])
+
+        data = widget.extract({'PWD': 'aA0*'})
+        self.assertEqual(data.errors, [])
+
+        # Minlength validation
+        widget = factory(
+            'password',
+            name='PWD',
+            props={
+                'minlength': 3,
+            })
+        data = widget.extract({'PWD': 'xx'})
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Input must have at least 3 characters.')]
+        )
+
+        data = widget.extract({'PWD': 'xxx'})
+        self.assertEqual(data.errors, [])
+
+        # Ascii validation
+        widget = factory(
+            'password',
+            name='PWD',
+            props={
+                'ascii': True,
+            })
+        data = widget.extract({'PWD': u'äää'})
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Input contains illegal characters.')]
+        )
+
+        data = widget.extract({'PWD': u'xx'})
+        self.assertEqual(data.errors, [])
+
+        # Combine all validations
+        widget = factory(
+            'password',
+            name='PWD',
+            props={
+                'required': 'No Password given',
+                'minlength': 6,
+                'ascii': True,
+                'strength': 4,
+            })
+        data = widget.extract({'PWD': u''})
+        self.assertEqual(data.errors, [ExtractionError('No Password given')])
+
+        data = widget.extract({'PWD': u'xxxxx'})
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Input must have at least 6 characters.')]
+        )
+
+        data = widget.extract({'PWD': u'xxxxxä'})
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Input contains illegal characters.')]
+        )
+
+        data = widget.extract({'PWD': u'xxxxxx'})
+        self.assertEqual(data.errors, [ExtractionError('Password too weak')])
+
+        data = widget.extract({'PWD': u'xX1*00'})
+        self.assertEqual(data.errors, [])
+
+        # Emptyvalue
+        widget = factory(
+            'password',
+            name='PWD',
+            props={
+                'emptyvalue': 'DEFAULTPWD',  # <- not a good idea, but works
+            })
+        data = widget.extract(request={'PWD': ''})
+        self.assertEqual(data.name, 'PWD')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, 'DEFAULTPWD')
+        self.assertEqual(data.errors, [])
+
+        data = widget.extract(request={'PWD': 'NOEMPTY'})
+        self.assertEqual(data.name, 'PWD')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, 'NOEMPTY')
+        self.assertEqual(data.errors, [])
+
+        # Persist
+        widget = factory(
+            'password',
+            name='PWD',
+            props={
+                'persist_writer': write_mapping_writer
+            })
+        data = widget.extract(request={'PWD': '1234'})
+        model = dict()
+        data.write(model)
+        self.assertEqual(model, {'PWD': '1234'})
+
+    def test_error_blueprint(self):
+        # Chained password inside error inside field
+        widget = factory(
+            'field:error:password',
+            name='PASSWORD',
+            props={
+                'label': 'Password',
+                'required': 'No password given!'
+            })
+        data = widget.extract({'PASSWORD': ''})
+        self.check_output("""
+        <div class="field" id="field-PASSWORD">
+          <div class="error">
+            <div class="errormessage">No password given!</div>
+            <input class="password required" id="input-PASSWORD" name="PASSWORD"
+                   required="required" type="password" value=""/>
+          </div>
+        </div>
+        """, fxml(widget(data=data)))
+
+        data = widget.extract({'PASSWORD': 'secret'})
+        self.check_output("""
+        <div class="field" id="field-PASSWORD">
+          <input class="password required" id="input-PASSWORD" name="PASSWORD"
+                 required="required" type="password" value="secret"/>
+        </div>
+        """, fxml(widget(data=data)))
+
+        widget = factory(
+            'error:text',
+            name='MYDISPLAY',
+            value='somevalue',
+            mode='display')
+        self.assertEqual(widget(), (
+            '<div class="display-text" id="display-MYDISPLAY">somevalue</div>'
+        ))
+
+        # Error wrapping in div element can be suppressed
+        widget = factory(
+            'field:error:password',
+            name='PASSWORD',
+            props={
+                'label': 'Password',
+                'required': 'No password given!',
+                'message_tag': None
+            })
+        data = widget.extract({'PASSWORD': ''})
+        self.check_output("""
+        <div class="field" id="field-PASSWORD">
+          <div class="error">No password given!<input class="password required"
+               id="input-PASSWORD" name="PASSWORD" required="required"
+               type="password" value=""/></div>
+        </div>
+        """, fxml(widget(data=data)))
+
+    def test_help_blueprint(self):
+        # Render some additional help text
+        widget = factory(
+            'field:help:text',
+            name='HELPEXAMPLE',
+            props={
+                'label': 'Help',
+                'help': 'Shout out loud here'
+            })
+        self.check_output("""
+        <div class="field" id="field-HELPEXAMPLE">
+          <div class="help">Shout out loud here</div>
+          <input class="text" id="input-HELPEXAMPLE" name="HELPEXAMPLE"
+                 type="text" value=""/>
+        </div>
+        """, fxml(widget()))
+
+        # Render empty (WHAT'S THIS GOOD FOR?)
+        widget = factory(
+            'field:help:text',
+            name='HELPEXAMPLE',
+            props={
+                'label': 'Help',
+                'help': False,
+                'render_empty': False
+            })
+        self.check_output("""
+        <div class="field" id="field-HELPEXAMPLE">
+          <input class="text" id="input-HELPEXAMPLE" name="HELPEXAMPLE"
+                 type="text" value=""/>
+        </div>
+        """, fxml(widget()))
+
+    def test_email_blueprint(self):
+        # Render email input field
+        widget = factory(
+            'email',
+            name='EMAIL')
+        self.assertEqual(widget(), (
+            '<input class="email" id="input-EMAIL" name="EMAIL" '
+            'type="email" value="" />'
+        ))
+
+        # Extract not required and empty
+        data = widget.extract({'EMAIL': ''})
+        self.assertEqual(data.errors, [])
+
+        # Extract invalid email input
+        data = widget.extract({'EMAIL': 'foo@bar'})
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Input not a valid email address.')]
+        )
+
+        data = widget.extract({'EMAIL': '@bar.com'})
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Input not a valid email address.')]
+        )
+
+        # Extract valid email input
+        data = widget.extract({'EMAIL': 'foo@bar.com'})
+        self.assertEqual(data.errors, [])
+
+        # Extract required email input
+        widget = factory(
+            'email',
+            name='EMAIL',
+            props={
+                'required': 'E-Mail Address is required'
+            })
+        data = widget.extract({'EMAIL': ''})
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('E-Mail Address is required')]
+        )
+
+        data = widget.extract({'EMAIL': 'foo@bar.com'})
+        self.assertEqual(data.errors, [])
+
+        # Emptyvalue
+        widget = factory(
+            'email',
+            name='EMAIL',
+            props={
+                'emptyvalue': 'foo@bar.baz',
+            })
+        data = widget.extract(request={'EMAIL': ''})
+        self.assertEqual(data.name, 'EMAIL')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, 'foo@bar.baz')
+        self.assertEqual(data.errors, [])
+
+        data = widget.extract(request={'EMAIL': 'foo@baz.bam'})
+        self.assertEqual(data.name, 'EMAIL')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, 'foo@baz.bam')
+        self.assertEqual(data.errors, [])
+
+        # Datatype
+        widget = factory(
+            'email',
+            name='EMAIL',
+            props={
+                'datatype': unicode
+            })
+        data = widget.extract(request={'EMAIL': 'foo@example.com'})
+        self.assertEqual(data.extracted, u'foo@example.com')
+        self.assertTrue(isinstance(data.extracted, unicode))
+        self.assertFalse(isinstance(data.extracted, str))
+
+        widget = factory(
+            'email',
+            name='EMAIL',
+            props={
+                'datatype': str
+            })
+        data = widget.extract(request={'EMAIL': u'foo@example.com'})
+        self.assertEqual(data.extracted, u'foo@example.com')
+        self.assertFalse(isinstance(data.extracted, unicode))
+        self.assertTrue(isinstance(data.extracted, str))
+
+        # Persist
+        widget = factory(
+            'email',
+            name='EMAIL')
+        data = widget.extract({'EMAIL': 'foo@bar.baz'})
+        model = dict()
+        data.persist_writer = write_mapping_writer
+        data.write(model)
+        self.assertEqual(model, {'EMAIL': 'foo@bar.baz'})
+
+    def test_url_blueprint(self):
+        # Render URL input field
+        widget = factory(
+            'url',
+            name='URL')
+        self.assertEqual(widget(), (
+            '<input class="url" id="input-URL" name="URL" '
+            'type="url" value="" />'
+        ))
+
+        # Extract not required and empty
+        data = widget.extract({'URL': ''})
+        self.assertEqual(data.errors, [])
+
+        # Extract invalid URL input
+        data = widget.extract({'URL': 'htt:/bla'})
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Input not a valid web address.')]
+        )
+
+        data = widget.extract({'URL': 'invalid'})
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Input not a valid web address.')]
+        )
+
+        # Extract value URL input
+        data = widget.extract({
+            'URL': 'http://www.foo.bar.com:8080/bla#fasel?blubber=bla&bla=fasel'
+        })
+        self.assertEqual(data.errors, [])
+
+        # Emptyvalue
+        widget = factory(
+            'url',
+            name='URL',
+            props={
+                'emptyvalue': 'http://www.example.com',
+            })
+        data = widget.extract(request={'URL': ''})
+        self.assertEqual(data.name, 'URL')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, 'http://www.example.com')
+        self.assertEqual(data.errors, [])
+
+        data = widget.extract(request={'URL': 'http://www.example.org'})
+        self.assertEqual(data.name, 'URL')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, 'http://www.example.org')
+        self.assertEqual(data.errors, [])
+
+        # Persist
+        widget = factory(
+            'url',
+            name='URL')
+        data = widget.extract({'URL': 'http://www.example.org'})
+        model = dict()
+        data.persist_writer = write_mapping_writer
+        data.write(model)
+        self.assertEqual(model, {'URL': 'http://www.example.org'})
+
+    def test_search_blueprint(self):
+        # Render search input field
+        widget = factory(
+            'search',
+            name='SEARCH')
+        self.assertEqual(widget(), (
+            '<input class="search" id="input-SEARCH" name="SEARCH" '
+            'type="search" value="" />'
+        ))
+
+        # Extract not required and empty
+        data = widget.extract({'SEARCH': ''})
+        self.assertEqual(data.errors, [])
+
+        # Extract required empty
+        widget.attrs['required'] = True
+        data = widget.extract({'SEARCH': ''})
+        self.assertEqual(data.name, 'SEARCH')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, '')
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Mandatory field was empty')]
+        )
+
+        del widget.attrs['required']
+
+        # Emptyvalue
+        widget.attrs['emptyvalue'] = 'defaultsearch'
+        data = widget.extract(request={'SEARCH': ''})
+        self.assertEqual(data.name, 'SEARCH')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, 'defaultsearch')
+        self.assertEqual(data.errors, [])
+
+        data = widget.extract(request={'SEARCH': 'searchstr'})
+        self.assertEqual(data.name, 'SEARCH')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, 'searchstr')
+        self.assertEqual(data.errors, [])
+
+    def test_number_blueprint(self):
+        # Display renderer
+        widget = factory(
+            'number',
+            name='NUMBER',
+            value=3,
+            mode='display')
+        self.assertEqual(widget(), (
+            '<div class="display-number" id="display-NUMBER">3</div>'
+        ))
+
+        # Render number input
+        widget = factory(
+            'number',
+            name='NUMBER',
+            value=lambda w,d:3)
+        self.assertEqual(widget(), (
+            '<input class="number" id="input-NUMBER" name="NUMBER" '
+            'type="number" value="3" />'
+        ))
+
+        # Extract unset
+        data = widget.extract({})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        self.assertEqual(data.name, 'NUMBER')
+        self.assertEqual(data.value, 3)
+        self.assertEqual(data.extracted, UNSET)
+        self.assertEqual(data.errors, [])
+
+        # Extract not required and empty
+        data = widget.extract({'NUMBER': ''})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, UNSET)
+
+        # Extract invalid floating point input
+        data = widget.extract({'NUMBER': 'abc'})
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Input is not a valid floating point number.')]
+        )
+
+        # Extract valid floating point input
+        data = widget.extract({'NUMBER': '10'})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, 10.)
+
+        data = widget.extract({'NUMBER': '10.0'})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, 10.)
+
+        data = widget.extract({'NUMBER': '10,0'})
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.extracted, 10.)
+
+        # Instanciate with invalid datatype
+        widget = factory(
+            'number',
+            name='NUMBER',
+            props={
+                'datatype': 'invalid'
+            })
+        err = self.expect_error(
+            ValueError,
+            widget.extract,
+            {'NUMBER': '10.0'}
+        )
+        self.assertEqual(str(err), 'Datatype not allowed: "invalid"')
+
+        # Extract invalid integer input
+        widget = factory(
+            'number',
+            name='NUMBER',
+            props={
+                'datatype': 'integer'
+            })
+        data = widget.extract({'NUMBER': '10.0'})
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Input is not a valid integer.')]
+        )
+
+        # Extract with min value set
+        widget = factory(
+            'number',
+            name='NUMBER',
+            props={
+                'min': 10
+            })
+        data = widget.extract({'NUMBER': '9'})
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Value has to be at minimum 10.')]
+        )
+
+        data = widget.extract({'NUMBER': '10'})
+        self.assertEqual(data.errors, [])
+
+        data = widget.extract({'NUMBER': '11'})
+        self.assertEqual(data.errors, [])
+
+        # Extract min value 0
+        widget = factory(
+            'number',
+            name='NUMBER',
+            props={
+                'min': 0
+            })
+        data = widget.extract({'NUMBER': '-1'})
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Value has to be at minimum 0.')]
+        )
+
+        data = widget.extract({'NUMBER': '0'})
+        self.assertEqual(data.errors, [])
+
+        # Extract with max value set
+        widget = factory(
+            'number',
+            name='NUMBER',
+            props={
+                'max': lambda w,d: 10
+            })
+        data = widget.extract({'NUMBER': '9'})
+        self.assertEqual(data.errors, [])
+
+        data = widget.extract({'NUMBER': '10'})
+        self.assertEqual(data.errors, [])
+
+        data = widget.extract({'NUMBER': '11'})
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Value has to be at maximum 10.')]
+        )
+
+        # Extract max value 0
+        widget = factory(
+            'number',
+            name='NUMBER',
+            props={
+               'max': 0
+            })
+        data = widget.extract({'NUMBER': '1'})
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Value has to be at maximum 0.')]
+        )
+
+        data = widget.extract({'NUMBER': '0'})
+        self.assertEqual(data.errors, [])
+
+        # Extract with step set
+        widget = factory(
+            'number',
+            name='NUMBER',
+            props={
+                'step': 2
+            })
+        data = widget.extract({'NUMBER': '9'})
+        self.assertEqual(
+            data.errors,
+            [ExtractionError('Value 9.0 has to be in stepping of 2')]
+        )
+
+        data = widget.extract({'NUMBER': '6'})
+        self.assertEqual(data.errors, [])
+
+        # Extract with step and min value set
+        widget = factory(
+            'number',
+            name='NUMBER',
+            props={
+               'step': 2,
+               'min': 3
+            })
+        data = widget.extract({'NUMBER': '7'})
+        self.assertEqual(data.errors, [])
+
+        data = widget.extract({'NUMBER': '6'})
+        self.assertEqual(
+            data.errors,
+            [ExtractionError(
+                'Value 6.0 has to be in stepping of 2 based on a floor '
+                'value of 3'
+            )]
+        )
+
+        # Extract 0 value
+        widget = factory(
+            'number',
+            name='NUMBER')
+        data = widget.extract({'NUMBER': '0'})
+        self.assertEqual(data.extracted, 0.0)
+
+        widget = factory(
+            'number',
+            name='NUMBER',
+            props={
+                'datatype': 'int'
+            })
+        data = widget.extract({'NUMBER': '0'})
+        self.assertEqual(data.extracted, 0)
+
+        # Persist
+        widget = factory(
+            'number',
+            name='NUMBER',
+            props={
+                'datatype': 'int'
+            })
+        data = widget.extract({'NUMBER': '0'})
+        model = dict()
+        data.persist_writer = write_mapping_writer
+        data.write(model)
+        self.assertEqual(model, {'NUMBER': 0})
