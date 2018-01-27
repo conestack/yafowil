@@ -5,7 +5,8 @@ History
 2.2.5 (unreleased)
 ------------------
 
-- No changes yet.
+- Add html5 data attribute support to ``form_edit_renderer``.
+  [rnix]
 
 
 2.2.4 (2017-11-13)

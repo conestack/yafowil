@@ -238,6 +238,7 @@ def form_edit_renderer(widget, data):
         'class_': cssclasses(widget, data),
         'id': 'form-{0}'.format('-'.join(widget.path)),
     }
+    form_attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
     return data.tag('form', data.rendered, **form_attrs)
 
 
