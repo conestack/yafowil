@@ -12,6 +12,9 @@ History
   ``common.error_renderer``.
   [rnix]
 
+- Add html5 data attribute support to ``form_edit_renderer``.
+  [rnix]
+
 
 2.2.4 (2017-11-13)
 ------------------
