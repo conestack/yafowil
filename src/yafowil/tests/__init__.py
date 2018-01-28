@@ -15,12 +15,14 @@ def test_suite():
     from yafowil.tests import test_base
     from yafowil.tests import test_common
     from yafowil.tests import test_compound
+    from yafowil.tests import test_controller
 
     suite = unittest.TestSuite()
 
     suite.addTest(unittest.findTestCases(test_base))
     suite.addTest(unittest.findTestCases(test_common))
     suite.addTest(unittest.findTestCases(test_compound))
+    suite.addTest(unittest.findTestCases(test_controller))
 
     return suite
 
