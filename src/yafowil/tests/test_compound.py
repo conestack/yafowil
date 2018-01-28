@@ -719,190 +719,193 @@ class TestCompound(NodeTestCase):
         </div>
         """, fxml(input()))
 
-"""
-Fieldset
---------
+    def test_fieldset_blueprint(self):
+        compound = factory(
+            'fieldset',
+            'COMPOUND',
+            props={
+                'legend': 'Some Test'
+            })
+        compound['inner'] = factory('text', 'inner', 'value')
+        compound['inner2'] = factory('text', 'inner2', 'value2')
+        self.check_output("""
+        <fieldset id="fieldset-COMPOUND">
+          <legend>Some Test</legend>
+          <input class="text" id="input-COMPOUND-inner" name="COMPOUND.inner"
+                 type="text" value="value"/>
+          <input class="text" id="input-COMPOUND-inner2" name="COMPOUND.inner2"
+                 type="text" value="value2"/>
+        </fieldset>
+        """, fxml(compound()))
 
-::
+        # Structural fieldset renders without id attribute
+        compound = factory(
+            'fieldset',
+            'COMPOUND',
+            props={
+                'structural': True
+            })
+        self.assertEqual(compound(), '<fieldset></fieldset>')
 
-    >>> compound = factory(
-    ...     'fieldset',
-    ...     'COMPOUND',
-    ...     props={
-    ...         'legend': 'Some Test'
-    ...     })
-    >>> compound['inner'] = factory('text', 'inner', 'value')
-    >>> compound['inner2'] = factory('text', 'inner2', 'value2')
-    >>> pxml(compound())
-    <fieldset id="fieldset-COMPOUND">
-      <legend>Some Test</legend>
-      <input class="text" id="input-COMPOUND-inner" name="COMPOUND.inner" 
-        type="text" value="value"/>
-      <input class="text" id="input-COMPOUND-inner2" name="COMPOUND.inner2" 
-        type="text" value="value2"/>
-    </fieldset>
-    <BLANKLINE>
+        # Fieldset display renderers are the same as fieldset edit renderers
+        compound = factory(
+            'fieldset',
+            'COMPOUND',
+            props={
+                'legend': 'Some Test'
+            },
+            mode='display')
+        self.check_output("""
+        <fieldset id="fieldset-COMPOUND">
+          <legend>Some Test</legend>
+        </fieldset>
+        """, fxml(compound()))
 
-Structural fieldset renders without id attribute::
+    def test_form_blueprint(self):
+        # Test Form
+        form = factory(
+            'form',
+            name = 'FORM',
+            props={
+                'action': 'http://fubar.com'
+            })
+        self.assertEqual(form(), (
+            '<form action="http://fubar.com" enctype="multipart/form-data" '
+            'id="form-FORM" method="post" novalidate="novalidate"></form>'
+        ))
 
-    >>> compound = factory(
-    ...     'fieldset',
-    ...     'COMPOUND',
-    ...     props={
-    ...         'structural': True
-    ...     })
-    >>> pxml(compound())
-    <fieldset/>
-    <BLANKLINE>
- 
-Fieldset display renderers are the same as fieldset edit renderers::
+        # Form action as callable
+        def action(widget, data):
+            return 'http://fubar.com'
 
-    >>> compound = factory(
-    ...     'fieldset',
-    ...     'COMPOUND',
-    ...     props={
-    ...         'legend': 'Some Test'
-    ...     },
-    ...     mode='display')
-    >>> pxml(compound())
-    <fieldset id="fieldset-COMPOUND">
-      <legend>Some Test</legend>
-    </fieldset>
-    <BLANKLINE>
+        form = factory(
+            'form',
+            name = 'FORM',
+            props={
+                'action': action
+            })
+        self.assertEqual(form(), (
+            '<form action="http://fubar.com" enctype="multipart/form-data" '
+            'id="form-FORM" method="post" novalidate="novalidate"></form>'
+        ))
 
+        # Form display renderer
+        form = factory(
+            'form',
+            name = 'FORM',
+            props={
+                'action': 'http://fubar.com'
+            },
+            mode='display')
+        self.assertEqual(form(), '<div></div>')
 
-Form
-----
+        # Create a form with some children
+        form = factory(
+            'form',
+            name='myform',
+            props={
+                'action': 'http://www.domain.tld/someform'
+            })
+        form['someinput'] = factory(
+            'label:text',
+            props={
+                'label': 'Your Text'
+            })
 
-Test Form::
+        self.form_data = None
+        def formaction(widget, data):
+            self.form_data = data
 
-    >>> form = factory(
-    ...     'form',
-    ...     name = 'FORM',
-    ...     props={
-    ...         'action': 'http://fubar.com'
-    ...     })
-    >>> form()
-    u'<form action="http://fubar.com" enctype="multipart/form-data" 
-    id="form-FORM" method="post" novalidate="novalidate"></form>'
+        def formnext(request):
+            return 'http://www.domain.tld/result'
 
-Form action as callable::
+        form['submit'] = factory(
+            'submit',
+            props={
+                'handler': formaction,
+                'next': formnext,
+                'action': True
+            })
 
-    >>> def action(widget, data):
-    ...     return 'http://fubar.com'
+        # Render an empty form
+        self.check_output("""
+        <form action="http://www.domain.tld/someform"
+              enctype="multipart/form-data" id="form-myform" method="post"
+              novalidate="novalidate">
+          <label for="input-myform-someinput">Your Text</label>
+          <input class="text" id="input-myform-someinput"
+                 name="myform.someinput" type="text" value=""/>
+          <input id="input-myform-submit" name="action.myform.submit"
+                 type="submit" value="submit"/>
+        </form>
+        """, fxml(form()))
 
-    >>> form = factory(
-    ...     'form',
-    ...     name = 'FORM',
-    ...     props={
-    ...         'action': action
-    ...     })
-    >>> form()
-    u'<form action="http://fubar.com" enctype="multipart/form-data" 
-    id="form-FORM" method="post" novalidate="novalidate"></form>'
+        # Get form data out of request (request is expected dict-like)
+        request = {
+            'myform.someinput': 'Hello World',
+            'action.myform.submit': 'submit'
+        }
+        controller = Controller(form, request)
 
-Form display renderer::
+        form_data = self.form_data
+        self.assertEqual(form_data.name, 'myform')
+        self.assertEqual(form_data.value, UNSET)
+        expected = odict()
+        expected['someinput'] = 'Hello World'
+        expected['submit'] = UNSET
+        self.assertEqual(form_data.extracted, expected)
+        self.assertEqual(form_data.errors, [])
 
-    >>> form = factory(
-    ...     'form',
-    ...     name = 'FORM',
-    ...     props={
-    ...         'action': 'http://fubar.com'
-    ...     },
-    ...     mode='display')
-    >>> form()
-    u'<div></div>'
+        input_data = form_data['someinput']
+        self.assertEqual(input_data.name, 'someinput')
+        self.assertEqual(input_data.value, UNSET)
+        self.assertEqual(input_data.extracted, 'Hello World')
+        self.assertEqual(input_data.errors, [])
 
-Create a form with some children::
+        # submit blueprint gets a runtime data as well, but it's never needed
+        # or used so far
+        submit_data = form_data['submit']
+        self.assertEqual(submit_data.name, 'submit')
+        self.assertEqual(submit_data.value, UNSET)
+        self.assertEqual(submit_data.extracted, UNSET)
+        self.assertEqual(submit_data.errors, [])
 
-    >>> form = factory(
-    ...     'form',
-    ...     name='myform',
-    ...     props={
-    ...         'action': 'http://www.domain.tld/someform'
-    ...     })
-    >>> form['someinput'] = factory(
-    ...     'label:text',
-    ...     props={
-    ...         'label': 'Your Text'
-    ...     })
+        del self.form_data
 
-    >>> def formaction(widget, data):
-    ...     data.printtree()
+        # Form action property can be callable
+        def action(widget, data):
+            return 'actionfromcall'
 
-    >>> def formnext(request):
-    ...     return 'http://www.domain.tld/result'
+        form = factory(
+            'form',
+            name='form',
+            props={
+                'action':action,
+            })
+        self.assertEqual(form(), (
+            '<form action="actionfromcall" enctype="multipart/form-data" '
+            'id="form-form" method="post" novalidate="novalidate"></form>'
+        ))
 
-    >>> form['submit'] = factory(
-    ...     'submit',
-    ...     props={
-    ...         'handler': formaction,
-    ...         'next': formnext,
-    ...         'action': True
-    ...     })
-
-Render an empty form::
-
-    >>> pxml(form())
-    <form action="http://www.domain.tld/someform" 
-      enctype="multipart/form-data" id="form-myform" method="post" 
-      novalidate="novalidate">
-      <label for="input-myform-someinput">Your Text</label>
-      <input class="text" id="input-myform-someinput" name="myform.someinput" 
-        type="text" value=""/>
-      <input id="input-myform-submit" name="action.myform.submit" 
-        type="submit" value="submit"/>
-    </form>
-    <BLANKLINE>
-
-Get form data out of request (request is expected dict-like)::
-
-    >>> request = {
-    ...     'myform.someinput': 'Hello World',
-    ...     'action.myform.submit': 'submit'
-    ... }
-    >>> controller = Controller(form, request)
-    <RuntimeData myform, value=<UNSET>, 
-      extracted=odict([('someinput', 'Hello World'), 
-      ('submit', <UNSET>)]) at ...>
-      <RuntimeData myform.someinput, value=<UNSET>, 
-        extracted='Hello World' at ...>
-      <RuntimeData myform.submit, value=<UNSET>, extracted=<UNSET> at ...>
-
-Form action property can be callable::
-
-    >>> def action(widget, data):
-    ...     return 'actionfromcall'
-
-    >>> form = factory(
-    ...     'form',
-    ...     name='form',
-    ...     props={
-    ...         'action':action,
-    ...     })
-    >>> form()
-    u'<form action="actionfromcall" enctype="multipart/form-data" 
-    id="form-form" method="post" novalidate="novalidate"></form>'
-
-Create label for field in other compound::
-
-    >>> form = factory(
-    ...     'form',
-    ...     name = 'form',
-    ...     props = {
-    ...         'action': 'action'
-    ...     })
-    >>> form['label'] = factory(
-    ...     'label',
-    ...     props={
-    ...         'label': 'Foo',
-    ...         'for': 'field'
-    ...     })
-    >>> form['field'] = factory('text')
-    >>> form()
-    u'<form action="action" enctype="multipart/form-data" id="form-form" 
-    method="post" novalidate="novalidate"><label 
-    for="input-form-field">Foo</label><input 
-    class="text" id="input-form-field" name="form.field" type="text" 
-    value="" /></form>'
-"""
+        # Create label for field in other compound
+        form = factory(
+            'form',
+            name = 'form',
+            props = {
+                'action': 'action'
+            })
+        form['label'] = factory(
+            'label',
+            props={
+                'label': 'Foo',
+                'for': 'field'
+            })
+        form['field'] = factory('text')
+        self.check_output("""
+        <form action="action" enctype="multipart/form-data" id="form-form"
+              method="post" novalidate="novalidate">
+          <label for="input-form-field">Foo</label>
+          <input class="text" id="input-form-field" name="form.field"
+                 type="text" value=""/>
+        </form>
+        """, fxml(form()))
