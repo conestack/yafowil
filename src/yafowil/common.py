@@ -1997,10 +1997,13 @@ def error_renderer(widget, data):
     for error in data.errors:
         message_tag = attr_value('message_tag', widget, data)
         if message_tag:
-            msgs += tag(message_tag, error,
-                        class_=attr_value('message_class', widget, data))
+            msgs += tag(
+                message_tag,
+                error,
+                class_=attr_value('message_class', widget, data)
+            )
         else:
-            msgs += error.message
+            msgs += unicode(error)
     attrs = dict(class_=cssclasses(widget, data))
     elem_tag = attr_value('tag', widget, data)
     position = attr_value('position', widget, data)

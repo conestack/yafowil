@@ -581,142 +581,145 @@ class TestCompound(NodeTestCase):
         self.assertEqual(data.extracted, expected)
         self.assertEqual(data.errors, [])
 
+    def test_div_blueprint_compound(self):
+        # Div blueprint as compound
+        div = factory(
+            'div',
+            name='DIV_COMPOUND')
+        div['inner']  = factory(
+            'text',
+            value='value1')
+        div['inner2'] = factory(
+            'text',
+            value='value2',
+            props={
+                'required': True
+            })
+        self.check_output("""
+        <div>
+          <input class="text" id="input-DIV_COMPOUND-inner"
+                 name="DIV_COMPOUND.inner" type="text" value="value1"/>
+          <input class="required text" id="input-DIV_COMPOUND-inner2"
+                 name="DIV_COMPOUND.inner2" required="required" type="text"
+                 value="value2"/>
+        </div>
+        """, fxml(div()))
+
+        data = div.extract({
+            'DIV_COMPOUND.inner': '1',
+            'DIV_COMPOUND.inner2': '2',
+        })
+        self.assertEqual(data.name, 'DIV_COMPOUND')
+        self.assertEqual(data.value, UNSET)
+        expected = odict()
+        expected['inner'] = '1'
+        expected['inner2'] = '2'
+        self.assertEqual(data.extracted, expected)
+        self.assertEqual(data.errors, [])
+
+        data_inner = data['inner']
+        self.assertEqual(data_inner.name, 'inner')
+        self.assertEqual(data_inner.value, 'value1')
+        self.assertEqual(data_inner.extracted, '1')
+        self.assertEqual(data_inner.errors, [])
+
+        data_inner2 = data['inner2']
+        self.assertEqual(data_inner2.name, 'inner2')
+        self.assertEqual(data_inner2.value, 'value2')
+        self.assertEqual(data_inner2.extracted, '2')
+        self.assertEqual(data_inner2.errors, [])
+
+    def test_div_blueprint_compound_leaf(self):
+        # Div blueprint as compound, but with ``leaf`` property set. Causes
+        # ``hybrid_renderer`` and ``hybrid_extractor`` to skip auto delegating
+        # to ``compound_renderer`` and ``compound_extractor``
+        div = factory(
+            'div',
+            name='DIV_COMPOUND_LEAF',
+            props={
+                'leaf': True
+            })
+        div['inner']  = factory(
+            'text',
+            value='value1')
+        div['inner2'] = factory(
+            'text',
+            value='value2',
+            props={
+                'required': True
+            })
+        self.assertEqual(div(), '<div></div>')
+
+        data = div.extract({
+            'DIV_COMPOUND_LEAF.inner': '1',
+            'DIV_COMPOUND_LEAF.inner2': '2',
+        })
+        self.assertEqual(data.name, 'DIV_COMPOUND_LEAF')
+        self.assertEqual(data.value, UNSET)
+        self.assertEqual(data.extracted, UNSET)
+        self.assertEqual(data.errors, [])
+        self.assertEqual(data.keys(), [])
+
+    def test_div_blueprint_as_leaf(self):
+        # Div blueprint as leaf
+        input = factory(
+            'div:text',
+            name='DIV',
+            value='1')
+        self.check_output("""
+        <div>
+          <input class="text" id="input-DIV" name="DIV"
+                 type="text" value="1"/>
+        </div>
+        """, fxml(input()))
+
+        data = input.extract({
+            'DIV': '2',
+        })
+        self.assertEqual(data.name, 'DIV')
+        self.assertEqual(data.value, '1')
+        self.assertEqual(data.extracted, '2')
+        self.assertEqual(data.errors, [])
+
+        # Empty div
+        input = factory(
+            'div',
+            name='DIV')
+        self.assertEqual(input(), '<div></div>')
+
+        # Div with data attributes
+        input = factory(
+            'div',
+            name='DIV',
+            props={
+                'data': {
+                    'foo': 'bar'
+                }
+            })
+        self.assertEqual(input(), "<div data-foo='bar'></div>")
+
+        # Display mode
+        div = factory(
+            'div',
+            name='DIV',
+            props={
+                'class': 'foo'
+            },
+            mode='display')
+        self.assertEqual(div(), '<div class="foo"></div>')
+
+        input = factory(
+            'div:text',
+            name='DIV',
+            value='1',
+            mode='display')
+        self.check_output("""
+        <div>
+          <div class="display-text" id="display-DIV">1</div>
+        </div>
+        """, fxml(input()))
+
 """
-Div
----
-
-Div blueprint as compound::
-
-    >>> div = factory(
-    ...     'div',
-    ...     name='WRAPPED_COMPOUND')
-    >>> div['inner']  = factory(
-    ...     'text',
-    ...     value='value1')
-    >>> div['inner2'] = factory(
-    ...     'text',
-    ...     value='value2',
-    ...     props={
-    ...         'required': True
-    ...     })
-    >>> pxml(div())
-    <div>
-      <input class="text" id="input-WRAPPED_COMPOUND-inner" 
-        name="WRAPPED_COMPOUND.inner" type="text" value="value1"/>
-      <input class="required text" id="input-WRAPPED_COMPOUND-inner2" 
-        name="WRAPPED_COMPOUND.inner2" required="required" type="text" 
-        value="value2"/>
-    </div>
-    <BLANKLINE>
-
-    >>> data = div.extract({
-    ...     'WRAPPED_COMPOUND.inner': '1',
-    ...     'WRAPPED_COMPOUND.inner2': '2',
-    ... })
-    >>> data.printtree()
-    <RuntimeData WRAPPED_COMPOUND, value=<UNSET>, 
-      extracted=odict([('inner', '1'), ('inner2', '2')]) at ...>
-      <RuntimeData WRAPPED_COMPOUND.inner, value='value1', 
-        extracted='1' at ...>
-      <RuntimeData WRAPPED_COMPOUND.inner2, value='value2', 
-        extracted='2' at ...>
-
-Dic blueprint as compound, but with ``leaf`` property set. Causes
-``hybrid_renderer`` and ``hybrid_extractor`` to skip auto delegating to
-``compound_renderer`` and ``compound_extractor``::
-
-    >>> div = factory(
-    ...     'div',
-    ...     name='WRAPPED_COMPOUND',
-    ...     props={
-    ...         'leaf': True
-    ...     })
-    >>> div['inner']  = factory(
-    ...     'text',
-    ...     value='value1')
-    >>> div['inner2'] = factory(
-    ...     'text',
-    ...     value='value2',
-    ...     props={
-    ...         'required': True
-    ...     })
-    >>> pxml(div())
-    <div/>
-    <BLANKLINE>
-
-    >>> data = div.extract({
-    ...     'WRAPPED_COMPOUND.inner': '1',
-    ...     'WRAPPED_COMPOUND.inner2': '2',
-    ... })
-    >>> data.printtree()
-    <RuntimeData WRAPPED_COMPOUND, value=<UNSET>, extracted=<UNSET> at ...>
-
-Div blueprint as leaf::
-
-    >>> input = factory(
-    ...     'div:text',
-    ...     'field',
-    ...     value='1')
-    >>> pxml(input())
-    <div>
-      <input class="text" id="input-field" name="field" type="text" value="1"/>
-    </div>
-    <BLANKLINE>
-
-    >>> data = input.extract({
-    ...     'field': '2',
-    ... })
-    >>> data.printtree()
-    <RuntimeData field, value='1', extracted='2' at ...>
-
-Empty div::
-
-    >>> input = factory(
-    ...     'div',
-    ...     'field')
-    >>> pxml(input())
-    <div/>
-    <BLANKLINE>
-
-Div with data attributes::
-
-    >>> input = factory(
-    ...     'div',
-    ...     'field',
-    ...     props={
-    ...         'data': {
-    ...             'foo': 'bar'
-    ...         }
-    ...     })
-    >>> pxml(input())
-    <div data-foo="bar"/>
-    <BLANKLINE>
-
-Display mode::
-
-    >>> div = factory(
-    ...     'div',
-    ...     name='WRAPPED_COMPOUND',
-    ...     props={
-    ...         'class': 'foo'
-    ...     },
-    ...     mode='display')
-    >>> pxml(div())
-    <div class="foo"/>
-    <BLANKLINE>
-
-    >>> input = factory(
-    ...     'div:text',
-    ...     'field',
-    ...     value='1',
-    ...     mode='display')
-    >>> pxml(input())
-    <div>
-      <div class="display-text" id="display-field">1</div>
-    </div>
-    <BLANKLINE>
-
-
 Fieldset
 --------
 
