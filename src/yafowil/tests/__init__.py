@@ -14,11 +14,13 @@ def pxml(xml):
 def test_suite():
     from yafowil.tests import test_base
     from yafowil.tests import test_common
+    from yafowil.tests import test_compound
 
     suite = unittest.TestSuite()
 
     suite.addTest(unittest.findTestCases(test_base))
     suite.addTest(unittest.findTestCases(test_common))
+    suite.addTest(unittest.findTestCases(test_compound))
 
     return suite
 
