@@ -20,6 +20,7 @@ def test_suite():
     from yafowil.tests import test_resources
     from yafowil.tests import test_table
     from yafowil.tests import test_tsf
+    from yafowil.tests import test_utils
 
     suite = unittest.TestSuite()
 
@@ -31,6 +32,7 @@ def test_suite():
     suite.addTest(unittest.findTestCases(test_resources))
     suite.addTest(unittest.findTestCases(test_table))
     suite.addTest(unittest.findTestCases(test_tsf))
+    suite.addTest(unittest.findTestCases(test_utils))
 
     return suite
 
