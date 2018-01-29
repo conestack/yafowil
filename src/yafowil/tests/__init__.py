@@ -19,6 +19,7 @@ def test_suite():
     from yafowil.tests import test_persistence
     from yafowil.tests import test_resources
     from yafowil.tests import test_table
+    from yafowil.tests import test_tsf
 
     suite = unittest.TestSuite()
 
@@ -29,6 +30,7 @@ def test_suite():
     suite.addTest(unittest.findTestCases(test_persistence))
     suite.addTest(unittest.findTestCases(test_resources))
     suite.addTest(unittest.findTestCases(test_table))
+    suite.addTest(unittest.findTestCases(test_tsf))
 
     return suite
 
