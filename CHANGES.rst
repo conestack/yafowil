@@ -5,6 +5,10 @@ History
 2.2.5 (unreleased)
 ------------------
 
+- Create deepcopy of resources in ``YafowilResources.__init__`` to prevent
+  modification of the original resource definitions.
+  [rnix]
+
 - Implement ``ExtractionError.__eq__`` to make them comparable.
   [rnix]
 

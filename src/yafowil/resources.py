@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from yafowil.base import factory
 from yafowil.utils import get_plugin_names
+import copy
 
 
 class YafowilResources(object):
@@ -14,9 +15,8 @@ class YafowilResources(object):
         This object normally gets instanciated only once at application
         startup.
 
-        @param js_skip - ignored resource groups when aggregating JS resources.
-        @param css_skip - ignored resource groups when aggregating CSS
-                          resources.
+        :param js_skip: ignored resource groups when aggregating JS resources.
+        :param css_skip: ignored resource groups when aggregating CSS resources.
         """
         all_js = list()
         all_css = list()
@@ -24,17 +24,18 @@ class YafowilResources(object):
             resources = factory.resources_for(plugin_name)
             if not resources:
                 continue
+            resources = copy.deepcopy(resources)
             resource_base = self.configure_resource_directory(
                 plugin_name, resources['resourcedir'])
             for js in resources['js']:
                 if js['group'] in js_skip:
-                    continue                                 #pragma NO COVER
+                    continue
                 if not self._is_remote_resource(js['resource']):
                     js['resource'] = resource_base + '/' + js['resource']
                 all_js.append(js)
             for css in resources['css']:
                 if css['group'] in css_skip:
-                    continue                                 #pragma NO COVER
+                    continue
                 if not self._is_remote_resource(css['resource']):
                     css['resource'] = resource_base + '/' + css['resource']
                 all_css.append(css)
@@ -56,8 +57,10 @@ class YafowilResources(object):
         This function is supposed to be implemented on derived object by
         framework integration code.
 
-        @param plugin_name - plugin name.
-        @param resource_dir - absolute path of the physical location of plugin
-                              resource directory.
+        :param plugin_name: plugin name.
+        :param resource_dir: absolute path of the physical location of plugin
+            resource directory.
+        :return string: base URL under which the plugin specific resources are
+            available.
         """
         return plugin_name
