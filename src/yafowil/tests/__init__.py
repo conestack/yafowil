@@ -1,5 +1,22 @@
+from node.tests import NodeTestCase
+from yafowil.base import factory
 import lxml.etree as etree
 import unittest
+import yafowil.common
+import yafowil.compound
+import yafowil.persistence
+import yafowil.table
+
+
+class YafowilTestCase(NodeTestCase):
+
+    def setUp(self):
+        super(YafowilTestCase, self).setUp()
+        factory.clear()
+        reload(yafowil.persistence)
+        reload(yafowil.common)
+        reload(yafowil.compound)
+        reload(yafowil.table)
 
 
 def fxml(xml):

@@ -1,15 +1,15 @@
-from node.tests import NodeTestCase
 from node.utils import UNSET
 from odict import odict
 from yafowil.base import ExtractionError
 from yafowil.base import factory
+from yafowil.tests import YafowilTestCase
 from yafowil.tests import fxml
 import yafowil.common
 import yafowil.compound
 import yafowil.table
 
 
-class TestTable(NodeTestCase):
+class TestTable(YafowilTestCase):
     # Table elements are available as blueprints, often one wanta to
     # organize form elements inside a table, providing pretty looking forms
 

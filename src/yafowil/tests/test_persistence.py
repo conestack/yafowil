@@ -1,16 +1,16 @@
 from node.base import AttributedNode
-from node.tests import NodeTestCase
 from node.utils import UNSET
 from odict import odict
 from yafowil.base import factory
 from yafowil.persistence import attribute_writer
 from yafowil.persistence import node_attribute_writer
 from yafowil.persistence import write_mapping_writer
+from yafowil.tests import YafowilTestCase
 import uuid
 import yafowil.loader
 
 
-class TestPersistence(NodeTestCase):
+class TestPersistence(YafowilTestCase):
 
     def test_persistence(self):
         # Test ``attribute_writer``

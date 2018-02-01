@@ -5,6 +5,9 @@ History
 2.2.5 (unreleased)
 ------------------
 
+- Introduce ``yafowil.base.Factory.clear`` function. Used in tests to prepare
+  ``yafowil.base.factory`` singleton as required.
+
 - Create deepcopy of resources in ``YafowilResources.__init__`` to prevent
   modification of the original resource definitions.
   [rnix]

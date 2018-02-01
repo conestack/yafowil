@@ -1,9 +1,9 @@
 from odict import odict
-from node.tests import NodeTestCase
 from node.utils import UNSET
 from yafowil.base import ExtractionError
 from yafowil.base import factory
 from yafowil.controller import Controller
+from yafowil.tests import YafowilTestCase
 from yafowil.tests import fxml
 from yafowil.utils import Tag
 import yafowil.common
@@ -21,7 +21,7 @@ tag = Tag(lambda msg: msg)
 # Tests
 ###############################################################################
 
-class TestCompound(NodeTestCase):
+class TestCompound(YafowilTestCase):
 
     def test_compound_blueprint_value_via_compound(self):
         # Render Compound with values set via compound widget

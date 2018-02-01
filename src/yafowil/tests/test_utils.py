@@ -3,10 +3,10 @@ from node.base import AttributedNode
 from node.base import OrderedNode
 from node.behaviors import Attributes
 from node.behaviors import Nodespaces
-from node.tests import NodeTestCase
 from node.utils import UNSET
 from plumber import plumbing
 from yafowil.base import factory
+from yafowil.tests import YafowilTestCase
 from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import Tag
 from yafowil.utils import attr_value
@@ -26,7 +26,7 @@ import uuid
 import yafowil.loader
 
 
-class TestUtils(NodeTestCase):
+class TestUtils(YafowilTestCase):
 
     def test_entry_point(self):
         # Test entry_point support tools

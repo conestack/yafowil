@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from StringIO import StringIO
-from node.tests import NodeTestCase
 from node.utils import UNSET
 from yafowil.base import ExtractionError
 from yafowil.base import factory
 from yafowil.common import convert_bytes
 from yafowil.persistence import write_mapping_writer
+from yafowil.tests import YafowilTestCase
 from yafowil.tests import fxml
 from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import Tag
@@ -27,7 +27,7 @@ def wrapped_fxml(value):
 # Tests
 ###############################################################################
 
-class TestCommon(NodeTestCase):
+class TestCommon(YafowilTestCase):
     # Common Blueprints
 
     # This test creates widgets from ist blueprints with different properties.

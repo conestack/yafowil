@@ -1,12 +1,12 @@
-from node.tests import NodeTestCase
 from yafowil.base import factory
 from yafowil.controller import Controller
 from yafowil.tests import fxml
+from yafowil.tests import YafowilTestCase
 import yafowil.common
 import yafowil.compound
 
 
-class TestController(NodeTestCase):
+class TestController(YafowilTestCase):
 
     def test_controller(self):
         # Dummy context

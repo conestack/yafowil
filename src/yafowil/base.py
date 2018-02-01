@@ -536,6 +536,9 @@ class Factory(object):
             'blueprint': dict(),
         }
 
+    def clear(self):
+        self.__init__()
+
     def _name_check(self, name):
         for chara in '*:#':
             if chara in name:
