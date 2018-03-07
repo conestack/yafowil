@@ -1,10 +1,10 @@
 **Yet Another Form WIdget Library**.
 
-.. image:: https://pypip.in/v/yafowil/badge.png
+.. image:: https://img.shields.io/pypi/v/yafowil.svg
     :target: https://pypi.python.org/pypi/yafowil
     :alt: Latest PyPI version
 
-.. image:: https://pypip.in/d/yafowil/badge.png
+.. image:: https://img.shields.io/pypi/dm/yafowil.svg
     :target: https://pypi.python.org/pypi/yafowil
     :alt: Number of PyPI downloads
 
