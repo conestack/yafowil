@@ -5,8 +5,12 @@ History
 2.2.5 (unreleased)
 ------------------
 
+- Cache results of ``yafowil.utils.get_plugin_names`` by namespace.
+  [rnix]
+
 - Introduce ``yafowil.base.Factory.clear`` function. Used in tests to prepare
   ``yafowil.base.factory`` singleton as required.
+  [rnix]
 
 - Create deepcopy of resources in ``YafowilResources.__init__`` to prevent
   modification of the original resource definitions.

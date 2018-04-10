@@ -34,8 +34,14 @@ def get_entry_points(ns=None):
     return sorted(entry_points, key=_ep_sortkey)
 
 
+_plugin_names = dict()
+
 def get_plugin_names(ns=None):
-    return list(set([_.dist.project_name for _ in get_entry_points(ns=ns)]))
+    if ns not in _plugin_names:
+        _plugin_names[ns] = list(set(
+            [_.dist.project_name for _ in get_entry_points(ns=ns)]
+        ))
+    return _plugin_names[ns]
 
 
 def get_example(example_name):
