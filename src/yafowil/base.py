@@ -129,6 +129,7 @@ class RuntimeData(object):
                 'Attempt to persist data which failed to extract'
             )
         current_writer = self.persist_writer or writer
+        # XXX: if persist and not current_writer
         if not current_writer:
             raise ValueError('No persistence writer found')
         if not writer:
