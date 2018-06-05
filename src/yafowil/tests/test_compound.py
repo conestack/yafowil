@@ -7,7 +7,7 @@ from yafowil.tests import YafowilTestCase
 from yafowil.tests import fxml
 from yafowil.utils import Tag
 import yafowil.common
-import yafowil.compound
+import yafowil.compound # noqa
 
 
 ###############################################################################
@@ -33,7 +33,7 @@ class TestCompound(YafowilTestCase):
             'compound',
             name='COMPOUND',
             value=value)
-        compound['inner']  = factory('text')
+        compound['inner'] = factory('text')
         compound['inner2'] = factory(
             'text',
             props={
@@ -54,7 +54,7 @@ class TestCompound(YafowilTestCase):
         compound = factory(
             'compound',
             name='COMPOUND')
-        compound['inner']  = factory(
+        compound['inner'] = factory(
             'text',
             value='value1')
         compound['inner2'] = factory(
@@ -80,7 +80,7 @@ class TestCompound(YafowilTestCase):
             'compound',
             name='COMPOUND',
             value=value)
-        compound['inner']  = factory(
+        compound['inner'] = factory(
             'text',
             value='value1')
         err = self.expect_error(
@@ -92,7 +92,7 @@ class TestCompound(YafowilTestCase):
 
     def test_compound_blueprint_extraction(self):
         compound = factory('compound', name='COMPOUND')
-        compound['inner']  = factory('text', value='value1')
+        compound['inner'] = factory('text', value='value1')
         compound['inner2'] = factory(
             'error:text',
             value='value2',
@@ -178,7 +178,7 @@ class TestCompound(YafowilTestCase):
             props={
                 'structural': True
             })
-        structural['inner']  = factory('text')
+        structural['inner'] = factory('text')
         structural['inner2'] = factory(
             'text',
             props={
@@ -259,7 +259,7 @@ class TestCompound(YafowilTestCase):
                  name="COMPOUND.CHILD_COMPOUND.inner2" required="required"
                  type="text" value="Value 2 from parent"/>
         </div>
-        """, fxml(tag('div', compound())))
+        """, fxml(tag('div', compound())))  # noqa
 
         self.assertEqual(compound.treerepr().split('\n'), [
             "<class 'yafowil.base.Widget'>: COMPOUND",
@@ -344,7 +344,7 @@ class TestCompound(YafowilTestCase):
                  name="COMPOUND.CHILD_COMPOUND.inner2" required="required"
                  type="text" value="Value 2 from parent"/>
         </div>
-        """, fxml(tag('div', compound())))
+        """, fxml(tag('div', compound())))  # noqa
 
         self.assertEqual(compound.treerepr().split('\n'), [
             "<class 'yafowil.base.Widget'>: COMPOUND",
@@ -586,7 +586,7 @@ class TestCompound(YafowilTestCase):
         div = factory(
             'div',
             name='DIV_COMPOUND')
-        div['inner']  = factory(
+        div['inner'] = factory(
             'text',
             value='value1')
         div['inner2'] = factory(
@@ -639,7 +639,7 @@ class TestCompound(YafowilTestCase):
             props={
                 'leaf': True
             })
-        div['inner']  = factory(
+        div['inner'] = factory(
             'text',
             value='value1')
         div['inner2'] = factory(
@@ -765,7 +765,7 @@ class TestCompound(YafowilTestCase):
         # Test Form
         form = factory(
             'form',
-            name = 'FORM',
+            name='FORM',
             props={
                 'action': 'http://fubar.com'
             })
@@ -780,7 +780,7 @@ class TestCompound(YafowilTestCase):
 
         form = factory(
             'form',
-            name = 'FORM',
+            name='FORM',
             props={
                 'action': action
             })
@@ -792,7 +792,7 @@ class TestCompound(YafowilTestCase):
         # Form display renderer
         form = factory(
             'form',
-            name = 'FORM',
+            name='FORM',
             props={
                 'action': 'http://fubar.com'
             },
@@ -813,6 +813,7 @@ class TestCompound(YafowilTestCase):
             })
 
         self.form_data = None
+
         def formaction(widget, data):
             self.form_data = data
 
@@ -845,7 +846,7 @@ class TestCompound(YafowilTestCase):
             'myform.someinput': 'Hello World',
             'action.myform.submit': 'submit'
         }
-        controller = Controller(form, request)
+        Controller(form, request)
 
         form_data = self.form_data
         self.assertEqual(form_data.name, 'myform')
@@ -880,7 +881,7 @@ class TestCompound(YafowilTestCase):
             'form',
             name='form',
             props={
-                'action':action,
+                'action': action,
             })
         self.assertEqual(form(), (
             '<form action="actionfromcall" enctype="multipart/form-data" '
@@ -890,8 +891,8 @@ class TestCompound(YafowilTestCase):
         # Create label for field in other compound
         form = factory(
             'form',
-            name = 'form',
-            props = {
+            name='form',
+            props={
                 'action': 'action'
             })
         form['label'] = factory(

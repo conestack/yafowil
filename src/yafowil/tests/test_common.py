@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-from StringIO import StringIO
 from node.utils import UNSET
 from yafowil.base import ExtractionError
 from yafowil.base import factory
 from yafowil.common import convert_bytes
 from yafowil.persistence import write_mapping_writer
-from yafowil.tests import YafowilTestCase
 from yafowil.tests import fxml
+from yafowil.tests import YafowilTestCase
 from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import Tag
+
 import StringIO
 import uuid
 
@@ -18,6 +18,7 @@ import uuid
 ###############################################################################
 
 tag = Tag(lambda msg: msg)
+
 
 def wrapped_fxml(value):
     return fxml(u'<div>' + value + u'</div>')
@@ -65,7 +66,7 @@ class TestCommon(YafowilTestCase):
             name='MYHIDDEN',
             value='Test Hidden',
             props={
-                'data':{
+                'data': {
                     'foo': 'bar'
                 }
             })
@@ -1039,7 +1040,7 @@ class TestCommon(YafowilTestCase):
         data = widget.extract(request)
         self.check_output("""
         <RuntimeData MYCHECKBOX, value='Test Checkbox', extracted=<UNSET> at ...>
-        """, data.treerepr())
+        """, data.treerepr())  # noqa
 
         model = dict()
         data.persist_writer = write_mapping_writer
@@ -1500,7 +1501,7 @@ class TestCommon(YafowilTestCase):
     def test_select_blueprint_single_value(self):
         # Default single value selection
         vocab = [
-            ('one','One'),
+            ('one', 'One'),
             ('two', 'Two'),
             ('three', 'Three'),
             ('four', 'Four')
@@ -1724,7 +1725,8 @@ class TestCommon(YafowilTestCase):
         </select>
         """, fxml(widget()))
 
-        # Single value selection with ``datatype`` with specific options disabled
+        # Single value selection with ``datatype`` with specific options
+        # disabled
         widget.attrs['emptyvalue'] = None
         widget.attrs['disabled'] = [None, 2]
         rendered = widget()
@@ -1829,7 +1831,7 @@ class TestCommon(YafowilTestCase):
     def test_select_blueprint_single_radio(self):
         # Render single selection as radio inputs
         vocab = [
-            ('one','One'),
+            ('one', 'One'),
             ('two', 'Two'),
             ('three', 'Three'),
             ('four', 'Four')
@@ -2084,7 +2086,7 @@ class TestCommon(YafowilTestCase):
             name='MYSELECT',
             value='one',
             props={
-                'vocabulary': [('one','One')],
+                'vocabulary': [('one', 'One')],
                 'format': 'single',
                 'listing_label_position': 'before',
                 'data': {'foo': 'bar'}
@@ -2108,7 +2110,7 @@ class TestCommon(YafowilTestCase):
             name='MYSELECT',
             value='one',
             props={
-                'vocabulary': [('one','One')],
+                'vocabulary': [('one', 'One')],
                 'format': 'single',
                 'listing_label_position': 'before',
                 'data': {'foo': 'bar'}
@@ -2124,7 +2126,7 @@ class TestCommon(YafowilTestCase):
     def test_select_blueprint_multi(self):
         # Default multi valued
         vocab = [
-            ('one','One'),
+            ('one', 'One'),
             ('two', 'Two'),
             ('three', 'Three'),
             ('four', 'Four')
@@ -2252,7 +2254,7 @@ class TestCommon(YafowilTestCase):
 
         # Multiple values on single valued selection fails
         vocab = [
-            ('one','One'),
+            ('one', 'One'),
             ('two', 'Two'),
             ('three', 'Three'),
             ('four', 'Four')
@@ -2272,7 +2274,7 @@ class TestCommon(YafowilTestCase):
 
         # Multi value selection with float datatype set
         vocab = [
-            (1.0,'One'),
+            (1.0, 'One'),
             (2.0, 'Two'),
             (3.0, 'Three'),
             (4.0, 'Four')
@@ -2339,7 +2341,7 @@ class TestCommon(YafowilTestCase):
 
         # Generic HTML5 Data
         vocab = [
-            ('one','One'),
+            ('one', 'One'),
             ('two', 'Two')
         ]
         widget = factory(
@@ -2391,7 +2393,7 @@ class TestCommon(YafowilTestCase):
     def test_select_blueprint_multi_checkboxes(self):
         # Render multi selection as checkboxes
         vocab = [
-            ('one','One'),
+            ('one', 'One'),
             ('two', 'Two'),
             ('three', 'Three'),
             ('four', 'Four')
@@ -2482,7 +2484,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'multivalued': True,
                 'data': {'foo': 'bar'},
-                'vocabulary': [('one','One')],
+                'vocabulary': [('one', 'One')],
                 'format': 'single'
             })
         self.check_output("""
@@ -2510,7 +2512,7 @@ class TestCommon(YafowilTestCase):
         # Using 'ul' instead of 'div' for rendering radio or checkbox
         # selections
         vocab = [
-            ('one','One'),
+            ('one', 'One'),
             ('two', 'Two'),
             ('three', 'Three'),
             ('four', 'Four')
@@ -2562,7 +2564,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'multivalued': True,
                 'vocabulary': [
-                    ('one','One'),
+                    ('one', 'One'),
                     ('two', 'Two'),
                 ],
                 'format': 'single',
@@ -2588,7 +2590,8 @@ class TestCommon(YafowilTestCase):
         </div>
         """, wrapped_fxml(widget()))
 
-        # Render single format selection with input inside label before checkbox
+        # Render single format selection with input inside label before
+        # checkbox
         widget = factory(
             'select',
             name='MYSELECT',
@@ -2596,7 +2599,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'multivalued': True,
                 'vocabulary': [
-                    ('one','One'),
+                    ('one', 'One'),
                     ('two', 'Two'),
                 ],
                 'format': 'single',
@@ -2629,7 +2632,7 @@ class TestCommon(YafowilTestCase):
             name='MYSELECT',
             value='one',
             props={
-                'vocabulary': [('one','One')],
+                'vocabulary': [('one', 'One')],
                 'format': 'single',
                 'listing_label_position': 'inner'
             })
@@ -2649,7 +2652,7 @@ class TestCommon(YafowilTestCase):
 
         # Check selection required
         vocab = [
-            ('one','One'),
+            ('one', 'One'),
             ('two', 'Two'),
             ('three', 'Three'),
             ('four', 'Four')
@@ -2678,7 +2681,7 @@ class TestCommon(YafowilTestCase):
         self.assertEqual(data.errors, [ExtractionError('Selection required')])
 
         vocab = [
-            ('one','One'),
+            ('one', 'One'),
             ('two', 'Two'),
             ('three', 'Three'),
             ('four', 'Four')
@@ -2713,7 +2716,7 @@ class TestCommon(YafowilTestCase):
 
         # Check selection required with datatype set
         vocab = [
-            (1,'One'),
+            (1, 'One'),
             (2, 'Two'),
             (3, 'Three'),
             (4, 'Four')
@@ -2745,7 +2748,7 @@ class TestCommon(YafowilTestCase):
             name='MYSELECT',
             props={
                 'vocabulary': [
-                    ('one','One'),
+                    ('one', 'One'),
                     ('two', 'Two')
                 ]
             })
@@ -2766,7 +2769,7 @@ class TestCommon(YafowilTestCase):
             value='two',
             props={
                 'vocabulary': [
-                    ('one','One'),
+                    ('one', 'One'),
                     ('two', 'Two')
                 ]
             })
@@ -2804,7 +2807,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'required': True,
                 'vocabulary': [
-                    ('one','One'),
+                    ('one', 'One'),
                     ('two', 'Two')
                 ]
             })
@@ -2835,7 +2838,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'multivalued': True,
                 'vocabulary': [
-                    ('one','One'),
+                    ('one', 'One'),
                     ('two', 'Two')
                 ]
             })
@@ -2850,7 +2853,7 @@ class TestCommon(YafowilTestCase):
 
         # Multiple selection extraction with value
         vocab = [
-            ('one','One'),
+            ('one', 'One'),
             ('two', 'Two'),
             ('three', 'Three')
         ]
@@ -2882,7 +2885,7 @@ class TestCommon(YafowilTestCase):
 
         # Multiselection, partly disabled, empty request
         vocab = [
-            ('one','One'),
+            ('one', 'One'),
             ('two', 'Two'),
             ('three', 'Three'),
             ('four', 'Four')
@@ -2904,7 +2907,7 @@ class TestCommon(YafowilTestCase):
 
         # Multiselection, partly disabled, non-empty request
         vocab = [
-            ('one','One'),
+            ('one', 'One'),
             ('two', 'Two'),
             ('three', 'Three'),
             ('four', 'Four'),
@@ -2926,14 +2929,14 @@ class TestCommon(YafowilTestCase):
         }
 
         # Explanation:
-        # 
+        #
         # * one is a simple value as usal,
         # * two is disabled and in value, so it should be kept in.
         # * three is disabled and not in value, so it should kept out,
-        # * four is disabled and in value, but someone removed it in the request, it
-        #   should get recovered,
-        # * five is disabled and not in value, but someone put it in the request. it
-        #   should get removed.
+        # * four is disabled and in value, but someone removed it in the
+        #   request, it should get recovered,
+        # * five is disabled and not in value, but someone put it in the
+        #   request. it should get removed.
 
         # Check extraction
 
@@ -2945,7 +2948,7 @@ class TestCommon(YafowilTestCase):
 
         # Single selection radio extraction
         vocab = [
-            ('one','One'),
+            ('one', 'One'),
             ('two', 'Two'),
             ('three', 'Three')
         ]
@@ -2988,7 +2991,7 @@ class TestCommon(YafowilTestCase):
 
         # Multi selection radio extraction
         vocab = [
-            ('one','One'),
+            ('one', 'One'),
             ('two', 'Two'),
             ('three', 'Three')
         ]
@@ -3410,7 +3413,7 @@ class TestCommon(YafowilTestCase):
         # Render with title attribute
         widget = factory(
             'label',
-            name='MYFILE', \
+            name='MYFILE',
             props={
                 'title': 'My awesome title',
             })
@@ -3421,7 +3424,7 @@ class TestCommon(YafowilTestCase):
         # Label Text can be a callable
         widget = factory(
             'label',
-            name='MYFILE', \
+            name='MYFILE',
             props={
                 'label': lambda: 'Fooo',
             })
@@ -3432,7 +3435,7 @@ class TestCommon(YafowilTestCase):
         # Position can be callable
         widget = factory(
             'label',
-            name='MYFILE', \
+            name='MYFILE',
             props={
                 'label': 'Fooo',
                 'position': lambda x, y: 'inner',
@@ -3502,7 +3505,8 @@ class TestCommon(YafowilTestCase):
 
         # Use in edit forms. note that password is never shown up in markup,
         # but a placeholder is used when a password is already set. Thus, if a
-        # extracted password value is UNSET, this means that password was not changed
+        # extracted password value is UNSET, this means that password was not
+        # changed
         widget = factory(
             'password',
             name='PASSWORD',
@@ -3531,7 +3535,7 @@ class TestCommon(YafowilTestCase):
             'password',
             name='PWD',
             props={
-                'strength': 5, # max 4, does not matter, max is used
+                'strength': 5,  # max 4, does not matter, max is used
             })
         data = widget.extract({'PWD': ''})
         self.assertEqual(data.errors, [ExtractionError('Password too weak')])
@@ -3663,7 +3667,7 @@ class TestCommon(YafowilTestCase):
                    required="required" type="password" value=""/>
           </div>
         </div>
-        """, fxml(widget(data=data)))
+        """, fxml(widget(data=data)))  # noqa
 
         data = widget.extract({'PASSWORD': 'secret'})
         self.check_output("""
@@ -3861,7 +3865,7 @@ class TestCommon(YafowilTestCase):
 
         # Extract value URL input
         data = widget.extract({
-            'URL': 'http://www.foo.bar.com:8080/bla#fasel?blubber=bla&bla=fasel'
+            'URL': 'http://www.foo.bar.com:8080/bla#fasel?blubber=bla&bla=fasel'  # noqa
         })
         self.assertEqual(data.errors, [])
 
@@ -3950,7 +3954,7 @@ class TestCommon(YafowilTestCase):
         widget = factory(
             'number',
             name='NUMBER',
-            value=lambda w,d:3)
+            value=lambda w, d: 3)
         self.assertEqual(widget(), (
             '<input class="number" id="input-NUMBER" name="NUMBER" '
             'type="number" value="3" />'
@@ -4058,7 +4062,7 @@ class TestCommon(YafowilTestCase):
             'number',
             name='NUMBER',
             props={
-                'max': lambda w,d: 10
+                'max': lambda w, d: 10
             })
         data = widget.extract({'NUMBER': '9'})
         self.assertEqual(data.errors, [])
@@ -4076,9 +4080,8 @@ class TestCommon(YafowilTestCase):
         widget = factory(
             'number',
             name='NUMBER',
-            props={
-               'max': 0
-            })
+            props={'max': 0}
+        )
         data = widget.extract({'NUMBER': '1'})
         self.assertEqual(
             data.errors,
@@ -4109,8 +4112,8 @@ class TestCommon(YafowilTestCase):
             'number',
             name='NUMBER',
             props={
-               'step': 2,
-               'min': 3
+                'step': 2,
+                'min': 3
             })
         data = widget.extract({'NUMBER': '7'})
         self.assertEqual(data.errors, [])

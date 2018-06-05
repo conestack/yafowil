@@ -6,7 +6,7 @@ from yafowil.base import RuntimeData
 from yafowil.base import TBSupplementWidget
 from yafowil.base import Widget
 from yafowil.base import fetch_value
-import sys
+
 import traceback
 
 
@@ -72,7 +72,7 @@ class TestBase(NodeTestCase):
 
         # You can fetch other data also by its dotted absolute path
         fetched = data.fetch('root.fieldset.age')
-        self.assertEqual(fetched.value , 36)
+        self.assertEqual(fetched.value, 36)
 
         # Or by the absolute path as an list of strings
         fetched = data.fetch(['root', 'fieldset', 'age'])
@@ -97,7 +97,7 @@ class TestBase(NodeTestCase):
         # It fails if sub path element is wrong
         try:
             data['fieldset']['age'].fetch('root.unknown')
-        except KeyError, e:
+        except KeyError:
             self.check_output("""
             Traceback (most recent call last):
             ...
@@ -117,9 +117,9 @@ class TestBase(NodeTestCase):
             number = data.request[widget.__name__]
             try:
                 return int(number)
-            except:
+            except Exception:
                 raise ExtractionError('e3: Integer expected, got %s' % number)
-            return value
+            return number
 
         def fail_extractor(widget, data):
             raise ValueError('extractor has to fail')
@@ -329,7 +329,7 @@ class TestBase(NodeTestCase):
 
         try:
             testwidget.extract({})
-        except Exception, e:
+        except Exception:
             self.check_output("""
             Traceback (most recent call last):
             ...
@@ -347,7 +347,7 @@ class TestBase(NodeTestCase):
 
         try:
             testwidget()
-        except Exception, e:
+        except Exception:
             self.check_output("""
             Traceback (most recent call last):
             ...
@@ -465,7 +465,7 @@ class TestBase(NodeTestCase):
 
         def child_extractor(widget, data):
             for child in widget.values():
-                 child.extract(request=data.request, parent=data)
+                child.extract(request=data.request, parent=data)
 
         def error_extractor(widget, data):
             raise ExtractionError(widget.dottedpath)
@@ -477,13 +477,13 @@ class TestBase(NodeTestCase):
             [],
             [],
             uniquename='root')
-        child_0 = root['child_0'] = Widget(
+        root['child_0'] = Widget(
             'child_blueprint',
             [('value_extractor', value_extractor)],
             [],
             [],
             [])
-        child_1 = root['child_1'] = Widget(
+        root['child_1'] = Widget(
             'child_blueprint',
             [('error_extractor', error_extractor)],
             [],
@@ -598,12 +598,18 @@ class TestBase(NodeTestCase):
             {'test_macro': (['foo', '*bar', 'baz'], {'foo.newprop': 'abc'})}
         )
         self.assertEqual(
-            factory._expand_blueprints('#test_macro', {'foo.newprop' : '123'}),
+            factory._expand_blueprints('#test_macro', {'foo.newprop': '123'}),
             (['foo', '*bar', 'baz'], {'foo.newprop': '123'})
         )
         self.assertEqual(
-            factory._expand_blueprints('#test_macro', {'foo.newprop2' : '123'}),
-            (['foo', '*bar', 'baz'], {'foo.newprop': 'abc', 'foo.newprop2': '123'})
+            factory._expand_blueprints(
+                '#test_macro',
+                {'foo.newprop2': '123'}
+            ),
+            (
+                ['foo', '*bar', 'baz'],
+                {'foo.newprop': 'abc', 'foo.newprop2': '123'}
+            )
         )
 
         err = self.expect_error(
@@ -821,13 +827,19 @@ class TestBase(NodeTestCase):
         # Colon seperated blueprint chain definition
         widget = factory('outer:inner', name='OUTER_INNER')
         data = widget.extract({})
-        self.assertEqual(data.extracted, ['extracted inner', 'extracted outer'])
+        self.assertEqual(
+            data.extracted,
+            ['extracted inner', 'extracted outer']
+        )
         self.assertEqual(widget(data), u'<OUTER><INNER /></OUTER>')
 
         # Blueprint chain definition as list
         widget = factory(['outer', 'inner'], name='OUTER_INNER')
         data = widget.extract({})
-        self.assertEqual(data.extracted, ['extracted inner', 'extracted outer'])
+        self.assertEqual(
+            data.extracted,
+            ['extracted inner', 'extracted outer']
+        )
         self.assertEqual(widget(data), u'<OUTER><INNER /></OUTER>')
 
         # Inject custom specials blueprints into chain
@@ -964,7 +976,7 @@ class TestBase(NodeTestCase):
         dmarker = list()
         defaults = dict(default=dmarker)
         widget_no_return = Widget(
-            'blueprint_names_goes_here', [],[],[], 'empty', defaults=defaults)
+            'blueprint_names_goes_here', [], [], [], 'empty', defaults=defaults)  # noqa
         widget_with_value = Widget(
             'blueprint_names_goes_here',
             [], [], [],
@@ -1035,14 +1047,15 @@ class TestBase(NodeTestCase):
 
     def test_TBSupplementWidget(self):
         class NoNameMock(object):
-            blueprints='blue:prints:here'
+            blueprints = 'blue:prints:here'
+
             @property
             def dottedpath(self):
-                 raise ValueError('fail')
+                raise ValueError('fail')
 
         mock = NoNameMock()
         suppl = TBSupplementWidget(
-            mock, lambda x:x, 'testtask', 'some description')
+            mock, lambda x: x, 'testtask', 'some description')
 
         self.check_output("""
         yafowil widget processing info:
@@ -1053,10 +1066,10 @@ class TestBase(NodeTestCase):
         """, suppl.getInfo())
 
         class Mock(object):
-            dottedpath='test.path.abc'
-            blueprints='blue:prints:here'
+            dottedpath = 'test.path.abc'
+            blueprints = 'blue:prints:here'
         mock = Mock()
-        suppl = TBSupplementWidget(mock, lambda x:x, 'testtask',
+        suppl = TBSupplementWidget(mock, lambda x: x, 'testtask',
                                    'some description')
 
         self.check_output("""

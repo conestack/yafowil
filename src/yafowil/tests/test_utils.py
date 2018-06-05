@@ -23,7 +23,7 @@ from yafowil.utils import managedprops
 from yafowil.utils import tag as deprecated_tag
 from yafowil.utils import vocabulary
 import uuid
-import yafowil.loader
+import yafowil.loader  # noqa
 
 
 class TestUtils(YafowilTestCase):
@@ -78,6 +78,7 @@ class TestUtils(YafowilTestCase):
             ]),
             [('key', 'value'), ('key2', 'value2'), ('key3', 'key3')]
         )
+
         def callme():
             return 'bar'
         self.assertEqual(vocabulary(callme), [('bar', 'bar')])
@@ -86,7 +87,6 @@ class TestUtils(YafowilTestCase):
     def test_tag_renderer(self):
         # Test Tag renderer
         tag = Tag(lambda msg: msg)
-        a = {'class': u'fancy', 'id': '2f5b8a234ff'}
         t = tag('p', 'Lorem Ipsum. ', u'Hello World!',
                 class_='fancy', id='2f5b8a234ff')
         self.assertEqual(t, (
@@ -342,13 +342,13 @@ class TestUtils(YafowilTestCase):
         # Test with Tag renderer
         tag = Tag(lambda msg: msg)
         self.check_output("""
-        <dummy 
+        <dummy
           data-camel-attr-name='camelValue'
-          data-testattr1='value' 
+          data-testattr1='value'
           data-testattr2='true'
-          data-testattr3='false' 
-          data-testattr5='["item1", "item2", "item3"]' 
-          data-testattr6='{"key3": "item3", "key2": "item2", "key1": "item1"}' 
+          data-testattr3='false'
+          data-testattr5='["item1", "item2", "item3"]'
+          data-testattr6='{"key3": "item3", "key2": "item2", "key1": "item1"}'
           data-testattr7='1234'
           data-testattr8='1234.5678'
           name="foo" />

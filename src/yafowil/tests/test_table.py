@@ -6,7 +6,7 @@ from yafowil.tests import YafowilTestCase
 from yafowil.tests import fxml
 import yafowil.common
 import yafowil.compound
-import yafowil.table
+import yafowil.table  # noqa
 
 
 class TestTable(YafowilTestCase):
@@ -29,9 +29,9 @@ class TestTable(YafowilTestCase):
         self.assertEqual(table(), '<table class="css" id="id"></table>')
 
         table = factory(
-             'table',
-             name='foo',
-             mode='display')
+            'table',
+            name='foo',
+            mode='display')
         self.assertEqual(table(), '<table></table>')
 
     def test_thead_blueprint(self):

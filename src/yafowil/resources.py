@@ -16,7 +16,8 @@ class YafowilResources(object):
         startup.
 
         :param js_skip: ignored resource groups when aggregating JS resources.
-        :param css_skip: ignored resource groups when aggregating CSS resources.
+        :param css_skip: ignored resource groups when aggregating CSS
+                         resources.
         """
         all_js = list()
         all_css = list()
