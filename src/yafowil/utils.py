@@ -1,19 +1,12 @@
 # -*- coding: utf-8 -*-
 from node.utils import UNSET
 from pkg_resources import iter_entry_points
-
 import inspect
 import json
 import logging
 import re
 import unicodedata
 import uuid
-
-
-def safe_decode(value, encoding='utf-8'):
-    if value and not isinstance(value, unicode):
-        value = str(value).decode(encoding)
-    return value
 
 
 class entry_point(object):
@@ -126,7 +119,9 @@ class Tag(object):
         for key, value in attributes.items():
             if value is None or value is UNSET:
                 continue
-            value = safe_decode(self.translate(value))
+            value = self.translate(value)
+            if not isinstance(value, unicode):
+                value = str(value).decode(self.encoding)
             cl.append((key.strip('_'), value))
         attributes = u''
         # NOTE: data attributes are enclosed in single quotes, since this makes
@@ -144,7 +139,9 @@ class Tag(object):
             attributes = u' {0}'.format(u' '.join(sorted(attributes)))
         cl = list()
         for inner in inners:
-            inner = safe_decode(self.translate(inner))
+            inner = self.translate(inner)
+            if not isinstance(inner, unicode):
+                inner = str(inner).decode(self.encoding)
             cl.append(inner)
         if not cl:
             return u'<{name}{attrs} />'.format(**{
@@ -181,8 +178,6 @@ class managedprops(object):
 def cssid(widget, prefix, postfix=None):
     if widget.attrs.get('structural', False):
         return None
-    prefix = safe_decode(prefix)
-    postfix = safe_decode(postfix)
     path = widget.dottedpath.replace(u'.', u'-')
     cssid = u'{0}-{1}'.format(prefix, path)
     if postfix is not None:
