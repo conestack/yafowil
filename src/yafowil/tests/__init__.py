@@ -1,11 +1,18 @@
+from __future__ import print_function
 from node.tests import NodeTestCase
 from yafowil.base import factory
+from yafowil.compat import IS_PY2
+from yafowil.compat import UNICODE_TYPE
 import lxml.etree as etree
 import unittest
 import yafowil.common
 import yafowil.compound
 import yafowil.persistence
 import yafowil.table
+
+
+if not IS_PY2:
+    from importlib import reload
 
 
 class YafowilTestCase(NodeTestCase):
@@ -21,11 +28,11 @@ class YafowilTestCase(NodeTestCase):
 
 def fxml(xml):
     et = etree.fromstring(xml)
-    return etree.tostring(et, pretty_print=True)
+    return etree.tostring(et, pretty_print=True).decode('utf-8')
 
 
 def pxml(xml):
-    print fxml(xml)
+    print(fxml(xml))
 
 
 def test_suite():

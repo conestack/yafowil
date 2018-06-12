@@ -3,6 +3,12 @@ from node.utils import UNSET
 from yafowil.base import ExtractionError
 from yafowil.base import factory
 from yafowil.base import fetch_value
+from yafowil.compat import BYTES_TYPE
+from yafowil.compat import ITER_TYPES
+from yafowil.compat import IS_PY2
+from yafowil.compat import LONG_TYPE
+from yafowil.compat import STR_TYPE
+from yafowil.compat import UNICODE_TYPE
 from yafowil.tsf import _
 from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import attr_value
@@ -15,7 +21,6 @@ from yafowil.utils import generic_html5_attrs
 from yafowil.utils import managedprops
 from yafowil.utils import vocabulary
 import re
-import types
 import uuid
 
 
@@ -77,6 +82,12 @@ Callable for converting extracted value to output datatype.
 ``datatype`` can also be defined as string with value out of ``'str'``,
 ``'unicode'``, ``'int'``, ``'integer'``, ``'long'``, ``'float'`` or
 ``'uuid'``.
+
+ATTENTION: In python 3, string identifiers should not be used at all, but if,
+    the following must be known:
+        * ``'str'`` refers to ``bytes`` type.
+        * ``'unicode'`` refers to ``str`` type.
+        * ``'long'`` refers to ``int`` type.
 
 Custom converter callables must raise one out of the following exceptions if
 conversion fails:
@@ -189,7 +200,7 @@ def generic_required_extractor(widget, data):
     required = attr_value('required', widget, data)
     if not required or bool(data.extracted) or data.extracted is UNSET:
         return data.extracted
-    if isinstance(required, basestring):
+    if isinstance(required, STR_TYPE):
         raise ExtractionError(required)
     raise ExtractionError(attr_value('required_message', widget, data))
 
@@ -207,19 +218,22 @@ def generic_emptyvalue_extractor(widget, data):
 
 
 DATATYPE_LABELS = {
-    str: _('datatype_str', default='string'),
-    unicode: _('datatype_unicode', default='unicode'),
+    BYTES_TYPE: _('datatype_str', default='string'),
+    UNICODE_TYPE: _('datatype_unicode', default='unicode'),
     int: _('datatype_integer', default='integer'),
-    long: _('datatype_long', default='long integer'),
     float: _('datatype_float', default='floating point number'),
     uuid.UUID: _('datatype_uuid', default='UUID')
 }
+if IS_PY2:
+    DATATYPE_LABELS[LONG_TYPE] = _('datatype_long', default='long integer')
+else:
+    DATATYPE_LABELS[LONG_TYPE] = DATATYPE_LABELS[int]
 # B/C
-DATATYPE_LABELS['str'] = DATATYPE_LABELS[str]
-DATATYPE_LABELS['unicode'] = DATATYPE_LABELS[unicode]
+DATATYPE_LABELS['str'] = DATATYPE_LABELS[BYTES_TYPE]
+DATATYPE_LABELS['unicode'] = DATATYPE_LABELS[UNICODE_TYPE]
 DATATYPE_LABELS['int'] = DATATYPE_LABELS[int]
 DATATYPE_LABELS['integer'] = DATATYPE_LABELS[int]
-DATATYPE_LABELS['long'] = DATATYPE_LABELS[long]
+DATATYPE_LABELS['long'] = DATATYPE_LABELS[LONG_TYPE]
 DATATYPE_LABELS['float'] = DATATYPE_LABELS[float]
 DATATYPE_LABELS['uuid'] = DATATYPE_LABELS[uuid.UUID]
 
@@ -280,7 +294,7 @@ def generic_datatype_extractor(widget, data):
 def input_attributes_common(widget, data, excludes=list(), value=None):
     if value is None:
         value = fetch_value(widget, data)
-    if isinstance(value, basestring):
+    if isinstance(value, STR_TYPE):
         value = value.replace('"', '&quot;')
     autofocus = attr_value('autofocus', widget, data) and 'autofocus' or None
     disabled = attr_value('disabled', widget, data)
@@ -335,9 +349,9 @@ def display_proxy_renderer(widget, data):
         widget.attrs['type'] = 'hidden'
         value = fetch_value(widget, data)
         multivalued = attr_value('multivalued', widget, data)
-        if multivalued and isinstance(value, basestring):
+        if multivalued and isinstance(value, STR_TYPE):
             value = [value]
-        if multivalued or type(value) in [types.ListType, types.TupleType]:
+        if multivalued or type(value) in ITER_TYPES:
             for val in value:
                 input_attrs = input_attributes_full(widget, data, value=val)
                 rendered += data.tag('input', **input_attrs)
@@ -690,7 +704,7 @@ def lines_edit_renderer(widget, data):
 @managedprops('class', 'data')
 def lines_display_renderer(widget, data):
     value = fetch_value(widget, data)
-    if type(value) in [types.ListType, types.TupleType] and not value:
+    if type(value) in ITER_TYPES and not value:
         value = u''
     attrs = {
         'id': cssid(widget, 'display'),
@@ -794,7 +808,7 @@ def ascii_extractor(widget, data):
     if not attr_value('ascii', widget, data, False):
         return val
     try:
-        str(val)
+        val.encode('ascii')
     except UnicodeEncodeError:
         message = _(u'ascii_extractor_error',
                     default=u'Input contains illegal characters.')
@@ -1118,7 +1132,7 @@ def select_extractor(widget, data):
             extracted = ''
     if extracted is UNSET:
         return extracted
-    if multivalued and isinstance(extracted, basestring):
+    if multivalued and isinstance(extracted, STR_TYPE):
         extracted = [extracted]
     disabled = widget.attrs.get('disabled', False)
     if not disabled:
@@ -1126,7 +1140,7 @@ def select_extractor(widget, data):
     if not multivalued:
         return data.value
     disabled_items = disabled is True and data.value or disabled
-    if isinstance(disabled_items, basestring):
+    if isinstance(disabled_items, STR_TYPE):
         disabled_items = [disabled_items]
     for item in disabled_items:
         if item in extracted and item not in data.value:
@@ -1150,7 +1164,7 @@ def select_exists_marker(widget, data):
 def select_edit_renderer_props(widget, data):
     value = fetch_value(widget, data)
     multivalued = attr_value('multivalued', widget, data)
-    if isinstance(value, basestring) or not hasattr(value, '__iter__'):
+    if isinstance(value, STR_TYPE) or not hasattr(value, '__iter__'):
         value = [value]
     datatype = attr_value('datatype', widget, data)
     if datatype:
@@ -1298,7 +1312,7 @@ def select_edit_renderer(widget, data, custom_attrs={}):
 @managedprops('data', 'template', 'class', 'multivalued')
 def select_display_renderer(widget, data):
     value = fetch_value(widget, data)
-    if type(value) in [types.ListType, types.TupleType] and not value:
+    if type(value) in ITER_TYPES and not value:
         value = u''
     multivalued = attr_value('multivalued', widget, data)
     vocab = dict(attr_value('vocabulary', widget, data, []))
@@ -1313,7 +1327,7 @@ def select_display_renderer(widget, data):
     }
     attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
     content = u''
-    if multivalued and isinstance(value, basestring):
+    if multivalued and isinstance(value, STR_TYPE):
         value = [value]
     for key in value:
         content += data.tag('li', vocab.get(key, key))
@@ -1656,14 +1670,18 @@ Flag  input field is disabled.
 # email
 ###############################################################################
 
-EMAIL_RE = u'^[a-zA-Z0-9\._\-]+@[a-zA-Z0-9\._\-]+.[a-zA-Z0-9]{2,6}$'
+EMAIL_RE_UNICODE = u'^[a-zA-Z0-9\._\-]+@[a-zA-Z0-9\._\-]+.[a-zA-Z0-9]{2,6}$'
+EMAIL_RE_BYTES = b'^[a-zA-Z0-9\._\-]+@[a-zA-Z0-9\._\-]+.[a-zA-Z0-9]{2,6}$'
 
 
 def email_extractor(widget, data):
     val = data.extracted
     if not val:
         return val
-    if not re.match(EMAIL_RE, val):
+    email_re = EMAIL_RE_UNICODE \
+        if isinstance(val, UNICODE_TYPE) \
+        else EMAIL_RE_BYTES
+    if not re.match(email_re, val):
         message = _('email_address_not_valid',
                     default=u'Input not a valid email address.')
         raise ExtractionError(message)
@@ -1700,7 +1718,7 @@ factory.defaults['email.class'] = 'email'
 factory.defaults['email.persist'] = True
 
 factory.defaults['email.allowed_datatypes'] = [
-    str, unicode,
+    BYTES_TYPE, UNICODE_TYPE,
 ]
 
 ###############################################################################
@@ -2003,7 +2021,7 @@ def error_renderer(widget, data):
                 class_=attr_value('message_class', widget, data)
             )
         else:
-            msgs += unicode(error)
+            msgs += UNICODE_TYPE(error)
     attrs = dict(class_=cssclasses(widget, data))
     elem_tag = attr_value('tag', widget, data)
     position = attr_value('position', widget, data)

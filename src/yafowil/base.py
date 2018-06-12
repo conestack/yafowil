@@ -12,10 +12,11 @@ from node.utils import UNSET
 from node.utils import instance_property
 from plumber import plumbing
 from threading import RLock
+from yafowil.compat import ITER_TYPES
+from yafowil.compat import STR_TYPE
 from yafowil.utils import Tag
 from yafowil.utils import attr_value
 import copy
-import types
 
 
 def _dict__repr__(self):
@@ -113,7 +114,7 @@ class RuntimeData(object):
         return Tag(self.translate_callable)
 
     def fetch(self, path):
-        if isinstance(path, basestring):
+        if isinstance(path, STR_TYPE):
             path = path.split('.')
         data = self.root
         if path[0] != data.name:
@@ -464,7 +465,7 @@ class Widget(object):
                     )
                     try:
                         data.extracted = extractor(self, data)
-                    except ExtractionError, e:
+                    except ExtractionError as e:
                         data.errors.append(e)
                         if e.abort:
                             break
@@ -565,7 +566,7 @@ class Factory(object):
 
     def register_macro(self, name, blueprints, props):
         self._name_check(name)
-        if isinstance(blueprints, basestring):
+        if isinstance(blueprints, STR_TYPE):
             blueprints = blueprints.split(':')
         self._macros[name] = blueprints, props
 
@@ -592,7 +593,7 @@ class Factory(object):
 
     def _expand_blueprints(self, blueprints, props):
         result = list()
-        if isinstance(blueprints, basestring):
+        if isinstance(blueprints, STR_TYPE):
             blueprints = blueprints.split(':')
         for blueprint in blueprints:
             if blueprint.startswith('#'):
@@ -664,8 +665,7 @@ class Factory(object):
         for blueprint in blueprints:
             if blueprint.startswith('*'):
                 part_name = blueprint[1:]
-                if type(custom[part_name]) in (types.ListType,
-                                               types.TupleType):
+                if type(custom[part_name]) in ITER_TYPES:
                     if len(custom[part_name]) < 5:
                         # BBB:
                         ex, eren, pre, bui = custom[part_name]

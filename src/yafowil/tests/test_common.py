@@ -3,13 +3,21 @@ from node.utils import UNSET
 from yafowil.base import ExtractionError
 from yafowil.base import factory
 from yafowil.common import convert_bytes
+from yafowil.compat import BYTES_TYPE
+from yafowil.compat import IS_PY2
+from yafowil.compat import LONG_TYPE
+from yafowil.compat import UNICODE_TYPE
 from yafowil.persistence import write_mapping_writer
 from yafowil.tests import fxml
 from yafowil.tests import YafowilTestCase
 from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import Tag
 
-import StringIO
+if IS_PY2:
+    from StringIO import StringIO
+else:
+    from io import StringIO
+
 import uuid
 
 
@@ -508,7 +516,7 @@ class TestCommon(YafowilTestCase):
 
         data = widget.extract({'MYDATATYPEFIELD': ''})
         self.assertEqual(data.errors, [])
-        self.assertEqual(data.extracted, 'abc')
+        self.assertEqual(data.extracted, b'abc')
 
         # Unicode emptyvalue
         widget.attrs['emptyvalue'] = u''
@@ -620,7 +628,7 @@ class TestCommon(YafowilTestCase):
 
         data = widget.extract({'MYDATATYPEFIELD': ''})
         self.assertEqual(data.errors, [])
-        self.assertEqual(data.extracted, -1L)
+        self.assertEqual(data.extracted, LONG_TYPE(-1))
 
         # String emptyvalue. If convertable still fine
         widget.attrs['emptyvalue'] = '0'
@@ -630,7 +638,7 @@ class TestCommon(YafowilTestCase):
 
         data = widget.extract({'MYDATATYPEFIELD': ''})
         self.assertEqual(data.errors, [])
-        self.assertEqual(data.extracted, 0L)
+        self.assertEqual(data.extracted, LONG_TYPE(0))
 
         # Test emptyvalue if ``float`` datatype set
         widget = factory(
@@ -2921,7 +2929,7 @@ class TestCommon(YafowilTestCase):
                 'multivalued': True,
                 'disabled': ['two', 'three', 'four', 'five'],
                 'vocabulary': vocab,
-                'datatype': unicode,
+                'datatype': UNICODE_TYPE,
             })
         request = {
             'MYSELECT': ['one', 'two', 'five'],
@@ -3050,7 +3058,7 @@ class TestCommon(YafowilTestCase):
 
         # Extract ``new``
         request = {
-            'MYFILE': {'file': StringIO.StringIO('123')},
+            'MYFILE': {'file': StringIO('123')},
         }
         data = widget.extract(request)
 
@@ -3060,7 +3068,7 @@ class TestCommon(YafowilTestCase):
 
         self.assertEqual(sorted(data.extracted.keys()), ['action', 'file'])
         self.assertEqual(data.extracted['action'], 'new')
-        self.assertTrue(isinstance(data.extracted['file'], StringIO.StringIO))
+        self.assertTrue(isinstance(data.extracted['file'], StringIO))
         self.assertEqual(data.extracted['file'].read(), '123')
 
         self.assertEqual(data.errors, [])
@@ -3070,7 +3078,7 @@ class TestCommon(YafowilTestCase):
             'file',
             name='MYFILE',
             value={
-                'file': StringIO.StringIO('321'),
+                'file': StringIO('321'),
             })
         self.check_output("""
         <div>
@@ -3095,7 +3103,7 @@ class TestCommon(YafowilTestCase):
 
         # Extract ``keep`` returns original value
         request = {
-            'MYFILE': {'file': StringIO.StringIO('123')},
+            'MYFILE': {'file': StringIO('123')},
             'MYFILE-action': 'keep'
         }
         data = widget.extract(request)
@@ -3104,11 +3112,11 @@ class TestCommon(YafowilTestCase):
 
         self.assertEqual(sorted(data.value.keys()), ['action', 'file'])
         self.assertEqual(data.value['action'], 'keep')
-        self.assertTrue(isinstance(data.value['file'], StringIO.StringIO))
+        self.assertTrue(isinstance(data.value['file'], StringIO))
 
         self.assertEqual(sorted(data.extracted.keys()), ['action', 'file'])
         self.assertEqual(data.extracted['action'], 'keep')
-        self.assertTrue(isinstance(data.extracted['file'], StringIO.StringIO))
+        self.assertTrue(isinstance(data.extracted['file'], StringIO))
         self.assertEqual(data.extracted['file'].read(), '321')
 
         self.assertEqual(data.errors, [])
@@ -3190,7 +3198,7 @@ class TestCommon(YafowilTestCase):
         """, fxml(widget()))
 
         value = {
-            'file': StringIO.StringIO('12345'),
+            'file': StringIO('12345'),
             'mimetype': 'text/plain',
             'filename': 'foo.txt',
         }
@@ -3808,23 +3816,23 @@ class TestCommon(YafowilTestCase):
             'email',
             name='EMAIL',
             props={
-                'datatype': unicode
+                'datatype': UNICODE_TYPE
             })
         data = widget.extract(request={'EMAIL': 'foo@example.com'})
         self.assertEqual(data.extracted, u'foo@example.com')
-        self.assertTrue(isinstance(data.extracted, unicode))
-        self.assertFalse(isinstance(data.extracted, str))
+        self.assertTrue(isinstance(data.extracted, UNICODE_TYPE))
+        self.assertFalse(isinstance(data.extracted, BYTES_TYPE))
 
         widget = factory(
             'email',
             name='EMAIL',
             props={
-                'datatype': str
+                'datatype': BYTES_TYPE
             })
         data = widget.extract(request={'EMAIL': u'foo@example.com'})
-        self.assertEqual(data.extracted, u'foo@example.com')
-        self.assertFalse(isinstance(data.extracted, unicode))
-        self.assertTrue(isinstance(data.extracted, str))
+        self.assertEqual(data.extracted, b'foo@example.com')
+        self.assertFalse(isinstance(data.extracted, UNICODE_TYPE))
+        self.assertTrue(isinstance(data.extracted, BYTES_TYPE))
 
         # Persist
         widget = factory(
