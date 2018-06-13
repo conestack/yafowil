@@ -13,12 +13,12 @@ from yafowil.tests import YafowilTestCase
 from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import Tag
 
+import uuid
+
 if IS_PY2:
     from StringIO import StringIO
 else:
     from io import StringIO
-
-import uuid
 
 
 ###############################################################################

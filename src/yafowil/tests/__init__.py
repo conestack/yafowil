@@ -2,7 +2,6 @@ from __future__ import print_function
 from node.tests import NodeTestCase
 from yafowil.base import factory
 from yafowil.compat import IS_PY2
-from yafowil.compat import UNICODE_TYPE
 import lxml.etree as etree
 import unittest
 import yafowil.common

@@ -405,7 +405,7 @@ def convert_value_to_datatype(value, datatype, empty_value=EMPTY_VALUE):
     if preconverter:
         value = preconverter(value)
     # special case bytes or str buildin type in python 3
-    # uses ascii codec to emulate same behavior as when converting with python 2
+    # uses ascii codec to emulate same behavior as when converting with python2
     # this is supposed to change in future
     if not IS_PY2 and converter in (bytes, str):
         return converter(value, 'ascii')
