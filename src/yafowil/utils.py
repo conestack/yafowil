@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 from node.utils import UNSET
 from pkg_resources import iter_entry_points
+from yafowil.compat import BYTES_TYPE
+from yafowil.compat import IS_PY2
+from yafowil.compat import LONG_TYPE
+from yafowil.compat import STR_TYPE
+from yafowil.compat import UNICODE_TYPE
 import inspect
 import json
 import logging
@@ -65,7 +70,7 @@ def vocabulary(definition):
     """
     if callable(definition):
         definition = definition()
-    if isinstance(definition, basestring):
+    if isinstance(definition, STR_TYPE):
         return [(definition, definition), ]
     # dict-like
     if hasattr(definition, '__getitem__') and hasattr(definition, 'keys'):
@@ -74,7 +79,7 @@ def vocabulary(definition):
     if hasattr(definition, '__iter__'):
         new_vocab = []
         for entry in definition:
-            if isinstance(entry, basestring):
+            if isinstance(entry, STR_TYPE):
                 # entry is a string
                 new_vocab.append((entry, entry))
             elif hasattr(entry, '__iter__'):
@@ -121,8 +126,12 @@ class Tag(object):
             if value is None or value is UNSET:
                 continue
             value = self.translate(value)
-            if not isinstance(value, unicode):
-                value = str(value).decode(self.encoding)
+            if not isinstance(value, UNICODE_TYPE):
+                # XXX: value = str(value).decode(self.encoding)
+                if isinstance(value, bytes):
+                    value = value.decode(self.encoding)
+                else:
+                    value = str(value)
             cl.append((key.strip('_'), value))
         attributes = u''
         # NOTE: data attributes are enclosed in single quotes, since this makes
@@ -141,8 +150,12 @@ class Tag(object):
         cl = list()
         for inner in inners:
             inner = self.translate(inner)
-            if not isinstance(inner, unicode):
-                inner = str(inner).decode(self.encoding)
+            if not isinstance(inner, UNICODE_TYPE):
+                # XXX: inner = str(inner).decode(self.encoding)
+                if isinstance(inner, bytes):
+                    inner = inner.decode(self.encoding)
+                else:
+                    inner = str(inner)
             cl.append(inner)
         if not cl:
             return u'<{name}{attrs} />'.format(**{
@@ -185,7 +198,7 @@ def cssid(widget, prefix, postfix=None):
         cssid = u'{0}-{1}'.format(cssid, postfix)
     return unicodedata.normalize('NFKD', cssid)\
         .encode('ASCII', 'ignore')\
-        .replace(' ', '_')
+        .replace(b' ', b'_')
 
 
 def attr_value(key, widget, data, default=None):
@@ -228,7 +241,7 @@ def generic_html5_attrs(data_dict):
         if val is UNSET:
             continue
         ret = json.dumps(val)  # js-ify
-        if isinstance(val, basestring):
+        if isinstance(val, STR_TYPE):
             # for strings, remove leading and trailing double quote, since
             # they are not needed for data-attributes
             ret = ret.strip('"')
@@ -275,7 +288,7 @@ def data_attrs_helper(widget, data, attrs):
         if val is None:
             continue
         ret = json.dumps(val)  # js-ify
-        if isinstance(val, basestring):
+        if isinstance(val, STR_TYPE):
             # for strings, remove leading and trailing double quote, since
             # they are not needed for data-attributes
             ret = ret.strip('"')
@@ -296,12 +309,12 @@ def cssclasses(widget, data, classattr='class', additional=[]):
     _classes = list()
     attrs = widget.attrs
     if attrs['error_class'] and data.errors:
-        if isinstance(attrs['error_class'], basestring):
+        if isinstance(attrs['error_class'], STR_TYPE):
             _classes.append(attrs['error_class'])
         else:
             _classes.append(attrs['error_class_default'])
     if attrs['required_class'] and attrs['required']:
-        if isinstance(attrs['required_class'], basestring):
+        if isinstance(attrs['required_class'], STR_TYPE):
             _classes.append(attrs['required_class'])
         else:
             _classes.append(attrs['required_class_default'])
@@ -335,16 +348,16 @@ EMPTY_VALUE = EmptyValue()
 
 
 DATATYPE_PRECONVERTERS = {
-    float: lambda x: isinstance(x, basestring) and x.replace(',', '.') or x
+    float: lambda x: isinstance(x, STR_TYPE) and x.replace(',', '.') or x
 }
 # B/C
 DATATYPE_PRECONVERTERS['float'] = DATATYPE_PRECONVERTERS[float]
 DATATYPE_CONVERTERS = {
-    'str': str,
-    'unicode': unicode,
+    'str': BYTES_TYPE,
+    'unicode': UNICODE_TYPE,
     'int': int,
     'integer': int,
-    'long': long,
+    'long': LONG_TYPE,
     'float': float,
     'uuid': uuid.UUID
 }
@@ -378,7 +391,7 @@ def convert_value_to_datatype(value, datatype, empty_value=EMPTY_VALUE):
         return empty_value
     if value in [None, '']:
         return empty_value
-    if isinstance(datatype, basestring):
+    if isinstance(datatype, STR_TYPE):
         converter = DATATYPE_CONVERTERS[datatype]
     else:
         converter = datatype
@@ -391,6 +404,11 @@ def convert_value_to_datatype(value, datatype, empty_value=EMPTY_VALUE):
     preconverter = DATATYPE_PRECONVERTERS.get(datatype)
     if preconverter:
         value = preconverter(value)
+    # special case bytes or str buildin type in python 3
+    # uses ascii codec to emulate same behavior as when converting with python2
+    # this is supposed to change in future
+    if not IS_PY2 and converter in (bytes, str):
+        return converter(value, 'ascii')
     return converter(value)
 
 

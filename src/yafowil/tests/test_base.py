@@ -164,7 +164,7 @@ class TestBase(NodeTestCase):
         MYUID,
         <RuntimeData MYUID, value='Test Value', extracted=<UNSET>,
         attrs={'test_preprocessor': 'called'} at ...>,
-        {'test1': 'Test1', 'test2': 'Test2'}
+        {...'test1': 'Test1'...}
         """, testwidget())
 
         # A passed in request does not trigger extraction
@@ -173,7 +173,7 @@ class TestBase(NodeTestCase):
         MYUID,
         <RuntimeData MYUID, value='Test Value', extracted=<UNSET>,
         attrs={'test_preprocessor': 'called'} at ...>,
-        {'test1': 'Test1', 'test2': 'Test2'}
+        {...'test2': 'Test2'...}
         """, testwidget(request=test_request))
 
         # Extraction is an explicit task
@@ -206,7 +206,7 @@ class TestBase(NodeTestCase):
         r1,
         MYUID,
         <RuntimeData MYUID, value='Test Value', extracted=<UNSET> at ...>,
-        {'test1': 'Test1', 'test2': 'Test2'}
+        {...'test1': 'Test1'...}
         """, testwidget())
 
         # a.2) mode display
@@ -224,7 +224,7 @@ class TestBase(NodeTestCase):
         disr1,
         MYUID,
         <RuntimeData MYUID, value='Test Value', extracted=<UNSET> at ...>,
-        {'test1': 'Test1', 'test2': 'Test2'}
+        {...'test2': 'Test2'...}
         """, testwidget())
 
         # a.3) mode skip
@@ -269,7 +269,7 @@ class TestBase(NodeTestCase):
         r2,
         MYUID2,
         <RuntimeData MYUID2, value='Test Value', extracted=<UNSET> at ...>,
-        {'test1': 'Test1', 'test2': 'Test2'}
+        {...'test1': 'Test1'...}
         """, testwidget())
 
         # b.2) extractor with request, non int has to fail
@@ -945,7 +945,7 @@ class TestBase(NodeTestCase):
         widget = factory('prefix', name='test')
         try:
             widget()
-        except KeyError, e:
+        except KeyError as e:
             msg = (
                 "'Property with key \"id\" is not given on "
                 "widget \"test\" (no default)'"

@@ -2,8 +2,14 @@
 History
 =======
 
-2.2.5 (unreleased)
-------------------
+2.3 (unreleased)
+----------------
+
+- Python 3 Compatibility.
+  [rnix]
+
+- Convert doctests to unittests.
+  [rnix]
 
 - Cache results of ``yafowil.utils.get_plugin_names`` by namespace.
   [rnix]

@@ -6,6 +6,10 @@ from node.behaviors import Nodespaces
 from node.utils import UNSET
 from plumber import plumbing
 from yafowil.base import factory
+from yafowil.compat import BYTES_TYPE
+from yafowil.compat import IS_PY2
+from yafowil.compat import LONG_TYPE
+from yafowil.compat import UNICODE_TYPE
 from yafowil.tests import YafowilTestCase
 from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import Tag
@@ -331,10 +335,11 @@ class TestUtils(YafowilTestCase):
             data_attrs['data-testattr5'],
             '["item1", "item2", "item3"]'
         )
-        self.assertEqual(
-            data_attrs['data-testattr6'],
-            '{"key3": "item3", "key2": "item2", "key1": "item1"}'
-        )
+        self.assertTrue(data_attrs['data-testattr6'].find('"key1": "item1"'))
+        self.assertTrue(data_attrs['data-testattr6'].find('"key2": "item2"'))
+        self.assertTrue(data_attrs['data-testattr6'].find('"key3": "item3"'))
+        self.assertTrue(data_attrs['data-testattr6'].startswith('{'))
+        self.assertTrue(data_attrs['data-testattr6'].endswith('}'))
         self.assertEqual(data_attrs['data-testattr7'], '1234')
         self.assertEqual(data_attrs['data-testattr8'], '1234.5678')
         self.assertEqual(data_attrs['data-camel-attr-name'], 'camelValue')
@@ -348,7 +353,7 @@ class TestUtils(YafowilTestCase):
           data-testattr2='true'
           data-testattr3='false'
           data-testattr5='["item1", "item2", "item3"]'
-          data-testattr6='{"key3": "item3", "key2": "item2", "key1": "item1"}'
+          data-testattr6='{"..."}'
           data-testattr7='1234'
           data-testattr8='1234.5678'
           name="foo" />
@@ -373,8 +378,8 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(convert_value_to_datatype(UNSET, 'str'), UNSET)
 
         converted = convert_value_to_datatype(u'string', 'str')
-        self.assertEqual(converted, 'string')
-        self.assertTrue(isinstance(converted, str))
+        self.assertEqual(converted, b'string')
+        self.assertTrue(isinstance(converted, BYTES_TYPE))
 
         err = self.expect_error(
             UnicodeEncodeError,
@@ -387,16 +392,16 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(str(err), msg)
 
         # Convert to string by type
-        self.assertEqual(convert_value_to_datatype(UNSET, str), UNSET)
+        self.assertEqual(convert_value_to_datatype(UNSET, BYTES_TYPE), UNSET)
 
-        converted = convert_value_to_datatype(u'string', str)
-        self.assertEqual(converted, 'string')
-        self.assertTrue(isinstance(converted, str))
+        converted = convert_value_to_datatype(u'string', BYTES_TYPE)
+        self.assertEqual(converted, b'string')
+        self.assertTrue(isinstance(converted, BYTES_TYPE))
 
         err = self.expect_error(
             UnicodeEncodeError,
             convert_value_to_datatype,
-            u'äöü', str
+            u'äöü', BYTES_TYPE
         )
         msg = (
             "'ascii' codec can't encode characters in position 0-2: "
@@ -409,12 +414,12 @@ class TestUtils(YafowilTestCase):
 
         converted = convert_value_to_datatype('unicode', 'unicode')
         self.assertEqual(converted, u'unicode')
-        self.assertTrue(isinstance(converted, unicode))
+        self.assertTrue(isinstance(converted, UNICODE_TYPE))
 
         err = self.expect_error(
             UnicodeDecodeError,
             convert_value_to_datatype,
-            '\xc3\xa4\xc3\xb6\xc3\xbc', 'unicode'
+            b'\xc3\xa4\xc3\xb6\xc3\xbc', 'unicode'
         )
         msg = (
             "'ascii' codec can't decode byte 0xc3 in position 0: "
@@ -422,16 +427,16 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(str(err), msg)
 
         # Convert to unicode by type
-        self.assertEqual(convert_value_to_datatype(UNSET, unicode), UNSET)
+        self.assertEqual(convert_value_to_datatype(UNSET, UNICODE_TYPE), UNSET)
 
-        converted = convert_value_to_datatype('unicode', unicode)
+        converted = convert_value_to_datatype('unicode', UNICODE_TYPE)
         self.assertEqual(converted, u'unicode')
-        self.assertTrue(isinstance(converted, unicode))
+        self.assertTrue(isinstance(converted, UNICODE_TYPE))
 
         err = self.expect_error(
             UnicodeDecodeError,
             convert_value_to_datatype,
-            '\xc3\xa4\xc3\xb6\xc3\xbc', unicode
+            b'\xc3\xa4\xc3\xb6\xc3\xbc', UNICODE_TYPE
         )
         msg = (
             "'ascii' codec can't decode byte 0xc3 in position 0: "
@@ -498,38 +503,46 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(convert_value_to_datatype(UNSET, 'long'), UNSET)
 
         converted = convert_value_to_datatype('1', 'long')
-        self.assertEqual(converted, 1L)
-        self.assertTrue(isinstance(converted, long))
+        self.assertEqual(converted, LONG_TYPE(1))
+        self.assertTrue(isinstance(converted, LONG_TYPE))
 
         converted = convert_value_to_datatype(2.0, 'long')
-        self.assertEqual(converted, 2L)
-        self.assertTrue(isinstance(converted, long))
+        self.assertEqual(converted, LONG_TYPE(2))
+        self.assertTrue(isinstance(converted, LONG_TYPE))
 
         err = self.expect_error(
             ValueError,
             convert_value_to_datatype,
             'a', 'long'
         )
-        msg = "invalid literal for long() with base 10: 'a'"
+        if IS_PY2:
+            msg = "invalid literal for long() with base 10: 'a'"
+        else:
+            # there is no long type in python 3, falls back to int
+            msg = "invalid literal for int() with base 10: 'a'"
         self.assertEqual(str(err), msg)
 
         # Convert to long by type
-        self.assertEqual(convert_value_to_datatype(UNSET, long), UNSET)
+        self.assertEqual(convert_value_to_datatype(UNSET, LONG_TYPE), UNSET)
 
-        converted = convert_value_to_datatype('3', long)
-        self.assertEqual(converted, 3L)
-        self.assertTrue(isinstance(converted, long))
+        converted = convert_value_to_datatype('3', LONG_TYPE)
+        self.assertEqual(converted, LONG_TYPE(3))
+        self.assertTrue(isinstance(converted, LONG_TYPE))
 
-        converted = convert_value_to_datatype(4.0, long)
-        self.assertEqual(converted, 4L)
-        self.assertTrue(isinstance(converted, long))
+        converted = convert_value_to_datatype(4.0, LONG_TYPE)
+        self.assertEqual(converted, LONG_TYPE(4))
+        self.assertTrue(isinstance(converted, LONG_TYPE))
 
         err = self.expect_error(
             ValueError,
             convert_value_to_datatype,
-            'b', long
+            'b', LONG_TYPE
         )
-        msg = "invalid literal for long() with base 10: 'b'"
+        if IS_PY2:
+            msg = "invalid literal for long() with base 10: 'b'"
+        else:
+            # there is no long type in python 3, falls back to int
+            msg = "invalid literal for int() with base 10: 'b'"
         self.assertEqual(str(err), msg)
 
     def test_convert_value_to_datatype_float(self):
@@ -549,7 +562,10 @@ class TestUtils(YafowilTestCase):
             convert_value_to_datatype,
             'a', 'float'
         )
-        msg = "could not convert string to float: a"
+        if IS_PY2:
+            msg = "could not convert string to float: a"
+        else:
+            msg = "could not convert string to float: 'a'"
         self.assertEqual(str(err), msg)
 
         converted = convert_value_to_datatype(3, 'float')
@@ -572,7 +588,10 @@ class TestUtils(YafowilTestCase):
             convert_value_to_datatype,
             'b', float
         )
-        msg = "could not convert string to float: b"
+        if IS_PY2:
+            msg = "could not convert string to float: b"
+        else:
+            msg = "could not convert string to float: 'b'"
         self.assertEqual(str(err), msg)
 
         converted = convert_value_to_datatype(6, float)
