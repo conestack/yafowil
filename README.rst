@@ -65,4 +65,6 @@ Contributors
 
 - Daniel Widerin
 
+- Georg Bernhard
+
 - Christian Scholz aka MrTopf
