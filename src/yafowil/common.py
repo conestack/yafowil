@@ -2017,7 +2017,7 @@ def error_renderer(widget, data):
         if message_tag:
             msgs += tag(
                 message_tag,
-                error,
+                error.msg,
                 class_=attr_value('message_class', widget, data)
             )
         else:

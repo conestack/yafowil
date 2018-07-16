@@ -181,6 +181,7 @@ class ExtractionError(Exception):
             stops extraction.
         """
         Exception.__init__(self, msg)
+        self.msg = msg
         self.abort = abort
 
     def __repr__(self):

@@ -26,7 +26,8 @@ History
   [rnix]
 
 - Do not access deprecated ``Exception.message`` any more in
-  ``common.error_renderer``.
+  ``common.error_renderer``. Add ``msg`` attribute to ``ExtractionError``
+  directly and use this one to keep error translating sane.
   [rnix]
 
 - Add html5 data attribute support to ``form_edit_renderer``.
