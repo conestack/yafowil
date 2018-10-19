@@ -207,6 +207,8 @@ def attr_value(key, widget, data, default=None):
         try:
             # assume property factory signature
             # XXX: use keyword arguments?
+            # XXX: if callable raises TypeError we get non clear follow up
+            #      errors.
             return attr(widget, data)
         except TypeError:
             try:
