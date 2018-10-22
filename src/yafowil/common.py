@@ -4,20 +4,20 @@ from yafowil.base import ExtractionError
 from yafowil.base import factory
 from yafowil.base import fetch_value
 from yafowil.compat import BYTES_TYPE
-from yafowil.compat import ITER_TYPES
 from yafowil.compat import IS_PY2
+from yafowil.compat import ITER_TYPES
 from yafowil.compat import LONG_TYPE
 from yafowil.compat import STR_TYPE
 from yafowil.compat import UNICODE_TYPE
 from yafowil.tsf import _
 from yafowil.utils import EMPTY_VALUE
+from yafowil.utils import as_data_attrs
 from yafowil.utils import attr_value
 from yafowil.utils import convert_value_to_datatype
 from yafowil.utils import convert_values_to_datatype
 from yafowil.utils import css_managed_props
 from yafowil.utils import cssclasses
 from yafowil.utils import cssid
-from yafowil.utils import generic_html5_attrs
 from yafowil.utils import managedprops
 from yafowil.utils import vocabulary
 import re
@@ -314,7 +314,7 @@ def input_attributes_common(widget, data, excludes=list(), value=None):
         'type': attr_value('type', widget, data),
         'value': value,
     }
-    input_attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
+    input_attrs.update(as_data_attrs(attr_value('data', widget, data)))
     for attr_name in excludes:
         del input_attrs[attr_name]
     return input_attrs
@@ -383,7 +383,7 @@ def generic_display_renderer(widget, data, value=None):
             attr_value('class', widget, data) or 'generic'
         )
     }
-    attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
+    attrs.update(as_data_attrs(attr_value('data', widget, data)))
     return data.tag('div', content, **attrs)
 
 
@@ -443,7 +443,7 @@ def tag_renderer(widget, data):
         'id': cssid(widget, 'tag'),
         'class_': cssclasses(widget, data),
     }
-    attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
+    attrs.update(as_data_attrs(attr_value('data', widget, data)))
     tag = attr_value('tag', widget, data)
     text = attr_value('text', widget, data)
     return data.tag(tag, text, **attrs)
@@ -607,7 +607,7 @@ def textarea_attributes(widget, data):
         'rows': attr_value('rows', widget, data),
         'wrap': attr_value('wrap', widget, data),
     }
-    ta_attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
+    ta_attrs.update(as_data_attrs(attr_value('data', widget, data)))
     return ta_attrs
 
 
@@ -710,7 +710,7 @@ def lines_display_renderer(widget, data):
         'id': cssid(widget, 'display'),
         'class_': 'display-{0}'.format(attr_value('class', widget, data))
     }
-    attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
+    attrs.update(as_data_attrs(attr_value('data', widget, data)))
     content = u''
     for line in value:
         content += data.tag('li', line)
@@ -1213,9 +1213,7 @@ def select_block_edit_renderer(widget, data, custom_attrs={}):
         'autofocus': autofocus,
         'required': required,
     }
-    select_attrs.update(
-        generic_html5_attrs(
-            attr_value('data', widget, data)))
+    select_attrs.update(as_data_attrs(attr_value('data', widget, data)))
     select_attrs.update(custom_attrs)
     if disabled is True:
         select_attrs['disabled'] = 'disabled'
@@ -1286,9 +1284,7 @@ def select_cb_edit_renderer(widget, data, custom_attrs={}):
         })
         tags.append(item_wrapper)
     wrapper_attrs = {'id': cssid(widget, tagtype, 'wrapper')}
-    wrapper_attrs.update(
-        generic_html5_attrs(
-            attr_value('data', widget, data)))
+    wrapper_attrs.update(as_data_attrs(attr_value('data', widget, data)))
     wrapper_attrs.update(custom_attrs)
     taglisting = data.tag(listing_tag, *tags, **wrapper_attrs)
     return select_exists_marker(widget, data) + taglisting
@@ -1325,7 +1321,7 @@ def select_display_renderer(widget, data):
         'id': cssid(widget, 'display'),
         'class_': 'display-{0}'.format(attr_value('class', widget, data))
     }
-    attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
+    attrs.update(as_data_attrs(attr_value('data', widget, data)))
     content = u''
     if multivalued and isinstance(value, STR_TYPE):
         value = [value]
@@ -1524,7 +1520,7 @@ def input_file_display_renderer(widget, data):
     attrs = {
         'class': cssclasses(widget, data),
     }
-    attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
+    attrs.update(as_data_attrs(attr_value('data', widget, data)))
     if not value:
         no_file_message = _('no_file', default=u'No file')
         return tag('div', no_file_message, **attrs)

@@ -13,6 +13,7 @@ from yafowil.compat import UNICODE_TYPE
 from yafowil.tests import YafowilTestCase
 from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import Tag
+from yafowil.utils import as_data_attrs
 from yafowil.utils import attr_value
 from yafowil.utils import convert_value_to_datatype
 from yafowil.utils import convert_values_to_datatype
@@ -293,8 +294,9 @@ class TestUtils(YafowilTestCase):
         )
         self.assertEqual(str(err), 'failing_instance_bc_callback')
 
-    def test_generic_html5_attrs(self):
-        html5_attrs = generic_html5_attrs({
+    def test_as_data_attrs(self):
+        self.assertTrue(as_data_attrs is generic_html5_attrs)
+        html5_attrs = as_data_attrs({
             'foo': 'bar',
             'baz': ['bam'],
             'nada': None,
@@ -304,6 +306,10 @@ class TestUtils(YafowilTestCase):
             html5_attrs,
             {'data-baz': '["bam"]', 'data-foo': 'bar'}
         )
+        html5_attrs = as_data_attrs(None)
+        self.assertEqual(html5_attrs, {})
+        html5_attrs = as_data_attrs(UNSET)
+        self.assertEqual(html5_attrs, {})
 
     def test_data_attrs_helper(self):
         data = AttributedNode()
@@ -320,6 +326,7 @@ class TestUtils(YafowilTestCase):
         }
         widget.attrs['testattr7'] = 1234
         widget.attrs['testattr8'] = 1234.5678
+        widget.attrs['testattr9'] = UNSET
         widget.attrs['camelAttrName'] = 'camelValue'
         data_attrs_keys = [
             'testattr1', 'testattr2', 'testattr3', 'testattr4', 'testattr5',
@@ -342,6 +349,7 @@ class TestUtils(YafowilTestCase):
         self.assertTrue(data_attrs['data-testattr6'].endswith('}'))
         self.assertEqual(data_attrs['data-testattr7'], '1234')
         self.assertEqual(data_attrs['data-testattr8'], '1234.5678')
+        self.assertFalse('data-testattr9' in data_attrs)
         self.assertEqual(data_attrs['data-camel-attr-name'], 'camelValue')
 
         # Test with Tag renderer

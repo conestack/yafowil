@@ -2,11 +2,11 @@
 from node.utils import UNSET
 from odict import odict
 from yafowil.base import factory
+from yafowil.utils import as_data_attrs
 from yafowil.utils import attr_value
 from yafowil.utils import css_managed_props
 from yafowil.utils import cssclasses
 from yafowil.utils import cssid
-from yafowil.utils import generic_html5_attrs
 from yafowil.utils import managedprops
 
 
@@ -142,7 +142,7 @@ def div_renderer(widget, data):
         'id': attr_value('id', widget, data),
         'class_': cssclasses(widget, data)
     }
-    attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
+    attrs.update(as_data_attrs(attr_value('data', widget, data)))
     return data.tag('div', data.rendered, **attrs)
 
 
@@ -238,7 +238,7 @@ def form_edit_renderer(widget, data):
         'class_': cssclasses(widget, data),
         'id': 'form-{0}'.format('-'.join(widget.path)),
     }
-    form_attrs.update(generic_html5_attrs(attr_value('data', widget, data)))
+    form_attrs.update(as_data_attrs(attr_value('data', widget, data)))
     return data.tag('form', data.rendered, **form_attrs)
 
 

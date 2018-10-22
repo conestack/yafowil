@@ -231,26 +231,47 @@ def attr_value(key, widget, data, default=None):
     return attr
 
 
-def generic_html5_attrs(data_dict):
+def as_data_attrs(data):
+    """Convert either dict or list of (key, value) pairs into dict containing
+    HTML5 data attributes.
+
+    Keys gets prefixed with ``data-``, ``CamelCase`` gets converted
+    to ``caml-case``.
+
+    Values are ignored if ``None`` or ``UNSET``. If value is string, it's
+    taken as is, otherwise it's assumed that value is list or dict and gets
+    dumped as JSON string.
+
+    :param data: Either dict or list of (key, value) pairs.
+    :return: Dict containing HTML5 data attributes
+    """
     data_attrs = {}
-    if not data_dict:
-        return data_attrs  # don't fail on empty data_dict
-    for key, val in data_dict.items():
+    # no data passed, return empty dict
+    if not data:
+        return data_attrs
+    # expect dict if no list
+    if not isinstance(data, list):
+        data = data.items()
+    for key, val in data:
         # check against None and UNSET separately to please coverage tests
         # rnix, 2014-04-30
         if val is None:
             continue
         if val is UNSET:
             continue
-        ret = json.dumps(val)  # js-ify
-        if isinstance(val, STR_TYPE):
-            # for strings, remove leading and trailing double quote, since
+        # convert value to JSON dump if no string.
+        if not isinstance(val, STR_TYPE):
+            # also remove leading and trailing double quotes,
             # they are not needed for data-attributes
-            ret = ret.strip('"')
+            val = json.dumps(val).strip('"')
         # replace camelCase with camel-case
         key = re.sub('([a-z])([A-Z])', '\g<1>-\g<2>', key).lower()
-        data_attrs['data-{0}'.format(key)] = ret
+        data_attrs['data-{0}'.format(key)] = val
     return data_attrs
+
+
+# B/C: deprecate as of yafowil 2.4, remove in yafowil 3.0
+generic_html5_attrs = as_data_attrs
 
 
 def data_attrs_helper(widget, data, attrs):
@@ -279,25 +300,12 @@ def data_attrs_helper(widget, data, attrs):
 
     .. note::
       The Tag class encloses data-attribute values in single quotes, since the
-      JSON standard requires strings to be enclosed in double-quotes.  jQuery
+      JSON standard requires strings to be enclosed in double-quotes. jQuery
       requires this or .data() can't create lists or arrays out of
       data-attribute values.
-
     """
-    data_attrs = {}
-    for key in attrs:
-        val = attr_value(key, widget, data)
-        if val is None:
-            continue
-        ret = json.dumps(val)  # js-ify
-        if isinstance(val, STR_TYPE):
-            # for strings, remove leading and trailing double quote, since
-            # they are not needed for data-attributes
-            ret = ret.strip('"')
-        # replace camelCase with camel-case
-        key = re.sub('([a-z])([A-Z])', '\g<1>-\g<2>', key).lower()
-        data_attrs['data-{0}'.format(key)] = ret
-    return data_attrs
+    items = [(key, attr_value(key, widget, data)) for key in attrs]
+    return as_data_attrs(items)
 
 
 css_managed_props = [

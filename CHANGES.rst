@@ -5,7 +5,12 @@ History
 2.3.1 (unreleased)
 ------------------
 
-- No changes yet.
+- Do not dump string values as JSON data in ``yafowil.utils.as_data_attrs``.
+  [rnix]
+
+- Rename ``yafowil.utils.generic_html5_attrs`` to
+  ``yafowil.utils.as_data_attrs``.
+  [rnix]
 
 
 2.3 (2018-07-16)
