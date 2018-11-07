@@ -2,7 +2,7 @@
 History
 =======
 
-2.3.1 (unreleased)
+2.3.1 (2018-11-07)
 ------------------
 
 - Do not dump string values as JSON data in ``yafowil.utils.as_data_attrs``.
