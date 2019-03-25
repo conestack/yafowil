@@ -35,17 +35,34 @@ Read it and learn how to create your example application with YAFOWIL forms in 1
 Source Code
 ===========
 
-.. image:: https://secure.travis-ci.org/bluedynamics/yafowil.png
-    :target: http://travis-ci.org/#!/bluedynamics/yafowil
-
-.. image:: https://coveralls.io/repos/bluedynamics/yafowil/badge.png
-    :alt: Coverage
-    :target: https://coveralls.io/r/bluedynamics/yafowil
+.. image:: https://travis-ci.org/bluedynamics/yafowil.svg?branch=master
+    :target: https://travis-ci.org/bluedynamics/yafowil
 
 The sources are in a GIT DVCS with its main branches at
 `github <http://github.com/bluedynamics/yafowil>`_.
 
 We'd be happy to see many forks and pull-requests to make YAFOWIL even better.
+
+Coverage report::
+
+    Name                           Stmts   Miss  Cover
+    --------------------------------------------------
+    src/yafowil/__init__.py            0      0   100%
+    src/yafowil/base.py              363      0   100%
+    src/yafowil/common.py            884      1    99%
+    src/yafowil/compat.py              8      0   100%
+    src/yafowil/compound.py          100      1    99%
+    src/yafowil/controller.py         44      0   100%
+    src/yafowil/example.py            58      0   100%
+    src/yafowil/i18n/__init__.py       0      0   100%
+    src/yafowil/loader.py              9      0   100%
+    src/yafowil/persistence.py        10      0   100%
+    src/yafowil/resources.py          33      0   100%
+    src/yafowil/table.py              51      0   100%
+    src/yafowil/tsf.py                19      0   100%
+    src/yafowil/utils.py             214      5    98%
+    --------------------------------------------------
+    TOTAL                           1793      7    99%
 
 
 Contributors

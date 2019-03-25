@@ -18,6 +18,7 @@ from yafowil.utils import attr_value
 from yafowil.utils import convert_value_to_datatype
 from yafowil.utils import convert_values_to_datatype
 from yafowil.utils import cssclasses
+from yafowil.utils import cssid
 from yafowil.utils import data_attrs_helper
 from yafowil.utils import generic_html5_attrs
 from yafowil.utils import get_entry_points
@@ -105,6 +106,29 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(tag('dummy', name=UNSET), u'<dummy />')
         # deprecated test
         self.assertEqual(deprecated_tag('div', 'foo'), u'<div>foo</div>')
+
+    def test_cssid(self):
+        # Test CSS id
+        @plumbing(Nodespaces, Attributes)
+        class CSSTestNode(OrderedNode):
+            @property
+            def dottedpath(self):
+                return u'.'.join([it for it in self.path if it])
+
+        widget = CSSTestNode(name='form')
+
+        widget.attrs['structural'] = True
+        self.assertEqual(cssid(widget, 'PREFIX'), None)
+
+        child = widget['child'] = CSSTestNode()
+        self.assertEqual(cssid(child, 'PREFIX'), 'PREFIX-form-child')
+        self.assertEqual(
+            cssid(child, 'PREFIX', postfix='POSTFIX'),
+            'PREFIX-form-child-POSTFIX'
+        )
+
+        child = widget[u'Hällo Wörld'] = CSSTestNode()
+        self.assertEqual(cssid(child, 'PREFIX'), 'PREFIX-form-Hallo_World')
 
     def test_css_classes(self):
         # Test CSS Classes
