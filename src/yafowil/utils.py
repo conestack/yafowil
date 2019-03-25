@@ -198,7 +198,7 @@ def cssid(widget, prefix, postfix=None):
         cssid = u'{0}-{1}'.format(cssid, postfix)
     return unicodedata.normalize('NFKD', cssid)\
         .encode('ASCII', 'ignore')\
-        .replace(b' ', b'_')
+        .replace(b' ', b'_').decode()
 
 
 def attr_value(key, widget, data, default=None):

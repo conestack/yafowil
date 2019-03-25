@@ -15,7 +15,6 @@ longdesc = '\n\n'.join([read_file(name) for name in [
     'CHANGES.rst',
     'LICENSE.rst'
 ]])
-tests_require = ['interlude', 'lxml']
 
 
 setup(
@@ -50,13 +49,12 @@ setup(
         'node>0.9.10',
         'plumber>=1.3',
     ],
-    tests_require=tests_require,
+    tests_require=['lxml'],
     test_suite='yafowil.tests.test_suite',
-    extras_require=dict(
-        test=tests_require,
-    ),
+    extras_require=dict(test=['lxml']),
     entry_points="""
     [yafowil.plugin]
     register = yafowil.loader:register
     example = yafowil.example:get_example
-    """)
+    """
+)

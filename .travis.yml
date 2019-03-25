@@ -1,28 +1,19 @@
 language: python
+dist: "xenial"
 sudo: false
-cache:
-  pip: true
-  directories:
-    - $HOME/buildout-cache
+
 python:
-  - 2.7
-  - 3.5
-  - 3.6
-#  - 3.7
-before_install:
-  - mkdir -p $HOME/buildout-cache/{eggs,downloads}
-  - mkdir $HOME/.buildout
-  - echo "[buildout]" > $HOME/.buildout/default.cfg
-  - echo "download-cache = $HOME/buildout-cache/downloads" >> $HOME/.buildout/default.cfg
-  - echo "eggs-directory = $HOME/buildout-cache/eggs" >> $HOME/.buildout/default.cfg
-  - virtualenv .
-  - bin/pip install --upgrade pip setuptools zc.buildout
-#  - bin/pip install --upgrade pip setuptools zc.buildout coveralls createcoverage
+  - "2.7"
+  - "3.5"
+  - "3.6"
+  - "3.7"
+
 install:
-  - bin/buildout -N -t 3 -c travis.cfg
-script:
-  - bin/test
-  - bin/code-analysis
-#after_success:
-#  - bin/createcoverage
-#  - bin/coveralls
+  - pip install coverage
+  - pip install .[test]
+
+script: python -m yafowil.tests.__init__
+after_success:
+  - bin/coverage run --source src/yafowil src/yafowil/tests/__init__.py
+  - bin/coverage report
+  - bin/coverage html
