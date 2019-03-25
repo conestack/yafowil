@@ -3,6 +3,7 @@ from node.tests import NodeTestCase
 from yafowil.base import factory
 from yafowil.compat import IS_PY2
 import lxml.etree as etree
+import sys
 import unittest
 import yafowil.common
 import yafowil.compound
@@ -65,6 +66,7 @@ def run_tests():
 
     runner = Runner(found_suites=[test_suite()])
     runner.run()
+    sys.exit(int(runner.failed))
 
 
 if __name__ == '__main__':
