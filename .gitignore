@@ -23,3 +23,5 @@
 /htmlcov/
 /.settings/
 /pip-selfcheck.json
+/py2/
+/py3/

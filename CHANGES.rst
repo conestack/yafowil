@@ -7,7 +7,7 @@ History
 
 - Fix ``yafowil.utils.cssid`` to return unicode in order to prevent malformed
   rendering in python 3.
-  [rnix, 2019-03-25]
+  [rnix]
 
 
 2.3.1 (2018-11-07)

@@ -1,6 +1,7 @@
-import os
-from setuptools import setup
 from setuptools import find_packages
+from setuptools import setup
+from setuptools.command.test import test
+import os
 
 
 def read_file(name):
@@ -15,6 +16,13 @@ longdesc = '\n\n'.join([read_file(name) for name in [
     'CHANGES.rst',
     'LICENSE.rst'
 ]])
+
+
+class Test(test):
+
+    def run_tests(self):
+        from yafowil import tests
+        tests.run_tests()
 
 
 setup(
@@ -49,9 +57,15 @@ setup(
         'node>0.9.10',
         'plumber>=1.3',
     ],
-    tests_require=['lxml'],
+    tests_require=[
+        'lxml',
+        'zope.testrunner'
+    ],
     test_suite='yafowil.tests.test_suite',
-    extras_require=dict(test=['lxml']),
+    extras_require=dict(test=[
+        'lxml',
+        'zope.testrunner'
+    ]),
     entry_points="""
     [yafowil.plugin]
     register = yafowil.loader:register
