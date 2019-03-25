@@ -8,6 +8,11 @@
     :target: https://pypi.python.org/pypi/yafowil
     :alt: Number of PyPI downloads
 
+.. image:: https://travis-ci.org/bluedynamics/yafowil.svg?branch=master
+    :target: https://travis-ci.org/bluedynamics/yafowil
+
+.. image:: https://coveralls.io/repos/github/bluedynamics/yafowil/badge.svg?branch=master
+    :target: https://coveralls.io/github/bluedynamics/yafowil?branch=master
 
 YAFOWIL offers html-form creation and modification at runtime. 
 It is light-weight and provides an extensible, reusable set of blueprints to build flexible forms.

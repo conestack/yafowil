@@ -10,10 +10,13 @@ python:
 
 install:
   - pip install coverage
-  - pip install .[test]
+  - pip install coveralls
+  - pip install -e .[test]
 
-script: python -m yafowil.tests.__init__
+script:
+  - python -m yafowil.tests.__init__
+  - coverage run --source src/yafowil -m yafowil.tests.__init__
+  - coverage report
+
 after_success:
-  - bin/coverage run --source src/yafowil src/yafowil/tests/__init__.py
-  - bin/coverage report
-  - bin/coverage html
+  - coveralls
