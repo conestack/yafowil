@@ -5,6 +5,12 @@ History
 2.3.2 (unreleased)
 ------------------
 
+- Use ``logger.warning`` instead of deprecated ``logger.warn``.
+  [rnix]
+
+- Add ``yafowil.utils.callable_value``.
+  [rnix]
+
 - Fix ``yafowil.utils.cssid`` to return unicode in order to prevent malformed
   rendering in python 3.
   [rnix]

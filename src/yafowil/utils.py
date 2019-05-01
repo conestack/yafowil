@@ -171,8 +171,10 @@ class Tag(object):
 
 # Deprecation message
 def _deprecated_null_localization(msg):
-    logging.warn("Deprecated usage of 'yafowil.utils.tag', please use the " +
-                 "tag factory on RuntimeData instead.")
+    logging.warning(
+        "Deprecated usage of 'yafowil.utils.tag', please "
+        "use the tag factory on RuntimeData instead."
+    )
     return msg
 
 
@@ -201,34 +203,52 @@ def cssid(widget, prefix, postfix=None):
         .replace(b' ', b'_').decode()
 
 
-def attr_value(key, widget, data, default=None):
-    attr = widget.attrs.get(key, default)
-    if callable(attr):
+def callable_value(value, widget, data):
+    """Call value if callable with widget and data as arguments and return
+    the callables return value. If value not callable, return as is.
+    As B/C mode, if callable accepts no arguments, try to call without
+    arguments.
+    """
+    if not callable(value):
+        return value
+    try:
+        # assume property factory signature
+        # XXX: use keyword arguments?
+        # XXX: if callable raises TypeError we get non clear follow up
+        #      errors.
+        return value(widget, data)
+    except TypeError:
         try:
-            # assume property factory signature
-            # XXX: use keyword arguments?
-            # XXX: if callable raises TypeError we get non clear follow up
-            #      errors.
-            return attr(widget, data)
+            # assume function or class
+            spec = inspect.getargspec(value)
         except TypeError:
-            try:
-                # assume function or class
-                spec = inspect.getargspec(attr)
-            except TypeError:
-                spec = None
-            if spec is not None:
-                # assume B/C property factory signature if argument specs found
-                if len(spec.args) <= 1 and not spec.keywords:
-                    try:
-                        res = attr()
-                        logging.warn(
-                            "Deprecated usage of callback attributes. Please "
-                            "accept 'widget' and 'data' as arguments."
-                        )
-                        return res
-                    except TypeError:
-                        return attr
-    return attr
+            spec = None
+        if spec is not None:
+            # assume B/C property factory signature if argument specs found
+            if len(spec.args) <= 1 and not spec.keywords:
+                try:
+                    res = value()
+                    logging.warning(
+                        "Deprecated usage of callback attributes. Please "
+                        "accept 'widget' and 'data' as arguments."
+                    )
+                    return res
+                except TypeError:
+                    # XXX: raise here?
+                    return value
+    # XXX: raise here?
+    return value
+
+
+def attr_value(key, widget, data, default=None):
+    """Return widget attribute value by key or default. If value is callable,
+    it's return value is used.
+    """
+    return callable_value(
+        widget.attrs.get(key, default),
+        widget,
+        data
+    )
 
 
 def as_data_attrs(data):
