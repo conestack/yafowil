@@ -5,6 +5,9 @@ History
 2.3.2 (unreleased)
 ------------------
 
+- Parse value if they are callable, for HTML5 Data-Attributes
+  [2silver, 2019-06-12]
+
 - Use ``logger.warning`` instead of deprecated ``logger.warn``.
   [rnix]
 

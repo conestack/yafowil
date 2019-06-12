@@ -279,6 +279,18 @@ def as_data_attrs(data):
             continue
         if val is UNSET:
             continue
+
+        # this probably could be done much better!
+        # 2silver, 2019-06-11
+        if callable(val):
+            try:
+                val = val()
+            except TypeError:
+                logging.warning(
+                    'converting data-attribute for "{}" failed'.format(key)
+                )
+                val = str(val)
+
         # convert value to JSON dump if no string.
         if not isinstance(val, STR_TYPE):
             # also remove leading and trailing double quotes,
