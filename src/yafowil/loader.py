@@ -12,11 +12,11 @@ def register():
 
 # execute all register entry points. supposed to be used for widget and theme
 # registration
-for ep in yafowil.utils.get_entry_points('register'):
-    ep.load()()
+for ep, cb in yafowil.utils.get_plugins('register'):
+    cb()
 
 
 # execute all configure entry points. supposed to be used for theme
 # configuration, like setting factory defaults and defining macros.
-for ep in yafowil.utils.get_entry_points('configure'):
-    ep.load()()                                               #pragma NO COVER
+for ep, cb in yafowil.utils.get_plugins('configure'):
+    cb()

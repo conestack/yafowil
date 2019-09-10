@@ -11,8 +11,6 @@ from yafowil.compat import IS_PY2
 from yafowil.compat import LONG_TYPE
 from yafowil.compat import UNICODE_TYPE
 from yafowil.tests import YafowilTestCase
-from yafowil.utils import EMPTY_VALUE
-from yafowil.utils import Tag
 from yafowil.utils import as_data_attrs
 from yafowil.utils import attr_value
 from yafowil.utils import convert_value_to_datatype
@@ -20,12 +18,14 @@ from yafowil.utils import convert_values_to_datatype
 from yafowil.utils import cssclasses
 from yafowil.utils import cssid
 from yafowil.utils import data_attrs_helper
+from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import generic_html5_attrs
-from yafowil.utils import get_entry_points
 from yafowil.utils import get_example
 from yafowil.utils import get_example_names
 from yafowil.utils import get_plugin_names
+from yafowil.utils import get_plugins
 from yafowil.utils import managedprops
+from yafowil.utils import Tag
 from yafowil.utils import tag as deprecated_tag
 from yafowil.utils import vocabulary
 import uuid
@@ -37,10 +37,11 @@ class TestUtils(YafowilTestCase):
     def test_entry_point(self):
         # Test entry_point support tools
         self.check_output("""
-        [...EntryPoint.parse('register = yafowil.loader:register')...]
-        """, str(get_entry_points()))
+        [...(EntryPoint.parse('register = yafowil.loader:register'),
+        <function register at ...)...]
+        """, str(list(get_plugins())))
 
-        self.assertEqual(get_entry_points('nonexisting'), [])
+        self.assertEqual(list(get_plugins('nonexisting')), [])
 
         self.check_output("""
         [...'yafowil'...]

@@ -5,6 +5,9 @@ History
 2.3.2 (unreleased)
 ------------------
 
+- Refactor yafowil plugin lookup. Improves performance.
+  [rnix, jensens]
+
 - Use ``logger.warning`` instead of deprecated ``logger.warn``.
   [rnix]
 

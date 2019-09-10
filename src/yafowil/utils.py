@@ -26,17 +26,24 @@ class entry_point(object):
         return ob
 
 
-def _ep_sortkey(val):
-    return getattr(val.load(), 'order', 0)
+_yafowil_plugins = None
 
 
-def get_entry_points(ns=None):
-    entry_points = []
-    for ep in iter_entry_points('yafowil.plugin'):
+def get_plugins(ns=None):
+    global _yafowil_plugins
+    if _yafowil_plugins is None:
+        _yafowil_plugins = list()
+        for ep in iter_entry_points('yafowil.plugin'):
+            cb = ep.load()
+            _yafowil_plugins.append((ep, cb))
+        _yafowil_plugins = sorted(
+            _yafowil_plugins,
+            key=lambda x: getattr(x[1], 'order', 0)
+        )
+    for ep, cb in _yafowil_plugins:
         if ns is not None and ep.name != ns:
             continue
-        entry_points.append(ep)
-    return sorted(entry_points, key=_ep_sortkey)
+        yield (ep, cb)
 
 
 _plugin_names = dict()
@@ -45,22 +52,22 @@ _plugin_names = dict()
 def get_plugin_names(ns=None):
     if ns not in _plugin_names:
         _plugin_names[ns] = list(set(
-            [_.dist.project_name for _ in get_entry_points(ns=ns)]
+            [ep.dist.project_name for ep, cb in get_plugins(ns=ns)]
         ))
     return _plugin_names[ns]
 
 
 def get_example(example_name):
-    for ep in get_entry_points(ns='example'):
+    for ep, cb in get_plugins(ns='example'):
         if ep.dist.project_name != example_name:
             continue
-        info = ep.load()()
+        info = cb()
         return info
 
 
 def get_example_names():
     result = []
-    for ep in get_entry_points(ns='example'):
+    for ep, cb in get_plugins(ns='example'):
         result.append(ep.dist.project_name)
     return result
 
