@@ -2,7 +2,7 @@
 History
 =======
 
-2.3.2 (unreleased)
+2.3.2 (2019-11-07)
 ------------------
 
 - Refactor yafowil plugin lookup. Improves performance.
