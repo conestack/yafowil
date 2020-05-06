@@ -2132,6 +2132,24 @@ class TestCommon(YafowilTestCase):
         """, wrapped_fxml(widget()))
 
     def test_select_blueprint_multi(self):
+        # Empty multi valued
+        widget = factory(
+            'select',
+            name='EMPTYSELECT',
+            value=UNSET,
+            props={
+                'multivalued': True,
+                'vocabulary': []
+            })
+        self.check_output("""
+        <div>
+          <input id="exists-EMPTYSELECT" name="EMPTYSELECT-exists"
+                 type="hidden" value="exists"/>
+          <select class="select" id="input-EMPTYSELECT" multiple="multiple"
+                  name="EMPTYSELECT"> </select>
+        </div>
+        """, wrapped_fxml(widget()))
+
         # Default multi valued
         vocab = [
             ('one', 'One'),

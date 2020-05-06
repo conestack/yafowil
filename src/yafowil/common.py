@@ -1217,6 +1217,8 @@ def select_block_edit_renderer(widget, data, custom_attrs={}):
     select_attrs.update(custom_attrs)
     if disabled is True:
         select_attrs['disabled'] = 'disabled'
+    if not optiontags:
+        optiontags = [' ']
     rendered = data.tag('select', *optiontags, **select_attrs)
     if multivalued:
         attrs = {

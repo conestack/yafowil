@@ -5,7 +5,8 @@ History
 2.3.3 (unreleased)
 ------------------
 
-- No changes yet.
+- Ensure ``select`` tag not renders without closing tag if no options.
+  [rnix]
 
 
 2.3.2 (2019-11-07)
