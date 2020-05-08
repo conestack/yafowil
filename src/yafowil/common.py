@@ -1604,7 +1604,7 @@ factory.defaults['file.vocabulary'] = [
 # submit
 ###############################################################################
 
-@managedprops('label', 'class', 'action', 'handler',
+@managedprops('tag_type', 'label', 'class', 'action', 'handler',
               'next', 'skip', 'expression')
 def submit_renderer(widget, data):
     expression = attr_value('expression', widget, data)
@@ -1616,7 +1616,7 @@ def submit_renderer(widget, data):
     input_attrs['name_'] = attr_value('action', widget, data) \
         and 'action.{0}'.format(widget.dottedpath)
     input_attrs['value'] = attr_value('label', widget, data, widget.name)
-    return tag('input', **input_attrs)
+    return tag(attr_value("tag_type", widget, data), **input_attrs)
 
 
 factory.register(
@@ -1630,6 +1630,11 @@ Submit action inside the form
 
 factory.doc['props']['submit.label'] = """\
 Label of the submit.
+"""
+
+factory.defaults['tag_type'] = 'input'
+factory.doc['props']['tag_type'] = """\
+Define the type of tag that will be rendered.
 """
 
 factory.defaults['submit.expression'] = True
@@ -1658,9 +1663,9 @@ Next is a callable expected to return the web address. It expects a request as
 the only parameter.
 """
 
-factory.defaults['text.disabled'] = False
+factory.defaults['submit.disabled'] = False
 factory.doc['props']['text.disabled'] = """\
-Flag  input field is disabled.
+Flag the submit field as disabled.
 """
 
 
