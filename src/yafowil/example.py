@@ -335,7 +335,34 @@ def block():
         'title': 'Selection block',
     }
 
+DOC_FILEUPLOAD = """
+File upload
+-----------
+
+Upload a file
+
+.. code-block:: python
+
+    fileupload = factory('#field:file', props={
+        'label': 'File',
+        'help': 'Upload a single file',
+    })
+"""
+
+
+def fileupload():
+    fileupload = factory('compound', name='yafowil-fileupload')
+    fileupload['file'] = factory('#field:file', props={
+        'label': 'File',
+        'help': 'Upload a single file',
+    })
+    return {
+        'widget': fileupload,
+        'doc': DOC_FILEUPLOAD,
+        'title': 'File upload',
+    }
+
 
 def get_example():
     return [plaintext(), email(), number(), integer(), password(), url(),
-            textarea(), radio(), dropdown(), checkbox(), block()]
+            textarea(), radio(), dropdown(), checkbox(), block(), fileupload()]
