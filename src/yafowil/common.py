@@ -1673,7 +1673,7 @@ Flag the submit field as disabled.
 ###############################################################################
 
 @managedprops(
-    'text', 'action', 'handler',  'next', 'skip',
+    'text', 'action', 'handler',  'next', 'skip', "type"
     'expression', 'form', 'formaction', 'formenctype', 'formmethod',
     'formnovalidate', 'formtarget',
     'autofocus', 'disabled', 'class', 'class_add', 'accesskey',
@@ -1702,6 +1702,8 @@ factory.register(
     'button',
     edit_renderers=[button_renderer],
     display_renderers=[empty_display_renderer])
+
+factory.defaults['button.type'] = 'submit'
 
 factory.doc['blueprint']['button'] = """\
 Represents a clickable button, used to submit forms or anywhere in a document for
