@@ -3302,6 +3302,74 @@ class TestCommon(YafowilTestCase):
             'type="submit" value="Action name" />'
         ))
 
+    def test_button_blueprint(self):
+        # Render button element
+        widget = factory(
+            'submit',
+            name='SAVE',
+            props={
+                'action': True,
+                'text': 'Button text',
+            })
+        self.assertEqual(widget(), (
+            '<input id="input-SAVE" name="action.SAVE" type="submit" '
+            'value="Action name" />'
+        ))
+
+        # If expression is or evaluates to False, skip rendering
+        widget = factory(
+            'button',
+            name='SAVE',
+            props={
+                'action': True,
+                'text': 'Button text',
+                'expression': False,
+            })
+        self.assertEqual(widget(), '')
+
+        widget = factory(
+            'button',
+            name='SAVE',
+            props={
+                'action': True,
+                'text': 'Button text',
+                'expression': lambda: False,
+            })
+        self.assertEqual(widget(), '')
+
+        # Generic HTML5 Data
+        widget = factory(
+            'button',
+            name='SAVE',
+            props={
+                'action': True,
+                'text': 'Button text',
+                'data': {'foo': 'bar'},
+            })
+        self.assertEqual(widget(), (
+            '<input data-foo=\'bar\' id="input-SAVE" name="action.SAVE" '
+            'type="submit" value="Action name" />'
+        ))
+
+        # Button specific attrs
+        widget = factory(
+            'button',
+            name='SAVE',
+            props={
+                'action': True,
+                'text': 'Button text',
+                'form': 'my-parent-for',
+                'formaction': 'alternative-action',
+                'formenctype': 'text/plain',
+                'formmethod': 'post',
+                'formnovalidate': "1",
+                'formtarget': "_blank",
+            })
+        self.assertEqual(widget(), (
+            '<input data-foo=\'bar\' id="input-SAVE" name="action.SAVE" '
+            'type="submit" value="Action name" />'
+        ))
+
     def test_proxy_blueprint(self):
         # Used to pass hidden arguments out of form namespace
         widget = factory(
