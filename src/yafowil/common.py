@@ -1690,10 +1690,9 @@ def button_renderer(widget, data):
     input_attrs['formmethod'] = attr_value('formmethod', widget, data)
     input_attrs['formnovalidate'] = attr_value('formnovalidate', widget, data)
     input_attrs['formtarget'] = attr_value('formtarget', widget, data)
-    input_attrs['name_'] = attr_value('action', widget, data)
     input_attrs['accesskey'] = attr_value('accesskey', widget, data)
-    if not input_attrs['name_']:
-        input_attrs['name_'] = 'action.{0}'.format(widget.dottedpath)
+    input_attrs['name_'] = attr_value('action', widget, data) \
+        and 'action.{0}'.format(widget.dottedpath)
     text = attr_value('text', widget, data)
     return tag("button", text, **input_attrs)
 
