@@ -1684,6 +1684,7 @@ def button_renderer(widget, data):
         return u''
     tag = data.tag
     input_attrs = input_attributes_common(widget, data)
+    input_attrs['type'] = attr_value('type', widget, data)
     input_attrs['form'] = attr_value('form', widget, data)
     input_attrs['formaction'] = attr_value('formaction', widget, data)
     input_attrs['formenctype'] = attr_value('formenctype', widget, data)
@@ -1691,8 +1692,14 @@ def button_renderer(widget, data):
     input_attrs['formnovalidate'] = attr_value('formnovalidate', widget, data)
     input_attrs['formtarget'] = attr_value('formtarget', widget, data)
     input_attrs['accesskey'] = attr_value('accesskey', widget, data)
-    input_attrs['name_'] = attr_value('action', widget, data) \
-        and 'action.{0}'.format(widget.dottedpath)
+    if input_attrs['type'] == 'submit':
+        # only 'submit' type sends data to the server
+        if attr_value('action', widget, data):
+            # only if an server side action is set this makes sense:
+            input_attrs['name_'] = 'action.{0}'.format(widget.dottedpath)
+        else:
+            # otherwise check for a custom name
+            input_attrs['name_'] = attr_value('name', widget, data)
     text = attr_value('text', widget, data)
     return tag("button", text, **input_attrs)
 
