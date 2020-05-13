@@ -209,43 +209,19 @@ def cssid(widget, prefix, postfix=None):
         .encode('ASCII', 'ignore')\
         .replace(b' ', b'_').decode()
 
+_BUILTINS = dir(globals()['__builtins__'])
 
 def callable_value(value, widget, data):
     """Call value if callable with widget and data as arguments and return
     the callables return value. If value not callable, return as is.
-    As B/C mode, if callable accepts no arguments, try to call without
-    arguments.
+    If called value raises TypeError, return value.
     """
     if not callable(value):
         return value
     try:
-        # assume property factory signature
-        # XXX: use keyword arguments?
-        # XXX: if callable raises TypeError we get non clear follow up
-        #      errors.
         return value(widget, data)
     except TypeError:
-        try:
-            # assume function or class
-            spec = inspect.getargspec(value)
-        except TypeError:
-            spec = None
-        if spec is not None:
-            # assume B/C property factory signature if argument specs found
-            if len(spec.args) <= 1 and not spec.keywords:
-                try:
-                    res = value()
-                    logging.warning(
-                        "Deprecated usage of callback attributes. Please "
-                        "accept 'widget' and 'data' as arguments."
-                    )
-                    return res
-                except TypeError:
-                    # XXX: raise here?
-                    return value
-    # XXX: raise here?
-    return value
-
+        return value
 
 def attr_value(key, widget, data, default=None):
     """Return widget attribute value by key or default. If value is callable,

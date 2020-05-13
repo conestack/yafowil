@@ -3284,7 +3284,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'action': True,
                 'label': 'Action name',
-                'expression': lambda: False,
+                'expression': lambda w, d: False,
             })
         self.assertEqual(widget(), '')
 
@@ -3305,16 +3305,17 @@ class TestCommon(YafowilTestCase):
     def test_button_blueprint(self):
         # Render button element
         widget = factory(
-            'submit',
+            'button',
             name='SAVE',
             props={
                 'action': True,
                 'text': 'Button text',
             })
-        self.assertEqual(widget(), (
-            '<input id="input-SAVE" name="action.SAVE" type="submit" '
-            'value="Action name" />'
-        ))
+        self.assertEqual(
+            widget(),
+            '<button id="input-SAVE" name="action.SAVE" type="submit">'
+            'Button text</button>'
+        )
 
         # If expression is or evaluates to False, skip rendering
         widget = factory(
@@ -3333,7 +3334,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'action': True,
                 'text': 'Button text',
-                'expression': lambda: False,
+                'expression': lambda w,d: False,
             })
         self.assertEqual(widget(), '')
 
@@ -3346,10 +3347,10 @@ class TestCommon(YafowilTestCase):
                 'text': 'Button text',
                 'data': {'foo': 'bar'},
             })
-        self.assertEqual(widget(), (
-            '<input data-foo=\'bar\' id="input-SAVE" name="action.SAVE" '
-            'type="submit" value="Action name" />'
-        ))
+        self.assertEqual(
+            widget(),
+            """<button data-foo='bar' id="input-SAVE" name="action.SAVE" type="submit">Button text</button>"""
+        )
 
         # Button specific attrs
         widget = factory(
@@ -3365,10 +3366,12 @@ class TestCommon(YafowilTestCase):
                 'formnovalidate': "1",
                 'formtarget': "_blank",
             })
-        self.assertEqual(widget(), (
-            '<input data-foo=\'bar\' id="input-SAVE" name="action.SAVE" '
-            'type="submit" value="Action name" />'
-        ))
+        self.assertEqual(
+            widget(),
+            '<button form="my-parent-for" formaction="alternative-action" '
+            'formenctype="text/plain" formmethod="post" formnovalidate="1" '
+            'formtarget="_blank" id="input-SAVE" name="action.SAVE" type="submit">Button text</button>'
+        )
 
     def test_proxy_blueprint(self):
         # Used to pass hidden arguments out of form namespace
@@ -3520,7 +3523,7 @@ class TestCommon(YafowilTestCase):
             'label',
             name='MYFILE',
             props={
-                'label': lambda: 'Fooo',
+                'label': lambda x, y: 'Fooo',
             })
         self.assertEqual(widget(), (
             '<label for="input-MYFILE">Fooo</label>'
@@ -3904,7 +3907,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'datatype': UNICODE_TYPE
             })
-        data = widget.extract(request={'EMAIL': 'foo@example.com'})
+        data = widget.extract(request={'EMAIL': b'foo@example.com'})
         self.assertEqual(data.extracted, u'foo@example.com')
         self.assertTrue(isinstance(data.extracted, UNICODE_TYPE))
         self.assertFalse(isinstance(data.extracted, BYTES_TYPE))

@@ -2,8 +2,17 @@
 History
 =======
 
-2.3.3 (unreleased)
+2.4.0 (unreleased)
 ------------------
+
+- Add example for ``file`` blueprint.
+  [jensens]
+
+- Add ``button`` blueprint.
+  [jensens]
+
+- Overhault ``callable_value`` behavior acceptance of no parameters.
+  [jensens]
 
 - Ensure ``select`` tag not renders without closing tag if no options.
   [rnix]
