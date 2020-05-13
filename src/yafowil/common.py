@@ -1684,12 +1684,12 @@ def button_renderer(widget, data):
         return u''
     tag = data.tag
     input_attrs = input_attributes_common(widget, data)
-    input_attrs['form'] = attr_value('form', widget, data, widget.name)
-    input_attrs['formaction'] = attr_value('formaction', widget, data, widget.name)
-    input_attrs['formenctype'] = attr_value('formenctype', widget, data, widget.name)
-    input_attrs['formmethod'] = attr_value('formmethod', widget, data, widget.name)
-    input_attrs['formnovalidate'] = attr_value('formnovalidate', widget, data, widget.name)
-    input_attrs['formtarget'] = attr_value('formtarget', widget, data, widget.name)
+    input_attrs['form'] = attr_value('form', widget, data)
+    input_attrs['formaction'] = attr_value('formaction', widget, data)
+    input_attrs['formenctype'] = attr_value('formenctype', widget, data)
+    input_attrs['formmethod'] = attr_value('formmethod', widget, data)
+    input_attrs['formnovalidate'] = attr_value('formnovalidate', widget, data)
+    input_attrs['formtarget'] = attr_value('formtarget', widget, data)
     input_attrs['name_'] = attr_value('action', widget, data)
     input_attrs['accesskey'] = attr_value('accesskey', widget, data)
     if not input_attrs['name_']:
