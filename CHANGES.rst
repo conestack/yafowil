@@ -11,7 +11,9 @@ History
 - Add ``button`` blueprint.
   [jensens]
 
-- Overhault ``callable_value`` behavior acceptance of no parameters.
+- Overhaul ``callable_value`` behavior, remove long deprecated b/c call.
+  It no longer calls callabled lways needs widget and data arguments.
+  This was needed to run on Python 3.7+ with different ``inspect`` module behavior.
   [jensens]
 
 - Ensure ``select`` tag not renders without closing tag if no options.
