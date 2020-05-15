@@ -741,4 +741,5 @@ class TestUtils(YafowilTestCase):
         def zero_callable():
             pass
 
-        self.assertIs(callable_value(zero_callable, None, None), zero_callable)
+        with self.assertRaises(TypeError):
+            callable_value(zero_callable, None, None)

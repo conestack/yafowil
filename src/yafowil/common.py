@@ -1169,7 +1169,7 @@ def select_edit_renderer_props(widget, data):
     multivalued = attr_value('multivalued', widget, data)
     if isinstance(value, STR_TYPE) or not hasattr(value, '__iter__'):
         value = [value]
-    datatype = attr_value('datatype', widget, data)
+    datatype = widget.attrs.get('datatype', None)
     if datatype:
         value = convert_values_to_datatype(value, datatype)
     emptyvalue = attr_value('emptyvalue', widget, data, EMPTY_VALUE)
