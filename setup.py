@@ -9,7 +9,7 @@ def read_file(name):
         return f.read()
 
 
-version = '2.3.3.dev0'
+version = '3.0.0.dev0'
 shortdesc = 'YAFOWIL - declarative, framework independent, flexible HTML forms'
 longdesc = '\n\n'.join([read_file(name) for name in [
     'README.rst',
@@ -38,9 +38,9 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
     ],
     keywords='html input widgets form compound',
     author='BlueDynamics Alliance',

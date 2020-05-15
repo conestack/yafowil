@@ -2,7 +2,7 @@
 History
 =======
 
-2.4.0 (unreleased)
+3.0.0 (unreleased)
 ------------------
 
 - Add example for ``file`` blueprint.
@@ -12,7 +12,8 @@ History
   [jensens]
 
 - Overhaul ``callable_value`` behavior, remove long deprecated b/c call.
-  It no longer calls callabled lways needs widget and data arguments.
+  It no longer calls callables with zero parameters.
+  Now it always needs widget and data arguments.
   This was needed to run on Python 3.7+ with different ``inspect`` module behavior.
   [jensens]
 
