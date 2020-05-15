@@ -53,7 +53,7 @@ class Controller(object):
         return result
 
     def triggered(self, action):
-        return self.request.get('action.{0}'.format(action.dottedpath))
+        return self.request.get('action.{0}'.format(action.dottedpath)) is not None
 
     def _error(self, data):
         if data.errors:
