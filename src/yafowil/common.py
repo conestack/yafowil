@@ -254,7 +254,10 @@ def generic_datatype_extractor(widget, data):
     extracted = data.extracted
     if extracted is UNSET:
         return extracted
-    datatype = attr_value('datatype', widget, data)
+    # datattype is one of the rare cases where an attribute is not a callable
+    # in the yafowil sense (called with widget and data) but one to be called
+    # with just the value.
+    datatype = widget.attrs.get('datatype', None)
     if not datatype:
         return extracted
     allowed_datatypes = attr_value('allowed_datatypes', widget, data)

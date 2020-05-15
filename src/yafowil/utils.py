@@ -218,10 +218,8 @@ def callable_value(value, widget, data):
     """
     if not callable(value):
         return value
-    try:
-        return value(widget, data)
-    except TypeError:
-        return value
+    return value(widget, data)
+
 
 def attr_value(key, widget, data, default=None):
     """Return widget attribute value by key or default. If value is callable,

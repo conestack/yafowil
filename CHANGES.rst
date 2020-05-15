@@ -11,10 +11,13 @@ History
 - Add ``button`` blueprint.
   [jensens]
 
-- Overhaul ``callable_value`` behavior, remove long deprecated b/c call.
-  It no longer calls callables with zero parameters.
-  Now it always needs widget and data arguments.
+- Breaking: Overhaul ``callable_value`` function, remove long deprecated b/c call.
+  It no longer calls callable without patameters as fallback.
+  It always needs widget and data arguments.
   This was needed to run on Python 3.7+ with different ``inspect`` module behavior.
+  Also coming with the change the `datatype` property is always expected to be a converter takig just the value as parameter.
+  Prior it was possible to have a callable called with widget and data to return a converter callable.
+  This resulted in ugky and error-prone code, which was removed with this chnages
   [jensens]
 
 - Ensure ``select`` tag not renders without closing tag if no options.
