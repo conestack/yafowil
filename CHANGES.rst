@@ -5,6 +5,12 @@ History
 3.0.0 (unreleased)
 ------------------
 
+- Fixed error_renderer in case theres no inner message_tag message wa not translated.
+  [jensens]
+
+- Added valid_class and valid_class_default as opposite of error_class to mark an element as valid.
+  [jensens]
+
 - Add example for ``file`` blueprint.
   [jensens]
 

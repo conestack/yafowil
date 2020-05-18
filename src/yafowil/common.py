@@ -45,12 +45,22 @@ Additional CSS-class to put on.
 
 factory.defaults['error_class'] = None
 factory.doc['props']['error_class'] = """\
-CSS-class to put on in case of error.
+CSS-class to put on in case of error after extraction.
 """
 
 factory.defaults['error_class_default'] = 'error'
 factory.doc['props']['error_class_default'] = """\
 Fallback CSS-class to put on in case of error if no specific class was
+given.
+"""
+factory.defaults['valid_class'] = None
+factory.doc['props']['valid_class'] = """\
+CSS-class to put on in case of valid value after extraction.
+"""
+
+factory.defaults['valid_class_default'] = 'valid'
+factory.doc['props']['valid_class_default'] = """\
+Fallback CSS-class to put on in case of valid value if no specific class was
 given.
 """
 
@@ -2194,7 +2204,7 @@ def error_renderer(widget, data):
                 class_=attr_value('message_class', widget, data)
             )
         else:
-            msgs += UNICODE_TYPE(error)
+            msgs += tag.translate(error.msg)
     attrs = dict(class_=cssclasses(widget, data))
     elem_tag = attr_value('tag', widget, data)
     position = attr_value('position', widget, data)

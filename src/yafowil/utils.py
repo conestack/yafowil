@@ -311,6 +311,7 @@ def data_attrs_helper(widget, data, attrs):
 
 css_managed_props = [
     'class', 'class_add',
+    'valid_class', 'valid_class_default',
     'error_class', 'error_class_default',
     'required_class', 'required_class_default',
 ]
@@ -324,6 +325,11 @@ def cssclasses(widget, data, classattr='class', additional=[]):
             _classes.append(attrs['error_class'])
         else:
             _classes.append(attrs['error_class_default'])
+    elif attrs['valid_class'] and data.root.extracted:
+        if isinstance(attrs['valid_class'], STR_TYPE):
+            _classes.append(attrs['valid_class'])
+        else:
+            _classes.append(attrs['valid_class_default'])
     if attrs['required_class'] and attrs['required']:
         if isinstance(attrs['required_class'], STR_TYPE):
             _classes.append(attrs['required_class'])
