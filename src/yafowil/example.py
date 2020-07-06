@@ -341,12 +341,15 @@ Single checkbox
 ---------------
 
 Single checkbox (return True or False). Usually used without surrounding field.
+This is an example how to render it for Bootstrap 4
 
 .. code-block:: python
 
-    checkbox = factory('#field:checkbox', props={
+    checkbox = factory('div:help:checkbox:label', props={
         'label': 'Single checkbox',
         'help': 'A single checkbox without vocabulary',
+        'div.class': 'form-check',
+        'label.class': 'form-check-label',
     })
 """
 
