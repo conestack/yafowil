@@ -993,9 +993,11 @@ def checkbox_extractor(widget, data):
 
 
 @managedprops('data', 'title', 'size', 'disabled', 'autofocus',
-              'format', 'disabled', 'checked', *css_managed_props)
+              'format', 'disabled', 'checked', 'listing_label_position',
+              *css_managed_props)
 def checkbox_edit_renderer(widget, data):
     tag = data.tag
+    label_pos = attr_value('listing_label_position', widget, data)
     input_attrs = input_attributes_common(widget, data)
     input_attrs['type'] = 'checkbox'
     checked = attr_value('checked', widget, data)
@@ -1006,15 +1008,16 @@ def checkbox_edit_renderer(widget, data):
         input_attrs['checked'] = input_attrs['value'] and 'checked' or None
     if attr_value('format', widget, data) == 'bool':
         input_attrs['value'] = ''
-    with_label = attr_value('with_label', widget, data)
-    if with_label:
-        label = tag('label',
-                    '&nbsp;',
-                    for_=cssid(widget, 'input'),
-                    class_='checkbox_label')
-        checkbox = tag('input', **input_attrs) + label
-    else:
-        checkbox = tag('input', **input_attrs)
+    checkbox = tag('input', **input_attrs)
+    if attr_value('with_label', widget, data):
+        checkbox = generic_positional_rendering_helper(
+            'label', # tag
+            '&nbsp;', # message
+            'checkbox_label', # class
+            checkbox,
+            label_pos,
+            tag
+        )
     input_attrs = {
         'type': 'hidden',
         'value': 'checkboxexists',
@@ -1022,7 +1025,7 @@ def checkbox_edit_renderer(widget, data):
         'id': cssid(widget, 'checkboxexists'),
     }
     exists_marker = tag('input', **input_attrs)
-    return checkbox + exists_marker
+    return checkbox + exists_marker + data.rendered
 
 
 @managedprops('class', 'format', 'vocabulary', 'display_proxy')

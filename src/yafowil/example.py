@@ -335,6 +335,36 @@ def block():
         'title': 'Selection block',
     }
 
+
+DOC_SINGLE_CHECKBOX = """
+Single checkbox
+---------------
+
+Single checkbox (return True or False). Usually used without surrounding field.
+
+.. code-block:: python
+
+    checkbox = factory('#field:checkbox', props={
+        'label': 'Single checkbox',
+        'help': 'A single checkbox without vocabulary',
+    })
+"""
+
+def single_checkbox():
+    comp = factory('compound', name='yafowil-single-checkbox')
+    comp['checkbox'] = factory('div:help:checkbox:label', props={
+        'label': 'Single checkbox',
+        'help': 'A single checkbox without vocabulary',
+        'div.class': 'form-check',
+        'label.class': 'form-check-label',
+    })
+    return {
+        'widget': comp,
+        'doc': DOC_SINGLE_CHECKBOX,
+        'title': 'Single checkbox',
+    }
+
+
 DOC_FILEUPLOAD = """
 File upload
 -----------
@@ -365,4 +395,5 @@ def fileupload():
 
 def get_example():
     return [plaintext(), email(), number(), integer(), password(), url(),
-            textarea(), radio(), dropdown(), checkbox(), block(), fileupload()]
+            textarea(), radio(), dropdown(), checkbox(), block(),
+            single_checkbox(), fileupload()]
