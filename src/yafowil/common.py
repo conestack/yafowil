@@ -1258,6 +1258,7 @@ def select_cb_edit_renderer(widget, data, custom_attrs={}):
         tagtype = 'checkbox'
         wrapper_class = attr_value('checkbox_wrapper_class', widget, data)
         label_class = attr_value('checkbox_label_class', widget, data)
+        input_class_additional = attr_value('checkbox_input_class', widget, data)
         # B/C deprecated as of yafowil 2.2
         if not label_class:
             label_class = attr_value('label_checkbox_class', widget, data)
@@ -1265,6 +1266,7 @@ def select_cb_edit_renderer(widget, data, custom_attrs={}):
         tagtype = 'radio'
         wrapper_class = attr_value('radio_wrapper_class', widget, data)
         label_class = attr_value('radio_label_class', widget, data)
+        input_class_additional = attr_value('radio_input_class', widget, data)
         # B/C deprecated as of yafowil 2.2
         if not label_class:
             label_class = attr_value('label_radio_class', widget, data)
@@ -1284,7 +1286,7 @@ def select_cb_edit_renderer(widget, data, custom_attrs={}):
             'checked': 'checked' if vval in value else None,
             'name_': widget.dottedpath,
             'id': cssid(widget, 'input', key),
-            'class_': cssclasses(widget, data),
+            'class_': cssclasses(widget, data, additional=[input_class_additional]),
         }
         if (disabled and disabled is not True and vval in disabled) \
            or disabled is True:
@@ -1308,6 +1310,8 @@ def select_cb_edit_renderer(widget, data, custom_attrs={}):
 @managedprops('data', 'title', 'format', 'vocabulary', 'multivalued',
               'disabled', 'listing_label_position', 'listing_tag', 'size',
               'label_checkbox_class', 'label_radio_class', 'block_class',
+              'input_checkbox_class', 'input_radio_class',
+              'wrapper_checkbox_class', 'wrapper_radio_class',
               'autofocus', 'placeholder', 'datatype', 'emptyvalue',
               *css_managed_props)
 def select_edit_renderer(widget, data, custom_attrs={}):
