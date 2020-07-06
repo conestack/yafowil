@@ -345,21 +345,23 @@ This is an example how to render it for Bootstrap 4
 
 .. code-block:: python
 
-    checkbox = factory('div:help:checkbox:label', props={
+    checkbox = factory('div:help:label:checkbox', props={
         'label': 'Single checkbox',
         'help': 'A single checkbox without vocabulary',
         'div.class': 'form-check',
         'label.class': 'form-check-label',
+        'label.position': 'after',
     })
 """
 
 def single_checkbox():
     comp = factory('compound', name='yafowil-single-checkbox')
-    comp['checkbox'] = factory('div:help:checkbox:label', props={
+    comp['checkbox'] = factory('div:help:label:checkbox', props={
         'label': 'Single checkbox',
         'help': 'A single checkbox without vocabulary',
         'div.class': 'form-check',
         'label.class': 'form-check-label',
+        'label.position': 'after',
     })
     return {
         'widget': comp,

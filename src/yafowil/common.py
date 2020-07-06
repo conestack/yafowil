@@ -1025,7 +1025,7 @@ def checkbox_edit_renderer(widget, data):
         'id': cssid(widget, 'checkboxexists'),
     }
     exists_marker = tag('input', **input_attrs)
-    return checkbox + exists_marker + data.rendered
+    return checkbox + exists_marker
 
 
 @managedprops('class', 'format', 'vocabulary', 'display_proxy')
