@@ -212,7 +212,6 @@ def cssid(widget, prefix, postfix=None):
 def callable_value(value, widget, data):
     """Call value if callable with widget and data as arguments and return
     the callables return value. If value not callable, return as is.
-    If called value raises TypeError, return value.
     """
     if not callable(value):
         return value
@@ -264,7 +263,7 @@ def as_data_attrs(data):
             # they are not needed for data-attributes
             val = json.dumps(val).strip('"')
         # replace camelCase with camel-case
-        key = re.sub('([a-z])([A-Z])', '\g<1>-\g<2>', key).lower()
+        key = re.sub(r'([a-z])([A-Z])', r'\g<1>-\g<2>', key).lower()
         data_attrs['data-{0}'.format(key)] = val
     return data_attrs
 

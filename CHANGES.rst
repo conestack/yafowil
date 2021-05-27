@@ -5,7 +5,7 @@ History
 3.0.0 (unreleased)
 ------------------
 
-- Fixed error_renderer in case theres no inner message_tag message wa not
+- Fixed error_renderer in case theres no inner message_tag message was not
   translated.
   [jensens]
 

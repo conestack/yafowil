@@ -1286,7 +1286,11 @@ def select_cb_edit_renderer(widget, data, custom_attrs={}):
             'checked': 'checked' if vval in value else None,
             'name_': widget.dottedpath,
             'id': cssid(widget, 'input', key),
-            'class_': cssclasses(widget, data, additional=[input_class_additional]),
+            'class_': cssclasses(
+                widget,
+                data,
+                additional=[input_class_additional]
+            ),
         }
         if (disabled and disabled is not True and vval in disabled) \
            or disabled is True:
@@ -1309,11 +1313,10 @@ def select_cb_edit_renderer(widget, data, custom_attrs={}):
 
 @managedprops('data', 'title', 'format', 'vocabulary', 'multivalued',
               'disabled', 'listing_label_position', 'listing_tag', 'size',
-              'label_checkbox_class', 'label_radio_class', 'block_class',
-              'input_checkbox_class', 'input_radio_class',
-              'wrapper_checkbox_class', 'wrapper_radio_class',
-              'autofocus', 'placeholder', 'datatype', 'emptyvalue',
-              *css_managed_props)
+              'block_class', 'autofocus', 'placeholder', 'datatype',
+              'emptyvalue', 'checkbox_wrapper_class', 'checkbox_label_class',
+              'checkbox_input_class', 'radio_wrapper_class',
+              'radio_label_class', 'radio_input_class', *css_managed_props)
 def select_edit_renderer(widget, data, custom_attrs={}):
     if attr_value('format', widget, data) == 'block':
         return select_block_edit_renderer(
@@ -1412,6 +1415,11 @@ This property is deprecated and will be remove as of yafowil 2.2. Use
 ``checkbox_label_class`` instead.
 """
 
+factory.defaults['select.checkbox_input_class'] = None
+factory.doc['props']['select.checkbox_input_class'] = """\
+CSS class to render on checkbox input tag.
+"""
+
 factory.defaults['select.radio_wrapper_class'] = None
 factory.doc['props']['select.radio_wrapper_class'] = """\
 CSS class to render on radio button wrapper.
@@ -1428,6 +1436,11 @@ CSS class to render on radio button labels.
 
 This property is deprecated and will be remove as of yafowil 2.2. Use
 ``radio_label_class`` instead.
+"""
+
+factory.defaults['select.radio_input_class'] = None
+factory.doc['props']['select.radio_input_class'] = """\
+CSS class to render on radio button input tag.
 """
 
 factory.defaults['select.listing_tag'] = 'div'
