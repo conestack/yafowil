@@ -5,10 +5,12 @@ History
 3.0.0 (unreleased)
 ------------------
 
-- Fixed error_renderer in case theres no inner message_tag message wa not translated.
+- Fixed error_renderer in case theres no inner message_tag message wa not
+  translated.
   [jensens]
 
-- Added valid_class and valid_class_default as opposite of error_class to mark an element as valid.
+- Added valid_class and valid_class_default as opposite of error_class to mark
+  an element as valid.
   [jensens]
 
 - Add example for ``file`` blueprint.
@@ -17,14 +19,19 @@ History
 - Add ``button`` blueprint.
   [jensens]
 
-- Breaking: Overhaul ``callable_value`` function, remove long deprecated b/c call.
-  It no longer calls callable without patameters as fallback.
-  It always needs widget and data arguments.
-  This was needed to run on Python 3.7+ with different ``inspect`` module behavior.
-  Also coming with the change the `datatype` property is always expected to be a converter takig just the value as parameter.
-  Prior it was possible to have a callable called with widget and data to return a converter callable.
-  This resulted in ugky and error-prone code, which was removed with this chnages
+- Breaking: Overhaul ``callable_value`` function, remove long deprecated B/C
+  call. It no longer calls callable without patameters as fallback. It always
+  needs widget and data arguments. This was needed to run on Python 3.7+ with
+  different ``inspect`` module behavior. Also coming with the change the
+  ``datatype`` property is always expected to be a converter takig just the
+  value as parameter. Prior it was possible to have a callable called with
+  widget and data to return a converter callable. This resulted in ugly and
+  error-prone code, which was removed with this chnages
   [jensens]
+
+
+2.3.3 (2020-05-30)
+------------------
 
 - Ensure ``select`` tag not renders without closing tag if no options.
   [rnix]
