@@ -1022,8 +1022,7 @@ def checkbox_edit_renderer(widget, data):
         'id': cssid(widget, 'checkboxexists'),
     }
     exists_marker = tag('input', **input_attrs)
-    rendered = data.rendered is not UNSET and data.rendered or u''
-    return checkbox + exists_marker + rendered
+    return checkbox + exists_marker
 
 
 @managedprops('class', 'format', 'vocabulary', 'display_proxy')
