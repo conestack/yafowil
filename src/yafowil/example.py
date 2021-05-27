@@ -354,6 +354,7 @@ This is an example how to render it for Bootstrap 4
     })
 """
 
+
 def single_checkbox():
     comp = factory('compound', name='yafowil-single-checkbox')
     comp['checkbox'] = factory('div:help:label:checkbox', props={

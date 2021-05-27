@@ -53,6 +53,7 @@ factory.doc['props']['error_class_default'] = """\
 Fallback CSS-class to put on in case of error if no specific class was
 given.
 """
+
 factory.defaults['valid_class'] = None
 factory.doc['props']['valid_class'] = """\
 CSS-class to put on in case of valid value after extraction.
@@ -264,7 +265,7 @@ def generic_datatype_extractor(widget, data):
     extracted = data.extracted
     if extracted is UNSET:
         return extracted
-    # datattype is one of the rare cases where an attribute is not a callable
+    # datatype is one of the rare cases where an attribute is not a callable
     # in the yafowil sense (called with widget and data) but one to be called
     # with just the value.
     datatype = widget.attrs.get('datatype', None)
@@ -282,7 +283,7 @@ def generic_datatype_extractor(widget, data):
         )
     except KeyError:
         raise ValueError('Datatype unknown: "{0}"'.format(datatype))
-    except (ValueError, UnicodeEncodeError, UnicodeDecodeError) as exc:
+    except (ValueError, UnicodeEncodeError, UnicodeDecodeError):
         datatype_message = attr_value('datatype_message', widget, data)
         if not datatype_message:
             datatype_label = DATATYPE_LABELS.get(datatype)
@@ -1011,9 +1012,9 @@ def checkbox_edit_renderer(widget, data):
     checkbox = tag('input', **input_attrs)
     if attr_value('with_label', widget, data):
         checkbox = generic_positional_rendering_helper(
-            'label', # tag
-            '&nbsp;', # message
-            'checkbox_label', # class
+            'label',  # tag
+            '&nbsp;',  # message
+            'checkbox_label',  # class
             checkbox,
             label_pos,
             tag
@@ -1636,7 +1637,7 @@ def submit_renderer(widget, data):
     input_attrs['name_'] = attr_value('action', widget, data) \
         and 'action.{0}'.format(widget.dottedpath)
     input_attrs['value'] = attr_value('label', widget, data, widget.name)
-    return tag(attr_value("tag_type", widget, data), **input_attrs)
+    return tag(attr_value('tag_type', widget, data), **input_attrs)
 
 
 factory.register(
@@ -1652,8 +1653,8 @@ factory.doc['props']['submit.label'] = """\
 Label of the submit.
 """
 
-factory.defaults['tag_type'] = 'input'
-factory.doc['props']['tag_type'] = """\
+factory.defaults['submit.tag_type'] = 'input'
+factory.doc['props']['submit.tag_type'] = """\
 Define the type of tag that will be rendered.
 """
 
@@ -1684,20 +1685,20 @@ the only parameter.
 """
 
 factory.defaults['submit.disabled'] = False
-factory.doc['props']['text.disabled'] = """\
+factory.doc['props']['submit.disabled'] = """\
 Flag the submit field as disabled.
 """
+
 
 ###############################################################################
 # button
 ###############################################################################
 
 @managedprops(
-    'text', 'action', 'handler',  'next', 'skip', "type"
+    'text', 'action', 'handler', 'next', 'skip', 'type',
     'expression', 'form', 'formaction', 'formenctype', 'formmethod',
-    'formnovalidate', 'formtarget',
-    'autofocus', 'disabled', 'class', 'class_add', 'accesskey',
-)
+    'formnovalidate', 'formtarget', 'autofocus', 'disabled', 'class',
+    'class_add', 'accesskey')
 def button_renderer(widget, data):
     expression = attr_value('expression', widget, data)
     if not expression:
@@ -1852,8 +1853,6 @@ Unlike other browsers, Firefox persists the dynamic disabled state of a
 <button> across page loads. Setting autocomplete="off" on the button
 disables this feature
 """
-
-
 
 
 ###############################################################################

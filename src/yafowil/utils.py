@@ -6,7 +6,6 @@ from yafowil.compat import IS_PY2
 from yafowil.compat import LONG_TYPE
 from yafowil.compat import STR_TYPE
 from yafowil.compat import UNICODE_TYPE
-import inspect
 import json
 import logging
 import re
@@ -209,7 +208,6 @@ def cssid(widget, prefix, postfix=None):
         .encode('ASCII', 'ignore')\
         .replace(b' ', b'_').decode()
 
-_BUILTINS = dir(globals()['__builtins__'])
 
 def callable_value(value, widget, data):
     """Call value if callable with widget and data as arguments and return

@@ -13,6 +13,7 @@ from yafowil.compat import UNICODE_TYPE
 from yafowil.tests import YafowilTestCase
 from yafowil.utils import as_data_attrs
 from yafowil.utils import attr_value
+from yafowil.utils import callable_value
 from yafowil.utils import convert_value_to_datatype
 from yafowil.utils import convert_values_to_datatype
 from yafowil.utils import cssclasses
@@ -28,7 +29,6 @@ from yafowil.utils import managedprops
 from yafowil.utils import Tag
 from yafowil.utils import tag as deprecated_tag
 from yafowil.utils import vocabulary
-
 import uuid
 import yafowil.loader  # noqa
 
@@ -258,38 +258,12 @@ class TestUtils(YafowilTestCase):
         )
         self.assertEqual(str(err), 'failing_func_callback')
 
-        def bc_func_callback(widget, data):
-            return 'bc_func_callback value'
-
-        widget.attrs['attr'] = bc_func_callback
-        self.assertEqual(
-            attr_value('attr', widget, data),
-            'bc_func_callback value'
-        )
-
-        def failing_bc_func_callback(widget, data):
-            raise Exception('failing_bc_func_callback')
-
-        widget.attrs['attr'] = failing_bc_func_callback
-        err = self.expect_error(
-            Exception,
-            attr_value,
-            'attr', widget, data
-        )
-        self.assertEqual(str(err), 'failing_bc_func_callback')
-
         class FormContext(object):
             def instance_callback(self, widget, data):
                 return 'instance_callback'
 
             def failing_instance_callback(self, widget, data):
                 raise Exception('failing_instance_callback')
-
-            def instance_bc_callback(self, widget, data):
-                return 'instance_bc_callback'
-
-            def failing_instance_bc_callback(self, widget, data):
-                raise Exception('failing_instance_bc_callback')
 
         context = FormContext()
         widget.attrs['attr'] = context.instance_callback
@@ -305,20 +279,6 @@ class TestUtils(YafowilTestCase):
             'attr', widget, data
         )
         self.assertEqual(str(err), 'failing_instance_callback')
-
-        widget.attrs['attr'] = context.instance_bc_callback
-        self.assertEqual(
-            attr_value('attr', widget, data),
-            'instance_bc_callback'
-        )
-
-        widget.attrs['attr'] = context.failing_instance_bc_callback
-        err = self.expect_error(
-            Exception,
-            attr_value,
-            'attr', widget, data
-        )
-        self.assertEqual(str(err), 'failing_instance_bc_callback')
 
     def test_as_data_attrs(self):
         self.assertTrue(as_data_attrs is generic_html5_attrs)
@@ -726,20 +686,15 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(convert_values_to_datatype(['0', '1'], int), [0, 1])
 
     def test_callable_value(self):
-        from yafowil.utils import callable_value
-
         # non callbale is returned as is
         self.assertEqual(callable_value('1', None, None), '1')
 
         # callable expects widget and data
         def dummy_callable(widget, data):
             return "2"
-
         self.assertEqual(callable_value(dummy_callable, None, None), '2')
 
-        # callable with no parameters is returned as is
-        def zero_callable():
+        # callable with no parameters raises type error
+        def invalid_signature():
             pass
-
-        with self.assertRaises(TypeError):
-            callable_value(zero_callable, None, None)
+        self.assertRaises(TypeError, invalid_signature, None, None)
