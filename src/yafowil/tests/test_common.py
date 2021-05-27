@@ -928,7 +928,7 @@ class TestCommon(YafowilTestCase):
             '<div class="display-checkbox" id="display-MYCHECKBOX">Yes</div>'
         )
 
-        # A checkbox with label
+        # A checkbox with custom CSS related empty label
         widget = factory(
             'checkbox',
             name='MYCHECKBOX',
@@ -942,6 +942,25 @@ class TestCommon(YafowilTestCase):
         id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden"
         value="checkboxexists" />
         """, widget())
+
+        # Checkbox not as last blueprint
+        widget = factory(
+            'checkbox:tag',
+            name='MYCHECKBOX',
+            value='Test Checkbox',
+            props={
+                'tag': 'span',
+                'text': 'hallo'
+            })
+        self.check_output("""
+        <div>
+          <input checked="checked" class="checkbox" id="input-MYCHECKBOX"
+                 name="MYCHECKBOX" type="checkbox" value=""/>
+          <input id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists"
+                 type="hidden" value="checkboxexists"/>
+          <span id="tag-MYCHECKBOX">hallo</span>
+        </div>
+        """, wrapped_fxml(widget()))
 
         # A checkbox widget with a value or an empty string
         widget = factory(

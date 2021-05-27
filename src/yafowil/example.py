@@ -341,7 +341,7 @@ Single checkbox
 ---------------
 
 Single checkbox (return True or False). Usually used without surrounding field.
-This is an example how to render it for Bootstrap 4
+This is an example how to render it for Bootstrap 5
 
 .. code-block:: python
 
@@ -400,6 +400,8 @@ def fileupload():
 
 
 def get_example():
-    return [plaintext(), email(), number(), integer(), password(), url(),
-            textarea(), radio(), dropdown(), checkbox(), block(),
-            single_checkbox(), fileupload()]
+    return [
+        plaintext(), email(), number(), integer(), password(), url(),
+        textarea(), radio(), dropdown(), checkbox(), block(),
+        single_checkbox(), fileupload()
+    ]

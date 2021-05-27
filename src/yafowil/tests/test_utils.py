@@ -144,12 +144,19 @@ class TestUtils(YafowilTestCase):
         widget.attrs['required_class_default'] = 'required'
         widget.attrs['error_class'] = None
         widget.attrs['error_class_default'] = 'error'
+        widget.attrs['valid_class'] = None
+        widget.attrs['valid_class_default'] = 'valid'
         widget.attrs['class'] = None
         widget.attrs['class_add'] = None
 
         class DummyData(object):
             def __init__(self):
                 self.errors = []
+                self.extracted = UNSET
+
+            @property
+            def root(self):
+                return self
 
         data = DummyData()
 
@@ -216,6 +223,17 @@ class TestUtils(YafowilTestCase):
             cssclasses(widget, data, additional=['zika', 'akiz']),
             'akiz bar error foo required zika'
         )
+
+        data.errors = []
+        data.extracted = True
+        widget.attrs['required'] = False
+        widget.attrs['class'] = None
+
+        widget.attrs['valid_class'] = True
+        self.assertEqual(cssclasses(widget, data), 'valid')
+
+        widget.attrs['valid_class'] = 'custom_valid'
+        self.assertEqual(cssclasses(widget, data), 'custom_valid')
 
     def test_managedprops(self):
         # Test managedprops annotation

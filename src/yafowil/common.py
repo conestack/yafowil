@@ -994,11 +994,9 @@ def checkbox_extractor(widget, data):
 
 
 @managedprops('data', 'title', 'size', 'disabled', 'autofocus',
-              'format', 'disabled', 'checked', 'listing_label_position',
-              *css_managed_props)
+              'format', 'disabled', 'checked', 'with_label', *css_managed_props)
 def checkbox_edit_renderer(widget, data):
     tag = data.tag
-    label_pos = attr_value('listing_label_position', widget, data)
     input_attrs = input_attributes_common(widget, data)
     input_attrs['type'] = 'checkbox'
     checked = attr_value('checked', widget, data)
@@ -1011,13 +1009,11 @@ def checkbox_edit_renderer(widget, data):
         input_attrs['value'] = ''
     checkbox = tag('input', **input_attrs)
     if attr_value('with_label', widget, data):
-        checkbox = generic_positional_rendering_helper(
-            'label',  # tag
-            '&nbsp;',  # message
-            'checkbox_label',  # class
-            checkbox,
-            label_pos,
-            tag
+        checkbox += tag(
+            'label',
+            '&nbsp;',
+            for_=cssid(widget, 'input'),
+            class_='checkbox_label'
         )
     input_attrs = {
         'type': 'hidden',
@@ -1026,7 +1022,8 @@ def checkbox_edit_renderer(widget, data):
         'id': cssid(widget, 'checkboxexists'),
     }
     exists_marker = tag('input', **input_attrs)
-    return checkbox + exists_marker
+    rendered = data.rendered is not UNSET and data.rendered or u''
+    return checkbox + exists_marker + rendered
 
 
 @managedprops('class', 'format', 'vocabulary', 'display_proxy')
@@ -1859,17 +1856,16 @@ disables this feature
 # email
 ###############################################################################
 
-EMAIL_RE_UNICODE = u'^[a-zA-Z0-9\._\-]+@[a-zA-Z0-9\._\-]+.[a-zA-Z0-9]{2,6}$'
-EMAIL_RE_BYTES = b'^[a-zA-Z0-9\._\-]+@[a-zA-Z0-9\._\-]+.[a-zA-Z0-9]{2,6}$'
+EMAIL_RE = r'^[a-zA-Z0-9\._\-]+@[a-zA-Z0-9\._\-]+.[a-zA-Z0-9]{2,6}$'
 
 
 def email_extractor(widget, data):
     val = data.extracted
     if not val:
         return val
-    email_re = EMAIL_RE_UNICODE \
+    email_re = EMAIL_RE \
         if isinstance(val, UNICODE_TYPE) \
-        else EMAIL_RE_BYTES
+        else EMAIL_RE.encode()
     if not re.match(email_re, val):
         message = _('email_address_not_valid',
                     default=u'Input not a valid email address.')
@@ -2125,8 +2121,9 @@ def label_renderer(widget, data):
         # deprecated, use explicit inner-after or inner-before
         pos = 'inner-before'
     rendered = data.rendered is not UNSET and data.rendered or u''
-    return generic_positional_rendering_helper('label', label_text,
-                                               label_attrs, rendered, pos, tag)
+    return generic_positional_rendering_helper(
+        'label', label_text, label_attrs, rendered, pos, tag
+    )
 
 
 factory.register(
