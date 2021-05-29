@@ -5,28 +5,29 @@ History
 3.0.0 (unreleased)
 ------------------
 
-- Fixed error_renderer in case theres no inner message_tag message was not
-  translated.
+- Try to translate plain error message in ``error_renderer`` in case of no
+  ``message_tag`` defined.
   [jensens]
 
-- Added valid_class and valid_class_default as opposite of error_class to mark
-  an element as valid.
-  [jensens]
-
-- Add example for ``file`` blueprint.
+- Add ``valid_class`` and ``valid_class_default`` as opposite of ``error_class``
+  and ``error_class_default`` to mark extracted values as valid.
   [jensens]
 
 - Add ``button`` blueprint.
   [jensens]
 
-- Breaking: Overhaul ``callable_value`` function, remove long deprecated B/C
-  call. It no longer calls callable without patameters as fallback. It always
-  needs widget and data arguments. This was needed to run on Python 3.7+ with
-  different ``inspect`` module behavior. Also coming with the change the
-  ``datatype`` property is always expected to be a converter takig just the
-  value as parameter. Prior it was possible to have a callable called with
-  widget and data to return a converter callable. This resulted in ugly and
-  error-prone code, which was removed with this chnages
+**Breaking changes:**
+
+- Remove B/C behavior of ``callable_value`` function. No longer calls callable
+  without parameters as fallback. Always expect widget and data arguments in
+  signature.
+  [jensens]
+
+- ``datatype`` converters now always gets passed the raw extracted value only.
+  Prior to removing B/C behavior from ``callable_value`` it was possible to use
+  callables taking widget and data as arguments returning the real converter
+  callable. This behavior was never intended to be supported for datatype
+  conversion.
   [jensens]
 
 
