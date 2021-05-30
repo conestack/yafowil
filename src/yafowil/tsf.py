@@ -33,7 +33,7 @@ if not os.environ.get('TESTRUN_MARKER'):
             TSF = DummyTranslationStringFactory
 # test run, use dummy translation string factory
 else:
-    TSF = DummyTranslationStringFactory                      #pragma NO COVER
+    TSF = DummyTranslationStringFactory  # pragma: no cover
 
 
 _ = TSF('yafowil')

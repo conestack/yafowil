@@ -133,7 +133,6 @@ class Tag(object):
                 continue
             value = self.translate(value)
             if not isinstance(value, UNICODE_TYPE):
-                # XXX: value = str(value).decode(self.encoding)
                 if isinstance(value, bytes):
                     value = value.decode(self.encoding)
                 else:
@@ -348,6 +347,8 @@ class EmptyValue(object):
     def __nonzero__(self):
         return False
 
+    __bool__ = __nonzero__
+
     def __str__(self):
         return ''
 
@@ -422,7 +423,7 @@ def convert_value_to_datatype(value, datatype, empty_value=EMPTY_VALUE):
     # uses ascii codec to emulate same behavior as when converting with python2
     # this is supposed to change in future
     if not IS_PY2 and converter in (bytes, str):
-        return converter(value, 'ascii')
+        return converter(value, 'ascii')  # pragma: no cover
     return converter(value)
 
 

@@ -19,4 +19,4 @@ for ep, cb in yafowil.utils.get_plugins('register'):
 # execute all configure entry points. supposed to be used for theme
 # configuration, like setting factory defaults and defining macros.
 for ep, cb in yafowil.utils.get_plugins('configure'):
-    cb()
+    cb()  # pragma: no cover

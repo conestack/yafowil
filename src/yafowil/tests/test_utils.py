@@ -92,11 +92,11 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(vocabulary(callme), [('bar', 'bar')])
         self.assertTrue(vocabulary(None) is None)
 
-    def test_tag_renderer(self):
-        # Test Tag renderer
+    def test_Tag(self):
+        # Test Tag
         tag = Tag(lambda msg: msg)
-        t = tag('p', 'Lorem Ipsum. ', u'Hello World!',
-                class_='fancy', id='2f5b8a234ff')
+        t = tag('p', b'Lorem Ipsum. ', u'Hello World!',
+                class_=b'fancy', id=u'2f5b8a234ff')
         self.assertEqual(t, (
             u'<p class="fancy" id="2f5b8a234ff">Lorem Ipsum. Hello World!</p>'
         ))
@@ -370,6 +370,12 @@ class TestUtils(YafowilTestCase):
           data-testattr8='1234.5678'
           name="foo" />
         """, tag('dummy', name='foo', **data_attrs))
+
+    def test_EMPTY_VALUE(self):
+        self.assertEqual(repr(EMPTY_VALUE), '<EMPTY_VALUE>')
+        self.assertEqual(str(EMPTY_VALUE), '')
+        self.assertFalse(bool(EMPTY_VALUE))
+        self.assertEqual(len(EMPTY_VALUE), 0)
 
     def test_convert_value_to_datatype(self):
         # Unknown string identifier

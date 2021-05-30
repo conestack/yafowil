@@ -7,7 +7,7 @@ from yafowil.tests import YafowilTestCase
 from yafowil.tests import fxml
 from yafowil.utils import Tag
 import yafowil.common
-import yafowil.compound # noqa
+import yafowil.compound  # noqa
 
 
 ###############################################################################

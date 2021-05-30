@@ -236,9 +236,9 @@ DATATYPE_LABELS = {
     uuid.UUID: _('datatype_uuid', default='UUID')
 }
 if IS_PY2:
-    DATATYPE_LABELS[LONG_TYPE] = _('datatype_long', default='long integer')
+    DATATYPE_LABELS[LONG_TYPE] = _('datatype_long', default='long integer')  # pragma: no cover
 else:
-    DATATYPE_LABELS[LONG_TYPE] = DATATYPE_LABELS[int]
+    DATATYPE_LABELS[LONG_TYPE] = DATATYPE_LABELS[int]  # pragma: no cover
 # B/C
 DATATYPE_LABELS['str'] = DATATYPE_LABELS[BYTES_TYPE]
 DATATYPE_LABELS['unicode'] = DATATYPE_LABELS[UNICODE_TYPE]

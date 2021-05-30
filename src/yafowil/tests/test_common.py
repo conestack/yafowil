@@ -3334,7 +3334,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'action': True,
                 'text': 'Button text',
-                'expression': lambda w,d: False,
+                'expression': lambda w, d: False,
             })
         self.assertEqual(widget(), '')
 
@@ -3349,7 +3349,8 @@ class TestCommon(YafowilTestCase):
             })
         self.assertEqual(
             widget(),
-            """<button data-foo='bar' id="input-SAVE" name="action.SAVE" type="submit">Button text</button>"""
+            """<button data-foo='bar' id="input-SAVE" name="action.SAVE" """
+            """type="submit">Button text</button>"""
         )
 
         # Button specific attrs
@@ -3370,7 +3371,23 @@ class TestCommon(YafowilTestCase):
             widget(),
             '<button form="my-parent-for" formaction="alternative-action" '
             'formenctype="text/plain" formmethod="post" formnovalidate="1" '
-            'formtarget="_blank" id="input-SAVE" name="action.SAVE" type="submit">Button text</button>'
+            'formtarget="_blank" id="input-SAVE" name="action.SAVE" '
+            'type="submit">Button text</button>'
+        )
+
+        # Custom button name if action not defined
+        widget = factory(
+            'button',
+            name='BUTTON',
+            props={
+                'text': 'Button text',
+                'action': False,
+                'name': 'custom_button_action'
+            })
+        self.assertEqual(
+            widget(),
+            '<button id="input-BUTTON" name="custom_button_action" '
+            'type="submit">Button text</button>'
         )
 
     def test_proxy_blueprint(self):
