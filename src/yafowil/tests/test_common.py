@@ -12,7 +12,6 @@ from yafowil.tests import fxml
 from yafowil.tests import YafowilTestCase
 from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import Tag
-
 import uuid
 
 if IS_PY2:

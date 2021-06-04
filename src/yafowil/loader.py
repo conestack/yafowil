@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import yafowil.serializer  # noqa
 import yafowil.utils
 
 

@@ -6,7 +6,6 @@ from yafowil.base import RuntimeData
 from yafowil.base import TBSupplementWidget
 from yafowil.base import Widget
 from yafowil.base import fetch_value
-
 import traceback
 
 
