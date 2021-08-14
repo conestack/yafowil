@@ -830,10 +830,10 @@ def ascii_extractor(widget, data):
     return val
 
 
-LOWER_CASE_RE = '(?=.*[a-z])'
-UPPER_CASE_RE = '(?=.*[A-Z])'
-DIGIT_RE = '(?=.*[\d])'
-SPECIAL_CHAR_RE = '(?=.*[\W])'
+LOWER_CASE_RE = r'(?=.*[a-z])'
+UPPER_CASE_RE = r'(?=.*[A-Z])'
+DIGIT_RE = r'(?=.*[\d])'
+SPECIAL_CHAR_RE = r'(?=.*[\W])'
 RE_PASSWORD_ALL = [
     LOWER_CASE_RE,
     UPPER_CASE_RE,
