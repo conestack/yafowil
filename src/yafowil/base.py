@@ -527,7 +527,7 @@ class Widget(object):
 
 class Factory(object):
 
-    def __init__(self):
+    def __init__(self, _states=[]):
         self._blueprints = dict()
         self._global_preprocessors = list()
         self._macros = dict()
@@ -538,9 +538,31 @@ class Factory(object):
             'props': dict(),
             'blueprint': dict(),
         }
+        self._states = _states
 
     def clear(self):
-        self.__init__()
+        self.__init__(_states=self._states)
+
+    def push_state(self):
+        self._states.append(dict(
+            _blueprints=copy.deepcopy(self._blueprints),
+            _global_preprocessors=copy.deepcopy(self._global_preprocessors),
+            _macros=copy.deepcopy(self._macros),
+            _themes=copy.deepcopy(self._themes),
+            theme=copy.deepcopy(self.theme),
+            defaults=copy.deepcopy(self.defaults),
+            doc=copy.deepcopy(self.doc)
+        ))
+
+    def pop_state(self):
+        state = self._states.pop()
+        self._blueprints = state['_blueprints']
+        self._global_preprocessors = state['_global_preprocessors']
+        self._macros = state['_macros']
+        self._themes = state['_themes']
+        self.theme = state['theme']
+        self.defaults = state['defaults']
+        self.doc = state['doc']
 
     def _name_check(self, name):
         for chara in '*:#':

@@ -5,6 +5,11 @@ History
 3.0.0 (unreleased)
 ------------------
 
+- Add ``push_state`` and ``pop_state`` to factory. Used in ``YafowilTestCase``
+  for saving and restoring factory state. This is needed when yafowil tests run
+  in compound with foreign tests to avoid breaking possible custom factory
+  configuration.
+
 - Try to translate plain error message in ``error_renderer`` in case of no
   ``message_tag`` defined.
   [jensens]

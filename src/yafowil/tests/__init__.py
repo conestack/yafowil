@@ -19,11 +19,16 @@ class YafowilTestCase(NodeTestCase):
 
     def setUp(self):
         super(YafowilTestCase, self).setUp()
+        factory.push_state()
         factory.clear()
         reload(yafowil.persistence)
         reload(yafowil.common)
         reload(yafowil.compound)
         reload(yafowil.table)
+
+    def tearDown(self):
+        factory.pop_state()
+        super(YafowilTestCase, self).tearDown()
 
 
 def fxml(xml):
