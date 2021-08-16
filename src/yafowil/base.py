@@ -527,7 +527,7 @@ class Widget(object):
 
 class Factory(object):
 
-    def __init__(self, _states=[]):
+    def __init__(self):
         self._blueprints = dict()
         self._global_preprocessors = list()
         self._macros = dict()
@@ -538,10 +538,12 @@ class Factory(object):
             'props': dict(),
             'blueprint': dict(),
         }
-        self._states = _states
+        self._states = list()
 
     def clear(self):
-        self.__init__(_states=self._states)
+        states = self._states
+        self.__init__()
+        self._states = states
 
     def push_state(self):
         self._states.append(dict(
