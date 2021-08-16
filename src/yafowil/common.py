@@ -1922,8 +1922,8 @@ factory.defaults['email.allowed_datatypes'] = [
 # url
 ###############################################################################
 
-URL_RE = u'^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:'
-URL_RE += u'.?+=&%@!\-\/]))?$'
+URL_RE = r'^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:'
+URL_RE += r'.?+=&%@!\-\/]))?$'
 
 
 def url_extractor(widget, data):
