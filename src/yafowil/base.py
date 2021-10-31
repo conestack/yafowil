@@ -237,7 +237,7 @@ class TBSupplementWidget(object):
     Nodify,
     DictStorage)
 class WidgetAttributes(object):
-    allow_non_node_childs = True
+    allow_non_node_children = True
     __str__ = __repr__ = _dict__repr__
 
     def __init__(self, name=None, parent=None):
