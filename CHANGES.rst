@@ -5,7 +5,9 @@ History
 2.3.4 (unreleased)
 ------------------
 
-- No changes yet.
+- Rename deprecated ``WidgetAttributes.allow_non_node_childs`` to
+  ``allow_non_node_children``.
+  [rnix]
 
 
 2.3.3 (2020-05-30)
