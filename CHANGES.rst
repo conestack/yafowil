@@ -2,7 +2,7 @@
 History
 =======
 
-2.3.4 (unreleased)
+2.3.4 (2021-11-08)
 ------------------
 
 - Rename deprecated ``WidgetAttributes.allow_non_node_childs`` to

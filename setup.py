@@ -9,7 +9,7 @@ def read_file(name):
         return f.read()
 
 
-version = '2.3.4.dev0'
+version = '2.3.4'
 shortdesc = 'YAFOWIL - declarative, framework independent, flexible HTML forms'
 longdesc = '\n\n'.join([read_file(name) for name in [
     'README.rst',
@@ -54,7 +54,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'setuptools',
-        'node>0.9.10',
+        'node>=0.9.28',
         'plumber>=1.3',
     ],
     tests_require=[
