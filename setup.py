@@ -54,7 +54,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'setuptools',
-        'node>0.9.10',
+        'node>=0.9.28',
         'plumber>=1.3',
     ],
     tests_require=[

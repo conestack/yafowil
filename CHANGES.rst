@@ -5,10 +5,6 @@ History
 3.0.0 (unreleased)
 ------------------
 
-- Rename deprecated ``WidgetAttributes.allow_non_node_childs`` to
-  ``allow_non_node_children``.
-  [rnix]
-
 - Add ``push_state`` and ``pop_state`` to factory. Used in ``YafowilTestCase``
   for saving and restoring factory state. This is needed when yafowil tests run
   in compound with foreign tests to avoid breaking possible custom factory
@@ -39,6 +35,14 @@ History
   callable. This behavior was never intended to be supported for datatype
   conversion.
   [jensens]
+
+
+2.3.4 (2021-11-08)
+------------------
+
+- Rename deprecated ``WidgetAttributes.allow_non_node_childs`` to
+  ``allow_non_node_children``.
+  [rnix]
 
 
 2.3.3 (2020-05-30)
