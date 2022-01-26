@@ -47,7 +47,6 @@ def test_suite():
     from yafowil.tests import test_controller
     from yafowil.tests import test_persistence
     from yafowil.tests import test_resources
-    from yafowil.tests import test_serializer
     from yafowil.tests import test_table
     from yafowil.tests import test_tsf
     from yafowil.tests import test_utils
@@ -60,7 +59,6 @@ def test_suite():
     suite.addTest(unittest.findTestCases(test_controller))
     suite.addTest(unittest.findTestCases(test_persistence))
     suite.addTest(unittest.findTestCases(test_resources))
-    suite.addTest(unittest.findTestCases(test_serializer))
     suite.addTest(unittest.findTestCases(test_table))
     suite.addTest(unittest.findTestCases(test_tsf))
     suite.addTest(unittest.findTestCases(test_utils))
