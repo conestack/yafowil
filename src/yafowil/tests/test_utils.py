@@ -2,7 +2,6 @@
 from node.base import AttributedNode
 from node.base import OrderedNode
 from node.behaviors import Attributes
-from node.behaviors import Nodespaces
 from node.utils import UNSET
 from plumber import plumbing
 from yafowil.base import factory
@@ -111,7 +110,7 @@ class TestUtils(YafowilTestCase):
 
     def test_cssid(self):
         # Test CSS id
-        @plumbing(Nodespaces, Attributes)
+        @plumbing(Attributes)
         class CSSTestNode(OrderedNode):
             @property
             def dottedpath(self):
@@ -134,7 +133,7 @@ class TestUtils(YafowilTestCase):
 
     def test_css_classes(self):
         # Test CSS Classes
-        @plumbing(Nodespaces, Attributes)
+        @plumbing(Attributes)
         class CSSTestNode(OrderedNode):
             pass
 
