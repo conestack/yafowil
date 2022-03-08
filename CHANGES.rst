@@ -5,12 +5,6 @@ History
 3.0.0 (unreleased)
 ------------------
 
-- Add ``push_state`` and ``pop_state`` to factory. Used in ``YafowilTestCase``
-  for saving and restoring factory state. This is needed when yafowil tests run
-  in compound with foreign tests to avoid breaking possible custom factory
-  configuration.
-  [rnix]
-
 - Try to translate plain error message in ``error_renderer`` in case of no
   ``message_tag`` defined.
   [jensens]
@@ -21,6 +15,29 @@ History
 
 - Add ``button`` blueprint.
   [jensens]
+
+**Internals:**
+
+- Remove usage of ``Nodespaces`` behavior.
+  [rnix]
+
+- Replace deprecated use of ``Nodify`` by ``MappingNode``.
+  [rnix]
+
+- Replace deprecated use of ``NodeChildValidate`` by ``MappingConstraints``.
+  [rnix]
+
+- Replace deprecated use of ``Adopt`` by ``MappingAdopt``.
+  [rnix]
+
+- Remove ``NodeChildValidate`` and ``Adopt`` behaviors from ``WidgetAttributes``.
+  [rnix]
+
+- Add ``push_state`` and ``pop_state`` to factory. Used in ``YafowilTestCase``
+  for saving and restoring factory state. This is needed when yafowil tests run
+  in compound with foreign tests to avoid breaking possible custom factory
+  configuration.
+  [rnix]
 
 **Breaking changes:**
 

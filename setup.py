@@ -38,9 +38,10 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10'
     ],
     keywords='html input widgets form compound',
     author='Yafowil Contributors',
@@ -54,8 +55,8 @@ setup(
     zip_safe=False,
     install_requires=[
         'setuptools',
-        'node>=0.9.28',
-        'plumber>=1.3',
+        'node>0.999',
+        'plumber>1.6',
     ],
     tests_require=[
         'lxml',
