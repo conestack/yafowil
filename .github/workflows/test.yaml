@@ -43,5 +43,6 @@ jobs:
           python -m yafowil.tests.__init__
 
       - name: Run coverage
+        run: |
           coverage run --source=src/yafowil -m yafowil.tests.__init__
           coverage report -m --fail-under=99
