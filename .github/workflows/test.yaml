@@ -24,11 +24,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install
-        run: |
-          pip install https://github.com/conestack/plumber/archive/master.zip
-          pip install https://github.com/conestack/node/archive/master.zip
-          pip install -e .[test]
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
 
       - name: Run tests
-        run: python -m yafowil.tests.__init__
+        run: |
+          echo "----------"
+          python --version
+          echo "----------"
+          python -m yafowil.tests.__init__
