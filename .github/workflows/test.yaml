@@ -25,7 +25,9 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install
-        run: pip install -e .[test]
+        run: |
+          pip install https://github.com/conestack/node/archive/master.zip
+          pip install -e .[test]
 
       - name: Run tests
         run: python -m yafowil.tests.__init__
