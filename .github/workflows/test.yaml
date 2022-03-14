@@ -9,12 +9,18 @@ on:
       - 3.0
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  test:
+    name: Test ${{ matrix.python }} - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+
         python:
           - "2.7"
           - "3.7"
