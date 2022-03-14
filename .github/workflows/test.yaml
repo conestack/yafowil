@@ -1,0 +1,31 @@
+name: Test yafowil
+
+on:
+  push:
+    branches:
+      - 3.0
+  workflow_dispatch:
+    branches:
+      - 3.0
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python:
+          - "2.7"
+          - "3.7"
+          - "3.8"
+          - "3.9"
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install
+        run: pip install -e .[test]
+
+      - name: Run tests
+        run: python -m yafowil.tests.__init__
