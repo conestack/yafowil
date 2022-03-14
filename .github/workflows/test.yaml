@@ -29,6 +29,12 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
 
+      - name: Install
+        run: |
+          pip install https://github.com/conestack/plumber/archive/master.zip
+          pip install https://github.com/conestack/node/archive/master.zip
+          pip install -e .[test]
+
       - name: Run tests
         run: |
           echo "----------"
