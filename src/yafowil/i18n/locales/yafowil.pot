@@ -1,163 +1,179 @@
 #
 # SOME DESCRIPTIVE TITLE
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-11-21 10:38+0100\n"
+"POT-Creation-Date: 2022-03-21 16:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: \n"
-"Generated-By: Lingua 3.12\n"
+"Generated-By: Lingua 4.14\n"
 
 #. Default: Mandatory field was empty
-#: ./src/yafowil/common.py:103
+#: ./src/yafowil/common.py:126
 msgid "required_message"
 msgstr ""
 
-#. Default: Password too weak
-#: ./src/yafowil/common.py:917
-msgid "weak_password_message"
-msgstr ""
-
 #. Default: string
-#: ./src/yafowil/common.py:209
+#: ./src/yafowil/common.py:232
 msgid "datatype_str"
 msgstr ""
 
 #. Default: unicode
-#: ./src/yafowil/common.py:210
+#: ./src/yafowil/common.py:233
 msgid "datatype_unicode"
 msgstr ""
 
 #. Default: integer
-#: ./src/yafowil/common.py:211
+#: ./src/yafowil/common.py:234
 msgid "datatype_integer"
 msgstr ""
 
-#. Default: long integer
-#: ./src/yafowil/common.py:212
-msgid "datatype_long"
-msgstr ""
-
 #. Default: floating point number
-#: ./src/yafowil/common.py:213
+#: ./src/yafowil/common.py:235
 msgid "datatype_float"
 msgstr ""
 
 #. Default: UUID
-#: ./src/yafowil/common.py:214
+#: ./src/yafowil/common.py:236
 msgid "datatype_uuid"
 msgstr ""
 
-#. Default: Yes
-#: ./src/yafowil/common.py:1052
-msgid "yes"
-msgstr ""
-
-#. Default: No
-#: ./src/yafowil/common.py:1053
-msgid "no"
-msgstr ""
-
-#. Default: Unset
-#: ./src/yafowil/common.py:1054
-msgid "unset"
-msgstr ""
-
-#. Default: Unknown
-#: ./src/yafowil/common.py:1465
-msgid "unknown"
-msgstr ""
-
-#. Default: Filename: 
-#: ./src/yafowil/common.py:1466
-msgid "filename"
-msgstr ""
-
-#. Default: Mimetype: 
-#: ./src/yafowil/common.py:1467
-msgid "mimetype"
-msgstr ""
-
-#. Default: Size: 
-#: ./src/yafowil/common.py:1468
-msgid "size"
-msgstr ""
-
-#. Default: No file
-#: ./src/yafowil/common.py:1460
-msgid "no_file"
-msgstr ""
-
-#. Default: Keep Existing file
-#: ./src/yafowil/common.py:1530
-msgid "file_keep"
-msgstr ""
-
-#. Default: Replace existing file
-#: ./src/yafowil/common.py:1531
-msgid "file_replace"
-msgstr ""
-
-#. Default: Delete existing file
-#: ./src/yafowil/common.py:1532
-msgid "file_delete"
-msgstr ""
-
-#. Default: Input not a valid email address.
-#: ./src/yafowil/common.py:1612
-msgid "email_address_not_valid"
-msgstr ""
-
-#. Default: Input not a valid web address.
-#: ./src/yafowil/common.py:1658
-msgid "web_address_not_valid"
-msgstr ""
-
-#. Default: Value has to be at minimum ${min}.
-#: ./src/yafowil/common.py:1730
-msgid "input_number_minimum_value"
-msgstr ""
-
-#. Default: Value has to be at maximum ${max}.
-#: ./src/yafowil/common.py:1736
-msgid "input_number_maximum_value"
-msgstr ""
-
-#. Default: Input must have at least ${len} characters.
-#: ./src/yafowil/common.py:756
-msgid "minlength_extraction_error"
-msgstr ""
-
-#. Default: Input contains illegal characters.
-#: ./src/yafowil/common.py:782
-msgid "ascii_extractor_error"
-msgstr ""
-
-#. Default: Value ${val} has to be in stepping of ${step} based on a floor
-#. value of ${minimum}
-#: ./src/yafowil/common.py:1745
-msgid "input_number_step_and_minimum_value"
-msgstr ""
-
-#. Default: Value ${val} has to be in stepping of ${step}
-#: ./src/yafowil/common.py:1755
-msgid "input_number_step_value"
+#. Default: long integer
+#. pragma: no cover
+#: ./src/yafowil/common.py:239
+msgid "datatype_long"
 msgstr ""
 
 #. Default: Input conversion failed.
-#: ./src/yafowil/common.py:256
+#: ./src/yafowil/common.py:291
 msgid "generic_datatype_message"
 msgstr ""
 
 #. Default: Input is not a valid ${datatype}.
-#: ./src/yafowil/common.py:261
+#: ./src/yafowil/common.py:298
 msgid "standard_datatype_message"
+msgstr ""
+
+#. Default: Input must have at least ${len} characters.
+#: ./src/yafowil/common.py:801
+msgid "minlength_extraction_error"
+msgstr ""
+
+#. Default: Input contains illegal characters.
+#: ./src/yafowil/common.py:827
+msgid "ascii_extractor_error"
+msgstr ""
+
+#. Default: Password too weak
+#: ./src/yafowil/common.py:962
+msgid "weak_password_message"
+msgstr ""
+
+#. Default: Yes
+#: ./src/yafowil/common.py:1098
+msgid "yes"
+msgstr ""
+
+#. Default: No
+#: ./src/yafowil/common.py:1099
+msgid "no"
+msgstr ""
+
+#. Default: Unset
+#. XXX: never used right now?
+#: ./src/yafowil/common.py:1100
+msgid "unset"
+msgstr ""
+
+#. Default: No file
+#: ./src/yafowil/common.py:1557
+msgid "no_file"
+msgstr ""
+
+#. Default: Unknown
+#: ./src/yafowil/common.py:1562
+msgid "unknown"
+msgstr ""
+
+#. Default: Filename: 
+#: ./src/yafowil/common.py:1563
+msgid "filename"
+msgstr ""
+
+#. Default: Mimetype: 
+#: ./src/yafowil/common.py:1564
+msgid "mimetype"
+msgstr ""
+
+#. Default: Size: 
+#: ./src/yafowil/common.py:1565
+msgid "size"
+msgstr ""
+
+#. Default: Keep Existing file
+#: ./src/yafowil/common.py:1627
+msgid "file_keep"
+msgstr ""
+
+#. Default: Replace existing file
+#: ./src/yafowil/common.py:1628
+msgid "file_replace"
+msgstr ""
+
+#. Default: Delete existing file
+#: ./src/yafowil/common.py:1629
+msgid "file_delete"
+msgstr ""
+
+#. Default: Input not a valid email address.
+#: ./src/yafowil/common.py:1882
+msgid "email_address_not_valid"
+msgstr ""
+
+#. Default: Input not a valid web address.
+#: ./src/yafowil/common.py:1934
+msgid "web_address_not_valid"
+msgstr ""
+
+#. Default: Value has to be at minimum ${min}.
+#: ./src/yafowil/common.py:2010
+msgid "input_number_minimum_value"
+msgstr ""
+
+#. Default: Value has to be at maximum ${max}.
+#: ./src/yafowil/common.py:2016
+msgid "input_number_maximum_value"
+msgstr ""
+
+#. Default: Value ${val} has to be in stepping of ${step} based on a floor
+#. value of ${minimum}
+#: ./src/yafowil/common.py:2025
+msgid "input_number_step_and_minimum_value"
+msgstr ""
+
+#. Default: Value ${val} has to be in stepping of ${step}
+#: ./src/yafowil/common.py:2035
+msgid "input_number_step_value"
+msgstr ""
+
+#: ./src/yafowil/tests/test_tsf.py:11
+msgid "foo"
+msgstr ""
+
+#. Default: Bar
+#: ./src/yafowil/tests/test_tsf.py:12
+msgid "bar"
+msgstr ""
+
+#. Default: Baz ${bam}
+#: ./src/yafowil/tests/test_tsf.py:14
+msgid "baz"
 msgstr ""
