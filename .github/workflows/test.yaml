@@ -2,11 +2,6 @@ name: Test yafowil
 
 on:
   push:
-    branches:
-      - 3.0
-  workflow_dispatch:
-    branches:
-      - 3.0
 
 jobs:
   test:
@@ -38,9 +33,7 @@ jobs:
 
       - name: Install
         run: |
-          pip install coverage
-          pip install https://github.com/conestack/plumber/archive/master.zip
-          pip install https://github.com/conestack/node/archive/master.zip
+          pip install wheel coverage
           pip install -e .[test]
 
       - name: Run tests

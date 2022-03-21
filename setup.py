@@ -9,7 +9,7 @@ def read_file(name):
         return f.read()
 
 
-version = '3.0.0.dev0'
+version = '3.0.dev0'
 shortdesc = 'YAFOWIL - declarative, framework independent, flexible HTML forms'
 longdesc = '\n\n'.join([read_file(name) for name in [
     'README.rst',
@@ -31,6 +31,7 @@ setup(
     description=shortdesc,
     long_description=longdesc,
     classifiers=[
+        'Development Status :: 5 - Production/Stable',
         'License :: OSI Approved :: BSD License',
         'Intended Audience :: Developers',
         'Topic :: Software Development',
@@ -43,7 +44,7 @@ setup(
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10'
     ],
-    keywords='html input widgets form compound',
+    keywords='html form rendering processing',
     author='Yafowil Contributors',
     author_email='dev@conestack.org',
     url=u'http://github.com/conestack/yafowil',
@@ -55,8 +56,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'setuptools',
-        'node>0.999',
-        'plumber>1.6',
+        'node>=1.0'
     ],
     tests_require=[
         'lxml',

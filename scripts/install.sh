@@ -1,20 +1,20 @@
 #!/bin/bash
 
-if [ -x "$(which python)" ]; then
-    rm -r py2
+./scripts/clean.sh
 
-    virtualenv --clear --no-site-packages -p python py2
+function install {
+    local interpreter=$1
+    local target=$2
 
-    ./py2/bin/pip install coverage
-    ./py2/bin/pip install https://github.com/conestack/node/archive/master.zip
-    ./py2/bin/pip install -e .[test]
-fi
-if [ -x "$(which python3)" ]; then
-    rm -r py3
+    if [ -x "$(which $interpreter)" ]; then
+        virtualenv --clear -p $interpreter $target
+        ./$target/bin/pip install wheel coverage
+        ./$target/bin/pip install -e .[test]
+    else
+        echo "Interpreter $interpreter not found. Skip install."
+    fi
+}
 
-    virtualenv --clear --no-site-packages -p python3 py3
-
-    ./py3/bin/pip install coverage
-    ./py3/bin/pip install https://github.com/conestack/node/archive/master.zip
-    ./py3/bin/pip install -e .[test]
-fi
+install python2 py2
+install python3 py3
+install pypy3 pypy3

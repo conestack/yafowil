@@ -2,8 +2,11 @@
 History
 =======
 
-3.0.0 (unreleased)
-------------------
+3.0 (unreleased)
+----------------
+
+- Python 3.7+ support.
+  [rnix, jensens]
 
 - Try to translate plain error message in ``error_renderer`` in case of no
   ``message_tag`` defined.

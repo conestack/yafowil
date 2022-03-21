@@ -1,4 +1,5 @@
-**Yet Another Form WIdget Library**.
+yafowil
+=======
 
 .. image:: https://img.shields.io/pypi/v/yafowil.svg
     :target: https://pypi.python.org/pypi/yafowil
@@ -8,11 +9,11 @@
     :target: https://pypi.python.org/pypi/yafowil
     :alt: Number of PyPI downloads
 
-.. image:: https://travis-ci.org/bluedynamics/yafowil.svg?branch=master
-    :target: https://travis-ci.org/bluedynamics/yafowil
+.. image:: https://github.com/conestack/yafowil/actions/workflows/test.yaml/badge.svg
+    :target: https://github.com/conestack/yafowil/actions/workflows/test.yaml
+    :alt: Test yafowil
 
-.. image:: https://coveralls.io/repos/github/bluedynamics/yafowil/badge.svg?branch=master
-    :target: https://coveralls.io/github/bluedynamics/yafowil?branch=master
+**Yet Another Form WIdget Library**
 
 YAFOWIL offers html-form creation and modification at runtime. 
 It is light-weight and provides an extensible, reusable set of blueprints to build flexible forms.
@@ -50,19 +51,11 @@ Contributors
 ============
 
 - Jens W. Klein
-
 - Robert Niederreiter
-
 - Johannes Raggam
-
 - Peter Holzer
-
 - Attila Olah
-
 - Florian Friesdorf
-
 - Daniel Widerin
-
 - Georg Bernhard
-
 - Christian Scholz aka MrTopf
