@@ -36,14 +36,14 @@ class TestUtils(YafowilTestCase):
 
     def test_entry_point(self):
         # Test entry_point support tools
-        self.check_output("""
+        self.checkOutput("""
         [...(EntryPoint.parse('register = yafowil.loader:register'),
         <function register at ...)...]
         """, str(list(get_plugins())))
 
         self.assertEqual(list(get_plugins('nonexisting')), [])
 
-        self.check_output("""
+        self.checkOutput("""
         [...'yafowil'...]
         """, str((get_plugin_names())))
 
@@ -51,7 +51,7 @@ class TestUtils(YafowilTestCase):
 
     def test_examples_lookup(self):
         # Test examples lookup
-        self.check_output("""
+        self.checkOutput("""
         ['yafowil'...]
         """, str(sorted(get_example_names())))
 
@@ -60,7 +60,7 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(get_example('inexistent'), None)
 
         examples = get_example('yafowil')
-        self.check_output("""
+        self.checkOutput("""
         Plain Text
         ----------
         ...
@@ -268,7 +268,7 @@ class TestUtils(YafowilTestCase):
             raise Exception('failing_func_callback')
 
         widget.attrs['attr'] = failing_func_callback
-        err = self.expect_error(
+        err = self.expectError(
             Exception,
             attr_value,
             'attr', widget, data
@@ -290,7 +290,7 @@ class TestUtils(YafowilTestCase):
         )
 
         widget.attrs['attr'] = context.failing_instance_callback
-        err = self.expect_error(
+        err = self.expectError(
             Exception,
             attr_value,
             'attr', widget, data
@@ -357,7 +357,7 @@ class TestUtils(YafowilTestCase):
 
         # Test with Tag renderer
         tag = Tag(lambda msg: msg)
-        self.check_output("""
+        self.checkOutput("""
         <dummy
           data-camel-attr-name='camelValue'
           data-testattr1='value'
@@ -378,7 +378,7 @@ class TestUtils(YafowilTestCase):
 
     def test_convert_value_to_datatype(self):
         # Unknown string identifier
-        err = self.expect_error(
+        err = self.expectError(
             KeyError,
             convert_value_to_datatype,
             'val', 'inexistent'
@@ -398,15 +398,14 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(converted, b'string')
         self.assertTrue(isinstance(converted, BYTES_TYPE))
 
-        err = self.expect_error(
+        err = self.expectError(
             UnicodeEncodeError,
             convert_value_to_datatype,
             u'äöü', 'str'
         )
-        msg = (
-            "'ascii' codec can't encode characters in position 0-2: "
-            "ordinal not in range(128)")
-        self.assertEqual(str(err), msg)
+        self.checkOutput("""
+        'ascii' codec can't encode character...: ordinal not in range(128)
+        """, str(err))
 
         # Convert to string by type
         self.assertEqual(convert_value_to_datatype(UNSET, BYTES_TYPE), UNSET)
@@ -415,15 +414,14 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(converted, b'string')
         self.assertTrue(isinstance(converted, BYTES_TYPE))
 
-        err = self.expect_error(
+        err = self.expectError(
             UnicodeEncodeError,
             convert_value_to_datatype,
             u'äöü', BYTES_TYPE
         )
-        msg = (
-            "'ascii' codec can't encode characters in position 0-2: "
-            "ordinal not in range(128)")
-        self.assertEqual(str(err), msg)
+        self.checkOutput("""
+        'ascii' codec can't encode character...: ordinal not in range(128)
+        """, str(err))
 
     def test_convert_value_to_datatype_unicode(self):
         # Convert to unicode by id
@@ -433,7 +431,7 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(converted, u'unicode')
         self.assertTrue(isinstance(converted, UNICODE_TYPE))
 
-        err = self.expect_error(
+        err = self.expectError(
             UnicodeDecodeError,
             convert_value_to_datatype,
             b'\xc3\xa4\xc3\xb6\xc3\xbc', 'unicode'
@@ -450,7 +448,7 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(converted, u'unicode')
         self.assertTrue(isinstance(converted, UNICODE_TYPE))
 
-        err = self.expect_error(
+        err = self.expectError(
             UnicodeDecodeError,
             convert_value_to_datatype,
             b'\xc3\xa4\xc3\xb6\xc3\xbc', UNICODE_TYPE
@@ -468,7 +466,7 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(converted, 1)
         self.assertTrue(isinstance(converted, int))
 
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             convert_value_to_datatype,
             '1.0', 'int'
@@ -476,7 +474,7 @@ class TestUtils(YafowilTestCase):
         msg = "invalid literal for int() with base 10: '1.0'"
         self.assertEqual(str(err), msg)
 
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             convert_value_to_datatype,
             'a', 'int'
@@ -495,7 +493,7 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(converted, 3)
         self.assertTrue(isinstance(converted, int))
 
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             convert_value_to_datatype,
             '2.0', int
@@ -503,7 +501,7 @@ class TestUtils(YafowilTestCase):
         msg = "invalid literal for int() with base 10: '2.0'"
         self.assertEqual(str(err), msg)
 
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             convert_value_to_datatype,
             'b', int
@@ -527,7 +525,7 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(converted, LONG_TYPE(2))
         self.assertTrue(isinstance(converted, LONG_TYPE))
 
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             convert_value_to_datatype,
             'a', 'long'
@@ -550,7 +548,7 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(converted, LONG_TYPE(4))
         self.assertTrue(isinstance(converted, LONG_TYPE))
 
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             convert_value_to_datatype,
             'b', LONG_TYPE
@@ -574,7 +572,7 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(converted, 2.0)
         self.assertTrue(isinstance(converted, float))
 
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             convert_value_to_datatype,
             'a', 'float'
@@ -600,7 +598,7 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(converted, 5.0)
         self.assertTrue(isinstance(converted, float))
 
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             convert_value_to_datatype,
             'b', float
@@ -622,7 +620,7 @@ class TestUtils(YafowilTestCase):
         converted = convert_value_to_datatype(str(uuid.uuid4()), 'uuid')
         self.assertTrue(isinstance(converted, uuid.UUID))
 
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             convert_value_to_datatype,
             'a', 'uuid'
@@ -636,7 +634,7 @@ class TestUtils(YafowilTestCase):
         converted = convert_value_to_datatype(str(uuid.uuid4()), uuid.UUID)
         self.assertTrue(isinstance(converted, uuid.UUID))
 
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             convert_value_to_datatype,
             'a', uuid.UUID
@@ -656,7 +654,7 @@ class TestUtils(YafowilTestCase):
             'convertet: a'
         )
 
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             convert_value_to_datatype,
             'b', convert_func
@@ -674,7 +672,7 @@ class TestUtils(YafowilTestCase):
         converted = convert_value_to_datatype('a', Converter)
         self.assertTrue(isinstance(converted, Converter))
 
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             convert_value_to_datatype,
             'b', Converter
@@ -695,7 +693,7 @@ class TestUtils(YafowilTestCase):
             'convertet: a'
         )
 
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             convert_value_to_datatype,
             'b', ConverterInst()

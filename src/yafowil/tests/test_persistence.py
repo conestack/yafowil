@@ -64,7 +64,7 @@ class TestPersistence(YafowilTestCase):
         data = form.extract(request={
             'form.my_field': 'value'
         })
-        self.check_output("""
+        self.checkOutput("""
         <RuntimeData form, value=<UNSET>, extracted=odict(...) at ...>
           <RuntimeData form.my_field, value=<UNSET>, extracted='value' at ...>
         """, data.treerepr())
@@ -140,7 +140,7 @@ class TestPersistence(YafowilTestCase):
         # We can call write on children of runtime data. ``writer`` must be
         # passed in if ``persist_writer`` is not provide via widget
         model = dict()
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             data['my_field'].write,
             model
@@ -212,7 +212,7 @@ class TestPersistence(YafowilTestCase):
         })
         self.assertTrue(data.has_errors)
 
-        err = self.expect_error(
+        err = self.expectError(
             RuntimeError,
             data.write,
             dict()
