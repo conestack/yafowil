@@ -1,15 +1,15 @@
-#!/bin/sh
-set -e
-TEST="bin/python -m yafowil.tests.__init__"
+#!/bin/bash
 
-clear
+function run_tests {
+    local target=$1
 
-if [ -x "$(which python)" ]; then
-    ./py2/$TEST
-fi
+    if [ -e "$target" ]; then
+        ./$target/bin/python -m yafowil.tests.__init__
+    else
+        echo "Target $target not found."
+    fi
+}
 
-echo ""
-
-if [ -x "$(which python3)" ]; then
-    ./py3/$TEST
-fi
+run_tests py2
+run_tests py3
+run_tests pypy3

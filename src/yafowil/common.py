@@ -45,12 +45,23 @@ Additional CSS-class to put on.
 
 factory.defaults['error_class'] = None
 factory.doc['props']['error_class'] = """\
-CSS-class to put on in case of error.
+CSS-class to put on in case of error after extraction.
 """
 
 factory.defaults['error_class_default'] = 'error'
 factory.doc['props']['error_class_default'] = """\
 Fallback CSS-class to put on in case of error if no specific class was
+given.
+"""
+
+factory.defaults['valid_class'] = None
+factory.doc['props']['valid_class'] = """\
+CSS-class to put on in case of valid value after extraction.
+"""
+
+factory.defaults['valid_class_default'] = 'valid'
+factory.doc['props']['valid_class_default'] = """\
+Fallback CSS-class to put on in case of valid value if no specific class was
 given.
 """
 
@@ -225,9 +236,9 @@ DATATYPE_LABELS = {
     uuid.UUID: _('datatype_uuid', default='UUID')
 }
 if IS_PY2:
-    DATATYPE_LABELS[LONG_TYPE] = _('datatype_long', default='long integer')
+    DATATYPE_LABELS[LONG_TYPE] = _('datatype_long', default='long integer')  # pragma: no cover
 else:
-    DATATYPE_LABELS[LONG_TYPE] = DATATYPE_LABELS[int]
+    DATATYPE_LABELS[LONG_TYPE] = DATATYPE_LABELS[int]  # pragma: no cover
 # B/C
 DATATYPE_LABELS['str'] = DATATYPE_LABELS[BYTES_TYPE]
 DATATYPE_LABELS['unicode'] = DATATYPE_LABELS[UNICODE_TYPE]
@@ -254,7 +265,10 @@ def generic_datatype_extractor(widget, data):
     extracted = data.extracted
     if extracted is UNSET:
         return extracted
-    datatype = attr_value('datatype', widget, data)
+    # datatype is one of the rare cases where an attribute callable not follows
+    # the typical signature taking widget and data as arguments, but is just
+    # called with the value.
+    datatype = widget.attrs.get('datatype', None)
     if not datatype:
         return extracted
     allowed_datatypes = attr_value('allowed_datatypes', widget, data)
@@ -816,10 +830,10 @@ def ascii_extractor(widget, data):
     return val
 
 
-LOWER_CASE_RE = '(?=.*[a-z])'
-UPPER_CASE_RE = '(?=.*[A-Z])'
-DIGIT_RE = '(?=.*[\d])'
-SPECIAL_CHAR_RE = '(?=.*[\W])'
+LOWER_CASE_RE = r'(?=.*[a-z])'
+UPPER_CASE_RE = r'(?=.*[A-Z])'
+DIGIT_RE = r'(?=.*[\d])'
+SPECIAL_CHAR_RE = r'(?=.*[\W])'
 RE_PASSWORD_ALL = [
     LOWER_CASE_RE,
     UPPER_CASE_RE,
@@ -980,7 +994,7 @@ def checkbox_extractor(widget, data):
 
 
 @managedprops('data', 'title', 'size', 'disabled', 'autofocus',
-              'format', 'disabled', 'checked', *css_managed_props)
+              'format', 'disabled', 'checked', 'with_label', *css_managed_props)
 def checkbox_edit_renderer(widget, data):
     tag = data.tag
     input_attrs = input_attributes_common(widget, data)
@@ -993,15 +1007,14 @@ def checkbox_edit_renderer(widget, data):
         input_attrs['checked'] = input_attrs['value'] and 'checked' or None
     if attr_value('format', widget, data) == 'bool':
         input_attrs['value'] = ''
-    with_label = attr_value('with_label', widget, data)
-    if with_label:
-        label = tag('label',
-                    '&nbsp;',
-                    for_=cssid(widget, 'input'),
-                    class_='checkbox_label')
-        checkbox = tag('input', **input_attrs) + label
-    else:
-        checkbox = tag('input', **input_attrs)
+    checkbox = tag('input', **input_attrs)
+    if attr_value('with_label', widget, data):
+        checkbox += tag(
+            'label',
+            '&nbsp;',
+            for_=cssid(widget, 'input'),
+            class_='checkbox_label'
+        )
     input_attrs = {
         'type': 'hidden',
         'value': 'checkboxexists',
@@ -1166,7 +1179,7 @@ def select_edit_renderer_props(widget, data):
     multivalued = attr_value('multivalued', widget, data)
     if isinstance(value, STR_TYPE) or not hasattr(value, '__iter__'):
         value = [value]
-    datatype = attr_value('datatype', widget, data)
+    datatype = widget.attrs.get('datatype', None)
     if datatype:
         value = convert_values_to_datatype(value, datatype)
     emptyvalue = attr_value('emptyvalue', widget, data, EMPTY_VALUE)
@@ -1245,6 +1258,7 @@ def select_cb_edit_renderer(widget, data, custom_attrs={}):
         tagtype = 'checkbox'
         wrapper_class = attr_value('checkbox_wrapper_class', widget, data)
         label_class = attr_value('checkbox_label_class', widget, data)
+        input_class_additional = attr_value('checkbox_input_class', widget, data)
         # B/C deprecated as of yafowil 2.2
         if not label_class:
             label_class = attr_value('label_checkbox_class', widget, data)
@@ -1252,6 +1266,7 @@ def select_cb_edit_renderer(widget, data, custom_attrs={}):
         tagtype = 'radio'
         wrapper_class = attr_value('radio_wrapper_class', widget, data)
         label_class = attr_value('radio_label_class', widget, data)
+        input_class_additional = attr_value('radio_input_class', widget, data)
         # B/C deprecated as of yafowil 2.2
         if not label_class:
             label_class = attr_value('label_radio_class', widget, data)
@@ -1271,7 +1286,11 @@ def select_cb_edit_renderer(widget, data, custom_attrs={}):
             'checked': 'checked' if vval in value else None,
             'name_': widget.dottedpath,
             'id': cssid(widget, 'input', key),
-            'class_': cssclasses(widget, data),
+            'class_': cssclasses(
+                widget,
+                data,
+                additional=[input_class_additional]
+            ),
         }
         if (disabled and disabled is not True and vval in disabled) \
            or disabled is True:
@@ -1294,9 +1313,10 @@ def select_cb_edit_renderer(widget, data, custom_attrs={}):
 
 @managedprops('data', 'title', 'format', 'vocabulary', 'multivalued',
               'disabled', 'listing_label_position', 'listing_tag', 'size',
-              'label_checkbox_class', 'label_radio_class', 'block_class',
-              'autofocus', 'placeholder', 'datatype', 'emptyvalue',
-              *css_managed_props)
+              'block_class', 'autofocus', 'placeholder', 'datatype',
+              'emptyvalue', 'checkbox_wrapper_class', 'checkbox_label_class',
+              'checkbox_input_class', 'radio_wrapper_class',
+              'radio_label_class', 'radio_input_class', *css_managed_props)
 def select_edit_renderer(widget, data, custom_attrs={}):
     if attr_value('format', widget, data) == 'block':
         return select_block_edit_renderer(
@@ -1395,6 +1415,11 @@ This property is deprecated and will be remove as of yafowil 2.2. Use
 ``checkbox_label_class`` instead.
 """
 
+factory.defaults['select.checkbox_input_class'] = None
+factory.doc['props']['select.checkbox_input_class'] = """\
+CSS class to render on checkbox input tag.
+"""
+
 factory.defaults['select.radio_wrapper_class'] = None
 factory.doc['props']['select.radio_wrapper_class'] = """\
 CSS class to render on radio button wrapper.
@@ -1411,6 +1436,11 @@ CSS class to render on radio button labels.
 
 This property is deprecated and will be remove as of yafowil 2.2. Use
 ``radio_label_class`` instead.
+"""
+
+factory.defaults['select.radio_input_class'] = None
+factory.doc['props']['select.radio_input_class'] = """\
+CSS class to render on radio button input tag.
 """
 
 factory.defaults['select.listing_tag'] = 'div'
@@ -1604,7 +1634,7 @@ factory.defaults['file.vocabulary'] = [
 # submit
 ###############################################################################
 
-@managedprops('label', 'class', 'action', 'handler',
+@managedprops('tag_type', 'label', 'class', 'action', 'handler',
               'next', 'skip', 'expression')
 def submit_renderer(widget, data):
     expression = attr_value('expression', widget, data)
@@ -1616,7 +1646,7 @@ def submit_renderer(widget, data):
     input_attrs['name_'] = attr_value('action', widget, data) \
         and 'action.{0}'.format(widget.dottedpath)
     input_attrs['value'] = attr_value('label', widget, data, widget.name)
-    return tag('input', **input_attrs)
+    return tag(attr_value('tag_type', widget, data), **input_attrs)
 
 
 factory.register(
@@ -1630,6 +1660,11 @@ Submit action inside the form
 
 factory.doc['props']['submit.label'] = """\
 Label of the submit.
+"""
+
+factory.defaults['submit.tag_type'] = 'input'
+factory.doc['props']['submit.tag_type'] = """\
+Define the type of tag that will be rendered.
 """
 
 factory.defaults['submit.expression'] = True
@@ -1658,9 +1693,174 @@ Next is a callable expected to return the web address. It expects a request as
 the only parameter.
 """
 
-factory.defaults['text.disabled'] = False
-factory.doc['props']['text.disabled'] = """\
-Flag  input field is disabled.
+factory.defaults['submit.disabled'] = False
+factory.doc['props']['submit.disabled'] = """\
+Flag the submit field as disabled.
+"""
+
+
+###############################################################################
+# button
+###############################################################################
+
+@managedprops(
+    'text', 'action', 'handler', 'next', 'skip', 'type',
+    'expression', 'form', 'formaction', 'formenctype', 'formmethod',
+    'formnovalidate', 'formtarget', 'autofocus', 'disabled', 'class',
+    'class_add', 'accesskey')
+def button_renderer(widget, data):
+    expression = attr_value('expression', widget, data)
+    if not expression:
+        return u''
+    tag = data.tag
+    input_attrs = input_attributes_common(widget, data)
+    input_attrs['type'] = attr_value('type', widget, data)
+    input_attrs['form'] = attr_value('form', widget, data)
+    input_attrs['formaction'] = attr_value('formaction', widget, data)
+    input_attrs['formenctype'] = attr_value('formenctype', widget, data)
+    input_attrs['formmethod'] = attr_value('formmethod', widget, data)
+    input_attrs['formnovalidate'] = attr_value('formnovalidate', widget, data)
+    input_attrs['formtarget'] = attr_value('formtarget', widget, data)
+    input_attrs['accesskey'] = attr_value('accesskey', widget, data)
+    if input_attrs['type'] == 'submit':
+        # only 'submit' type sends data to the server
+        if attr_value('action', widget, data):
+            # only if an server side action is set this makes sense:
+            input_attrs['name_'] = 'action.{0}'.format(widget.dottedpath)
+        else:
+            # otherwise check for a custom name
+            input_attrs['name_'] = attr_value('name', widget, data)
+    text = attr_value('text', widget, data)
+    return tag("button", text, **input_attrs)
+
+
+factory.register(
+    'button',
+    edit_renderers=[button_renderer],
+    display_renderers=[empty_display_renderer])
+
+factory.defaults['button.type'] = 'submit'
+
+factory.doc['blueprint']['button'] = """\
+Represents a clickable button, used to submit forms or anywhere in a document for
+accessible, standard button functionality.
+"""
+
+factory.doc['props']['button.text'] = """\
+The content of the button element.
+"""
+
+# parts of the docs are copied over from
+# https://developer.mozilla.org/de/docs/Web/HTML/Element/button
+
+factory.doc['props']['button.form'] = """\
+The <form> element to associate the button with (its form owner).
+The value of this attribute must be the id of a <form> in the same document.
+(If this attribute is not set, the <button> is associated with its ancestor
+<form> element, if any.)
+"""
+
+factory.doc['props']['button.formaction'] = """\
+The URL that processes the information submitted by the button.
+Overrides the action attribute of the button's form owner.
+Does nothing if there is no form owner.
+"""
+
+factory.doc['props']['button.formenctype'] = """\
+If the button is a submit button (it's inside/associated with a <form> and
+doesn't have type="button"), specifies how to encode the form data that is
+submitted. Possible values:
+
+application/x-www-form-urlencoded: The default if the attribute is not used.
+
+multipart/form-data: Use to submit <input> elements with their type attributes
+set to file.
+
+text/plain: Specified as a debugging aid; shouldn’t be used for real form
+submission.
+
+If this attribute is specified, it overrides the enctype attribute of the
+button's form owner.
+"""
+
+factory.doc['props']['button.formmethod'] = """\
+If the button is a submit button (it's inside/associated with a <form> and
+doesn't have type="button"), this attribute specifies the HTTP method used
+to submit the form. Possible values: POST or GET. If specified, this
+attribute overrides the method attribute of the button's form owner.
+"""
+
+factory.doc['props']['button.formnovalidate'] = """\
+If the button is a submit button, this Boolean attribute specifies that the
+form is not to be validated when it is submitted. If this attribute is
+specified, it overrides the novalidate attribute of the button's form owner.
+"""
+
+factory.doc['props']['button.formtarget'] = """\
+If the button is a submit button, this attribute is a author-defined name or
+standardized, underscore-prefixed keyword indicating where to display the
+response from submitting the form. This is the name of, or keyword for,
+a browsing context (a tab, window, or <iframe>). If this attribute is
+specified, it overrides the target attribute of the button's form owner.
+The following keywords have special meanings:
+
+_self: Load the response into the same browsing context as the current one.
+This is the default if the attribute is not specified.
+
+_blank: Load the response into a new unnamed browsing context — usually a new
+tab or window, depending on the user’s browser settings.
+
+_parent: Load the response into the parent browsing context of the current one.
+If there is no parent, this option behaves the same way as _self.
+
+_top: Load the response into the top-level browsing context (that is, the
+browsing context that is an ancestor of the current one, and has no parent).
+If there is no parent, this option behaves the same way as _self.
+"""
+
+factory.defaults['button.expression'] = True
+factory.doc['props']['button.expression'] = """\
+Flag or expression callable whether this action is available to the user
+or not.
+"""
+
+factory.defaults['button.action'] = True
+factory.doc['props']['button.action'] = """\
+Marks this widget as an action. One out of ``True`` or ``False``.
+"""
+
+factory.defaults['button.skip'] = False
+factory.doc['props']['button.skip'] = """\
+Skips action and only perform next. One out of ``True`` or ``False``.
+"""
+
+factory.doc['props']['button.handler'] = """\
+Handler is a callable which get called if this action performs. It expects two
+parameters: ``widget``, ``data``.
+"""
+
+factory.doc['props']['button.next'] = """\
+Next is a callable expected to return the web address. It expects a request as
+the only parameter.
+"""
+
+factory.defaults['button.disabled'] = False
+factory.doc['props']['button.disabled'] = """\
+Flag the button field as disabled.
+"""
+
+factory.defaults['button.autofocus'] = False
+factory.doc['props']['button.autofocus'] = """\
+Boolean attribute specifies that the button should have input focus when the
+page loads. Only one element in a document can have this attribute.
+"""
+
+factory.defaults['button.autocomplete'] = False
+factory.doc['props']['button.autocomplete'] = """\
+This attribute on a <button> is nonstandard and Firefox-specific.
+Unlike other browsers, Firefox persists the dynamic disabled state of a
+<button> across page loads. Setting autocomplete="off" on the button
+disables this feature
 """
 
 
@@ -1668,17 +1868,16 @@ Flag  input field is disabled.
 # email
 ###############################################################################
 
-EMAIL_RE_UNICODE = u'^[a-zA-Z0-9\._\-]+@[a-zA-Z0-9\._\-]+.[a-zA-Z0-9]{2,6}$'
-EMAIL_RE_BYTES = b'^[a-zA-Z0-9\._\-]+@[a-zA-Z0-9\._\-]+.[a-zA-Z0-9]{2,6}$'
+EMAIL_RE = r'^[a-zA-Z0-9\._\-]+@[a-zA-Z0-9\._\-]+.[a-zA-Z0-9]{2,6}$'
 
 
 def email_extractor(widget, data):
     val = data.extracted
     if not val:
         return val
-    email_re = EMAIL_RE_UNICODE \
+    email_re = EMAIL_RE \
         if isinstance(val, UNICODE_TYPE) \
-        else EMAIL_RE_BYTES
+        else EMAIL_RE.encode()
     if not re.match(email_re, val):
         message = _('email_address_not_valid',
                     default=u'Input not a valid email address.')
@@ -1723,8 +1922,8 @@ factory.defaults['email.allowed_datatypes'] = [
 # url
 ###############################################################################
 
-URL_RE = u'^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:'
-URL_RE += u'.?+=&%@!\-\/]))?$'
+URL_RE = r'^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:'
+URL_RE += r'.?+=&%@!\-\/]))?$'
 
 
 def url_extractor(widget, data):
@@ -1934,8 +2133,9 @@ def label_renderer(widget, data):
         # deprecated, use explicit inner-after or inner-before
         pos = 'inner-before'
     rendered = data.rendered is not UNSET and data.rendered or u''
-    return generic_positional_rendering_helper('label', label_text,
-                                               label_attrs, rendered, pos, tag)
+    return generic_positional_rendering_helper(
+        'label', label_text, label_attrs, rendered, pos, tag
+    )
 
 
 factory.register(
@@ -2019,7 +2219,7 @@ def error_renderer(widget, data):
                 class_=attr_value('message_class', widget, data)
             )
         else:
-            msgs += UNICODE_TYPE(error)
+            msgs += tag.translate(error.msg)
     attrs = dict(class_=cssclasses(widget, data))
     elem_tag = attr_value('tag', widget, data)
     position = attr_value('position', widget, data)

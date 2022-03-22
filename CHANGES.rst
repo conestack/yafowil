@@ -2,10 +2,59 @@
 History
 =======
 
-2.3.5 (unreleased)
-------------------
+3.0 (unreleased)
+----------------
 
-- No changes yet.
+- Python 3.7+ support.
+  [rnix, jensens]
+
+- Try to translate plain error message in ``error_renderer`` in case of no
+  ``message_tag`` defined.
+  [jensens]
+
+- Add ``valid_class`` and ``valid_class_default`` as opposite of ``error_class``
+  and ``error_class_default`` to mark extracted values as valid.
+  [jensens]
+
+- Add ``button`` blueprint.
+  [jensens]
+
+**Internals:**
+
+- Remove usage of ``Nodespaces`` behavior.
+  [rnix]
+
+- Replace deprecated use of ``Nodify`` by ``MappingNode``.
+  [rnix]
+
+- Replace deprecated use of ``NodeChildValidate`` by ``MappingConstraints``.
+  [rnix]
+
+- Replace deprecated use of ``Adopt`` by ``MappingAdopt``.
+  [rnix]
+
+- Remove ``NodeChildValidate`` and ``Adopt`` behaviors from ``WidgetAttributes``.
+  [rnix]
+
+- Add ``push_state`` and ``pop_state`` to factory. Used in ``YafowilTestCase``
+  for saving and restoring factory state. This is needed when yafowil tests run
+  in compound with foreign tests to avoid breaking possible custom factory
+  configuration.
+  [rnix]
+
+**Breaking changes:**
+
+- Remove B/C behavior of ``callable_value`` function. No longer calls callable
+  without parameters as fallback. Always expect widget and data arguments in
+  signature.
+  [jensens]
+
+- ``datatype`` converters now always gets passed the raw extracted value only.
+  Prior to removing B/C behavior from ``callable_value`` it was possible to use
+  callables taking widget and data as arguments returning the real converter
+  callable. This behavior was never intended to be supported for datatype
+  conversion.
+  [jensens]
 
 
 2.3.4 (2021-11-08)

@@ -89,7 +89,7 @@ class TestController(YafowilTestCase):
 
         # Render form with empty request
         data = form.extract(request)
-        self.check_output("""
+        self.checkOutput("""
         <form action="http://fubar.com" enctype="multipart/form-data"
               id="form-testform" method="post" novalidate="novalidate">
           <input class="text" id="input-testform-field1" name="testform.field1"
@@ -141,7 +141,7 @@ class TestController(YafowilTestCase):
         self.assertTrue(controller.performed)
 
         # Render the form performed
-        self.check_output("""
+        self.checkOutput("""
         <form action="http://fubar.com" enctype="multipart/form-data"
               id="form-testform" method="post" novalidate="novalidate">
           <input class="text" id="input-testform-field1" name="testform.field1"
@@ -164,7 +164,7 @@ class TestController(YafowilTestCase):
         self.assertFalse(controller.performed)
 
         # Render form not performed
-        self.check_output("""
+        self.checkOutput("""
         <form action="http://fubar.com" enctype="multipart/form-data"
               id="form-testform" method="post" novalidate="novalidate">
           <input class="text" id="input-testform-field1" name="testform.field1"

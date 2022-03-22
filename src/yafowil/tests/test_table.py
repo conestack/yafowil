@@ -143,7 +143,7 @@ class TestTable(YafowilTestCase):
         form['table']['row1']['field1'] = factory(
             'td:text',
             name='field1')
-        self.check_output("""
+        self.checkOutput("""
         <form action="myaction" enctype="multipart/form-data" id="form-myform"
               method="post" novalidate="novalidate">
           <table>
@@ -183,7 +183,7 @@ class TestTable(YafowilTestCase):
                 'required': 'Field 1 is required',
             }
         )
-        self.check_output("""
+        self.checkOutput("""
         <form action="mytableaction" enctype="multipart/form-data"
               id="form-mytableform" method="post" novalidate="novalidate">
           <table>
@@ -225,7 +225,7 @@ class TestTable(YafowilTestCase):
             ExtractionError('Field 1 is required')
         ])
 
-        self.check_output("""
+        self.checkOutput("""
         <form action="mytableaction" enctype="multipart/form-data"
               id="form-mytableform" method="post" novalidate="novalidate">
           <table>
@@ -272,7 +272,7 @@ class TestTable(YafowilTestCase):
                 'required': 'Field 1 is required',
             }
         )
-        self.check_output("""
+        self.checkOutput("""
         <form action="mytableaction" enctype="multipart/form-data"
               id="form-mytableform" method="post" novalidate="novalidate">
           <table>
@@ -314,7 +314,7 @@ class TestTable(YafowilTestCase):
             ExtractionError('Field 1 is required')
         ])
 
-        self.check_output("""
+        self.checkOutput("""
         <form action="mytableaction" enctype="multipart/form-data"
               id="form-mytableform" method="post" novalidate="novalidate">
           <table>

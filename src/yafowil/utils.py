@@ -6,7 +6,6 @@ from yafowil.compat import IS_PY2
 from yafowil.compat import LONG_TYPE
 from yafowil.compat import STR_TYPE
 from yafowil.compat import UNICODE_TYPE
-import inspect
 import json
 import logging
 import re
@@ -134,7 +133,6 @@ class Tag(object):
                 continue
             value = self.translate(value)
             if not isinstance(value, UNICODE_TYPE):
-                # XXX: value = str(value).decode(self.encoding)
                 if isinstance(value, bytes):
                     value = value.decode(self.encoding)
                 else:
@@ -213,38 +211,10 @@ def cssid(widget, prefix, postfix=None):
 def callable_value(value, widget, data):
     """Call value if callable with widget and data as arguments and return
     the callables return value. If value not callable, return as is.
-    As B/C mode, if callable accepts no arguments, try to call without
-    arguments.
     """
     if not callable(value):
         return value
-    try:
-        # assume property factory signature
-        # XXX: use keyword arguments?
-        # XXX: if callable raises TypeError we get non clear follow up
-        #      errors.
-        return value(widget, data)
-    except TypeError:
-        try:
-            # assume function or class
-            spec = inspect.getargspec(value)
-        except TypeError:
-            spec = None
-        if spec is not None:
-            # assume B/C property factory signature if argument specs found
-            if len(spec.args) <= 1 and not spec.keywords:
-                try:
-                    res = value()
-                    logging.warning(
-                        "Deprecated usage of callback attributes. Please "
-                        "accept 'widget' and 'data' as arguments."
-                    )
-                    return res
-                except TypeError:
-                    # XXX: raise here?
-                    return value
-    # XXX: raise here?
-    return value
+    return value(widget, data)
 
 
 def attr_value(key, widget, data, default=None):
@@ -292,7 +262,7 @@ def as_data_attrs(data):
             # they are not needed for data-attributes
             val = json.dumps(val).strip('"')
         # replace camelCase with camel-case
-        key = re.sub('([a-z])([A-Z])', '\g<1>-\g<2>', key).lower()
+        key = re.sub(r'([a-z])([A-Z])', r'\g<1>-\g<2>', key).lower()
         data_attrs['data-{0}'.format(key)] = val
     return data_attrs
 
@@ -337,6 +307,7 @@ def data_attrs_helper(widget, data, attrs):
 
 css_managed_props = [
     'class', 'class_add',
+    'valid_class', 'valid_class_default',
     'error_class', 'error_class_default',
     'required_class', 'required_class_default',
 ]
@@ -350,6 +321,11 @@ def cssclasses(widget, data, classattr='class', additional=[]):
             _classes.append(attrs['error_class'])
         else:
             _classes.append(attrs['error_class_default'])
+    elif attrs['valid_class'] and data.root.extracted:
+        if isinstance(attrs['valid_class'], STR_TYPE):
+            _classes.append(attrs['valid_class'])
+        else:
+            _classes.append(attrs['valid_class_default'])
     if attrs['required_class'] and attrs['required']:
         if isinstance(attrs['required_class'], STR_TYPE):
             _classes.append(attrs['required_class'])
@@ -370,6 +346,8 @@ class EmptyValue(object):
 
     def __nonzero__(self):
         return False
+
+    __bool__ = __nonzero__
 
     def __str__(self):
         return ''
@@ -445,7 +423,7 @@ def convert_value_to_datatype(value, datatype, empty_value=EMPTY_VALUE):
     # uses ascii codec to emulate same behavior as when converting with python2
     # this is supposed to change in future
     if not IS_PY2 and converter in (bytes, str):
-        return converter(value, 'ascii')
+        return converter(value, 'ascii')  # pragma: no cover
     return converter(value)
 
 

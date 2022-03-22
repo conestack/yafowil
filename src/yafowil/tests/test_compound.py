@@ -7,7 +7,7 @@ from yafowil.tests import YafowilTestCase
 from yafowil.tests import fxml
 from yafowil.utils import Tag
 import yafowil.common
-import yafowil.compound # noqa
+import yafowil.compound  # noqa
 
 
 ###############################################################################
@@ -39,7 +39,7 @@ class TestCompound(YafowilTestCase):
             props={
                 'required': True
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input class="text" id="input-COMPOUND-inner" name="COMPOUND.inner"
                  type="text" value="Value 1 from parent"/>
@@ -63,7 +63,7 @@ class TestCompound(YafowilTestCase):
             props={
                 'required': True
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input class="text" id="input-COMPOUND-inner" name="COMPOUND.inner"
                  type="text" value="value1"/>
@@ -83,7 +83,7 @@ class TestCompound(YafowilTestCase):
         compound['inner'] = factory(
             'text',
             value='value1')
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             compound
         )
@@ -142,7 +142,7 @@ class TestCompound(YafowilTestCase):
         expected['inner2'] = ''
         self.assertEqual(data.extracted, expected)
 
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input class="text" id="input-COMPOUND-inner" name="COMPOUND.inner"
                  type="text" value="newvalue"/>
@@ -184,7 +184,7 @@ class TestCompound(YafowilTestCase):
             props={
                 'required': True
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input class="text" id="input-COMPOUND-inner" name="COMPOUND.inner"
                  type="text" value="Value 1 from parent"/>
@@ -250,7 +250,7 @@ class TestCompound(YafowilTestCase):
             props={
                 'required': True
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input class="text" id="input-COMPOUND-CHILD_COMPOUND-inner"
                  name="COMPOUND.CHILD_COMPOUND.inner" type="text"
@@ -335,7 +335,7 @@ class TestCompound(YafowilTestCase):
             props={
                 'required': True
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input class="text" id="input-COMPOUND-CHILD_COMPOUND-inner"
                  name="COMPOUND.CHILD_COMPOUND.inner" type="text"
@@ -428,7 +428,7 @@ class TestCompound(YafowilTestCase):
         compound['c3'] = factory('compound')
         compound['c3']['f4'] = factory('text')
 
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input class="text" id="input-comp-c1-f1" name="comp.c1.f1"
                  type="text" value="Foo"/>
@@ -595,7 +595,7 @@ class TestCompound(YafowilTestCase):
             props={
                 'required': True
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input class="text" id="input-DIV_COMPOUND-inner"
                  name="DIV_COMPOUND.inner" type="text" value="value1"/>
@@ -666,7 +666,7 @@ class TestCompound(YafowilTestCase):
             'div:text',
             name='DIV',
             value='1')
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input class="text" id="input-DIV" name="DIV"
                  type="text" value="1"/>
@@ -713,7 +713,7 @@ class TestCompound(YafowilTestCase):
             name='DIV',
             value='1',
             mode='display')
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <div class="display-text" id="display-DIV">1</div>
         </div>
@@ -728,7 +728,7 @@ class TestCompound(YafowilTestCase):
             })
         compound['inner'] = factory('text', 'inner', 'value')
         compound['inner2'] = factory('text', 'inner2', 'value2')
-        self.check_output("""
+        self.checkOutput("""
         <fieldset id="fieldset-COMPOUND">
           <legend>Some Test</legend>
           <input class="text" id="input-COMPOUND-inner" name="COMPOUND.inner"
@@ -755,7 +755,7 @@ class TestCompound(YafowilTestCase):
                 'legend': 'Some Test'
             },
             mode='display')
-        self.check_output("""
+        self.checkOutput("""
         <fieldset id="fieldset-COMPOUND">
           <legend>Some Test</legend>
         </fieldset>
@@ -829,7 +829,7 @@ class TestCompound(YafowilTestCase):
             })
 
         # Render an empty form
-        self.check_output("""
+        self.checkOutput("""
         <form action="http://www.domain.tld/someform"
               enctype="multipart/form-data" id="form-myform" method="post"
               novalidate="novalidate">
@@ -902,7 +902,7 @@ class TestCompound(YafowilTestCase):
                 'for': 'field'
             })
         form['field'] = factory('text')
-        self.check_output("""
+        self.checkOutput("""
         <form action="action" enctype="multipart/form-data" id="form-form"
               method="post" novalidate="novalidate">
           <label for="input-form-field">Foo</label>

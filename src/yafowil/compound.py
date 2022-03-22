@@ -112,9 +112,7 @@ def hybrid_renderer(widget, data):
         rendered = compound_renderer(widget, data)
     else:
         rendered = data.rendered
-        if data.rendered is None:
-            rendered = u''
-    return rendered
+    return rendered if rendered else u''
 
 
 factory.defaults['leaf'] = None

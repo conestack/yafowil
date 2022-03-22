@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
-from node.behaviors import Adopt
 from node.behaviors import Attributes
 from node.behaviors import DictStorage
+from node.behaviors import MappingAdopt
+from node.behaviors import MappingConstraints
+from node.behaviors import MappingNode
 from node.behaviors import NodeAttributes
-from node.behaviors import NodeChildValidate
-from node.behaviors import Nodespaces
-from node.behaviors import Nodify
 from node.behaviors import OdictStorage
 from node.behaviors import Order
-from node.utils import UNSET
 from node.utils import instance_property
+from node.utils import UNSET
 from plumber import plumbing
 from threading import RLock
 from yafowil.compat import ITER_TYPES
 from yafowil.compat import STR_TYPE
-from yafowil.utils import Tag
 from yafowil.utils import attr_value
+from yafowil.utils import Tag
 import copy
 
 
@@ -33,11 +32,10 @@ class RuntimeDataAttributes(NodeAttributes):
 
 
 @plumbing(
-    Nodespaces,
     Attributes,
-    NodeChildValidate,
-    Adopt,
-    Nodify,
+    MappingConstraints,
+    MappingAdopt,
+    MappingNode,
     OdictStorage)
 class RuntimeData(object):
     """Holds Runtime data of widget.
@@ -231,13 +229,9 @@ class TBSupplementWidget(object):
         return tag('p', 'yafowil widget processing info:', tag('ul', li))
 
 
-@plumbing(
-    NodeChildValidate,
-    Adopt,
-    Nodify,
-    DictStorage)
+@plumbing(MappingNode, DictStorage)
 class WidgetAttributes(object):
-    allow_non_node_children = True
+
     __str__ = __repr__ = _dict__repr__
 
     def __init__(self, name=None, parent=None):
@@ -262,12 +256,11 @@ class WidgetAttributes(object):
 
 
 @plumbing(
-    Nodespaces,
     Attributes,
-    NodeChildValidate,
-    Adopt,
+    MappingConstraints,
+    MappingAdopt,
     Order,
-    Nodify,
+    MappingNode,
     OdictStorage)
 class Widget(object):
     """Base Widget Class.
@@ -538,9 +531,33 @@ class Factory(object):
             'props': dict(),
             'blueprint': dict(),
         }
+        self._states = list()
 
     def clear(self):
+        states = self._states
         self.__init__()
+        self._states = states
+
+    def push_state(self):
+        self._states.append(dict(
+            _blueprints=copy.deepcopy(self._blueprints),
+            _global_preprocessors=copy.deepcopy(self._global_preprocessors),
+            _macros=copy.deepcopy(self._macros),
+            _themes=copy.deepcopy(self._themes),
+            theme=copy.deepcopy(self.theme),
+            defaults=copy.deepcopy(self.defaults),
+            doc=copy.deepcopy(self.doc)
+        ))
+
+    def pop_state(self):
+        state = self._states.pop()
+        self._blueprints = state['_blueprints']
+        self._global_preprocessors = state['_global_preprocessors']
+        self._macros = state['_macros']
+        self._themes = state['_themes']
+        self.theme = state['theme']
+        self.defaults = state['defaults']
+        self.doc = state['doc']
 
     def _name_check(self, name):
         for chara in '*:#':

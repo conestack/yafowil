@@ -12,7 +12,6 @@ from yafowil.tests import fxml
 from yafowil.tests import YafowilTestCase
 from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import Tag
-
 import uuid
 
 if IS_PY2:
@@ -422,7 +421,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'template': mytemplate
             })
-        self.check_output("""
+        self.checkOutput("""
         <div class="display-text" id="display-DISPLAY">
           <TEMPLATE>lorem ipsum</TEMPLATE>
         </div>
@@ -438,7 +437,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'display_proxy': True
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <div class="display-text" id="display-DISPLAY">lorem ipsum</div>
           <input class="text" id="input-DISPLAY" name="DISPLAY" type="hidden"
@@ -829,7 +828,7 @@ class TestCommon(YafowilTestCase):
         request = {
             'MYDATATYPEFIELD': '3b8449f3-0456-4baa-a670-3066b0fcbda0'
         }
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             widget.extract,
             request
@@ -882,7 +881,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'datatype': 'inexistent',
             })
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             widget.extract,
             {'MYDATATYPEFIELD': 'a'}
@@ -894,7 +893,7 @@ class TestCommon(YafowilTestCase):
         widget = factory(
             'checkbox',
             name='MYCHECKBOX')
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX"
                  type="checkbox" value=""/>
@@ -913,7 +912,7 @@ class TestCommon(YafowilTestCase):
             'checkbox',
             name='MYCHECKBOX',
             value='True')
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input checked="checked" class="checkbox" id="input-MYCHECKBOX"
                  name="MYCHECKBOX" type="checkbox" value=""/>
@@ -928,14 +927,14 @@ class TestCommon(YafowilTestCase):
             '<div class="display-checkbox" id="display-MYCHECKBOX">Yes</div>'
         )
 
-        # A checkbox with label
+        # A checkbox with custom CSS related empty label
         widget = factory(
             'checkbox',
             name='MYCHECKBOX',
             props={
                 'with_label': True
             })
-        self.check_output("""
+        self.checkOutput("""
         <input class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX"
         type="checkbox" value="" /><label class="checkbox_label"
         for="input-MYCHECKBOX">&nbsp;</label><input
@@ -951,7 +950,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'format': 'string'
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX"
                  type="checkbox" value=""/>
@@ -973,7 +972,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'format': 'string'
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input checked="checked" class="checkbox" id="input-MYCHECKBOX"
                  name="MYCHECKBOX" type="checkbox" value="Test Checkbox"/>
@@ -997,7 +996,7 @@ class TestCommon(YafowilTestCase):
                 'format': 'string',
                 'checked': True,
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input checked="checked" class="checkbox" id="input-MYCHECKBOX"
                  name="MYCHECKBOX" type="checkbox" value=""/>
@@ -1014,7 +1013,7 @@ class TestCommon(YafowilTestCase):
                 'format': 'string',
                 'checked': False,
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX"
                  type="checkbox" value="Test Checkbox"/>
@@ -1029,7 +1028,7 @@ class TestCommon(YafowilTestCase):
             'MYCHECKBOX-exists': 'checkboxexists'
         }
         data = widget.extract(request)
-        self.check_output("""
+        self.checkOutput("""
         <RuntimeData MYCHECKBOX, value='Test Checkbox', extracted='1' at ...>
         """, data.treerepr())
 
@@ -1038,7 +1037,7 @@ class TestCommon(YafowilTestCase):
             'MYCHECKBOX-exists': 'checkboxexists'
         }
         data = widget.extract(request)
-        self.check_output("""
+        self.checkOutput("""
         <RuntimeData MYCHECKBOX, value='Test Checkbox', extracted='' at ...>
         """, data.treerepr())
 
@@ -1046,7 +1045,7 @@ class TestCommon(YafowilTestCase):
             'MYCHECKBOX': 1,
         }
         data = widget.extract(request)
-        self.check_output("""
+        self.checkOutput("""
         <RuntimeData MYCHECKBOX, value='Test Checkbox', extracted=<UNSET> at ...>
         """, data.treerepr())  # noqa
 
@@ -1068,7 +1067,7 @@ class TestCommon(YafowilTestCase):
             'MYCHECKBOX-exists': 'checkboxexists'
         }
         data = widget.extract(request)
-        self.check_output("""
+        self.checkOutput("""
         <RuntimeData MYCHECKBOX, value='Test Checkbox', extracted=True at ...>
         """, data.treerepr())
 
@@ -1076,7 +1075,7 @@ class TestCommon(YafowilTestCase):
             'MYCHECKBOX-exists': 'checkboxexists'
         }
         data = widget.extract(request)
-        self.check_output("""
+        self.checkOutput("""
         <RuntimeData MYCHECKBOX, value='Test Checkbox', extracted=False at ...>
         """, data.treerepr())
 
@@ -1096,7 +1095,7 @@ class TestCommon(YafowilTestCase):
             'MYCHECKBOX': '',
             'MYCHECKBOX-exists': 'checkboxexists'
         }
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             widget.extract,
             request
@@ -1113,7 +1112,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'format': 'bool'
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <div class="display-checkbox" id="display-MYCHECKBOX">No</div>
         </div>
@@ -1127,7 +1126,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'format': 'bool'
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <div class="display-checkbox" id="display-MYCHECKBOX">Yes</div>
         </div>
@@ -1143,7 +1142,7 @@ class TestCommon(YafowilTestCase):
                 'display_proxy': True
             },
             mode='display')
-        self.check_output("""
+        self.checkOutput("""
         <div class="display-checkbox" id="display-MYCHECKBOX">Yes<input
         class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden"
         value="" /><input id="checkboxexists-MYCHECKBOX"
@@ -1155,7 +1154,7 @@ class TestCommon(YafowilTestCase):
         self.assertEqual(data.value, True)
         self.assertEqual(data.extracted, False)
 
-        self.check_output("""
+        self.checkOutput("""
         <div class="display-checkbox" id="display-MYCHECKBOX">No<input
         id="checkboxexists-MYCHECKBOX" name="MYCHECKBOX-exists" type="hidden"
         value="checkboxexists" /></div>
@@ -1169,7 +1168,7 @@ class TestCommon(YafowilTestCase):
         self.assertEqual(data.value, True)
         self.assertEqual(data.extracted, True)
 
-        self.check_output("""
+        self.checkOutput("""
         <div class="display-checkbox" id="display-MYCHECKBOX">Yes<input
         class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX"
         type="hidden" value="" /><input id="checkboxexists-MYCHECKBOX"
@@ -1186,7 +1185,7 @@ class TestCommon(YafowilTestCase):
                 'display_proxy': True
             },
             mode='display')
-        self.check_output("""
+        self.checkOutput("""
         <div class="display-checkbox" id="display-MYCHECKBOX">yes<input
         class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX"
         type="hidden" value="yes" /><input id="checkboxexists-MYCHECKBOX"
@@ -1198,7 +1197,7 @@ class TestCommon(YafowilTestCase):
         self.assertEqual(data.value, 'yes')
         self.assertEqual(data.extracted, '')
 
-        self.check_output("""
+        self.checkOutput("""
         <div class="display-checkbox" id="display-MYCHECKBOX">No<input
         class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden"
         value="" /><input id="checkboxexists-MYCHECKBOX"
@@ -1213,7 +1212,7 @@ class TestCommon(YafowilTestCase):
         self.assertEqual(data.value, 'yes')
         self.assertEqual(data.extracted, '')
 
-        self.check_output("""
+        self.checkOutput("""
         <div class="display-checkbox" id="display-MYCHECKBOX">No<input
         class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX" type="hidden"
         value="" /><input id="checkboxexists-MYCHECKBOX"
@@ -1226,7 +1225,7 @@ class TestCommon(YafowilTestCase):
         self.assertEqual(data.value, 'yes')
         self.assertEqual(data.extracted, 'foo')
 
-        self.check_output("""
+        self.checkOutput("""
         <div class="display-checkbox" id="display-MYCHECKBOX">foo<input
         class="checkbox" id="input-MYCHECKBOX" name="MYCHECKBOX"
         type="hidden" value="foo" /><input id="checkboxexists-MYCHECKBOX"
@@ -1241,7 +1240,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'data': {'foo': 'bar'}
             })
-        self.check_output("""
+        self.checkOutput("""
         <input checked="checked" class="checkbox" data-foo=\'bar\'
         id="input-MYCHECKBOX" name="MYCHECKBOX" type="checkbox"
         value="" /><input id="checkboxexists-MYCHECKBOX"
@@ -1326,7 +1325,7 @@ class TestCommon(YafowilTestCase):
             'lines',
             name='MYLINES',
             value=['a', 'b', 'c'])
-        self.check_output("""
+        self.checkOutput("""
         <textarea class="lines" cols="40" id="input-MYLINES"
                   name="MYLINES" rows="8">a
         b
@@ -1342,7 +1341,7 @@ class TestCommon(YafowilTestCase):
         self.assertEqual(data.extracted, ['a', 'b'])
 
         # Render with extracted data
-        self.check_output("""
+        self.checkOutput("""
         <textarea class="lines" cols="40" id="input-MYLINES"
                   name="MYLINES" rows="8">a
         b</textarea>
@@ -1354,7 +1353,7 @@ class TestCommon(YafowilTestCase):
             name='MYLINES',
             value=['a', 'b', 'c'],
             mode='display')
-        self.check_output("""
+        self.checkOutput("""
         <ul class="display-lines" id="display-MYLINES">
           <li>a</li>
           <li>b</li>
@@ -1368,7 +1367,7 @@ class TestCommon(YafowilTestCase):
             name='MYLINES',
             value=[],
             mode='display')
-        self.check_output("""
+        self.checkOutput("""
         <ul class="display-lines" id="display-MYLINES"/>
         """, fxml(widget()))
 
@@ -1381,7 +1380,7 @@ class TestCommon(YafowilTestCase):
                 'display_proxy': True,
             },
             mode='display')
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <ul class="display-lines" id="display-MYLINES">
             <li>a</li>
@@ -1403,7 +1402,7 @@ class TestCommon(YafowilTestCase):
         self.assertEqual(data.extracted, ['a', 'b'])
         self.assertEqual(data.errors, [])
 
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <ul class="display-lines" id="display-MYLINES">
             <li>a</li>
@@ -1424,7 +1423,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'data': {'foo': 'bar'}
             })
-        self.check_output("""
+        self.checkOutput("""
         <textarea class="lines" cols="40" data-foo="bar" id="input-MYLINES"
                   name="MYLINES" rows="8">a
         b
@@ -1439,7 +1438,7 @@ class TestCommon(YafowilTestCase):
                 'data': {'foo': 'bar'}
             },
             mode='display')
-        self.check_output("""
+        self.checkOutput("""
         <ul class="display-lines" data-foo="bar" id="display-MYLINES">
           <li>a</li>
           <li>b</li>
@@ -1521,7 +1520,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'vocabulary': vocab
             })
-        self.check_output("""
+        self.checkOutput("""
         <select class="select" id="input-MYSELECT" name="MYSELECT">
           <option id="input-MYSELECT-one" selected="selected"
                   value="one">One</option>
@@ -1535,7 +1534,7 @@ class TestCommon(YafowilTestCase):
         self.assertEqual(data.errors, [])
         self.assertEqual(data.extracted, 'two')
 
-        self.check_output("""
+        self.checkOutput("""
         <select class="select" id="input-MYSELECT" name="MYSELECT">
           <option id="input-MYSELECT-one" value="one">One</option>
           <option id="input-MYSELECT-two" selected="selected"
@@ -1547,7 +1546,7 @@ class TestCommon(YafowilTestCase):
 
         # Single value selection completly disabled
         widget.attrs['disabled'] = True
-        self.check_output("""
+        self.checkOutput("""
         <select class="select" disabled="disabled" id="input-MYSELECT"
                 name="MYSELECT">
           <option id="input-MYSELECT-one" selected="selected"
@@ -1560,7 +1559,7 @@ class TestCommon(YafowilTestCase):
 
         # Single value selection with specific options disabled
         widget.attrs['disabled'] = ['two', 'four']
-        self.check_output("""
+        self.checkOutput("""
         <select class="select" id="input-MYSELECT" name="MYSELECT">
           <option id="input-MYSELECT-one" selected="selected"
                   value="one">One</option>
@@ -1582,7 +1581,7 @@ class TestCommon(YafowilTestCase):
         )
 
         widget.attrs['display_proxy'] = True
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <div class="display-select" id="display-MYSELECT">One</div>
           <input class="select" id="input-MYSELECT" name="MYSELECT"
@@ -1596,7 +1595,7 @@ class TestCommon(YafowilTestCase):
         self.assertEqual(data.extracted, 'two')
         self.assertEqual(data.errors, [])
 
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <div class="display-select" id="display-MYSELECT">Two</div>
           <input class="select" id="input-MYSELECT" name="MYSELECT"
@@ -1619,7 +1618,7 @@ class TestCommon(YafowilTestCase):
             (uuid.UUID('1b679ef8-9068-45f5-8bb8-4007264aa7f7'), 'One')
         ]
         res = widget()
-        self.check_output("""
+        self.checkOutput("""
         <select class="select" id="input-MYSELECT" name="MYSELECT">
           <option id="input-MYSELECT-" selected="selected"
                   value="">Empty value</option>
@@ -1642,7 +1641,7 @@ class TestCommon(YafowilTestCase):
 
         widget.getter = uuid.UUID('1b679ef8-9068-45f5-8bb8-4007264aa7f7')
         res = widget()
-        self.check_output("""
+        self.checkOutput("""
         <select class="select" id="input-MYSELECT" name="MYSELECT">
           <option id="input-MYSELECT-"
                   value="">Empty value</option>
@@ -1675,7 +1674,7 @@ class TestCommon(YafowilTestCase):
                 'vocabulary': vocab,
                 'datatype': 'int'
             })
-        self.check_output("""
+        self.checkOutput("""
         <select class="select" id="input-MYSELECT" name="MYSELECT">
           <option id="input-MYSELECT-" value="">Empty value</option>
           <option id="input-MYSELECT-1" value="1">One</option>
@@ -1690,7 +1689,7 @@ class TestCommon(YafowilTestCase):
         data = widget.extract({'MYSELECT': '1'})
         self.assertEqual(data.extracted, 1)
 
-        self.check_output("""
+        self.checkOutput("""
         <select class="select" id="input-MYSELECT" name="MYSELECT">
           <option id="input-MYSELECT-" value="">Empty value</option>
           <option id="input-MYSELECT-1" selected="selected"
@@ -1723,7 +1722,7 @@ class TestCommon(YafowilTestCase):
 
         # Single value selection with ``datatype`` set completly disabled
         widget.attrs['disabled'] = True
-        self.check_output("""
+        self.checkOutput("""
         <select class="select" disabled="disabled" id="input-MYSELECT"
                 name="MYSELECT">
           <option id="input-MYSELECT-" value="">Empty value</option>
@@ -1738,7 +1737,7 @@ class TestCommon(YafowilTestCase):
         widget.attrs['emptyvalue'] = None
         widget.attrs['disabled'] = [None, 2]
         rendered = widget()
-        self.check_output("""
+        self.checkOutput("""
         <select class="select" id="input-MYSELECT" name="MYSELECT">
           <option disabled="disabled" id="input-MYSELECT-"
                   value="">Empty value</option>
@@ -1770,7 +1769,7 @@ class TestCommon(YafowilTestCase):
         )
 
         widget.attrs['display_proxy'] = True
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <div class="display-select" id="display-MYSELECT">Two</div>
           <input class="select" id="input-MYSELECT" name="MYSELECT"
@@ -1784,7 +1783,7 @@ class TestCommon(YafowilTestCase):
         self.assertEqual(data.extracted, 1)
         self.assertEqual(data.errors, [])
 
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <div class="display-select" id="display-MYSELECT">One</div>
           <input class="select" id="input-MYSELECT" name="MYSELECT"
@@ -1801,7 +1800,7 @@ class TestCommon(YafowilTestCase):
                 'data': {'foo': 'bar'},
                 'vocabulary': [('one', 'One')]
             })
-        self.check_output("""
+        self.checkOutput("""
         <select class="select" data-foo="bar" id="input-MYSELECT"
                 name="MYSELECT">
           <option id="input-MYSELECT-one" selected="selected"
@@ -1818,7 +1817,7 @@ class TestCommon(YafowilTestCase):
                 'vocabulary': [('one', 'One')]
             },
             mode='display')
-        self.check_output("""
+        self.checkOutput("""
         <div class="display-select" data-foo="bar"
              id="display-MYSELECT">One</div>
         """, fxml(widget()))
@@ -1853,7 +1852,7 @@ class TestCommon(YafowilTestCase):
                 'format': 'single',
                 'listing_label_position': 'before'
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
                  value="exists"/>
@@ -1884,7 +1883,7 @@ class TestCommon(YafowilTestCase):
 
         # Render single selection as radio inputs, disables all
         widget.attrs['disabled'] = True
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
                  value="exists"/>
@@ -1918,7 +1917,7 @@ class TestCommon(YafowilTestCase):
 
         # Render single selection as radio inputs, disables some
         widget.attrs['disabled'] = ['one', 'three']
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
                  value="exists"/>
@@ -1959,7 +1958,7 @@ class TestCommon(YafowilTestCase):
         )
 
         widget.attrs['display_proxy'] = True
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <div class="display-select" id="display-MYSELECT">One</div>
           <input class="select" id="input-MYSELECT" name="MYSELECT"
@@ -1973,7 +1972,7 @@ class TestCommon(YafowilTestCase):
         self.assertEqual(data.extracted, 'two')
         self.assertEqual(data.errors, [])
 
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <div class="display-select" id="display-MYSELECT">Two</div>
           <input class="select" id="input-MYSELECT" name="MYSELECT"
@@ -1997,7 +1996,7 @@ class TestCommon(YafowilTestCase):
                 'datatype': 'uuid',
                 'format': 'single',
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
                  value="exists"/>
@@ -2047,7 +2046,7 @@ class TestCommon(YafowilTestCase):
             uuid.UUID('e09471dc-625d-463b-be03-438d7089ec13')
         )
 
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
                  value="exists"/>
@@ -2099,7 +2098,7 @@ class TestCommon(YafowilTestCase):
                 'listing_label_position': 'before',
                 'data': {'foo': 'bar'}
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
                  value="exists"/>
@@ -2124,7 +2123,7 @@ class TestCommon(YafowilTestCase):
                 'data': {'foo': 'bar'}
             },
             mode='display')
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <div class="display-select" data-foo="bar"
                id="display-MYSELECT">One</div>
@@ -2141,7 +2140,7 @@ class TestCommon(YafowilTestCase):
                 'multivalued': True,
                 'vocabulary': []
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input id="exists-EMPTYSELECT" name="EMPTYSELECT-exists"
                  type="hidden" value="exists"/>
@@ -2165,7 +2164,7 @@ class TestCommon(YafowilTestCase):
                 'multivalued': True,
                 'vocabulary': vocab
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
                  value="exists"/>
@@ -2188,7 +2187,7 @@ class TestCommon(YafowilTestCase):
         self.assertEqual(data.extracted, ['one', 'four'])
         self.assertEqual(data.errors, [])
 
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
                  value="exists"/>
@@ -2206,7 +2205,7 @@ class TestCommon(YafowilTestCase):
 
         # Multi selection display mode
         widget.mode = 'display'
-        self.check_output("""
+        self.checkOutput("""
         <ul class="display-select" id="display-MYSELECT">
           <li>One</li>
           <li>Two</li>
@@ -2215,7 +2214,7 @@ class TestCommon(YafowilTestCase):
 
         # Multi selection display mode with display proxy
         widget.attrs['display_proxy'] = True
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <ul class="display-select" id="display-MYSELECT">
             <li>One</li>
@@ -2235,7 +2234,7 @@ class TestCommon(YafowilTestCase):
         self.assertEqual(data.extracted, ['one'])
         self.assertEqual(data.errors, [])
 
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <ul class="display-select" id="display-MYSELECT">
             <li>One</li>
@@ -2255,7 +2254,7 @@ class TestCommon(YafowilTestCase):
                 'multivalued': True
             },
             mode='display')
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <div class="display-select" id="display-MYSELECT"/>
         </div>
@@ -2271,7 +2270,7 @@ class TestCommon(YafowilTestCase):
                 'vocabulary': [('two', 'Two')]
             },
             mode='display')
-        self.check_output("""
+        self.checkOutput("""
         <ul class="display-select" id="display-MYSELECT">
           <li>one</li>
           <li>Two</li>
@@ -2292,7 +2291,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'vocabulary': vocab
             })
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             widget
         )
@@ -2315,7 +2314,7 @@ class TestCommon(YafowilTestCase):
                 'vocabulary': vocab,
                 'emptyvalue': []
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
                  value="exists"/>
@@ -2337,7 +2336,7 @@ class TestCommon(YafowilTestCase):
         data = widget.extract(request=request)
         self.assertEqual(data.extracted, [2.0, 3.0])
 
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
                  value="exists"/>
@@ -2379,7 +2378,7 @@ class TestCommon(YafowilTestCase):
                 'data': {'foo': 'bar'},
                 'vocabulary': vocab
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
             value="exists"/>
@@ -2394,7 +2393,7 @@ class TestCommon(YafowilTestCase):
         """, wrapped_fxml(widget()))
 
         widget.mode = 'display'
-        self.check_output("""
+        self.checkOutput("""
         <ul class="display-select" data-foo="bar" id="display-MYSELECT">
           <li>One</li>
           <li>Two</li>
@@ -2433,7 +2432,7 @@ class TestCommon(YafowilTestCase):
                 'vocabulary': vocab,
                 'format': 'single'
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
                  value="exists"/>
@@ -2466,7 +2465,7 @@ class TestCommon(YafowilTestCase):
         # value for multivalued widget is set as string, which is treaten as
         # one item selected and covered with the below tests
         widget.mode = 'display'
-        self.check_output("""
+        self.checkOutput("""
         <ul class="display-select" id="display-MYSELECT">
           <li>One</li>
         </ul>
@@ -2474,7 +2473,7 @@ class TestCommon(YafowilTestCase):
 
         # Checkbox multi selection display mode with display proxy
         widget.attrs['display_proxy'] = True
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <ul class="display-select" id="display-MYSELECT">
             <li>One</li>
@@ -2492,7 +2491,7 @@ class TestCommon(YafowilTestCase):
         self.assertEqual(data.extracted, ['two'])
         self.assertEqual(data.errors, [])
 
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <ul class="display-select" id="display-MYSELECT">
             <li>Two</li>
@@ -2513,7 +2512,7 @@ class TestCommon(YafowilTestCase):
                 'vocabulary': [('one', 'One')],
                 'format': 'single'
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
                  value="exists"/>
@@ -2528,7 +2527,7 @@ class TestCommon(YafowilTestCase):
         """, wrapped_fxml(widget()))
 
         widget.mode = 'display'
-        self.check_output("""
+        self.checkOutput("""
         <ul class="display-select" data-foo="bar" id="display-MYSELECT">
           <li>One</li>
         </ul>
@@ -2553,7 +2552,7 @@ class TestCommon(YafowilTestCase):
                 'format': 'single',
                 'listing_tag': 'ul'
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
                  value="exists"/>
@@ -2597,7 +2596,7 @@ class TestCommon(YafowilTestCase):
                 'listing_tag': 'ul',
                 'listing_label_position': 'after'
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
                  value="exists"/>
@@ -2632,7 +2631,7 @@ class TestCommon(YafowilTestCase):
                 'listing_tag': 'ul',
                 'listing_label_position': 'inner-before'
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
                  value="exists"/>
@@ -2662,7 +2661,7 @@ class TestCommon(YafowilTestCase):
                 'format': 'single',
                 'listing_label_position': 'inner'
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
                  value="exists"/>
@@ -2690,7 +2689,7 @@ class TestCommon(YafowilTestCase):
                 'required': 'Selection required',
                 'vocabulary': vocab
             })
-        self.check_output("""
+        self.checkOutput("""
         <select class="select" id="input-MYSELECT" name="MYSELECT"
                 required="required">
           <option id="input-MYSELECT-one" value="one">One</option>
@@ -2720,7 +2719,7 @@ class TestCommon(YafowilTestCase):
                 'multivalued': True,
                 'vocabulary': vocab
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input id="exists-MYSELECT" name="MYSELECT-exists" type="hidden"
                  value="exists"/>
@@ -3098,7 +3097,7 @@ class TestCommon(YafowilTestCase):
             value={
                 'file': StringIO('321'),
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input id="input-MYFILE" name="MYFILE" type="file"/>
           <div id="radio-MYFILE-keep">
@@ -3168,7 +3167,7 @@ class TestCommon(YafowilTestCase):
 
         self.assertEqual(data.extracted['action'], 'delete')
 
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input id="input-MYFILE" name="MYFILE" type="file"/>
           <div id="radio-MYFILE-keep">
@@ -3211,7 +3210,7 @@ class TestCommon(YafowilTestCase):
             'file',
             name='MYFILE',
             mode='display')
-        self.check_output("""
+        self.checkOutput("""
         <div>No file</div>
         """, fxml(widget()))
 
@@ -3225,7 +3224,7 @@ class TestCommon(YafowilTestCase):
             name='MYFILE',
             value=value,
             mode='display')
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <ul>
             <li><strong>Filename: </strong>foo.txt</li>
@@ -3284,7 +3283,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'action': True,
                 'label': 'Action name',
-                'expression': lambda: False,
+                'expression': lambda w, d: False,
             })
         self.assertEqual(widget(), '')
 
@@ -3301,6 +3300,94 @@ class TestCommon(YafowilTestCase):
             '<input data-foo=\'bar\' id="input-SAVE" name="action.SAVE" '
             'type="submit" value="Action name" />'
         ))
+
+    def test_button_blueprint(self):
+        # Render button element
+        widget = factory(
+            'button',
+            name='SAVE',
+            props={
+                'action': True,
+                'text': 'Button text',
+            })
+        self.assertEqual(
+            widget(),
+            '<button id="input-SAVE" name="action.SAVE" type="submit">'
+            'Button text</button>'
+        )
+
+        # If expression is or evaluates to False, skip rendering
+        widget = factory(
+            'button',
+            name='SAVE',
+            props={
+                'action': True,
+                'text': 'Button text',
+                'expression': False,
+            })
+        self.assertEqual(widget(), '')
+
+        widget = factory(
+            'button',
+            name='SAVE',
+            props={
+                'action': True,
+                'text': 'Button text',
+                'expression': lambda w, d: False,
+            })
+        self.assertEqual(widget(), '')
+
+        # Generic HTML5 Data
+        widget = factory(
+            'button',
+            name='SAVE',
+            props={
+                'action': True,
+                'text': 'Button text',
+                'data': {'foo': 'bar'},
+            })
+        self.assertEqual(
+            widget(),
+            """<button data-foo='bar' id="input-SAVE" name="action.SAVE" """
+            """type="submit">Button text</button>"""
+        )
+
+        # Button specific attrs
+        widget = factory(
+            'button',
+            name='SAVE',
+            props={
+                'action': True,
+                'text': 'Button text',
+                'form': 'my-parent-for',
+                'formaction': 'alternative-action',
+                'formenctype': 'text/plain',
+                'formmethod': 'post',
+                'formnovalidate': "1",
+                'formtarget': "_blank",
+            })
+        self.assertEqual(
+            widget(),
+            '<button form="my-parent-for" formaction="alternative-action" '
+            'formenctype="text/plain" formmethod="post" formnovalidate="1" '
+            'formtarget="_blank" id="input-SAVE" name="action.SAVE" '
+            'type="submit">Button text</button>'
+        )
+
+        # Custom button name if action not defined
+        widget = factory(
+            'button',
+            name='BUTTON',
+            props={
+                'text': 'Button text',
+                'action': False,
+                'name': 'custom_button_action'
+            })
+        self.assertEqual(
+            widget(),
+            '<button id="input-BUTTON" name="custom_button_action" '
+            'type="submit">Button text</button>'
+        )
 
     def test_proxy_blueprint(self):
         # Used to pass hidden arguments out of form namespace
@@ -3385,7 +3472,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'label': 'MY FILE'
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <label for="input-MYFILE">MY FILE</label>
           <input id="input-MYFILE" name="MYFILE" type="file"/>
@@ -3400,7 +3487,7 @@ class TestCommon(YafowilTestCase):
                 'label': 'MY FILE',
                 'label.position': 'after'
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <input id="input-MYFILE" name="MYFILE" type="file"/>
           <label for="input-MYFILE">MY FILE</label>
@@ -3415,7 +3502,7 @@ class TestCommon(YafowilTestCase):
                 'label': 'MY FILE',
                 'label.position': 'inner'
             })
-        self.check_output("""
+        self.checkOutput("""
         <div>
           <label for="input-MYFILE">MY FILE<input id="input-MYFILE"
                  name="MYFILE" type="file"/></label>
@@ -3430,7 +3517,7 @@ class TestCommon(YafowilTestCase):
                 'label': 'MY FILE',
                 'label.position': 'inexistent'
             })
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             widget
         )
@@ -3452,7 +3539,7 @@ class TestCommon(YafowilTestCase):
             'label',
             name='MYFILE',
             props={
-                'label': lambda: 'Fooo',
+                'label': lambda x, y: 'Fooo',
             })
         self.assertEqual(widget(), (
             '<label for="input-MYFILE">Fooo</label>'
@@ -3476,7 +3563,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'label': 'MY FILE'
             })
-        self.check_output("""
+        self.checkOutput("""
         <div class="field" id="field-MYFILE">
           <label for="input-MYFILE">MY FILE</label>
           <input id="input-MYFILE" name="MYFILE" type="file"/>
@@ -3500,7 +3587,7 @@ class TestCommon(YafowilTestCase):
             [ExtractionError('Mandatory field was empty')]
         )
 
-        self.check_output("""
+        self.checkOutput("""
         <div class="field fielderrorclass" id="field-MYFIELD">
           <input class="required text" id="input-MYFIELD" name="MYFIELD"
                  required="required" type="text" value=""/>
@@ -3685,7 +3772,7 @@ class TestCommon(YafowilTestCase):
                 'required': 'No password given!'
             })
         data = widget.extract({'PASSWORD': ''})
-        self.check_output("""
+        self.checkOutput("""
         <div class="field" id="field-PASSWORD">
           <div class="error">
             <div class="errormessage">No password given!</div>
@@ -3696,7 +3783,7 @@ class TestCommon(YafowilTestCase):
         """, fxml(widget(data=data)))  # noqa
 
         data = widget.extract({'PASSWORD': 'secret'})
-        self.check_output("""
+        self.checkOutput("""
         <div class="field" id="field-PASSWORD">
           <input class="password required" id="input-PASSWORD" name="PASSWORD"
                  required="required" type="password" value="secret"/>
@@ -3722,7 +3809,7 @@ class TestCommon(YafowilTestCase):
                 'message_tag': None
             })
         data = widget.extract({'PASSWORD': ''})
-        self.check_output("""
+        self.checkOutput("""
         <div class="field" id="field-PASSWORD">
           <div class="error">No password given!<input class="password required"
                id="input-PASSWORD" name="PASSWORD" required="required"
@@ -3739,7 +3826,7 @@ class TestCommon(YafowilTestCase):
                 'label': 'Help',
                 'help': 'Shout out loud here'
             })
-        self.check_output("""
+        self.checkOutput("""
         <div class="field" id="field-HELPEXAMPLE">
           <div class="help">Shout out loud here</div>
           <input class="text" id="input-HELPEXAMPLE" name="HELPEXAMPLE"
@@ -3756,7 +3843,7 @@ class TestCommon(YafowilTestCase):
                 'help': False,
                 'render_empty': False
             })
-        self.check_output("""
+        self.checkOutput("""
         <div class="field" id="field-HELPEXAMPLE">
           <input class="text" id="input-HELPEXAMPLE" name="HELPEXAMPLE"
                  type="text" value=""/>
@@ -3836,7 +3923,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'datatype': UNICODE_TYPE
             })
-        data = widget.extract(request={'EMAIL': 'foo@example.com'})
+        data = widget.extract(request={'EMAIL': b'foo@example.com'})
         self.assertEqual(data.extracted, u'foo@example.com')
         self.assertTrue(isinstance(data.extracted, UNICODE_TYPE))
         self.assertFalse(isinstance(data.extracted, BYTES_TYPE))
@@ -4028,7 +4115,7 @@ class TestCommon(YafowilTestCase):
             props={
                 'datatype': 'invalid'
             })
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             widget.extract,
             {'NUMBER': '10.0'}

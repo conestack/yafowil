@@ -336,6 +336,72 @@ def block():
     }
 
 
+DOC_SINGLE_CHECKBOX = """
+Single checkbox
+---------------
+
+Single checkbox (return True or False). Usually used without surrounding field.
+This is an example how to render it for Bootstrap 5
+
+.. code-block:: python
+
+    checkbox = factory('div:help:label:checkbox', props={
+        'label': 'Single checkbox',
+        'help': 'A single checkbox without vocabulary',
+        'div.class': 'form-check',
+        'label.class': 'form-check-label',
+        'label.position': 'after',
+    })
+"""
+
+
+def single_checkbox():
+    comp = factory('compound', name='yafowil-single-checkbox')
+    comp['checkbox'] = factory('div:help:label:checkbox', props={
+        'label': 'Single checkbox',
+        'help': 'A single checkbox without vocabulary',
+        'div.class': 'form-check',
+        'label.class': 'form-check-label',
+        'label.position': 'after',
+    })
+    return {
+        'widget': comp,
+        'doc': DOC_SINGLE_CHECKBOX,
+        'title': 'Single checkbox',
+    }
+
+
+DOC_FILEUPLOAD = """
+File upload
+-----------
+
+Upload a file
+
+.. code-block:: python
+
+    fileupload = factory('#field:file', props={
+        'label': 'File',
+        'help': 'Upload a single file',
+    })
+"""
+
+
+def fileupload():
+    fileupload = factory('compound', name='yafowil-fileupload')
+    fileupload['file'] = factory('#field:file', props={
+        'label': 'File',
+        'help': 'Upload a single file',
+    })
+    return {
+        'widget': fileupload,
+        'doc': DOC_FILEUPLOAD,
+        'title': 'File upload',
+    }
+
+
 def get_example():
-    return [plaintext(), email(), number(), integer(), password(), url(),
-            textarea(), radio(), dropdown(), checkbox(), block()]
+    return [
+        plaintext(), email(), number(), integer(), password(), url(),
+        textarea(), radio(), dropdown(), checkbox(), block(),
+        single_checkbox(), fileupload()
+    ]

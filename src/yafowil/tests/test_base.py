@@ -6,7 +6,6 @@ from yafowil.base import RuntimeData
 from yafowil.base import TBSupplementWidget
 from yafowil.base import Widget
 from yafowil.base import fetch_value
-
 import traceback
 
 
@@ -87,7 +86,7 @@ class TestBase(NodeTestCase):
         self.assertEqual(fetched.__name__, 'surname')
 
         # It fails if if root element name is wrong
-        err = self.expect_error(
+        err = self.expectError(
             KeyError,
             data['fieldset']['age'].fetch,
             ['foobar', 'surname']
@@ -98,7 +97,7 @@ class TestBase(NodeTestCase):
         try:
             data['fieldset']['age'].fetch('root.unknown')
         except KeyError:
-            self.check_output("""
+            self.checkOutput("""
             Traceback (most recent call last):
             ...
                 data = data[key]
@@ -159,7 +158,7 @@ class TestBase(NodeTestCase):
             test_getter,
             dict(test1='Test1', test2='Test2'))
 
-        self.check_output("""
+        self.checkOutput("""
         r1,
         MYUID,
         <RuntimeData MYUID, value='Test Value', extracted=<UNSET>,
@@ -168,7 +167,7 @@ class TestBase(NodeTestCase):
         """, testwidget())
 
         # A passed in request does not trigger extraction
-        self.check_output("""
+        self.checkOutput("""
         r1,
         MYUID,
         <RuntimeData MYUID, value='Test Value', extracted=<UNSET>,
@@ -178,7 +177,7 @@ class TestBase(NodeTestCase):
 
         # Extraction is an explicit task
         data = testwidget.extract(test_request)
-        self.check_output("""
+        self.checkOutput("""
         <RuntimeData MYUID, value='Test Value', extracted='e1',
         attrs={'test_preprocessor': 'called'} at ...>
         """, str(data))
@@ -202,7 +201,7 @@ class TestBase(NodeTestCase):
             'MYUID',
             test_getter,
             dict(test1='Test1', test2='Test2'))
-        self.check_output("""
+        self.checkOutput("""
         r1,
         MYUID,
         <RuntimeData MYUID, value='Test Value', extracted=<UNSET> at ...>,
@@ -220,7 +219,7 @@ class TestBase(NodeTestCase):
             test_getter,
             dict(test1='Test1', test2='Test2'),
             mode='display')
-        self.check_output("""
+        self.checkOutput("""
         disr1,
         MYUID,
         <RuntimeData MYUID, value='Test Value', extracted=<UNSET> at ...>,
@@ -251,7 +250,7 @@ class TestBase(NodeTestCase):
             test_getter,
             dict(test1='Test1', test2='Test2'),
             mode='display')
-        err = self.expect_error(ValueError, testwidget)
+        err = self.expectError(ValueError, testwidget)
         msg = "no renderers given for widget 'MYUID' at mode 'display'"
         self.assertEqual(str(err), msg)
 
@@ -265,7 +264,7 @@ class TestBase(NodeTestCase):
             'MYUID2',
             test_getter,
             dict(test1='Test1', test2='Test2'))
-        self.check_output("""
+        self.checkOutput("""
         r2,
         MYUID2,
         <RuntimeData MYUID2, value='Test Value', extracted=<UNSET> at ...>,
@@ -283,7 +282,7 @@ class TestBase(NodeTestCase):
             test_getter2,
             dict(test1='Test1', test2='Test2'))
 
-        self.check_output("""
+        self.checkOutput("""
         <RuntimeData MYUID2, value=999, extracted=<UNSET>, 1 error(s) at ...>
         """, str(testwidget.extract({'MYUID2': 'ABC'})))
 
@@ -298,7 +297,7 @@ class TestBase(NodeTestCase):
             test_getter2,
             dict(test1='Test1', test2='Test2'),
             mode='display')
-        self.check_output("""
+        self.checkOutput("""
         <RuntimeData MYUID2, value=999, extracted=<UNSET> ...>
         """, str(testwidget.extract({'MYUID2': '123'})))
 
@@ -312,7 +311,7 @@ class TestBase(NodeTestCase):
             'MYUID2',
             test_getter2,
             dict(test1='Test1', test2='Test2'))
-        self.check_output("""
+        self.checkOutput("""
         <RuntimeData MYUID2, value=999, extracted=123 at ...>
         """, str(testwidget.extract({'MYUID2': '123'})))
 
@@ -330,7 +329,7 @@ class TestBase(NodeTestCase):
         try:
             testwidget.extract({})
         except Exception:
-            self.check_output("""
+            self.checkOutput("""
             Traceback (most recent call last):
             ...
                 data.extracted = extractor(self, data)
@@ -348,7 +347,7 @@ class TestBase(NodeTestCase):
         try:
             testwidget()
         except Exception:
-            self.check_output("""
+            self.checkOutput("""
             Traceback (most recent call last):
             ...
                 yafowil widget processing info:
@@ -363,7 +362,7 @@ class TestBase(NodeTestCase):
             raise Exception('Exception expected but not thrown')
 
         # Plausability
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             testwidget,
             data=data,
@@ -376,7 +375,7 @@ class TestBase(NodeTestCase):
 
         # Fails with no name in root
         testwidget = Widget('blueprint_names_goes_here', [], [], [], [])
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             lambda: testwidget.dottedpath
         )
@@ -427,7 +426,7 @@ class TestBase(NodeTestCase):
             [], [], [], [],
             uniquename='root',
             mode='other')
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             testwidget.extract,
             {}
@@ -490,7 +489,7 @@ class TestBase(NodeTestCase):
             [],
             [])
 
-        self.check_output("""
+        self.checkOutput("""
         <class 'yafowil.base.Widget'>: root
         <class 'yafowil.base.Widget'>: child_0
         <class 'yafowil.base.Widget'>: child_1
@@ -500,7 +499,7 @@ class TestBase(NodeTestCase):
             'root.child_0': 'a',
             'root.child_1': 'b',
         })
-        self.check_output("""
+        self.checkOutput("""
         <RuntimeData root, value=<UNSET>, extracted=None at ...>
         <RuntimeData root.child_0,
             value=<UNSET>, extracted='a' at ...>
@@ -530,7 +529,7 @@ class TestBase(NodeTestCase):
             name='MYFAC',
             value=test_getter,
             props=dict(foo='bar'))
-        self.check_output("""
+        self.checkOutput("""
         r1,
         MYFAC,
         <RuntimeData MYFAC, value='Test Value', extracted=<UNSET> at ...>,
@@ -580,13 +579,13 @@ class TestBase(NodeTestCase):
         )
 
         # Some basic name checks are done
-        err = self.expect_error(ValueError, factory._name_check, '*notallowed')
+        err = self.expectError(ValueError, factory._name_check, '*notallowed')
         self.assertEqual(str(err), '"*" as char not allowed as name.')
 
-        err = self.expect_error(ValueError, factory._name_check, 'not:allowed')
+        err = self.expectError(ValueError, factory._name_check, 'not:allowed')
         self.assertEqual(str(err), '":" as char not allowed as name.')
 
-        err = self.expect_error(ValueError, factory._name_check, '#notallowed')
+        err = self.expectError(ValueError, factory._name_check, '#notallowed')
         self.assertEqual(str(err), '"#" as char not allowed as name.')
 
         # Test the macros
@@ -612,7 +611,7 @@ class TestBase(NodeTestCase):
             )
         )
 
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             factory._expand_blueprints,
             '#nonexisting', {}
@@ -745,7 +744,7 @@ class TestBase(NodeTestCase):
         widget = factory('widget_test', name='root')
         widget['1'] = factory('widget_test')
         widget['2'] = factory('widget_test')
-        self.check_output("""
+        self.checkOutput("""
         <class 'yafowil.base.Widget'>: root
         <class 'yafowil.base.Widget'>: 1
         <class 'yafowil.base.Widget'>: 2
@@ -756,7 +755,7 @@ class TestBase(NodeTestCase):
         widget.insertbefore(new, ref)
         new = factory('widget_test', name='4')
         widget.insertafter(new, ref)
-        self.check_output("""
+        self.checkOutput("""
         <class 'yafowil.base.Widget'>: root
         <class 'yafowil.base.Widget'>: 3
         <class 'yafowil.base.Widget'>: 1
@@ -816,7 +815,7 @@ class TestBase(NodeTestCase):
             factory.edit_renderers('inner'),
             [inner_renderer]
         )
-        err = self.expect_error(
+        err = self.expectError(
             RuntimeError,
             factory.renderers,
             'inner'
@@ -1057,7 +1056,7 @@ class TestBase(NodeTestCase):
         suppl = TBSupplementWidget(
             mock, lambda x: x, 'testtask', 'some description')
 
-        self.check_output("""
+        self.checkOutput("""
         yafowil widget processing info:
             - path      : (name not set)
             - blueprints: blue:prints:here
@@ -1072,7 +1071,7 @@ class TestBase(NodeTestCase):
         suppl = TBSupplementWidget(mock, lambda x: x, 'testtask',
                                    'some description')
 
-        self.check_output("""
+        self.checkOutput("""
         yafowil widget processing info:
             - path      : test.path.abc
             - blueprints: blue:prints:here
@@ -1080,7 +1079,7 @@ class TestBase(NodeTestCase):
             - descr     : some description
         """, suppl.getInfo())
 
-        self.check_output("""
+        self.checkOutput("""
         <p>yafowil widget processing info:<ul><li>path:
         <strong>test.path.abc</strong></li><li>blueprints:
         <strong>blue:prints:here</strong></li><li>task:

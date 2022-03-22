@@ -1,7 +1,4 @@
 #!/bin/bash
-# Author: Robert Niederreiter <rnix@squarewave.at>
-# License: no license
-# Date: 2014-07-20
 #
 # Requirements:
 #     - python lingua (sudo pip install lingua)
