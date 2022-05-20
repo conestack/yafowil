@@ -673,7 +673,8 @@ class TestBase(NodeTestCase):
                 'thirdparty': False,
                 'resource': 'default/widget.js',
                 'order': 10
-            }]
+            }],
+            'resources': None
         })
 
         # Set theme on factory
@@ -691,7 +692,8 @@ class TestBase(NodeTestCase):
                 'thirdparty': False,
                 'resource': 'custom/widget.js',
                 'order': 10
-            }]
+            }],
+            'resources': None
         })
 
         # If no resources found for theme name, return default resources
@@ -709,7 +711,8 @@ class TestBase(NodeTestCase):
                 'thirdparty': False,
                 'resource': 'default/widget.js',
                 'order': 10
-            }]
+            }],
+            'resources': None
         })
 
         # If no resources registered at all for widget, None is returned

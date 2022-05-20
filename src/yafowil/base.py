@@ -589,14 +589,19 @@ class Factory(object):
         self._macros[name] = blueprints, props
 
     def register_theme(self, themename, widgetname,
-                       resourcedir=None, js=[], css=[]):
+                       resourcedir=None, js=[], css=[], resources=None):
         """Register theme for addon widget.
+
+        B/C registration is done using ``resourcedir``, ``js`` and ``css``
+        New way for registration is passing a webresource.ResourceGroup as
+        ``resources`` keyword argument.
         """
         theme = self._themes.setdefault(themename, {})
         widget_theme = theme.setdefault(widgetname, {})
         widget_theme['resourcedir'] = resourcedir
         widget_theme['js'] = js
         widget_theme['css'] = css
+        widget_theme['resources'] = resources
 
     def resources_for(self, widgetname, copy_resources=True):
         theme = self._themes.get(self.theme, {})
