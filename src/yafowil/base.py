@@ -7,15 +7,16 @@ from node.behaviors import MappingNode
 from node.behaviors import NodeAttributes
 from node.behaviors import OdictStorage
 from node.behaviors import Order
-from node.utils import instance_property
 from node.utils import UNSET
+from node.utils import instance_property
 from plumber import plumbing
 from threading import RLock
 from yafowil.compat import ITER_TYPES
 from yafowil.compat import STR_TYPE
-from yafowil.utils import attr_value
 from yafowil.utils import Tag
+from yafowil.utils import attr_value
 import copy
+import webresource as wr
 
 
 def _dict__repr__(self):
@@ -566,8 +567,15 @@ class Factory(object):
                     '"{0}" as char not allowed as name.'.format(chara)
                 )
 
-    def register(self, name, extractors=[], edit_renderers=[],
-                 preprocessors=[], builders=[], display_renderers=[]):
+    def register(
+        self,
+        name,
+        extractors=[],
+        edit_renderers=[],
+        preprocessors=[],
+        builders=[],
+        display_renderers=[]
+    ):
         """Registers a blueprint in the factory.
         """
         self._name_check(name)
@@ -588,22 +596,45 @@ class Factory(object):
             blueprints = blueprints.split(':')
         self._macros[name] = blueprints, props
 
-    def register_theme(self, themename, widgetname,
-                       resourcedir=None, js=[], css=[], resources=None):
+    def register_theme(
+        self,
+        themename,
+        widgetname,
+        resourcedir=None,
+        js=[],
+        css=[],
+        resources=None
+    ):
         """Register theme for addon widget.
 
         B/C registration is done using ``resourcedir``, ``js`` and ``css``
         New way for registration is passing a webresource.ResourceGroup as
         ``resources`` keyword argument.
+
+        :param themename: String or list of strings with theme names.
+        :param widgetname: String containing the widget name.
+        :param resourcedir: B/C registration resource directory.
+        :param js: B/C registration list of widget related javascripts.
+        :param css: B/C registration list of widget related stylesheets.
+        :param resources: webresource.ResourceGroup containing two
+            subsubsequent resource groups with name 'styles' and 'scripts'.
         """
-        theme = self._themes.setdefault(themename, {})
-        widget_theme = theme.setdefault(widgetname, {})
-        widget_theme['resourcedir'] = resourcedir
-        widget_theme['js'] = js
-        widget_theme['css'] = css
-        widget_theme['resources'] = resources
+        themenames = (
+            [themename]
+            if isinstance(themename, (list, tuple))
+            else themename
+        )
+        for name in themenames:
+            theme = self._themes.setdefault(name, {})
+            widget_theme = theme.setdefault(widgetname, {})
+            widget_theme['resourcedir'] = resourcedir
+            widget_theme['js'] = js
+            widget_theme['css'] = css
+            widget_theme['resources'] = resources
 
     def resources_for(self, widgetname, copy_resources=True):
+        """B/C resources lookup.
+        """
         theme = self._themes.get(self.theme, {})
         default = self._themes.get('default', {})
         resources = theme.get(widgetname)
@@ -613,6 +644,24 @@ class Factory(object):
         if copy_resources:
             return copy.deepcopy(resources)
         return resources
+
+    def register_scripts(self):
+        pass
+
+    def register_styles(self):
+        pass
+
+    @property
+    def script_resources(self):
+        theme = self._themes.get(self.theme, {})
+        default = self._themes.get('default', {})
+        scripts = wr.ResourceGroup(name='scripts')
+
+    @property
+    def style_resources(self):
+        theme = self._themes.get(self.theme, {})
+        default = self._themes.get('default', {})
+        styles = wr.ResourceGroup(name='styles')
 
     def _expand_blueprints(self, blueprints, props):
         result = list()
@@ -637,12 +686,15 @@ class Factory(object):
                 result.append(blueprint)
         return result, props
 
-    def __call__(self, blueprints,
-                 name=None,
-                 value=UNSET,
-                 props=dict(),
-                 custom=dict(),
-                 mode="edit"):
+    def __call__(
+        self,
+        blueprints,
+        name=None,
+        value=UNSET,
+        props=dict(),
+        custom=dict(),
+        mode='edit'
+    ):
         """Creates a widget from blueprints.
 
         ``blueprints``
