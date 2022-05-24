@@ -616,38 +616,38 @@ class Factory(object):
             return copy.deepcopy(resources)
         return resources
 
-    def register_scripts(self, themename, widgetname, scripts):
+    def register_scripts(self, theme_name, widget_name, scripts):
         """Register resource group containing theme related scripts for widget.
 
-        :param themename: String or list of strings with theme names.
-        :param widgetname: The widget name as string
+        :param theme_name: String or list of strings with theme names.
+        :param widget_name: The widget name as string
         :param scripts: webresource.ResourceGroup containing script resources.
         """
-        themenames = (
-            themename
-            if isinstance(themename, (list, tuple))
-            else [themename]
+        theme_names = (
+            theme_name
+            if isinstance(theme_name, (list, tuple))
+            else [theme_name]
         )
-        for name in themenames:
+        for name in theme_names:
             theme = self._themes.setdefault(name, {})
-            widget_theme = theme.setdefault(widgetname, {})
+            widget_theme = theme.setdefault(widget_name, {})
             widget_theme['scripts'] = scripts
 
-    def register_styles(self, themename, widgetname, styles):
+    def register_styles(self, theme_name, widget_name, styles):
         """Register resource group containing theme related styles for widget.
 
-        :param themename: String or list of strings with theme names.
-        :param widgetname: The widget name as string
+        :param theme_name: String or list of strings with theme names.
+        :param widget_name: The widget name as string
         :param styles: webresource.ResourceGroup containing style resources.
         """
-        themenames = (
-            themename
-            if isinstance(themename, (list, tuple))
-            else [themename]
+        theme_names = (
+            theme_name
+            if isinstance(theme_name, (list, tuple))
+            else [theme_name]
         )
-        for name in themenames:
+        for name in theme_names:
             theme = self._themes.setdefault(name, {})
-            widget_theme = theme.setdefault(widgetname, {})
+            widget_theme = theme.setdefault(widget_name, {})
             widget_theme['styles'] = styles
 
     def script_resources(self, widget_name=None):
@@ -656,17 +656,9 @@ class Factory(object):
         :param widget_name: The widget name. If None, all registered resources
             are returned.
         """
-        if not widget_name:
-            return self._get_all_resources('scripts')
-        theme = self._themes.get(self.theme, {})
-        default = self._themes.get('default', {})
-        return theme.get(
-            widget_name,
-            default.get(
-                widget_name,
-                wr.ResourceGroup(name='scripts')
-            )
-        )
+        if widget_name:
+            return self._get_widget_resources('scripts', widget_name)
+        return self._get_all_resources('scripts')
 
     def style_resources(self, widget_name=None):
         """Style resources lookup.
@@ -674,36 +666,30 @@ class Factory(object):
         :param widget_name: The widget name. If None, all registered resources
             are returned.
         """
-        if not widget_name:
-            return self._get_all_resources('styles')
-        theme = self._themes.get(self.theme, {})
-        default = self._themes.get('default', {})
-        return theme.get(
-            widget_name,
-            default.get(
-                widget_name,
-                wr.ResourceGroup(name='styles')
-            )
-        )
+        if widget_name:
+            return self._get_widget_resources('styles', widget_name)
+        return self._get_all_resources('styles')
 
     def _get_all_resources(self, resource_type):
-        theme = self._themes.get(self.theme, {})
-        default = self._themes.get('default', {})
         widget_names = set()
-        widget_names.update(theme)
-        widget_names.update(default)
+        for theme in self._themes.values():
+            widget_names.update(theme)
         resources = wr.ResourceGroup(name=resource_type)
         for widget_name in sorted(widget_names):
-            widget_theme = theme.get(widget_name, default.get(widget_name))
-            if not widget_theme:
-                continue
-            widget_resources = widget_theme.get(
+            resources.add(self._get_widget_resources(
                 resource_type,
-                wr.ResourceGroup()
-            )
-            for resource in widget_resources.members:
-                resources.add(resource)
+                widget_name
+            ))
         return resources
+
+    def _get_widget_resources(self, resource_type, widget_name):
+        theme = self._themes.get(self.theme, {})
+        default = self._themes.get('default', {})
+        widget_theme = theme.get(widget_name, default.get(widget_name, {}))
+        return widget_theme.get(
+            resource_type,
+            wr.ResourceGroup(name=resource_type)
+        )
 
     def _expand_blueprints(self, blueprints, props):
         result = list()

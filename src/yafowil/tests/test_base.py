@@ -2,11 +2,12 @@ from node.tests import NodeTestCase
 from node.utils import UNSET
 from yafowil.base import ExtractionError
 from yafowil.base import Factory
+from yafowil.base import fetch_value
 from yafowil.base import RuntimeData
 from yafowil.base import TBSupplementWidget
 from yafowil.base import Widget
-from yafowil.base import fetch_value
 import traceback
+import webresource as wr
 
 
 ###############################################################################
@@ -626,7 +627,7 @@ class TestBase(NodeTestCase):
             (['alpha', 'foo', '*bar', 'baz', 'beta'], {'foo.newprop': 'abc'})
         )
 
-    def test_theme_registry(self):
+    def test_BC_theme_registry(self):
         # Theme to use
         factory = Factory()
         self.assertEqual(factory.theme, 'default')
@@ -636,31 +637,39 @@ class TestBase(NodeTestCase):
             'default',
             'yafowil.widget.someaddon',
             '/foo/bar/resources',
-            js=[{'resource': 'default/widget.js',
-                 'thirdparty': False,
-                 'order': 10,
-                 'merge': False}],
-            css=[{'resource': 'default/widget.css',
-                  'thirdparty': False,
-                  'order': 10,
-                  'merge': False}])
+            js=[{
+                'resource': 'default/widget.js',
+                'thirdparty': False,
+                'order': 10,
+                'merge': False
+            }],
+            css=[{
+                'resource': 'default/widget.css',
+                'thirdparty': False,
+                'order': 10,
+                'merge': False
+            }])
 
-        # Register addon widget resources for custom theme
+        # Register addon widget resources for multiple themes
         factory.register_theme(
-            'custom',
+            ['custom', 'other'],
             'yafowil.widget.someaddon',
             '/foo/bar/resources',
-            js=[{'resource': 'custom/widget.js',
-                 'thirdparty': False,
-                 'order': 10,
-                 'merge': False}],
-            css=[{'resource': 'custom/widget.css',
-                  'thirdparty': False,
-                  'order': 10,
-                  'merge': False}])
+            js=[{
+                'resource': 'custom/widget.js',
+                'thirdparty': False,
+                'order': 10,
+                'merge': False
+            }],
+            css=[{
+                'resource': 'custom/widget.css',
+                'thirdparty': False,
+                'order': 10,
+                'merge': False
+            }])
 
         # Lookup resouces for addon widget
-        self.assertEqual(factory.resources_for('yafowil.widget.someaddon'), {
+        default_resources = {
             'resourcedir': '/foo/bar/resources',
             'css': [{
                 'merge': False,
@@ -673,13 +682,16 @@ class TestBase(NodeTestCase):
                 'thirdparty': False,
                 'resource': 'default/widget.js',
                 'order': 10
-            }],
-            'resources': None
-        })
+            }]
+        }
+        self.assertEqual(
+            factory.resources_for('yafowil.widget.someaddon'),
+            default_resources
+        )
 
         # Set theme on factory
         factory.theme = 'custom'
-        self.assertEqual(factory.resources_for('yafowil.widget.someaddon'), {
+        theme_resources = {
             'resourcedir': '/foo/bar/resources',
             'css': [{
                 'merge': False,
@@ -692,28 +704,26 @@ class TestBase(NodeTestCase):
                 'thirdparty': False,
                 'resource': 'custom/widget.js',
                 'order': 10
-            }],
-            'resources': None
-        })
+            }]
+        }
+        self.assertEqual(
+            factory.resources_for('yafowil.widget.someaddon'),
+            theme_resources
+        )
+
+        # resources also have been registered for 'other' theme
+        factory.theme = 'other'
+        self.assertEqual(
+            factory.resources_for('yafowil.widget.someaddon'),
+            theme_resources
+        )
 
         # If no resources found for theme name, return default resources
         factory.theme = 'inexistent'
-        self.assertEqual(factory.resources_for('yafowil.widget.someaddon'), {
-            'resourcedir': '/foo/bar/resources',
-            'css': [{
-                'merge': False,
-                'thirdparty': False,
-                'resource': 'default/widget.css',
-                'order': 10
-            }],
-            'js': [{
-                'merge': False,
-                'thirdparty': False,
-                'resource': 'default/widget.js',
-                'order': 10
-            }],
-            'resources': None
-        })
+        self.assertEqual(
+            factory.resources_for('yafowil.widget.someaddon'),
+            default_resources
+        )
 
         # If no resources registered at all for widget, None is returned
         factory.theme = 'default'
@@ -730,10 +740,128 @@ class TestBase(NodeTestCase):
 
         # Some might want the resource definitions as original instance
         resources = factory.resources_for(
-            'yafowil.widget.someaddon', copy_resources=False)
-        self.assertTrue(
-            resources is factory.resources_for(
-                'yafowil.widget.someaddon', copy_resources=False)
+            'yafowil.widget.someaddon',
+            copy_resources=False
+        )
+        self.assertTrue(resources is factory.resources_for(
+            'yafowil.widget.someaddon',
+            copy_resources=False
+        ))
+
+    def test_theme_registry(self):
+        factory = Factory()
+        self.assertEqual(factory.theme, 'default')
+
+        default_scripts = wr.ResourceGroup(name='default-scripts')
+        default_scripts.add(wr.ScriptResource(
+            name='script',
+            resource='default-script.js'
+        ))
+        factory.register_scripts('default', 'widget', default_scripts)
+
+        default_styles = wr.ResourceGroup(name='default-styles')
+        default_styles.add(wr.StyleResource(
+            name='style',
+            resource='default-style.css'
+        ))
+        factory.register_styles('default', 'widget', default_styles)
+
+        theme_scripts = wr.ResourceGroup(name='theme-scripts')
+        theme_scripts.add(wr.ScriptResource(
+            name='script-2',
+            resource='theme-script.js'
+        ))
+        factory.register_scripts('theme', 'widget', theme_scripts)
+
+        theme_styles = wr.ResourceGroup(name='theme-styles')
+        theme_styles.add(wr.StyleResource(
+            name='style',
+            resource='theme-style.css'
+        ))
+        factory.register_styles('theme', 'widget', theme_styles)
+
+        resources = factory.script_resources(widget_name='widget')
+        self.assertEqual(len(resources.members), 1)
+        self.assertEqual(resources.members[0].resource, 'default-script.js')
+
+        resources = factory.style_resources(widget_name='widget')
+        self.assertEqual(len(resources.members), 1)
+        self.assertEqual(resources.members[0].resource, 'default-style.css')
+
+        factory.theme = 'theme'
+        resources = factory.script_resources(widget_name='widget')
+        self.assertEqual(len(resources.members), 1)
+        self.assertEqual(resources.members[0].resource, 'theme-script.js')
+
+        resources = factory.style_resources(widget_name='widget')
+        self.assertEqual(len(resources.members), 1)
+        self.assertEqual(resources.members[0].resource, 'theme-style.css')
+
+        other_scripts = wr.ResourceGroup(name='other-scripts')
+        other_scripts.add(wr.ScriptResource(
+            name='other-script',
+            resource='other-script.js'
+        ))
+        factory.register_scripts(['default', 'other'], 'other', other_scripts)
+
+        other_styles = wr.ResourceGroup(name='other-styles')
+        other_styles.add(wr.StyleResource(
+            name='other-style',
+            resource='other-style.css'
+        ))
+        factory.register_styles(['default', 'other'], 'other', other_styles)
+
+        resources = factory.script_resources()
+        self.assertEqual(len(resources.members), 2)
+        self.assertEqual(len(resources.members[0].members), 1)
+        self.assertEqual(len(resources.members[1].members), 1)
+        self.assertEqual(
+            resources.members[0].members[0].resource,
+            'other-script.js'
+        )
+        self.assertEqual(
+            resources.members[1].members[0].resource,
+            'theme-script.js'
+        )
+
+        resources = factory.style_resources()
+        self.assertEqual(len(resources.members), 2)
+        self.assertEqual(len(resources.members[0].members), 1)
+        self.assertEqual(len(resources.members[1].members), 1)
+        self.assertEqual(
+            resources.members[0].members[0].resource,
+            'other-style.css'
+        )
+        self.assertEqual(
+            resources.members[1].members[0].resource,
+            'theme-style.css'
+        )
+
+        factory.theme = 'other'
+        resources = factory.script_resources()
+        self.assertEqual(len(resources.members), 2)
+        self.assertEqual(len(resources.members[0].members), 1)
+        self.assertEqual(len(resources.members[1].members), 1)
+        self.assertEqual(
+            resources.members[0].members[0].resource,
+            'other-script.js'
+        )
+        self.assertEqual(
+            resources.members[1].members[0].resource,
+            'default-script.js'
+        )
+
+        resources = factory.style_resources()
+        self.assertEqual(len(resources.members), 2)
+        self.assertEqual(len(resources.members[0].members), 1)
+        self.assertEqual(len(resources.members[1].members), 1)
+        self.assertEqual(
+            resources.members[0].members[0].resource,
+            'other-style.css'
+        )
+        self.assertEqual(
+            resources.members[1].members[0].resource,
+            'default-style.css'
         )
 
     def test_widget_tree_manipulation(self):
