@@ -172,12 +172,9 @@ class ExtractionError(Exception):
     def __init__(self, msg, abort=True):
         """Initialize Exception
 
-        ``msg``
-            error message - usally best unicode in one-liner style.
-
-        ``abort``
-            if True the extraction chain continues. Default to False, which
-            stops extraction.
+        :param msg: error message - usally best unicode in one-liner style.
+        :param abort: If True the extraction chain continues. Default to False,
+            which stops extraction.
         """
         Exception.__init__(self, msg)
         self.msg = msg
@@ -282,58 +279,38 @@ class Widget(object):
                  mode='edit'):
         """Initialize the widget.
 
-        ``blueprints``
-            The blueprint names used to create this widget as list of strings.
-
-        ``extractors``
-            list of tuples with chain part name and callables extracting the
-            data and returning it. Each extractor in chain is called. Expects
-            to raise ``ExtractionException`` and provide error-message if
-            something went wrong. You can call this validation.
+        :param blueprints: The blueprint names used to create this widget as
+            list of strings.
+        :param extractors: list of tuples with chain part name and callables
+            extracting the data and returning it. Each extractor in chain is
+            called. Expects to raise ``ExtractionException`` and provide
+            error-message if something went wrong. You can call this validation.
             Need to accept some ``request`` (dict like object), ``value``
             (same as while rendering), ``uniquename`` and ``properties``, a
             dict-like. Properties gets a key ``extracted`` set, a list of
             results of previous extractors in chain-
-
-        ``edit_renderers``
-            list of tuples with chain part name and callable rendering widget
-            in edit mode. Callable need to accept ``value``, ``uniquename`` and
-            properties as dict-like. Properties gets a key ``rendered`` set, a
-            list of results  of previous extractors in chain. Has same
-            signature as extract.
-
-        ``display_renderers``
-            list of tuples with chain part name and callable rendering widget
-            in display mode. Callable need to accept ``value``, ``uniquename``
-            and properties as dict-like. Properties gets a key ``rendered``
-            set, a list of results of previous extractors in chain. Has same
-            signature as extract.
-
-        ``preprocessors``
-            list of tuples with chain part name and callable executed before
-            extract or rendering. Executed only once for a given runtime data.
-            Has same signature a s extract.
-
-        ``uniquename``
-            id as string containing characters from a-z, A-Z, 0-9 only. Must
-            not start with numerical character.
-
-        ``value_or_getter``
-            either a callable or the value itself. If callable, its called
-            before passing to given ``renderer`` .
-
-        ``properties``
-            arbitrary dict-like passed through for use in renderer and
-            extractor, static data must never be modifed!
-
-        ``custom``
-            Definitions for custom factory chain parts.
-
-        ``defaults``
-            a dict with defaults value for the widgets attributes.
-
-        ``mode``
-            Rendering mode of widget: One out of ``edit``, ``display``,
+        :param edit_renderers: List of tuples with chain part name and callable
+            rendering widget in edit mode. Callable need to accept ``value``,
+            ``uniquename`` and properties as dict-like. Properties gets a key
+            ``rendered`` set, a list of results  of previous extractors in
+            chain. Has same signature as extract.
+        :param display_renderers: List of tuples with chain part name and
+            callable rendering widget in display mode. Callable need to accept
+            ``value``, ``uniquename`` and properties as dict-like. Properties
+            gets a key ``rendered`` set, a list of results of previous
+            extractors in chain. Has same signature as extract.
+        :param preprocessors: List of tuples with chain part name and callable
+            executed before extract or rendering. Executed only once for a
+            given runtime data. Has same signature a s extract.
+        :param uniquename: Id as string containing characters from a-z, A-Z,
+            0-9 only. Must not start with numerical character.
+        :param value_or_getter: Either a callable or the value itself. If
+            callable, its called before passing to given ``renderer`` .
+        :param properties: Arbitrary dict-like passed through for use in
+            renderer and extractor, static data must never be modifed!
+        :param custom: Definitions for custom factory chain parts.
+        :param defaults: A dict with defaults value for the widgets attributes.
+        :param mode: Rendering mode of widget: One out of ``edit``, ``display``,
             ``skip``.  Default is ``edit`` Expects string or callable accepting
             two parameters  ``widget`` and ``data``.
         """
@@ -360,16 +337,13 @@ class Widget(object):
         If data is passed in request is ignored! Request can't be passed in
         together with data.
 
-        ``data``
-            runtime data, information collected in one run of the widget.
-            If passed in, extract need to be called separate before.
+        :param data: Runtime data, information collected in one run of the
+            widget. If passed in, extract need to be called separate before.
             Expects either an initialized RuntimeData instance or None
             (default) to create an empty widget.
-
-        ``request``
-            pass in request. if passed in it will be available at data.
-            but extraction does not happen. call extract explicit before if
-            needed.
+        :param request: Pass in request. if passed in it will be available at
+            data. but extraction does not happen. call extract explicit before
+            if needed.
         """
         if data is not None and request is not None:
             raise ValueError("if data is passed in, don't pass in request!")
@@ -416,11 +390,8 @@ class Widget(object):
     def extract(self, request, parent=None):
         """Extract the data from the request by calling the given extractors.
 
-        ``request``
-            expects a dict-like object
-
-        ``parent``
-            parent data
+        :param request: Expects a dict-like object
+        :param parent: Parent data
         """
         data = self._runpreprocessors(RuntimeData(
             name=self.name,
@@ -602,27 +573,23 @@ class Factory(object):
         widgetname,
         resourcedir=None,
         js=[],
-        css=[],
-        resources=None
+        css=[]
     ):
-        """Register theme for addon widget.
+        """B/C resources registration for addon widgets.
 
-        B/C registration is done using ``resourcedir``, ``js`` and ``css``
-        New way for registration is passing a webresource.ResourceGroup as
-        ``resources`` keyword argument.
+        This function will be deprecated as of yafowil 4.0 and removed in a
+        later version.
 
         :param themename: String or list of strings with theme names.
-        :param widgetname: String containing the widget name.
-        :param resourcedir: B/C registration resource directory.
-        :param js: B/C registration list of widget related javascripts.
-        :param css: B/C registration list of widget related stylesheets.
-        :param resources: webresource.ResourceGroup containing two
-            subsubsequent resource groups with name 'styles' and 'scripts'.
+        :param widgetname: The widget name as string
+        :param resourcedir: Registration resource directory.
+        :param js: Registration list of widget related javascripts.
+        :param css: Registration list of widget related stylesheets.
         """
         themenames = (
-            [themename]
+            themename
             if isinstance(themename, (list, tuple))
-            else themename
+            else [themename]
         )
         for name in themenames:
             theme = self._themes.setdefault(name, {})
@@ -630,10 +597,14 @@ class Factory(object):
             widget_theme['resourcedir'] = resourcedir
             widget_theme['js'] = js
             widget_theme['css'] = css
-            widget_theme['resources'] = resources
 
     def resources_for(self, widgetname, copy_resources=True):
         """B/C resources lookup.
+
+        This function will be deprecated as of yafowil 4.0 and removed in a
+        later version.
+
+        :param widgetname: The widget name as string
         """
         theme = self._themes.get(self.theme, {})
         default = self._themes.get('default', {})
@@ -645,23 +616,94 @@ class Factory(object):
             return copy.deepcopy(resources)
         return resources
 
-    def register_scripts(self):
-        pass
+    def register_scripts(self, themename, widgetname, scripts):
+        """Register resource group containing theme related scripts for widget.
 
-    def register_styles(self):
-        pass
+        :param themename: String or list of strings with theme names.
+        :param widgetname: The widget name as string
+        :param scripts: webresource.ResourceGroup containing script resources.
+        """
+        themenames = (
+            themename
+            if isinstance(themename, (list, tuple))
+            else [themename]
+        )
+        for name in themenames:
+            theme = self._themes.setdefault(name, {})
+            widget_theme = theme.setdefault(widgetname, {})
+            widget_theme['scripts'] = scripts
 
-    @property
-    def script_resources(self):
+    def register_styles(self, themename, widgetname, styles):
+        """Register resource group containing theme related styles for widget.
+
+        :param themename: String or list of strings with theme names.
+        :param widgetname: The widget name as string
+        :param styles: webresource.ResourceGroup containing style resources.
+        """
+        themenames = (
+            themename
+            if isinstance(themename, (list, tuple))
+            else [themename]
+        )
+        for name in themenames:
+            theme = self._themes.setdefault(name, {})
+            widget_theme = theme.setdefault(widgetname, {})
+            widget_theme['styles'] = styles
+
+    def script_resources(self, widget_name=None):
+        """Script resources lookup.
+
+        :param widget_name: The widget name. If None, all registered resources
+            are returned.
+        """
+        if not widget_name:
+            return self._get_all_resources('scripts')
         theme = self._themes.get(self.theme, {})
         default = self._themes.get('default', {})
-        scripts = wr.ResourceGroup(name='scripts')
+        return theme.get(
+            widget_name,
+            default.get(
+                widget_name,
+                wr.ResourceGroup(name='scripts')
+            )
+        )
 
-    @property
-    def style_resources(self):
+    def style_resources(self, widget_name=None):
+        """Style resources lookup.
+
+        :param widget_name: The widget name. If None, all registered resources
+            are returned.
+        """
+        if not widget_name:
+            return self._get_all_resources('styles')
         theme = self._themes.get(self.theme, {})
         default = self._themes.get('default', {})
-        styles = wr.ResourceGroup(name='styles')
+        return theme.get(
+            widget_name,
+            default.get(
+                widget_name,
+                wr.ResourceGroup(name='styles')
+            )
+        )
+
+    def _get_all_resources(self, resource_type):
+        theme = self._themes.get(self.theme, {})
+        default = self._themes.get('default', {})
+        widget_names = set()
+        widget_names.update(theme)
+        widget_names.update(default)
+        resources = wr.ResourceGroup(name=resource_type)
+        for widget_name in sorted(widget_names):
+            widget_theme = theme.get(widget_name, default.get(widget_name))
+            if not widget_theme:
+                continue
+            widget_resources = widget_theme.get(
+                resource_type,
+                wr.ResourceGroup()
+            )
+            for resource in widget_resources.members:
+                resources.add(resource)
+        return resources
 
     def _expand_blueprints(self, blueprints, props):
         result = list()
