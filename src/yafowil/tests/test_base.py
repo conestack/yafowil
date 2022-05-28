@@ -752,115 +752,94 @@ class TestBase(NodeTestCase):
         factory = Factory()
         self.assertEqual(factory.theme, 'default')
 
-        default_scripts = wr.ResourceGroup(name='default-scripts')
-        default_scripts.add(wr.ScriptResource(
+        default_resources = wr.ResourceGroup(name='default-resources')
+        default_resources.add(wr.ScriptResource(
             name='script',
             resource='default-script.js'
         ))
-        factory.register_scripts('default', 'widget', default_scripts)
-
-        default_styles = wr.ResourceGroup(name='default-styles')
-        default_styles.add(wr.StyleResource(
+        default_resources.add(wr.StyleResource(
             name='style',
             resource='default-style.css'
         ))
-        factory.register_styles('default', 'widget', default_styles)
+        factory.register_resources('default', 'widget', default_resources)
 
-        theme_scripts = wr.ResourceGroup(name='theme-scripts')
-        theme_scripts.add(wr.ScriptResource(
+        theme_resources = wr.ResourceGroup(name='theme-resources')
+        theme_resources.add(wr.ScriptResource(
             name='script-2',
             resource='theme-script.js'
         ))
-        factory.register_scripts('theme', 'widget', theme_scripts)
-
-        theme_styles = wr.ResourceGroup(name='theme-styles')
-        theme_styles.add(wr.StyleResource(
+        theme_resources.add(wr.StyleResource(
             name='style',
             resource='theme-style.css'
         ))
-        factory.register_styles('theme', 'widget', theme_styles)
+        factory.register_resources('theme', 'widget', theme_resources)
 
-        resources = factory.script_resources(widget_name='widget')
-        self.assertEqual(len(resources.members), 1)
+        resources = factory.get_resources(widget_name='widget')
+        self.assertEqual(len(resources.members), 2)
         self.assertEqual(resources.members[0].resource, 'default-script.js')
-
-        resources = factory.style_resources(widget_name='widget')
-        self.assertEqual(len(resources.members), 1)
-        self.assertEqual(resources.members[0].resource, 'default-style.css')
+        self.assertEqual(resources.members[1].resource, 'default-style.css')
 
         factory.theme = 'theme'
-        resources = factory.script_resources(widget_name='widget')
-        self.assertEqual(len(resources.members), 1)
+        resources = factory.get_resources(widget_name='widget')
+        self.assertEqual(len(resources.members), 2)
         self.assertEqual(resources.members[0].resource, 'theme-script.js')
+        self.assertEqual(resources.members[1].resource, 'theme-style.css')
 
-        resources = factory.style_resources(widget_name='widget')
-        self.assertEqual(len(resources.members), 1)
-        self.assertEqual(resources.members[0].resource, 'theme-style.css')
-
-        other_scripts = wr.ResourceGroup(name='other-scripts')
-        other_scripts.add(wr.ScriptResource(
+        other_resources = wr.ResourceGroup(name='other-resources')
+        other_resources.add(wr.ScriptResource(
             name='other-script',
             resource='other-script.js'
         ))
-        factory.register_scripts(['default', 'other'], 'other', other_scripts)
-
-        other_styles = wr.ResourceGroup(name='other-styles')
-        other_styles.add(wr.StyleResource(
+        other_resources.add(wr.StyleResource(
             name='other-style',
             resource='other-style.css'
         ))
-        factory.register_styles(['default', 'other'], 'other', other_styles)
+        factory.register_resources(
+            ['default', 'other'],
+            'other',
+            other_resources
+        )
 
-        resources = factory.script_resources()
+        resources = factory.get_resources()
         self.assertEqual(len(resources.members), 2)
-        self.assertEqual(len(resources.members[0].members), 1)
-        self.assertEqual(len(resources.members[1].members), 1)
+        self.assertEqual(len(resources.members[0].members), 2)
+        self.assertEqual(len(resources.members[1].members), 2)
         self.assertEqual(
             resources.members[0].members[0].resource,
             'other-script.js'
+        )
+        self.assertEqual(
+            resources.members[0].members[1].resource,
+            'other-style.css'
         )
         self.assertEqual(
             resources.members[1].members[0].resource,
             'theme-script.js'
         )
-
-        resources = factory.style_resources()
-        self.assertEqual(len(resources.members), 2)
-        self.assertEqual(len(resources.members[0].members), 1)
-        self.assertEqual(len(resources.members[1].members), 1)
         self.assertEqual(
-            resources.members[0].members[0].resource,
-            'other-style.css'
-        )
-        self.assertEqual(
-            resources.members[1].members[0].resource,
+            resources.members[1].members[1].resource,
             'theme-style.css'
         )
 
         factory.theme = 'other'
-        resources = factory.script_resources()
+        resources = factory.get_resources()
         self.assertEqual(len(resources.members), 2)
-        self.assertEqual(len(resources.members[0].members), 1)
-        self.assertEqual(len(resources.members[1].members), 1)
+        self.assertEqual(len(resources.members[0].members), 2)
+        self.assertEqual(len(resources.members[1].members), 2)
         self.assertEqual(
             resources.members[0].members[0].resource,
             'other-script.js'
         )
         self.assertEqual(
-            resources.members[1].members[0].resource,
-            'default-script.js'
-        )
-
-        resources = factory.style_resources()
-        self.assertEqual(len(resources.members), 2)
-        self.assertEqual(len(resources.members[0].members), 1)
-        self.assertEqual(len(resources.members[1].members), 1)
-        self.assertEqual(
-            resources.members[0].members[0].resource,
+            resources.members[0].members[1].resource,
             'other-style.css'
         )
         self.assertEqual(
             resources.members[1].members[0].resource,
+            'default-script.js'
+        )
+        self.assertEqual(
+            resources.members[1].members[1].resource,
             'default-style.css'
         )
 
