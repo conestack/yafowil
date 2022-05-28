@@ -604,7 +604,9 @@ class Factory(object):
         This function will be deprecated as of yafowil 4.0 and removed in a
         later version.
 
-        :param widgetname: The widget name as string
+        :param widgetname: The widget name as string.
+        :param copy_resources: Flag whether to return a copy of the resources.
+            Defaults to True.
         """
         theme = self._themes.get(self.theme, {})
         default = self._themes.get('default', {})
@@ -634,15 +636,21 @@ class Factory(object):
             widget_theme = theme.setdefault(widget_name, {})
             widget_theme['resources'] = resources
 
-    def get_resources(self, widget_name=None):
+    def get_resources(self, widget_name=None, copy_resources=True):
         """Resources lookup.
 
         :param widget_name: The widget name. If None, all registered resources
             are returned.
+        :param copy_resources: Flag whether to return a copy of the resources.
+            Defaults to True.
         """
         if widget_name:
-            return self._get_widget_resources(widget_name)
-        return self._get_all_resources()
+            resources = self._get_widget_resources(widget_name)
+        else:
+            resources = self._get_all_resources()
+        if copy_resources:
+            return copy.deepcopy(resources)
+        return resources
 
     def _get_all_resources(self):
         widget_names = set()
