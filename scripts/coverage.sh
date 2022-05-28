@@ -6,6 +6,7 @@ function run_coverage {
     if [ -e "$target" ]; then
         ./$target/bin/coverage run --source src/yafowil src/yafowil/tests/__init__.py
         ./$target/bin/coverage report
+        ./$target/bin/coverage html
     else
         echo "Target $target not found."
     fi
