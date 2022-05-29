@@ -268,12 +268,9 @@ class TestUtils(YafowilTestCase):
             raise Exception('failing_func_callback')
 
         widget.attrs['attr'] = failing_func_callback
-        err = self.expectError(
-            Exception,
-            attr_value,
-            'attr', widget, data
-        )
-        self.assertEqual(str(err), 'failing_func_callback')
+        with self.assertRaises(Exception) as arc:
+            attr_value('attr', widget, data)
+        self.assertEqual(str(arc.exception), 'failing_func_callback')
 
         class FormContext(object):
             def instance_callback(self, widget, data):
@@ -290,12 +287,9 @@ class TestUtils(YafowilTestCase):
         )
 
         widget.attrs['attr'] = context.failing_instance_callback
-        err = self.expectError(
-            Exception,
-            attr_value,
-            'attr', widget, data
-        )
-        self.assertEqual(str(err), 'failing_instance_callback')
+        with self.assertRaises(Exception) as arc:
+            attr_value('attr', widget, data)
+        self.assertEqual(str(arc.exception), 'failing_instance_callback')
 
     def test_as_data_attrs(self):
         self.assertTrue(as_data_attrs is generic_html5_attrs)
@@ -378,12 +372,9 @@ class TestUtils(YafowilTestCase):
 
     def test_convert_value_to_datatype(self):
         # Unknown string identifier
-        err = self.expectError(
-            KeyError,
-            convert_value_to_datatype,
-            'val', 'inexistent'
-        )
-        self.assertEqual(str(err), "'inexistent'")
+        with self.assertRaises(KeyError) as arc:
+            convert_value_to_datatype('val', 'inexistent')
+        self.assertEqual(str(arc.exception), "'inexistent'")
 
         # Function returns ``EMPTY_VALUE`` marker if value is ``None`` or empty
         # string
@@ -398,14 +389,11 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(converted, b'string')
         self.assertTrue(isinstance(converted, BYTES_TYPE))
 
-        err = self.expectError(
-            UnicodeEncodeError,
-            convert_value_to_datatype,
-            u'äöü', 'str'
-        )
+        with self.assertRaises(UnicodeEncodeError) as arc:
+            convert_value_to_datatype(u'äöü', 'str')
         self.checkOutput("""
         'ascii' codec can't encode character...: ordinal not in range(128)
-        """, str(err))
+        """, str(arc.exception))
 
         # Convert to string by type
         self.assertEqual(convert_value_to_datatype(UNSET, BYTES_TYPE), UNSET)
@@ -414,14 +402,11 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(converted, b'string')
         self.assertTrue(isinstance(converted, BYTES_TYPE))
 
-        err = self.expectError(
-            UnicodeEncodeError,
-            convert_value_to_datatype,
-            u'äöü', BYTES_TYPE
-        )
+        with self.assertRaises(UnicodeEncodeError) as arc:
+            convert_value_to_datatype(u'äöü', BYTES_TYPE)
         self.checkOutput("""
         'ascii' codec can't encode character...: ordinal not in range(128)
-        """, str(err))
+        """, str(arc.exception))
 
     def test_convert_value_to_datatype_unicode(self):
         # Convert to unicode by id
@@ -431,15 +416,12 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(converted, u'unicode')
         self.assertTrue(isinstance(converted, UNICODE_TYPE))
 
-        err = self.expectError(
-            UnicodeDecodeError,
-            convert_value_to_datatype,
-            b'\xc3\xa4\xc3\xb6\xc3\xbc', 'unicode'
-        )
+        with self.assertRaises(UnicodeDecodeError) as arc:
+            convert_value_to_datatype(b'\xc3\xa4\xc3\xb6\xc3\xbc', 'unicode')
         msg = (
             "'ascii' codec can't decode byte 0xc3 in position 0: "
             "ordinal not in range(128)")
-        self.assertEqual(str(err), msg)
+        self.assertEqual(str(arc.exception), msg)
 
         # Convert to unicode by type
         self.assertEqual(convert_value_to_datatype(UNSET, UNICODE_TYPE), UNSET)
@@ -448,15 +430,12 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(converted, u'unicode')
         self.assertTrue(isinstance(converted, UNICODE_TYPE))
 
-        err = self.expectError(
-            UnicodeDecodeError,
-            convert_value_to_datatype,
-            b'\xc3\xa4\xc3\xb6\xc3\xbc', UNICODE_TYPE
-        )
+        with self.assertRaises(UnicodeDecodeError) as arc:
+            convert_value_to_datatype(b'\xc3\xa4\xc3\xb6\xc3\xbc', UNICODE_TYPE)
         msg = (
             "'ascii' codec can't decode byte 0xc3 in position 0: "
             "ordinal not in range(128)")
-        self.assertEqual(str(err), msg)
+        self.assertEqual(str(arc.exception), msg)
 
     def test_convert_value_to_datatype_int(self):
         # Convert to int by id
@@ -466,21 +445,15 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(converted, 1)
         self.assertTrue(isinstance(converted, int))
 
-        err = self.expectError(
-            ValueError,
-            convert_value_to_datatype,
-            '1.0', 'int'
-        )
+        with self.assertRaises(ValueError) as arc:
+            convert_value_to_datatype('1.0', 'int')
         msg = "invalid literal for int() with base 10: '1.0'"
-        self.assertEqual(str(err), msg)
+        self.assertEqual(str(arc.exception), msg)
 
-        err = self.expectError(
-            ValueError,
-            convert_value_to_datatype,
-            'a', 'int'
-        )
+        with self.assertRaises(ValueError) as arc:
+            convert_value_to_datatype('a', 'int')
         msg = "invalid literal for int() with base 10: 'a'"
-        self.assertEqual(str(err), msg)
+        self.assertEqual(str(arc.exception), msg)
 
         converted = convert_value_to_datatype(2.0, 'int')
         self.assertEqual(converted, 2)
@@ -493,21 +466,15 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(converted, 3)
         self.assertTrue(isinstance(converted, int))
 
-        err = self.expectError(
-            ValueError,
-            convert_value_to_datatype,
-            '2.0', int
-        )
+        with self.assertRaises(ValueError) as arc:
+            convert_value_to_datatype('2.0', int)
         msg = "invalid literal for int() with base 10: '2.0'"
-        self.assertEqual(str(err), msg)
+        self.assertEqual(str(arc.exception), msg)
 
-        err = self.expectError(
-            ValueError,
-            convert_value_to_datatype,
-            'b', int
-        )
+        with self.assertRaises(ValueError) as arc:
+            convert_value_to_datatype('b', int)
         msg = "invalid literal for int() with base 10: 'b'"
-        self.assertEqual(str(err), msg)
+        self.assertEqual(str(arc.exception), msg)
 
         converted = convert_value_to_datatype(4.0, int)
         self.assertEqual(converted, 4)
@@ -525,17 +492,15 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(converted, LONG_TYPE(2))
         self.assertTrue(isinstance(converted, LONG_TYPE))
 
-        err = self.expectError(
-            ValueError,
-            convert_value_to_datatype,
-            'a', 'long'
+        with self.assertRaises(ValueError) as arc:
+            convert_value_to_datatype('a', 'long')
+        # there is no long type in python 3, falls back to int
+        msg = (
+            "invalid literal for long() with base 10: 'a'"
+            if IS_PY2
+            else "invalid literal for int() with base 10: 'a'"
         )
-        if IS_PY2:
-            msg = "invalid literal for long() with base 10: 'a'"
-        else:
-            # there is no long type in python 3, falls back to int
-            msg = "invalid literal for int() with base 10: 'a'"
-        self.assertEqual(str(err), msg)
+        self.assertEqual(str(arc.exception), msg)
 
         # Convert to long by type
         self.assertEqual(convert_value_to_datatype(UNSET, LONG_TYPE), UNSET)
@@ -548,17 +513,15 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(converted, LONG_TYPE(4))
         self.assertTrue(isinstance(converted, LONG_TYPE))
 
-        err = self.expectError(
-            ValueError,
-            convert_value_to_datatype,
-            'b', LONG_TYPE
+        with self.assertRaises(ValueError) as arc:
+            convert_value_to_datatype('b', LONG_TYPE)
+        # there is no long type in python 3, falls back to int
+        msg = (
+            "invalid literal for long() with base 10: 'b'"
+            if IS_PY2
+            else "invalid literal for int() with base 10: 'b'"
         )
-        if IS_PY2:
-            msg = "invalid literal for long() with base 10: 'b'"
-        else:
-            # there is no long type in python 3, falls back to int
-            msg = "invalid literal for int() with base 10: 'b'"
-        self.assertEqual(str(err), msg)
+        self.assertEqual(str(arc.exception), msg)
 
     def test_convert_value_to_datatype_float(self):
         # Convert to float by id
@@ -572,16 +535,14 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(converted, 2.0)
         self.assertTrue(isinstance(converted, float))
 
-        err = self.expectError(
-            ValueError,
-            convert_value_to_datatype,
-            'a', 'float'
+        with self.assertRaises(ValueError) as arc:
+            convert_value_to_datatype('a', 'float')
+        msg = (
+            "could not convert string to float: a"
+            if IS_PY2
+            else "could not convert string to float: 'a'"
         )
-        if IS_PY2:
-            msg = "could not convert string to float: a"
-        else:
-            msg = "could not convert string to float: 'a'"
-        self.assertEqual(str(err), msg)
+        self.assertEqual(str(arc.exception), msg)
 
         converted = convert_value_to_datatype(3, 'float')
         self.assertEqual(converted, 3.0)
@@ -598,16 +559,14 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(converted, 5.0)
         self.assertTrue(isinstance(converted, float))
 
-        err = self.expectError(
-            ValueError,
-            convert_value_to_datatype,
-            'b', float
+        with self.assertRaises(ValueError) as arc:
+            convert_value_to_datatype('b', float)
+        msg = (
+            "could not convert string to float: b"
+            if IS_PY2
+            else "could not convert string to float: 'b'"
         )
-        if IS_PY2:
-            msg = "could not convert string to float: b"
-        else:
-            msg = "could not convert string to float: 'b'"
-        self.assertEqual(str(err), msg)
+        self.assertEqual(str(arc.exception), msg)
 
         converted = convert_value_to_datatype(6, float)
         self.assertEqual(converted, 6.0)
@@ -620,13 +579,10 @@ class TestUtils(YafowilTestCase):
         converted = convert_value_to_datatype(str(uuid.uuid4()), 'uuid')
         self.assertTrue(isinstance(converted, uuid.UUID))
 
-        err = self.expectError(
-            ValueError,
-            convert_value_to_datatype,
-            'a', 'uuid'
-        )
+        with self.assertRaises(ValueError) as arc:
+            convert_value_to_datatype('a', 'uuid')
         msg = 'badly formed hexadecimal UUID string'
-        self.assertEqual(str(err), msg)
+        self.assertEqual(str(arc.exception), msg)
 
         # Convert to uuid by type
         self.assertEqual(convert_value_to_datatype(UNSET, uuid.UUID), UNSET)
@@ -634,13 +590,10 @@ class TestUtils(YafowilTestCase):
         converted = convert_value_to_datatype(str(uuid.uuid4()), uuid.UUID)
         self.assertTrue(isinstance(converted, uuid.UUID))
 
-        err = self.expectError(
-            ValueError,
-            convert_value_to_datatype,
-            'a', uuid.UUID
-        )
+        with self.assertRaises(ValueError) as arc:
+            convert_value_to_datatype('a', uuid.UUID)
         msg = 'badly formed hexadecimal UUID string'
-        self.assertEqual(str(err), msg)
+        self.assertEqual(str(arc.exception), msg)
 
     def test_convert_value_to_datatype_function(self):
         # Custom converter as function
@@ -654,12 +607,9 @@ class TestUtils(YafowilTestCase):
             'convertet: a'
         )
 
-        err = self.expectError(
-            ValueError,
-            convert_value_to_datatype,
-            'b', convert_func
-        )
-        self.assertEqual(str(err), "Value not 'a'")
+        with self.assertRaises(ValueError) as arc:
+            convert_value_to_datatype('b', convert_func)
+        self.assertEqual(str(arc.exception), "Value not 'a'")
 
     def test_convert_value_to_datatype_class(self):
         # Custom converters as class
@@ -672,12 +622,9 @@ class TestUtils(YafowilTestCase):
         converted = convert_value_to_datatype('a', Converter)
         self.assertTrue(isinstance(converted, Converter))
 
-        err = self.expectError(
-            ValueError,
-            convert_value_to_datatype,
-            'b', Converter
-        )
-        self.assertEqual(str(err), "Value not 'a'")
+        with self.assertRaises(ValueError) as arc:
+            convert_value_to_datatype('b', Converter)
+        self.assertEqual(str(arc.exception), "Value not 'a'")
 
     def test_convert_value_to_datatype_instance(self):
         # Custom converter as class instance with ``__call__`` function
@@ -693,12 +640,9 @@ class TestUtils(YafowilTestCase):
             'convertet: a'
         )
 
-        err = self.expectError(
-            ValueError,
-            convert_value_to_datatype,
-            'b', ConverterInst()
-        )
-        self.assertEqual(str(err), "Value not 'a'")
+        with self.assertRaises(ValueError) as arc:
+            convert_value_to_datatype('b', ConverterInst())
+        self.assertEqual(str(arc.exception), "Value not 'a'")
 
     def test_convert_values_to_datatype(self):
         self.assertEqual(convert_values_to_datatype(UNSET, 'int'), UNSET)
@@ -717,5 +661,5 @@ class TestUtils(YafowilTestCase):
 
         # callable with no parameters raises type error
         def invalid_signature():
-            pass
+            pass  # pragma: no cover
         self.assertRaises(TypeError, invalid_signature, None, None)

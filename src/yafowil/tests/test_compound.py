@@ -83,12 +83,10 @@ class TestCompound(YafowilTestCase):
         compound['inner'] = factory(
             'text',
             value='value1')
-        err = self.expectError(
-            ValueError,
-            compound
-        )
+        with self.assertRaises(ValueError) as arc:
+            compound()
         msg = "Both compound and compound member provide a value for 'inner'"
-        self.assertEqual(str(err), msg)
+        self.assertEqual(str(arc.exception), msg)
 
     def test_compound_blueprint_extraction(self):
         compound = factory('compound', name='COMPOUND')

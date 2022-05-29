@@ -36,10 +36,6 @@ def fxml(xml):
     return etree.tostring(et, pretty_print=True).decode('utf-8')
 
 
-def pxml(xml):
-    print(fxml(xml))
-
-
 def test_suite():
     from yafowil.tests import test_base
     from yafowil.tests import test_common

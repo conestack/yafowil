@@ -14,9 +14,9 @@ from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import Tag
 import uuid
 
-if IS_PY2:
+if IS_PY2:  # pragma: no cover
     from StringIO import StringIO
-else:
+else:  # pragma: no cover
     from io import StringIO
 
 
@@ -828,12 +828,9 @@ class TestCommon(YafowilTestCase):
         request = {
             'MYDATATYPEFIELD': '3b8449f3-0456-4baa-a670-3066b0fcbda0'
         }
-        err = self.expectError(
-            ValueError,
-            widget.extract,
-            request
-        )
-        self.assertEqual(str(err), 'Datatype not allowed: "uuid"')
+        with self.assertRaises(ValueError) as arc:
+            widget.extract(request)
+        self.assertEqual(str(arc.exception), 'Datatype not allowed: "uuid"')
 
         # Test ``datatype_message``
         widget = factory(
@@ -881,12 +878,9 @@ class TestCommon(YafowilTestCase):
             props={
                 'datatype': 'inexistent',
             })
-        err = self.expectError(
-            ValueError,
-            widget.extract,
-            {'MYDATATYPEFIELD': 'a'}
-        )
-        self.assertEqual(str(err), 'Datatype unknown: "inexistent"')
+        with self.assertRaises(ValueError) as arc:
+            widget.extract({'MYDATATYPEFIELD': 'a'})
+        self.assertEqual(str(arc.exception), 'Datatype unknown: "inexistent"')
 
     def test_checkbox_blueprint(self):
         # A boolean checkbox widget (default)
@@ -1095,13 +1089,10 @@ class TestCommon(YafowilTestCase):
             'MYCHECKBOX': '',
             'MYCHECKBOX-exists': 'checkboxexists'
         }
-        err = self.expectError(
-            ValueError,
-            widget.extract,
-            request
-        )
+        with self.assertRaises(ValueError) as arc:
+            widget.extract(request)
         msg = "Checkbox widget has invalid format 'invalid' set"
-        self.assertEqual(str(err), msg)
+        self.assertEqual(str(arc.exception), msg)
 
         # Render in display mode
         widget = factory(
@@ -2291,11 +2282,12 @@ class TestCommon(YafowilTestCase):
             props={
                 'vocabulary': vocab
             })
-        err = self.expectError(
-            ValueError,
-            widget
+        with self.assertRaises(ValueError) as arc:
+            widget()
+        self.assertEqual(
+            str(arc.exception),
+            'Multiple values for single selection.'
         )
-        self.assertEqual(str(err), 'Multiple values for single selection.')
 
         # Multi value selection with float datatype set
         vocab = [
@@ -3517,11 +3509,12 @@ class TestCommon(YafowilTestCase):
                 'label': 'MY FILE',
                 'label.position': 'inexistent'
             })
-        err = self.expectError(
-            ValueError,
-            widget
+        with self.assertRaises(ValueError) as arc:
+            widget()
+        self.assertEqual(
+            str(arc.exception),
+            'Invalid value for position "inexistent"'
         )
-        self.assertEqual(str(err), 'Invalid value for position "inexistent"')
 
         # Render with title attribute
         widget = factory(
@@ -4115,12 +4108,9 @@ class TestCommon(YafowilTestCase):
             props={
                 'datatype': 'invalid'
             })
-        err = self.expectError(
-            ValueError,
-            widget.extract,
-            {'NUMBER': '10.0'}
-        )
-        self.assertEqual(str(err), 'Datatype not allowed: "invalid"')
+        with self.assertRaises(ValueError) as arc:
+            widget.extract({'NUMBER': '10.0'})
+        self.assertEqual(str(arc.exception), 'Datatype not allowed: "invalid"')
 
         # Extract invalid integer input
         widget = factory(

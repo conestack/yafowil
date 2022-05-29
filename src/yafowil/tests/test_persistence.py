@@ -140,12 +140,9 @@ class TestPersistence(YafowilTestCase):
         # We can call write on children of runtime data. ``writer`` must be
         # passed in if ``persist_writer`` is not provide via widget
         model = dict()
-        err = self.expectError(
-            ValueError,
-            data['my_field'].write,
-            model
-        )
-        self.assertEqual(str(err), 'No persistence writer found')
+        with self.assertRaises(ValueError) as arc:
+            data['my_field'].write(model)
+        self.assertEqual(str(arc.exception), 'No persistence writer found')
 
         data['my_field'].write(model, writer=write_mapping_writer)
         self.assertEqual(sorted(model.items()), [('my_field', 'value')])
@@ -212,10 +209,7 @@ class TestPersistence(YafowilTestCase):
         })
         self.assertTrue(data.has_errors)
 
-        err = self.expectError(
-            RuntimeError,
-            data.write,
-            dict()
-        )
+        with self.assertRaises(RuntimeError) as arc:
+            data.write(dict())
         msg = 'Attempt to persist data which failed to extract'
-        self.assertEqual(str(err), msg)
+        self.assertEqual(str(arc.exception), msg)

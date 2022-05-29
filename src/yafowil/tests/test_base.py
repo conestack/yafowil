@@ -6,7 +6,6 @@ from yafowil.base import fetch_value
 from yafowil.base import RuntimeData
 from yafowil.base import TBSupplementWidget
 from yafowil.base import Widget
-import traceback
 import webresource as wr
 
 
@@ -87,27 +86,13 @@ class TestBase(NodeTestCase):
         self.assertEqual(fetched.__name__, 'surname')
 
         # It fails if if root element name is wrong
-        err = self.expectError(
-            KeyError,
-            data['fieldset']['age'].fetch,
-            ['foobar', 'surname']
-        )
-        self.assertEqual(str(err), "'Invalid name of root element'")
+        with self.assertRaises(KeyError) as arc:
+            data['fieldset']['age'].fetch(['foobar', 'surname'])
+        self.assertEqual(str(arc.exception), "'Invalid name of root element'")
 
         # It fails if sub path element is wrong
-        try:
+        with self.assertRaises(KeyError):
             data['fieldset']['age'].fetch('root.unknown')
-        except KeyError:
-            self.checkOutput("""
-            Traceback (most recent call last):
-            ...
-                data = data[key]
-            - __traceback_info__: fetch path: ['root', 'unknown']
-            ...
-            KeyError: 'unknown'
-            """, traceback.format_exc())
-        else:
-            raise Exception('Exception expected but not thrown')
 
     def test_Widget(self):
         def test_extractor2(widget, data):
@@ -251,9 +236,10 @@ class TestBase(NodeTestCase):
             test_getter,
             dict(test1='Test1', test2='Test2'),
             mode='display')
-        err = self.expectError(ValueError, testwidget)
+        with self.assertRaises(ValueError) as arc:
+            testwidget()
         msg = "no renderers given for widget 'MYUID' at mode 'display'"
-        self.assertEqual(str(err), msg)
+        self.assertEqual(str(arc.exception), msg)
 
         # b.1) two extractors w/o request
         testwidget = Widget(
@@ -327,61 +313,26 @@ class TestBase(NodeTestCase):
             '',
             dict())
 
-        try:
+        with self.assertRaises(ValueError):
             testwidget.extract({})
-        except Exception:
-            self.checkOutput("""
-            Traceback (most recent call last):
-            ...
-                data.extracted = extractor(self, data)
-                yafowil widget processing info:
-                - path      : MYFAIL
-                - blueprints: blueprint_names_goes_here
-                - task      : extract
-                - descr     : failed at '1'
-            ...
-            ValueError: extractor has to fail
-            """, traceback.format_exc())
-        else:
-            raise Exception('Exception expected but not thrown')
 
-        try:
+        with self.assertRaises(ValueError):
             testwidget()
-        except Exception:
-            self.checkOutput("""
-            Traceback (most recent call last):
-            ...
-                yafowil widget processing info:
-                - path      : MYFAIL
-                - blueprints: blueprint_names_goes_here
-                - task      : render
-                - descr     : failed at '1' in mode 'edit'
-            ...
-            ValueError: renderer has to fail
-            """, traceback.format_exc())
-        else:
-            raise Exception('Exception expected but not thrown')
 
         # Plausability
-        err = self.expectError(
-            ValueError,
-            testwidget,
-            data=data,
-            request={}
-        )
+        with self.assertRaises(ValueError) as arc:
+            testwidget(data=data, request={})
         msg = "if data is passed in, don't pass in request!"
-        self.assertEqual(str(err), msg)
+        self.assertEqual(str(arc.exception), msg)
 
         # Widget dottedpath
 
         # Fails with no name in root
         testwidget = Widget('blueprint_names_goes_here', [], [], [], [])
-        err = self.expectError(
-            ValueError,
-            lambda: testwidget.dottedpath
-        )
+        with self.assertRaises(ValueError) as arc:
+            testwidget.dottedpath
         msg = 'Root widget has no name! Pass it to factory.'
-        self.assertEqual(str(err), msg)
+        self.assertEqual(str(arc.exception), msg)
 
         # At this test level the factory is not used,
         # so we pass it directly to Widget
@@ -427,16 +378,13 @@ class TestBase(NodeTestCase):
             [], [], [], [],
             uniquename='root',
             mode='other')
-        err = self.expectError(
-            ValueError,
-            testwidget.extract,
-            {}
-        )
+        with self.assertRaises(ValueError) as arc:
+            testwidget.extract({})
         msg = (
             "mode must be one out of 'edit', 'display', 'skip', "
             "but 'other' was given"
         )
-        self.assertEqual(str(err), msg)
+        self.assertEqual(str(arc.exception), msg)
 
         def mode(widget, data):
             return 'edit'
@@ -580,14 +528,17 @@ class TestBase(NodeTestCase):
         )
 
         # Some basic name checks are done
-        err = self.expectError(ValueError, factory._name_check, '*notallowed')
-        self.assertEqual(str(err), '"*" as char not allowed as name.')
+        with self.assertRaises(ValueError) as arc:
+            factory._name_check('*notallowed')
+        self.assertEqual(str(arc.exception), '"*" as char not allowed as name.')
 
-        err = self.expectError(ValueError, factory._name_check, 'not:allowed')
-        self.assertEqual(str(err), '":" as char not allowed as name.')
+        with self.assertRaises(ValueError) as arc:
+            factory._name_check('not:allowed')
+        self.assertEqual(str(arc.exception), '":" as char not allowed as name.')
 
-        err = self.expectError(ValueError, factory._name_check, '#notallowed')
-        self.assertEqual(str(err), '"#" as char not allowed as name.')
+        with self.assertRaises(ValueError) as arc:
+            factory._name_check('#notallowed')
+        self.assertEqual(str(arc.exception), '"#" as char not allowed as name.')
 
         # Test the macros
         factory.register_macro(
@@ -612,13 +563,10 @@ class TestBase(NodeTestCase):
             )
         )
 
-        err = self.expectError(
-            ValueError,
-            factory._expand_blueprints,
-            '#nonexisting', {}
-        )
+        with self.assertRaises(ValueError) as arc:
+            factory._expand_blueprints('#nonexisting', {})
         msg = "Macro named 'nonexisting' is not registered in factory"
-        self.assertEqual(str(err), msg)
+        self.assertEqual(str(arc.exception), msg)
 
         factory.register_macro('test_macro2', 'alpha:#test_macro:beta', {})
 
@@ -774,6 +722,15 @@ class TestBase(NodeTestCase):
         ))
         factory.register_resources('theme', 'widget', theme_resources)
 
+        self.assertTrue(
+            factory.get_resources(widget_name='widget', copy_resources=False)
+            is factory.get_resources(widget_name='widget', copy_resources=False)
+        )
+        self.assertFalse(
+            factory.get_resources(widget_name='widget')
+            is factory.get_resources(widget_name='widget')
+        )
+
         resources = factory.get_resources(widget_name='widget')
         self.assertEqual(len(resources.members), 2)
         self.assertEqual(resources.members[0].resource, 'default-script.js')
@@ -925,13 +882,10 @@ class TestBase(NodeTestCase):
             factory.edit_renderers('inner'),
             [inner_renderer]
         )
-        err = self.expectError(
-            RuntimeError,
-            factory.renderers,
-            'inner'
-        )
+        with self.assertRaises(RuntimeError) as arc:
+            factory.renderers('inner')
         msg = 'Deprecated since 1.2, use edit_renderers or display_renderers'
-        self.assertEqual(str(err), msg)
+        self.assertEqual(str(arc.exception), msg)
 
         # Colon seperated blueprint chain definition
         widget = factory('outer:inner', name='OUTER_INNER')
@@ -1052,16 +1006,13 @@ class TestBase(NodeTestCase):
 
         # Case for (5): We have only some unprefixed default
         widget = factory('prefix', name='test')
-        try:
+        with self.assertRaises(KeyError) as arc:
             widget()
-        except KeyError as e:
-            msg = (
-                "'Property with key \"id\" is not given on "
-                "widget \"test\" (no default)'"
-            )
-            self.assertEqual(str(e), msg)
-        else:
-            raise Exception('Exception expected but not thrown')
+        msg = (
+            "'Property with key \"id\" is not given on "
+            "widget \"test\" (no default)'"
+        )
+        self.assertEqual(str(arc.exception), msg)
 
         # Case for (4): Unprefixed default
         factory.defaults['id'] = 'Test4'
