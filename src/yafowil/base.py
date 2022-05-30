@@ -656,7 +656,7 @@ class Factory(object):
         widget_names = set()
         for theme in self._themes.values():
             widget_names.update(theme)
-        resources = wr.ResourceGroup(name='yafowil-resources')
+        resources = wr.ResourceGroup(name='yafowil')
         for widget_name in sorted(widget_names):
             resources.add(self._get_widget_resources(widget_name))
         return resources
