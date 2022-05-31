@@ -7,6 +7,9 @@ import copy
 class YafowilResources(object):
     """Object which can be used as base for resource publishing specific
     framework integration code.
+
+    This class belongs to the B/C theme registration and is deprecated.
+    It will be removed in future versions.
     """
 
     def __init__(self, js_skip=[], css_skip=[]):
