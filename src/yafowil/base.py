@@ -649,7 +649,7 @@ class Factory(object):
         else:
             resources = self._get_all_resources()
         if copy_resources:
-            return copy.deepcopy(resources)
+            return resources.copy()
         return resources
 
     def _get_all_resources(self):
