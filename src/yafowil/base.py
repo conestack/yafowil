@@ -636,28 +636,32 @@ class Factory(object):
             widget_theme = theme.setdefault(widget_name, {})
             widget_theme['resources'] = resources
 
-    def get_resources(self, widget_name=None, copy_resources=True):
+    def get_resources(self, widget_name=None, copy_resources=True, exclude=[]):
         """Resources lookup.
 
         :param widget_name: The widget name. If None, all registered resources
             are returned.
         :param copy_resources: Flag whether to return a copy of the resources.
             Defaults to True.
+        :param exclude: List of widget names to exclude. Only takes effect if
+            ``widget_name`` not given.
         """
         if widget_name:
             resources = self._get_widget_resources(widget_name)
         else:
-            resources = self._get_all_resources()
+            resources = self._get_all_resources(exclude)
         if copy_resources:
             return resources.copy()
         return resources
 
-    def _get_all_resources(self):
+    def _get_all_resources(self, exclude):
         widget_names = set()
         for theme in self._themes.values():
             widget_names.update(theme)
         resources = wr.ResourceGroup(name='yafowil')
         for widget_name in sorted(widget_names):
+            if widget_name in exclude:
+                continue
             resources.add(self._get_widget_resources(widget_name))
         return resources
 

@@ -800,6 +800,14 @@ class TestBase(NodeTestCase):
             'default-style.css'
         )
 
+        factory.theme = 'default'
+        resources = factory.get_resources()
+        self.assertEqual(len(resources.members), 2)
+        resources = factory.get_resources(exclude=['widget'])
+        self.assertEqual(len(resources.members), 1)
+        resources = factory.get_resources(exclude=['widget', 'other'])
+        self.assertEqual(len(resources.members), 0)
+
     def test_widget_tree_manipulation(self):
         # Widget trees provide functionality described in
         # ``node.interfaces.IOrder``, which makes it possible to insert widgets
