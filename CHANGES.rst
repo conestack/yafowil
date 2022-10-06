@@ -2,7 +2,7 @@
 History
 =======
 
-3.0 (unreleased)
+3.0 (2022-10-06)
 ----------------
 
 - Python 3.7+ support.
