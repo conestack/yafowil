@@ -142,7 +142,10 @@ class TestPersistence(YafowilTestCase):
         model = dict()
         with self.assertRaises(ValueError) as arc:
             data['my_field'].write(model)
-        self.assertEqual(str(arc.exception), 'No persistence writer found')
+        self.assertEqual(
+            str(arc.exception),
+            'No persistence writer found for "form.my_field"'
+        )
 
         data['my_field'].write(model, writer=write_mapping_writer)
         self.assertEqual(sorted(model.items()), [('my_field', 'value')])

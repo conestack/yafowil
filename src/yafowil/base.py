@@ -131,7 +131,10 @@ class RuntimeData(object):
         current_writer = self.persist_writer or writer
         # XXX: if persist and not current_writer
         if not current_writer:
-            raise ValueError('No persistence writer found')
+            msg = 'No persistence writer found for "{}"'.format(
+                '.'.join(self.path)
+            )
+            raise ValueError(msg)
         if not writer:
             writer = current_writer
         if self.persist:

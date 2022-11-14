@@ -2,10 +2,11 @@
 History
 =======
 
-3.1 (unreleased)
-----------------
+3.0.1 (unreleased)
+------------------
 
-- Nothing changed yet.
+- Add runtime data path to error message if persist writer not found.
+  [rnix]
 
 
 3.0 (2022-10-06)
