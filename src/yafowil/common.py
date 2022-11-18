@@ -1661,7 +1661,7 @@ def input_file_display_renderer(widget, data):
     )
 
 
-@managedprops(*css_managed_props)
+@managedprops('vocabulary', *css_managed_props)
 def file_options_renderer(widget, data):
     if data.value in [None, UNSET, '']:
         return data.rendered
@@ -1726,6 +1726,9 @@ factory.defaults['file.vocabulary'] = [
     ('replace', _('file_replace', default=u'Replace existing file')),
     ('delete', _('file_delete', default=u'Delete existing file')),
 ]
+factory.doc['props']['file.vocabulary'] = """\
+Vocabulary with available actions for existing files.
+"""
 
 
 ###############################################################################

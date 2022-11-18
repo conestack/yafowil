@@ -5,6 +5,9 @@ History
 3.0.1 (unreleased)
 ------------------
 
+- Document ``vocabulary`` property of ``file`` blueprint.
+  [rnix]
+
 - Add ``yafowil.common.mimetype_extractor`` and use in ``file`` blueprint.
   [rnix]
 
