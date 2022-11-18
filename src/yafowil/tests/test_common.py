@@ -3191,6 +3191,65 @@ class TestCommon(YafowilTestCase):
             'name="MYFILE" type="file" />'
         ))
 
+        # Mimetype extractor
+        widget = factory(
+            'file',
+            name='MYFILE',
+            props={
+                'accept': '*/*'
+            })
+        request = {
+            'MYFILE': {
+                'file': StringIO('123'),
+                'mimetype': 'image/jpeg'
+            }
+        }
+        data = widget.extract(request)
+        expected = {
+            'action': 'new',
+            'file': request['MYFILE']['file'],
+            'mimetype': 'image/jpeg'
+        }
+        self.assertEqual(data.extracted, expected)
+
+        widget = factory(
+            'file',
+            name='MYFILE',
+            props={
+                'accept': 'image/*'
+            })
+        data = widget.extract(request)
+        self.assertEqual(data.extracted, expected)
+
+        widget = factory(
+            'file',
+            name='MYFILE',
+            props={
+                'accept': 'image/png,image/jpeg'
+            })
+        data = widget.extract(request)
+        self.assertEqual(data.extracted, expected)
+
+        widget = factory(
+            'file',
+            name='MYFILE',
+            props={
+                'accept': 'video/webm,image/*'
+            })
+        data = widget.extract(request)
+        self.assertEqual(data.extracted, expected)
+
+        widget = factory(
+            'file',
+            name='MYFILE',
+            props={
+                'accept': 'image/png'
+            })
+        data = widget.extract(request)
+        self.assertEqual(data.errors, [
+            ExtractionError('Mimetype of uploaded file not matches')
+        ])
+
         # File display renderer
         self.assertEqual(convert_bytes(1 * 1024 * 1024 * 1024 * 1024), '1.00T')
         self.assertEqual(convert_bytes(1 * 1024 * 1024 * 1024), '1.00G')

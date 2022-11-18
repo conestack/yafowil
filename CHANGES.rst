@@ -5,6 +5,9 @@ History
 3.0.1 (unreleased)
 ------------------
 
+- Add ``yafowil.common.mimetype_extractor`` and use in ``file`` blueprint.
+  [rnix]
+
 - Add runtime data path to error message if persist writer not found.
   [rnix]
 
