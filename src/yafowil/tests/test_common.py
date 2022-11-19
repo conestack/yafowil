@@ -3191,6 +3191,94 @@ class TestCommon(YafowilTestCase):
             'name="MYFILE" type="file" />'
         ))
 
+        # File actions vocabulary
+        widget = factory(
+            'file',
+            name='MYFILE',
+            value={
+                'file': StringIO('321')
+            },
+            props={
+                'vocabulary': [
+                    ('keep', 'Keep Existing file'),
+                    ('replace', 'Replace existing file')
+                ]
+            })
+        self.checkOutput("""
+        <div>
+          <input id="input-MYFILE" name="MYFILE" type="file"/>
+          <div id="radio-MYFILE-keep">
+            <input checked="checked" id="input-MYFILE-keep"
+                   name="MYFILE-action" type="radio" value="keep"/>
+            <span>Keep Existing file</span>
+          </div>
+          <div id="radio-MYFILE-replace">
+            <input id="input-MYFILE-replace" name="MYFILE-action"
+                   type="radio" value="replace"/>
+            <span>Replace existing file</span>
+          </div>
+        </div>
+        """, wrapped_fxml(widget()))
+
+        # Mimetype extractor
+        widget = factory(
+            'file',
+            name='MYFILE',
+            props={
+                'accept': '*/*'
+            })
+        request = {
+            'MYFILE': {
+                'file': StringIO('123'),
+                'mimetype': 'image/jpeg'
+            }
+        }
+        data = widget.extract(request)
+        expected = {
+            'action': 'new',
+            'file': request['MYFILE']['file'],
+            'mimetype': 'image/jpeg'
+        }
+        self.assertEqual(data.extracted, expected)
+
+        widget = factory(
+            'file',
+            name='MYFILE',
+            props={
+                'accept': 'image/*'
+            })
+        data = widget.extract(request)
+        self.assertEqual(data.extracted, expected)
+
+        widget = factory(
+            'file',
+            name='MYFILE',
+            props={
+                'accept': 'image/png,image/jpeg'
+            })
+        data = widget.extract(request)
+        self.assertEqual(data.extracted, expected)
+
+        widget = factory(
+            'file',
+            name='MYFILE',
+            props={
+                'accept': 'video/webm,image/*'
+            })
+        data = widget.extract(request)
+        self.assertEqual(data.extracted, expected)
+
+        widget = factory(
+            'file',
+            name='MYFILE',
+            props={
+                'accept': 'image/png'
+            })
+        data = widget.extract(request)
+        self.assertEqual(data.errors, [
+            ExtractionError('Mimetype of uploaded file not matches')
+        ])
+
         # File display renderer
         self.assertEqual(convert_bytes(1 * 1024 * 1024 * 1024 * 1024), '1.00T')
         self.assertEqual(convert_bytes(1 * 1024 * 1024 * 1024), '1.00G')

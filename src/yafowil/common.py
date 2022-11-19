@@ -249,8 +249,11 @@ DATATYPE_LABELS['float'] = DATATYPE_LABELS[float]
 DATATYPE_LABELS['uuid'] = DATATYPE_LABELS[uuid.UUID]
 
 
-@managedprops('datatype', 'allowed_datatypes',
-              'datatype_message', 'emptyvalue')
+@managedprops(
+    'datatype',
+    'allowed_datatypes',
+    'datatype_message',
+    'emptyvalue')
 def generic_datatype_extractor(widget, data):
     """Convert extracted value to ``datatype``.
 
@@ -466,7 +469,8 @@ def tag_renderer(widget, data):
 factory.register(
     'tag',
     edit_renderers=[tag_renderer],
-    display_renderers=[tag_renderer])
+    display_renderers=[tag_renderer]
+)
 
 factory.doc['blueprint']['tag'] = """\
 Render HTML tags with text. Useful for rendering headings etc.
@@ -485,8 +489,15 @@ Tag contents.
 # text
 ###############################################################################
 
-@managedprops('data', 'title', 'size', 'disabled', 'autofocus',
-              'placeholder', 'autocomplete', *css_managed_props)
+@managedprops(
+    'data',
+    'title',
+    'size',
+    'disabled',
+    'autofocus',
+    'placeholder',
+    'autocomplete',
+    *css_managed_props)
 def text_edit_renderer(widget, data):
     return input_generic_renderer(widget, data)
 
@@ -503,7 +514,8 @@ factory.register(
     display_renderers=[
         generic_display_renderer,
         display_proxy_renderer
-    ])
+    ]
+)
 
 factory.doc['blueprint']['text'] = """\
 One line text input blueprint.
@@ -540,7 +552,8 @@ factory.register(
         generic_datatype_extractor
     ],
     edit_renderers=[input_generic_renderer],
-    display_renderers=[empty_display_renderer])
+    display_renderers=[empty_display_renderer]
+)
 
 factory.doc['blueprint']['hidden'] = """\
 Hidden input blueprint.
@@ -589,7 +602,8 @@ factory.register(
         generic_datatype_extractor
     ],
     edit_renderers=[input_proxy_renderer],
-    display_renderers=[empty_display_renderer])
+    display_renderers=[empty_display_renderer]
+)
 
 factory.doc['blueprint']['proxy'] = """\
 Bypass arguments out of form namespace using a hidden field.
@@ -655,7 +669,8 @@ factory.register(
     display_renderers=[
         generic_display_renderer,
         display_proxy_renderer
-    ])
+    ]
+)
 
 factory.doc['blueprint']['textarea'] = """\
 HTML textarea blueprint.
@@ -744,7 +759,8 @@ factory.register(
     display_renderers=[
         lines_display_renderer,
         display_proxy_renderer
-    ])
+    ]
+)
 
 factory.doc['blueprint']['lines'] = """\
 Lines blueprint. Renders a textarea and extracts lines as list.
@@ -891,8 +907,15 @@ def _pwd_value(widget, data):
     return attr_value('default', widget, data)
 
 
-@managedprops('data', 'title', 'size', 'disabled', 'autofocus',
-              'placeholder', 'autocomplete', *css_managed_props)
+@managedprops(
+    'data',
+    'title',
+    'size',
+    'disabled',
+    'autofocus',
+    'placeholder',
+    'autocomplete',
+    *css_managed_props)
 def password_edit_renderer(widget, data):
     """Render password widget.
     """
@@ -922,7 +945,8 @@ factory.register(
         password_extractor
     ],
     edit_renderers=[password_edit_renderer],
-    display_renderers=[password_display_renderer])
+    display_renderers=[password_display_renderer]
+)
 
 factory.doc['blueprint']['password'] = """\
 Password blueprint.
@@ -993,8 +1017,17 @@ def checkbox_extractor(widget, data):
     )
 
 
-@managedprops('data', 'title', 'size', 'disabled', 'autofocus',
-              'format', 'disabled', 'checked', 'with_label', *css_managed_props)
+@managedprops(
+    'data',
+    'title',
+    'size',
+    'disabled',
+    'autofocus',
+    'format',
+    'disabled',
+    'checked',
+    'with_label',
+    *css_managed_props)
 def checkbox_edit_renderer(widget, data):
     tag = data.tag
     input_attrs = input_attributes_common(widget, data)
@@ -1069,7 +1102,8 @@ factory.register(
         generic_required_extractor
     ],
     edit_renderers=[checkbox_edit_renderer],
-    display_renderers=[checkbox_display_renderer])
+    display_renderers=[checkbox_display_renderer]
+)
 
 factory.doc['blueprint']['checkbox'] = """\
 Single checkbox blueprint.
@@ -1311,12 +1345,28 @@ def select_cb_edit_renderer(widget, data, custom_attrs={}):
     return select_exists_marker(widget, data) + taglisting
 
 
-@managedprops('data', 'title', 'format', 'vocabulary', 'multivalued',
-              'disabled', 'listing_label_position', 'listing_tag', 'size',
-              'block_class', 'autofocus', 'placeholder', 'datatype',
-              'emptyvalue', 'checkbox_wrapper_class', 'checkbox_label_class',
-              'checkbox_input_class', 'radio_wrapper_class',
-              'radio_label_class', 'radio_input_class', *css_managed_props)
+@managedprops(
+    'data',
+    'title',
+    'format',
+    'vocabulary',
+    'multivalued',
+    'disabled',
+    'listing_label_position',
+    'listing_tag',
+    'size',
+    'block_class',
+    'autofocus',
+    'placeholder',
+    'datatype',
+    'emptyvalue',
+    'checkbox_wrapper_class',
+    'checkbox_label_class',
+    'checkbox_input_class',
+    'radio_wrapper_class',
+    'radio_label_class',
+    'radio_input_class',
+    *css_managed_props)
 def select_edit_renderer(widget, data, custom_attrs={}):
     if attr_value('format', widget, data) == 'block':
         return select_block_edit_renderer(
@@ -1364,7 +1414,8 @@ factory.register(
     display_renderers=[
         select_display_renderer,
         display_proxy_renderer
-    ])
+    ]
+)
 
 factory.doc['blueprint']['select'] = """\
 Selection Blueprint. Single selection as dropdown or radio-buttons. Multiple
@@ -1516,8 +1567,42 @@ def file_extractor(widget, data):
     return value
 
 
-@managedprops('accept', 'placeholder', 'autofocus',
-              'required', *css_managed_props)
+@managedprops('accept')
+def mimetype_extractor(widget, data):
+    accept = attr_value('accept', widget, data)
+    extracted = data.extracted
+    if not extracted or not accept:
+        return extracted
+    extracted_type, extracted_sub = extracted['mimetype'].split('/')
+    matches = False
+    for mimetype in accept.split(','):
+        type_, sub = mimetype.split('/')
+        if type_ == '*':
+            matches = True
+            break
+        if type_ != extracted_type:
+            continue
+        if sub == '*':
+            matches = True
+            break
+        if sub == extracted_sub:
+            matches = True
+            break
+    if not matches:
+        message = _(
+            'file_invalid_mimetype',
+            default=u'Mimetype of uploaded file not matches'
+        )
+        raise ExtractionError(message)
+    return extracted
+
+
+@managedprops(
+    'accept',
+    'placeholder',
+    'autofocus',
+    'required',
+    *css_managed_props)
 def input_file_edit_renderer(widget, data):
     tag = data.tag
     input_attrs = input_attributes_common(widget, data, excludes=['value'])
@@ -1565,15 +1650,18 @@ def input_file_display_renderer(widget, data):
     size_message = _('size', default=u'Size: ')
     filename = value.get('filename', unknown_message)
     mimetype = value.get('mimetype', unknown_message)
-    return tag('div',
-               tag('ul',
-                   tag('li', tag('strong', filename_message), filename),
-                   tag('li', tag('strong', mimetype_message), mimetype),
-                   tag('li', tag('strong', size_message), size)),
-               **attrs)
+    return tag(
+        'div',
+        tag(
+            'ul',
+            tag('li', tag('strong', filename_message), filename),
+            tag('li', tag('strong', mimetype_message), mimetype),
+            tag('li', tag('strong', size_message), size)),
+        **attrs
+    )
 
 
-@managedprops(*css_managed_props)
+@managedprops('vocabulary', *css_managed_props)
 def file_options_renderer(widget, data):
     if data.value in [None, UNSET, '']:
         return data.rendered
@@ -1597,8 +1685,12 @@ def file_options_renderer(widget, data):
         }
         taginput = tag('input', **attrs)
         text = tag('span', term)
-        tags.append(tag('div', taginput, text,
-                        **{'id': cssid(widget, 'radio', key)}))
+        tags.append(tag(
+            'div',
+            taginput,
+            text,
+            **{'id': cssid(widget, 'radio', key)}
+        ))
     return data.rendered + u''.join(tags)
 
 
@@ -1606,13 +1698,15 @@ factory.register(
     'file',
     extractors=[
         file_extractor,
+        mimetype_extractor,
         generic_required_extractor
     ],
     edit_renderers=[
         input_file_edit_renderer,
         file_options_renderer
     ],
-    display_renderers=[input_file_display_renderer])
+    display_renderers=[input_file_display_renderer]
+)
 
 factory.doc['blueprint']['file'] = """\
 A basic file upload blueprint.
@@ -1620,7 +1714,11 @@ A basic file upload blueprint.
 
 factory.defaults['file.accept'] = None
 factory.doc['props']['file.accept'] = """\
-Accepted mimetype.
+The accept attribute value is a string that defines the file types the file
+input should accept. This string is a comma-separated list of unique file type
+specifiers. Because a given file type may be identified in more than one
+manner, it's useful to provide a thorough set of type specifiers when you need
+files of a given format.
 """
 
 factory.defaults['file.vocabulary'] = [
@@ -1628,14 +1726,24 @@ factory.defaults['file.vocabulary'] = [
     ('replace', _('file_replace', default=u'Replace existing file')),
     ('delete', _('file_delete', default=u'Delete existing file')),
 ]
+factory.doc['props']['file.vocabulary'] = """\
+Vocabulary with available actions for existing files.
+"""
 
 
 ###############################################################################
 # submit
 ###############################################################################
 
-@managedprops('tag_type', 'label', 'class', 'action', 'handler',
-              'next', 'skip', 'expression')
+@managedprops(
+    'tag_type',
+    'label',
+    'class',
+    'action',
+    'handler',
+    'next',
+    'skip',
+    'expression')
 def submit_renderer(widget, data):
     expression = attr_value('expression', widget, data)
     if not expression:
@@ -1652,7 +1760,8 @@ def submit_renderer(widget, data):
 factory.register(
     'submit',
     edit_renderers=[submit_renderer],
-    display_renderers=[empty_display_renderer])
+    display_renderers=[empty_display_renderer]
+)
 
 factory.doc['blueprint']['submit'] = """\
 Submit action inside the form
@@ -1704,10 +1813,24 @@ Flag the submit field as disabled.
 ###############################################################################
 
 @managedprops(
-    'text', 'action', 'handler', 'next', 'skip', 'type',
-    'expression', 'form', 'formaction', 'formenctype', 'formmethod',
-    'formnovalidate', 'formtarget', 'autofocus', 'disabled', 'class',
-    'class_add', 'accesskey')
+    'text',
+    'action',
+    'handler',
+    'next',
+    'skip',
+    'type',
+    'expression',
+    'form',
+    'formaction',
+    'formenctype',
+    'formmethod',
+    'formnovalidate',
+    'formtarget',
+    'autofocus',
+    'disabled',
+    'class',
+    'class_add',
+    'accesskey')
 def button_renderer(widget, data):
     expression = attr_value('expression', widget, data)
     if not expression:
@@ -1737,7 +1860,8 @@ def button_renderer(widget, data):
 factory.register(
     'button',
     edit_renderers=[button_renderer],
-    display_renderers=[empty_display_renderer])
+    display_renderers=[empty_display_renderer]
+)
 
 factory.defaults['button.type'] = 'submit'
 
@@ -1898,7 +2022,8 @@ factory.register(
     display_renderers=[
         generic_display_renderer,
         display_proxy_renderer
-    ])
+    ]
+)
 
 factory.doc['blueprint']['email'] = """\
 Email (HTML5) input blueprint.
@@ -1949,7 +2074,8 @@ factory.register(
     display_renderers=[
         generic_display_renderer,
         display_proxy_renderer
-    ])
+    ]
+)
 
 factory.doc['blueprint']['url'] = """\
 URL aka web address (HTML5) input blueprint.
@@ -1981,7 +2107,8 @@ factory.register(
     display_renderers=[
         generic_display_renderer,
         display_proxy_renderer
-    ])
+    ]
+)
 
 factory.doc['blueprint']['search'] = """\
 Search blueprint (HTML5).
@@ -2056,7 +2183,8 @@ factory.register(
     display_renderers=[
         generic_display_renderer,
         display_proxy_renderer
-    ])
+    ]
+)
 
 factory.doc['blueprint']['number'] = """\
 Number blueprint (HTML5).
@@ -2141,7 +2269,8 @@ def label_renderer(widget, data):
 factory.register(
     'label',
     edit_renderers=[label_renderer],
-    display_renderers=[label_renderer])
+    display_renderers=[label_renderer]
+)
 
 factory.doc['blueprint']['label'] = """\
 Label blueprint.
@@ -2184,7 +2313,8 @@ def field_renderer(widget, data):
 factory.register(
     'field',
     edit_renderers=[field_renderer],
-    display_renderers=[field_renderer])
+    display_renderers=[field_renderer]
+)
 
 factory.doc['blueprint']['field'] = """\
 Renders a div with an class field around the prior rendered output. This is
@@ -2203,8 +2333,13 @@ Put the class given with this property on the div if an error happened.
 # error
 ###############################################################################
 
-@managedprops('tag', 'message_tag', 'message_class', 'position',
-              'render_empty', *css_managed_props)
+@managedprops(
+    'tag',
+    'message_tag',
+    'message_class',
+    'position',
+    'render_empty',
+    *css_managed_props)
 def error_renderer(widget, data):
     if not data.errors and not attr_value('render_empty', widget, data):
         return data.rendered
@@ -2231,7 +2366,8 @@ def error_renderer(widget, data):
 factory.register(
     'error',
     edit_renderers=[error_renderer],
-    display_renderers=[empty_display_renderer])
+    display_renderers=[empty_display_renderer]
+)
 
 factory.doc['blueprint']['error'] = """\
 Renders a tag with an error-message and the prior rendered output.
@@ -2289,7 +2425,8 @@ def help_renderer(widget, data):
 factory.register(
     'help',
     edit_renderers=[help_renderer],
-    display_renderers=[empty_display_renderer])
+    display_renderers=[empty_display_renderer]
+)
 
 factory.doc['blueprint']['help'] = """\
 Renders a tag with an help-message and the prior rendered output.
