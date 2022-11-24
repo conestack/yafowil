@@ -1559,11 +1559,13 @@ def file_extractor(widget, data):
         value['file'] = UNSET
     elif action == 'replace':
         new_val = data.request[name]
-        if new_val:
-            value = new_val
-            value['action'] = 'replace'
-        else:
-            value['action'] = 'keep'
+        if not new_val:
+            raise ExtractionError(_(
+                'file_replace_no_upload',
+                default='Cannot replace file. No file uploaded.'
+            ))
+        value = new_val
+        value['action'] = 'replace'
     return value
 
 

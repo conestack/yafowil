@@ -3138,16 +3138,17 @@ class TestCommon(YafowilTestCase):
         self.assertEqual(data.extracted['action'], 'replace')
         self.assertEqual(data.extracted['file'].read(), '123')
 
-        # Extract empty ``replace`` results in ``kepp action``
+        # Extract empty ``replace`` results in extraction error
         request = {
             'MYFILE': '',
             'MYFILE-action': 'replace'
         }
         data = widget.extract(request)
 
-        self.assertEqual(sorted(data.extracted.keys()), ['action', 'file'])
-        self.assertEqual(data.extracted['action'], 'keep')
-        self.assertEqual(data.extracted['file'].read(), '')
+        self.assertEqual(data.errors, [
+            ExtractionError('Cannot replace file. No file uploaded.')
+        ])
+        self.assertEqual(data.extracted, UNSET)
 
         # Extract ``delete`` returns UNSET
         request['MYFILE-action'] = 'delete'

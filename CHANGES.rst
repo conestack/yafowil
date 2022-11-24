@@ -5,6 +5,10 @@ History
 3.0.1 (unreleased)
 ------------------
 
+- File extractor raises an ``ExtractionError`` if file action is ``replace``
+  but no file is uploaded instead of silently changing the action to ``keep``.
+  [rnix]
+
 - Document ``vocabulary`` property of ``file`` blueprint.
   [rnix]
 
