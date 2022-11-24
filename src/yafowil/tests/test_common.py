@@ -3279,6 +3279,26 @@ class TestCommon(YafowilTestCase):
             ExtractionError('Mimetype of uploaded file not matches')
         ])
 
+        # no validation if mimetype not on extracted file
+        # happens with keep and replace actions.
+        widget = factory(
+            'file',
+            name='MYFILE',
+            value=dict(),
+            props={
+                'accept': 'image/png'
+            })
+        request = {
+            'MYFILE': {},
+            'MYFILE-action': 'keep'
+        }
+        data = widget.extract(request)
+        self.assertEqual(data.extracted, {'action': 'keep'})
+
+        request['MYFILE-action'] = 'delete'
+        data = widget.extract(request)
+        self.assertEqual(data.extracted, {'action': 'delete', 'file': UNSET})
+
         # File display renderer
         self.assertEqual(convert_bytes(1 * 1024 * 1024 * 1024 * 1024), '1.00T')
         self.assertEqual(convert_bytes(1 * 1024 * 1024 * 1024), '1.00G')

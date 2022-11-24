@@ -1573,7 +1573,10 @@ def mimetype_extractor(widget, data):
     extracted = data.extracted
     if not extracted or not accept:
         return extracted
-    extracted_type, extracted_sub = extracted['mimetype'].split('/')
+    extracted_mimetype = extracted.get('mimetype')
+    if not extracted_mimetype:
+        return extracted
+    extracted_type, extracted_sub = extracted_mimetype.split('/')
     matches = False
     for mimetype in accept.split(','):
         type_, sub = mimetype.split('/')
