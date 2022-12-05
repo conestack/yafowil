@@ -2,7 +2,7 @@
 History
 =======
 
-3.0.1 (unreleased)
+3.0.1 (2022-12-05)
 ------------------
 
 - File extractor raises an ``ExtractionError`` if file action is ``replace``
