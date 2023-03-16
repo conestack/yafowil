@@ -7,6 +7,7 @@ import sys
 import unittest
 import yafowil.common
 import yafowil.compound
+import yafowil.datatypes
 import yafowil.persistence
 import yafowil.table
 
@@ -21,9 +22,10 @@ class YafowilTestCase(NodeTestCase):
         super(YafowilTestCase, self).setUp()
         factory.push_state()
         factory.clear()
-        reload(yafowil.persistence)
         reload(yafowil.common)
         reload(yafowil.compound)
+        reload(yafowil.datatypes)
+        reload(yafowil.persistence)
         reload(yafowil.table)
 
     def tearDown(self):
@@ -41,6 +43,7 @@ def test_suite():
     from yafowil.tests import test_common
     from yafowil.tests import test_compound
     from yafowil.tests import test_controller
+    from yafowil.tests import test_datatypes
     from yafowil.tests import test_persistence
     from yafowil.tests import test_resources
     from yafowil.tests import test_table
@@ -53,6 +56,7 @@ def test_suite():
     suite.addTest(unittest.findTestCases(test_common))
     suite.addTest(unittest.findTestCases(test_compound))
     suite.addTest(unittest.findTestCases(test_controller))
+    suite.addTest(unittest.findTestCases(test_datatypes))
     suite.addTest(unittest.findTestCases(test_persistence))
     suite.addTest(unittest.findTestCases(test_resources))
     suite.addTest(unittest.findTestCases(test_table))

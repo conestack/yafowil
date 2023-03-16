@@ -1,18 +1,55 @@
 # -*- coding: utf-8 -*-
 from node.utils import UNSET
 from pkg_resources import iter_entry_points
-from yafowil.compat import BYTES_TYPE
-from yafowil.compat import IS_PY2
-from yafowil.compat import LONG_TYPE
 from yafowil.compat import STR_TYPE
 from yafowil.compat import UNICODE_TYPE
-import codecs
+from zope.deferredimport import deprecated
 import json
 import logging
 import re
 import unicodedata
-import uuid
-import warnings
+
+
+#: NOTE: This class will be moved to yafowil.datatypes as of yafowil 3.2
+class EmptyValue(object):
+    """Used to identify empty values in conjunction with data type conversion.
+    """
+
+    def __nonzero__(self):
+        return False
+
+    __bool__ = __nonzero__
+
+    def __str__(self):
+        return ''
+
+    def __len__(self):
+        return 0
+
+    def __repr__(self):
+        return '<EMPTY_VALUE>'
+
+    def __copy__(self):
+        return self
+
+    def __deepcopy__(self, memo):
+        return self
+
+    def __lt__(self, other):
+        return False
+
+    def __le__(self, other):
+        return False
+
+    def __gt__(self, other):
+        return False
+
+    def __ge__(self, other):
+        return False
+
+
+#: NOTE: This singleton will be moved to yafowil.datatypes as of yafowil 3.2
+EMPTY_VALUE = EmptyValue()
 
 
 class entry_point(object):
@@ -342,118 +379,16 @@ def cssclasses(widget, data, classattr='class', additional=[]):
     return _classes and ' '.join(sorted(_classes)) or None
 
 
-class EmptyValue(object):
-    """Used to identify empty values in conjunction with data type conversion.
-    """
-
-    def __nonzero__(self):
-        return False
-
-    __bool__ = __nonzero__
-
-    def __str__(self):
-        return ''
-
-    def __len__(self):
-        return 0
-
-    def __repr__(self):
-        return '<EMPTY_VALUE>'
-
-
-EMPTY_VALUE = EmptyValue()
-
-
-def bytes_to_unicode(value):
-    if isinstance(value, UNICODE_TYPE):
-        return value
-    return codecs.escape_encode(value)[0].decode('ascii')
-
-
-def unicode_to_bytes(value):
-    if isinstance(value, BYTES_TYPE):
-        return value
-    # passed unicode value must contain ascii characters only
-    return codecs.escape_decode(value.encode('ascii'))[0]
-
-
-DATATYPE_PRECONVERTERS = {
-    float: lambda x: isinstance(x, STR_TYPE) and x.replace(',', '.') or x
-}
-# B/C
-DATATYPE_PRECONVERTERS['float'] = DATATYPE_PRECONVERTERS[float]
-DATATYPE_CONVERTERS = {
-    'str': BYTES_TYPE,
-    'unicode': UNICODE_TYPE,
-    'int': int,
-    'integer': int,
-    'long': LONG_TYPE,
-    'float': float,
-    'uuid': uuid.UUID
-}
-
-
-def convert_value_to_datatype(value, datatype, empty_value=EMPTY_VALUE):
-    """Convert given value to datatype.
-
-    Datatype is either a callable or a string out of ``'str'``, ``'unicode'``,
-    ``'int'``, ``'integer'``, ``'long'``, ``'float'`` or ``'uuid'``
-
-    If value is ``UNSET``, return ``UNSET``, regardless of given datatype.
-
-    If value is ``EMPTY_VALUE``, return ``empty_value``, which defaults to
-    ``EMPTY_VALUE`` marker.
-
-    If value is ``None`` or ``''``, return ``empty_value``, which defaults to
-    ``EMPTY_VALUE`` marker. Be aware that empty value marker is even returned
-    if ``str`` datatype, to provide a consistent behavior.
-
-    Converter callables must raise one out of the following exceptions if
-    conversion fails:
-
-        * ``ValueError``
-        * ``UnicodeDecodeError``
-        * ``UnicodeEncodeError``
-    """
-    if value is UNSET:
-        return UNSET
-    if value is EMPTY_VALUE:
-        return empty_value
-    if value in [None, '']:
-        return empty_value
-    if isinstance(datatype, STR_TYPE):
-        warnings.warn(
-            'Passing ``datatype`` as string to ``convert_value_to_datatype`` '
-            'is deprecated and will be removed as of yafowil 3.2.'
-        )
-        converter = DATATYPE_CONVERTERS[datatype]
-    else:
-        converter = datatype
-    try:
-        if isinstance(value, converter):
-            return value
-    except TypeError:
-        # converter is instance of class or function
-        pass
-    preconverter = DATATYPE_PRECONVERTERS.get(datatype)
-    if preconverter:
-        value = preconverter(value)
-    # special case bytes or str buildin type in python 3
-    # uses ascii codec to emulate same behavior as when converting with python2
-    # this is supposed to change in future
-    if not IS_PY2 and converter in (bytes, str):
-        return converter(value, 'ascii')  # pragma: no cover
-    return converter(value)
-
-
-def convert_values_to_datatype(value, datatype, empty_value=EMPTY_VALUE):
-    if isinstance(value, list):
-        res = list()
-        for item in value:
-            res.append(convert_value_to_datatype(
-                item,
-                datatype,
-                empty_value=empty_value
-            ))
-        return res
-    return convert_value_to_datatype(value, datatype, empty_value=empty_value)
+# B/C 2023-03-16
+deprecated(
+    '``EmptyValue`` has been moved to ``yafowil.datatypes``.',
+    EmptyValue='yafowil.datatypes:EmptyValue',
+)
+deprecated(
+    '``convert_value_to_datatype`` has been moved to ``yafowil.datatypes``.',
+    convert_value_to_datatype='yafowil.datatypes:convert_value_to_datatype',
+)
+deprecated(
+    '``convert_values_to_datatype`` has been moved to ``yafowil.datatypes``.',
+    convert_values_to_datatype='yafowil.datatypes:convert_values_to_datatype',
+)
