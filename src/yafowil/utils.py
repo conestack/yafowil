@@ -367,13 +367,14 @@ EMPTY_VALUE = EmptyValue()
 def bytes_to_unicode(value):
     if isinstance(value, UNICODE_TYPE):
         return value
-    return value.decode('unicode_escape')
+    return codecs.escape_encode(value)[0].decode('ascii')
 
 
 def unicode_to_bytes(value):
     if isinstance(value, BYTES_TYPE):
         return value
-    return codecs.escape_decode(value.encode('unicode_escape'))[0]
+    # passed unicode value must contain ascii characters only
+    return codecs.escape_decode(value.encode('ascii'))[0]
 
 
 DATATYPE_PRECONVERTERS = {

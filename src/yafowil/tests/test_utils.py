@@ -374,22 +374,24 @@ class TestUtils(YafowilTestCase):
 
     def test_bytes_to_unicode(self):
         self.assertEqual(
-            bytes_to_unicode(b'\x01\x9a\x03\x04\x05\xff'),
-            u'\x01\x9a\x03\x04\x05\xff'
+            bytes_to_unicode(b'\r\n\x01\x9a\x03\xff'),
+            u'\\r\\n\\x01\\x9a\\x03\\xff'
         )
         self.assertEqual(
-            bytes_to_unicode(u'\x01\x9a\x03\x04\x05\xff'),
-            u'\x01\x9a\x03\x04\x05\xff'
+            bytes_to_unicode(u'aaa'),
+            u'aaa'
         )
 
     def test_unicode_to_bytes(self):
+        with self.assertRaises(UnicodeEncodeError):
+            unicode_to_bytes(u'ä')
         self.assertEqual(
-            unicode_to_bytes(u'\x01\x9a\x03\x04\x05\xff'),
-            b'\x01\x9a\x03\x04\x05\xff'
+            unicode_to_bytes(u'\\r\\n\\x01\\x9a\\x03\\xff'),
+            b'\r\n\x01\x9a\x03\xff'
         )
         self.assertEqual(
-            unicode_to_bytes(b'\x01\x9a\x03\x04\x05\xff'),
-            b'\x01\x9a\x03\x04\x05\xff'
+            unicode_to_bytes(b'aaa'),
+            b'aaa'
         )
 
     def test_convert_value_to_datatype(self):
