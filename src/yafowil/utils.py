@@ -6,11 +6,13 @@ from yafowil.compat import IS_PY2
 from yafowil.compat import LONG_TYPE
 from yafowil.compat import STR_TYPE
 from yafowil.compat import UNICODE_TYPE
+import codecs
 import json
 import logging
 import re
 import unicodedata
 import uuid
+import warnings
 
 
 class entry_point(object):
@@ -362,6 +364,18 @@ class EmptyValue(object):
 EMPTY_VALUE = EmptyValue()
 
 
+def bytes_to_unicode(value):
+    if isinstance(value, UNICODE_TYPE):
+        return value
+    return value.decode('unicode_escape')
+
+
+def unicode_to_bytes(value):
+    if isinstance(value, BYTES_TYPE):
+        return value
+    return codecs.escape_decode(value.encode('unicode_escape'))[0]
+
+
 DATATYPE_PRECONVERTERS = {
     float: lambda x: isinstance(x, STR_TYPE) and x.replace(',', '.') or x
 }
@@ -407,6 +421,10 @@ def convert_value_to_datatype(value, datatype, empty_value=EMPTY_VALUE):
     if value in [None, '']:
         return empty_value
     if isinstance(datatype, STR_TYPE):
+        warnings.warn(
+            'Passing ``datatype`` as string to ``convert_value_to_datatype`` '
+            'is deprecated and will be removed as of yafowil 3.2.'
+        )
         converter = DATATYPE_CONVERTERS[datatype]
     else:
         converter = datatype

@@ -10,23 +10,25 @@ from yafowil.compat import IS_PY2
 from yafowil.compat import LONG_TYPE
 from yafowil.compat import UNICODE_TYPE
 from yafowil.tests import YafowilTestCase
+from yafowil.utils import EMPTY_VALUE
+from yafowil.utils import Tag
 from yafowil.utils import as_data_attrs
 from yafowil.utils import attr_value
+from yafowil.utils import bytes_to_unicode
 from yafowil.utils import callable_value
 from yafowil.utils import convert_value_to_datatype
 from yafowil.utils import convert_values_to_datatype
 from yafowil.utils import cssclasses
 from yafowil.utils import cssid
 from yafowil.utils import data_attrs_helper
-from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import generic_html5_attrs
 from yafowil.utils import get_example
 from yafowil.utils import get_example_names
 from yafowil.utils import get_plugin_names
 from yafowil.utils import get_plugins
 from yafowil.utils import managedprops
-from yafowil.utils import Tag
 from yafowil.utils import tag as deprecated_tag
+from yafowil.utils import unicode_to_bytes
 from yafowil.utils import vocabulary
 import uuid
 import yafowil.loader  # noqa
@@ -369,6 +371,26 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(str(EMPTY_VALUE), '')
         self.assertFalse(bool(EMPTY_VALUE))
         self.assertEqual(len(EMPTY_VALUE), 0)
+
+    def test_bytes_to_unicode(self):
+        self.assertEqual(
+            bytes_to_unicode(b'\x01\x9a\x03\x04\x05\xff'),
+            u'\x01\x9a\x03\x04\x05\xff'
+        )
+        self.assertEqual(
+            bytes_to_unicode(u'\x01\x9a\x03\x04\x05\xff'),
+            u'\x01\x9a\x03\x04\x05\xff'
+        )
+
+    def test_unicode_to_bytes(self):
+        self.assertEqual(
+            unicode_to_bytes(u'\x01\x9a\x03\x04\x05\xff'),
+            b'\x01\x9a\x03\x04\x05\xff'
+        )
+        self.assertEqual(
+            unicode_to_bytes(b'\x01\x9a\x03\x04\x05\xff'),
+            b'\x01\x9a\x03\x04\x05\xff'
+        )
 
     def test_convert_value_to_datatype(self):
         # Unknown string identifier
