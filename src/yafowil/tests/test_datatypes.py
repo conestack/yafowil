@@ -2,6 +2,7 @@
 from node.utils import UNSET
 from yafowil.base import ExtractionError
 from yafowil.base import factory
+from yafowil.common import generic_extractor
 from yafowil.compat import BYTES_TYPE
 from yafowil.compat import IS_PY2
 from yafowil.compat import LONG_TYPE
@@ -9,6 +10,8 @@ from yafowil.compat import UNICODE_TYPE
 from yafowil.datatypes import EMPTY_VALUE
 from yafowil.datatypes import convert_value_to_datatype
 from yafowil.datatypes import convert_values_to_datatype
+from yafowil.datatypes import generic_emptyvalue_extractor
+from yafowil.datatypes import lookup_datatype_converter
 from yafowil.tests import YafowilTestCase
 import uuid
 import yafowil.loader  # noqa
@@ -22,27 +25,119 @@ class TestDatatypes(YafowilTestCase):
         self.assertFalse(bool(EMPTY_VALUE))
         self.assertEqual(len(EMPTY_VALUE), 0)
 
-    # def test_bytes_to_unicode(self):
-    #     self.assertEqual(
-    #         bytes_to_unicode(b'\r\n\x01\x9a\x03\xff'),
-    #         u'\\r\\n\\x01\\x9a\\x03\\xff'
-    #     )
-    #     self.assertEqual(
-    #         bytes_to_unicode(u'aaa'),
-    #         u'aaa'
-    #     )
+    def test_generic_emptyvalue_extractor(self):
+        factory.register(
+            'emptyvalue_test',
+            extractors=[
+                generic_extractor,
+                generic_emptyvalue_extractor
+            ]
+        )
+        widget = factory('emptyvalue_test', name='widget')
+        data = widget.extract({})
+        self.assertEqual(data.extracted, UNSET)
 
-    # def test_unicode_to_bytes(self):
-    #     with self.assertRaises(UnicodeEncodeError):
-    #         unicode_to_bytes(u'ä')
-    #     self.assertEqual(
-    #         unicode_to_bytes(u'\\r\\n\\x01\\x9a\\x03\\xff'),
-    #         b'\r\n\x01\x9a\x03\xff'
-    #     )
-    #     self.assertEqual(
-    #         unicode_to_bytes(b'aaa'),
-    #         b'aaa'
-    #     )
+        data = widget.extract({'widget': ''})
+        self.assertEqual(data.extracted, '')
+
+        widget = factory(
+            'emptyvalue_test',
+            name='widget',
+            props={'emptyvalue': EMPTY_VALUE}
+        )
+        data = widget.extract({})
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'widget': ''})
+        self.assertEqual(data.extracted, EMPTY_VALUE)
+
+        widget = factory(
+            'emptyvalue_test',
+            name='widget',
+            props={'emptyvalue': 'EMPTY'}
+        )
+        data = widget.extract({})
+        self.assertEqual(data.extracted, UNSET)
+
+        data = widget.extract({'widget': ''})
+        self.assertEqual(data.extracted, 'EMPTY')
+
+    def test_DatatypeConverter(self):
+        from yafowil.datatypes import DatatypeConverter
+
+        converter = DatatypeConverter()
+        self.assertEqual(converter.to_form(u'"quoted"'), u'&quot;quoted&quot;')
+
+        converter = DatatypeConverter(int)
+        self.assertEqual(converter.to_form(1), '1')
+        self.assertEqual(converter.to_value('1'), 1)
+        self.assertEqual(converter.to_value(1), 1)
+        self.assertEqual(converter.to_value(1.0), 1)
+
+        converter = DatatypeConverter(uuid.UUID)
+        uuid_ = uuid.uuid4()
+        self.assertEqual(converter.to_form(uuid_), UNICODE_TYPE(uuid_))
+        self.assertEqual(converter.to_value(UNICODE_TYPE(uuid_)), uuid_)
+        self.assertEqual(converter.to_value(uuid_), uuid_)
+
+    def test_BytesDatatypeConverter(self):
+        from yafowil.datatypes import BytesDatatypeConverter
+
+        converter = BytesDatatypeConverter()
+        self.assertEqual(
+            converter.to_form(b'\r\n\x01\x9a\x03\xff'),
+            u'\\r\\n\\x01\\x9a\\x03\\xff'
+        )
+        self.assertEqual(
+            converter.to_form(u'aaa'),
+            u'aaa'
+        )
+        with self.assertRaises(UnicodeEncodeError):
+            converter.to_value(u'ä')
+        self.assertEqual(
+            converter.to_value(u'\\r\\n\\x01\\x9a\\x03\\xff'),
+            b'\r\n\x01\x9a\x03\xff'
+        )
+        self.assertEqual(
+            converter.to_value(b'aaa'),
+            b'aaa'
+        )
+
+    def test_UnicodeDatatypeConverter(self):
+        from yafowil.datatypes import UnicodeDatatypeConverter
+
+        converter = UnicodeDatatypeConverter()
+        self.assertEqual(converter.to_value(u'äöü'), u'äöü')
+        self.assertEqual(converter.to_value(b'aou'), u'aou')
+
+    def test_FloatDatatypeConverter(self):
+        from yafowil.datatypes import FloatDatatypeConverter
+
+        converter = FloatDatatypeConverter()
+        self.assertEqual(converter.to_value('1.1'), 1.1)
+        self.assertEqual(converter.to_value('1,1'), 1.1)
+        self.assertEqual(converter.to_value(1.1), 1.1)
+
+    def test_lookup_datatype_converter(self):
+        from yafowil.datatypes import DatatypeConverter
+        converter = lookup_datatype_converter(int)
+        self.assertIsInstance(converter, DatatypeConverter)
+        self.assertEqual(converter.type_, int)
+
+        from yafowil.datatypes import BytesDatatypeConverter
+
+        converter = lookup_datatype_converter(BYTES_TYPE)
+        self.assertIsInstance(converter, BytesDatatypeConverter)
+
+        from yafowil.datatypes import UnicodeDatatypeConverter
+
+        converter = lookup_datatype_converter(UNICODE_TYPE)
+        self.assertIsInstance(converter, UnicodeDatatypeConverter)
+
+        from yafowil.datatypes import FloatDatatypeConverter
+
+        converter = lookup_datatype_converter(float)
+        self.assertIsInstance(converter, FloatDatatypeConverter)
 
     def test_convert_value_to_datatype(self):
         # Unknown string identifier
@@ -55,7 +150,7 @@ class TestDatatypes(YafowilTestCase):
         self.assertEqual(convert_value_to_datatype('', 'uuid'), EMPTY_VALUE)
         self.assertEqual(convert_value_to_datatype(None, 'uuid'), EMPTY_VALUE)
 
-    def test_convert_value_to_datatype_str(self):
+    def test_convert_value_to_datatype_bytes(self):
         # Convert to string by id
         self.assertEqual(convert_value_to_datatype(UNSET, 'str'), UNSET)
 

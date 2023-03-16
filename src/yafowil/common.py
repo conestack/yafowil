@@ -12,6 +12,7 @@ from yafowil.datatypes import convert_value_to_datatype
 from yafowil.datatypes import convert_values_to_datatype
 from yafowil.datatypes import generic_datatype_extractor
 from yafowil.datatypes import generic_emptyvalue_extractor
+from yafowil.datatypes import lookup_datatype_converter
 from yafowil.tsf import _
 from yafowil.utils import as_data_attrs
 from yafowil.utils import attr_value
@@ -193,7 +194,13 @@ deprecated(
 def input_attributes_common(widget, data, excludes=list(), value=None):
     if value is None:
         value = fetch_value(widget, data)
-    if isinstance(value, STR_TYPE):
+    datatype = widget.attrs.get('datatype', None)
+    if datatype is not None:
+        converter = lookup_datatype_converter(datatype)
+        value = converter.to_form(value)
+    # XXX: get rid of this, we probaly want to have a default datatype
+    #      converter here
+    elif isinstance(value, STR_TYPE):
         value = value.replace('"', '&quot;')
     autofocus = attr_value('autofocus', widget, data) and 'autofocus' or None
     disabled = attr_value('disabled', widget, data)

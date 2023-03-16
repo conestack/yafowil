@@ -1,15 +1,15 @@
 from __future__ import print_function
 from node.tests import NodeTestCase
+from yafowil import common
+from yafowil import compound
+from yafowil import datatypes
+from yafowil import persistence
+from yafowil import table
 from yafowil.base import factory
 from yafowil.compat import IS_PY2
 import lxml.etree as etree
 import sys
 import unittest
-import yafowil.common
-import yafowil.compound
-import yafowil.datatypes
-import yafowil.persistence
-import yafowil.table
 
 
 if not IS_PY2:
@@ -22,11 +22,11 @@ class YafowilTestCase(NodeTestCase):
         super(YafowilTestCase, self).setUp()
         factory.push_state()
         factory.clear()
-        reload(yafowil.common)
-        reload(yafowil.compound)
-        reload(yafowil.datatypes)
-        reload(yafowil.persistence)
-        reload(yafowil.table)
+        reload(common)
+        reload(compound)
+        reload(datatypes)
+        reload(persistence)
+        reload(table)
 
     def tearDown(self):
         factory.pop_state()

@@ -41,7 +41,7 @@ class DatatypeConverter(object):
         self.type_ = type_
 
     def to_value(self, value):
-        """Convert given value on extraction"""
+        """Convert given value on extraction to desired type."""
         try:
             if isinstance(value, self.type_):
                 return value
@@ -51,10 +51,10 @@ class DatatypeConverter(object):
         return self.type_(value)
 
     def to_form(self, value):
-        """Convert given value for rendering."""
-        if isinstance(value, UNICODE_TYPE):
-            return value
-        return u'{}'.format(value)
+        """Convert given value to unicode string for rendering."""
+        if not isinstance(value, UNICODE_TYPE):
+            value = u'{}'.format(value)
+        return value.replace('"', '&quot;')
 
 
 class BytesDatatypeConverter(DatatypeConverter):
@@ -75,41 +75,47 @@ class BytesDatatypeConverter(DatatypeConverter):
 class UnicodeDatatypeConverter(DatatypeConverter):
     """Datatype converter for unicode."""
 
+    def __init__(self):
+        super(UnicodeDatatypeConverter, self).__init__(UNICODE_TYPE)
+
     def to_value(self, value):
-        if isinstance(value, UNICODE_TYPE):
+        if isinstance(value, self.type_):
             return value
-        return UNICODE_TYPE(value, encoding='utf-8')
+        return self.type_(value, encoding='utf-8')
 
 
 class FloatDatatypeConverter(DatatypeConverter):
     """Datatype converter for float."""
 
+    def __init__(self):
+        super(FloatDatatypeConverter, self).__init__(float)
+
     def to_value(self, value):
         if isinstance(value, STR_TYPE):
             value = value.replace(',', '.')
-        return float(value)
+        return self.type_(value)
 
 
 DATATYPE_CONVERTERS = {
     BYTES_TYPE: BytesDatatypeConverter(),
-    UNICODE_TYPE: UnicodeDatatypeConverter(UNICODE_TYPE),
-    float: FloatDatatypeConverter(float)
+    UNICODE_TYPE: UnicodeDatatypeConverter(),
+    float: FloatDatatypeConverter()
 }
 
 # B/C, will be removed as of yafowil 3.2
 LEGACY_DATATYPE_CONVERTERS = {
     'str': BytesDatatypeConverter(),
-    'unicode': UnicodeDatatypeConverter(UNICODE_TYPE),
+    'unicode': UnicodeDatatypeConverter(),
     'int': int,
     'integer': int,
     'long': LONG_TYPE,  # long only exists in python 2
-    'float': FloatDatatypeConverter(float),
+    'float': FloatDatatypeConverter(),
     'uuid': uuid.UUID
 }
 
 
-def convert_value_to_datatype(value, datatype, empty_value=EMPTY_VALUE):
-    """Convert given value to datatype.
+def lookup_datatype_converter(datatype):
+    """Lookup datatype converter for given datatype.
 
     Datatype is either a type or an instance of ``DatatypeConverter``.
     If datatype is a type, an instance of ``DatatypeConverter`` gets created.
@@ -117,6 +123,25 @@ def convert_value_to_datatype(value, datatype, empty_value=EMPTY_VALUE):
     For B/C behavior, datatype can be a string out of 'str', 'unicode',
     'int', 'integer', 'long', 'float' or 'uuid'. This behavior is deprecated
     and will be removed as of yafowil 3.2.
+    """
+    if isinstance(datatype, STR_TYPE):
+        warnings.warn(
+            'Passing ``datatype`` as string to ``convert_value_to_datatype`` '
+            'is deprecated and will be removed as of yafowil 3.2.'
+        )
+        converter = LEGACY_DATATYPE_CONVERTERS[datatype]
+    else:
+        converter = DATATYPE_CONVERTERS.get(datatype, datatype)
+    if not isinstance(converter, DatatypeConverter):
+        converter = DatatypeConverter(converter)
+    return converter
+
+
+def convert_value_to_datatype(value, datatype, empty_value=EMPTY_VALUE):
+    """Convert given value to datatype.
+
+    Uses ``lookup_datatype_converter`` to lookup the appropriate datatype
+    converter.
 
     If value is ``UNSET``, return ``UNSET``, regardless of given datatype.
 
@@ -140,16 +165,7 @@ def convert_value_to_datatype(value, datatype, empty_value=EMPTY_VALUE):
         return empty_value
     if value in [None, '']:
         return empty_value
-    if isinstance(datatype, STR_TYPE):
-        warnings.warn(
-            'Passing ``datatype`` as string to ``convert_value_to_datatype`` '
-            'is deprecated and will be removed as of yafowil 3.2.'
-        )
-        converter = LEGACY_DATATYPE_CONVERTERS[datatype]
-    else:
-        converter = DATATYPE_CONVERTERS.get(datatype, datatype)
-    if not isinstance(converter, DatatypeConverter):
-        converter = DatatypeConverter(converter)
+    converter = lookup_datatype_converter(datatype)
     return converter.to_value(value)
 
 
