@@ -6,10 +6,10 @@ from yafowil.common import convert_bytes
 from yafowil.compat import BYTES_TYPE
 from yafowil.compat import IS_PY2
 from yafowil.compat import UNICODE_TYPE
-from yafowil.datatypes import EMPTY_VALUE
 from yafowil.persistence import write_mapping_writer
 from yafowil.tests import YafowilTestCase
 from yafowil.tests import fxml
+from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import Tag
 import uuid
 

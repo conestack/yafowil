@@ -8,9 +8,9 @@ from yafowil.compat import LONG_TYPE
 from yafowil.compat import STR_TYPE
 from yafowil.compat import UNICODE_TYPE
 from yafowil.tsf import _
+from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import attr_value
 from yafowil.utils import managedprops
-from yafowil.utils import EMPTY_VALUE
 import codecs
 import uuid
 import warnings

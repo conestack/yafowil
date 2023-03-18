@@ -7,13 +7,13 @@ from yafowil.compat import BYTES_TYPE
 from yafowil.compat import ITER_TYPES
 from yafowil.compat import STR_TYPE
 from yafowil.compat import UNICODE_TYPE
-from yafowil.datatypes import EMPTY_VALUE
 from yafowil.datatypes import convert_value_to_datatype
 from yafowil.datatypes import convert_values_to_datatype
 from yafowil.datatypes import generic_datatype_extractor
 from yafowil.datatypes import generic_emptyvalue_extractor
 from yafowil.datatypes import lookup_datatype_converter
 from yafowil.tsf import _
+from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import as_data_attrs
 from yafowil.utils import attr_value
 from yafowil.utils import css_managed_props

@@ -10,7 +10,6 @@ import re
 import unicodedata
 
 
-#: NOTE: This class will be moved to yafowil.datatypes as of yafowil 3.2
 class EmptyValue(object):
     """Used to identify empty values in conjunction with data type conversion.
     """
@@ -48,7 +47,6 @@ class EmptyValue(object):
         return False
 
 
-#: NOTE: This singleton will be moved to yafowil.datatypes as of yafowil 3.2
 EMPTY_VALUE = EmptyValue()
 
 
@@ -380,10 +378,6 @@ def cssclasses(widget, data, classattr='class', additional=[]):
 
 
 # B/C 2023-03-16
-deprecated(
-    '``EmptyValue`` has been moved to ``yafowil.datatypes``.',
-    EmptyValue='yafowil.datatypes:EmptyValue',
-)
 deprecated(
     '``convert_value_to_datatype`` has been moved to ``yafowil.datatypes``.',
     convert_value_to_datatype='yafowil.datatypes:convert_value_to_datatype',

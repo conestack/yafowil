@@ -7,12 +7,13 @@ from yafowil.compat import BYTES_TYPE
 from yafowil.compat import IS_PY2
 from yafowil.compat import LONG_TYPE
 from yafowil.compat import UNICODE_TYPE
-from yafowil.datatypes import EMPTY_VALUE
 from yafowil.datatypes import convert_value_to_datatype
 from yafowil.datatypes import convert_values_to_datatype
 from yafowil.datatypes import generic_emptyvalue_extractor
 from yafowil.datatypes import lookup_datatype_converter
 from yafowil.tests import YafowilTestCase
+from yafowil.utils import EMPTY_VALUE
+import copy
 import uuid
 import yafowil.loader  # noqa
 
@@ -24,6 +25,13 @@ class TestDatatypes(YafowilTestCase):
         self.assertEqual(str(EMPTY_VALUE), '')
         self.assertFalse(bool(EMPTY_VALUE))
         self.assertEqual(len(EMPTY_VALUE), 0)
+        self.assertTrue(copy.copy(EMPTY_VALUE) is EMPTY_VALUE)
+        self.assertTrue(copy.deepcopy(EMPTY_VALUE) is EMPTY_VALUE)
+        self.assertFalse(EMPTY_VALUE < EMPTY_VALUE)
+        self.assertFalse(EMPTY_VALUE <= EMPTY_VALUE)
+        self.assertFalse(EMPTY_VALUE > EMPTY_VALUE)
+        self.assertFalse(EMPTY_VALUE >= EMPTY_VALUE)
+
 
     def test_generic_emptyvalue_extractor(self):
         factory.register(
