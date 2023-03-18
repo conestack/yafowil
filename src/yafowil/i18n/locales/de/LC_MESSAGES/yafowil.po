@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: yafowil 2.1pre1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-03-21 16:26+0100\n"
+"POT-Creation-Date: 2023-03-18 10:23+0100\n"
 "PO-Revision-Date: 2014-04-30 17:34+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -18,166 +18,162 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "Generated-By: Babel 1.3\n"
 
-#. Default: Mandatory field was empty
-#: src/yafowil/common.py:126
-msgid "required_message"
-msgstr "Feld erfordert eine Eingabe"
-
 #. Default: string
-#: src/yafowil/common.py:232
+#: src/yafowil/datatypes.py:194
 msgid "datatype_str"
 msgstr "ASCII Zeichenkette"
 
 #. Default: unicode
-#: src/yafowil/common.py:233
+#: src/yafowil/datatypes.py:195
 msgid "datatype_unicode"
 msgstr "Zeichenkette"
 
 #. Default: integer
-#: src/yafowil/common.py:234
+#: src/yafowil/datatypes.py:196
 msgid "datatype_integer"
 msgstr "Ganzzahl"
 
 #. Default: floating point number
-#: src/yafowil/common.py:235
+#: src/yafowil/datatypes.py:197
 msgid "datatype_float"
 msgstr "Gleitkommazahl"
 
 #. Default: UUID
-#: src/yafowil/common.py:236
+#: src/yafowil/datatypes.py:198
 msgid "datatype_uuid"
 msgstr "UUID"
 
 #. Default: long integer
 #. pragma: no cover
-#: src/yafowil/common.py:239
+#: src/yafowil/datatypes.py:201
 msgid "datatype_long"
 msgstr "Ganzzahl"
 
 #. Default: Input conversion failed.
-#: src/yafowil/common.py:291
+#: src/yafowil/datatypes.py:259
 msgid "generic_datatype_message"
 msgstr "Eingabekonvertierung fehlgeschlagen"
 
 #. Default: Input is not a valid ${datatype}.
-#: src/yafowil/common.py:298
+#: src/yafowil/datatypes.py:266
 msgid "standard_datatype_message"
 msgstr "Eingabe ist keine gültige ${datatype}."
 
+#. Default: Mandatory field was empty
+#: src/yafowil/common.py:90
+msgid "required_message"
+msgstr "Feld erfordert eine Eingabe"
+
 #. Default: Input must have at least ${len} characters.
-#: src/yafowil/common.py:801
+#: src/yafowil/common.py:707
 msgid "minlength_extraction_error"
 msgstr "Eingabe muss mindestens ${len} Zeichen lang sein."
 
 #. Default: Input contains illegal characters.
-#: src/yafowil/common.py:827
+#: src/yafowil/common.py:733
 msgid "ascii_extractor_error"
 msgstr "Eingabe enthält ungültige Zeichen"
 
 #. Default: Password too weak
-#: src/yafowil/common.py:962
+#: src/yafowil/common.py:876
 msgid "weak_password_message"
 msgstr "Passwort zu schwach"
 
 #. Default: Yes
-#: src/yafowil/common.py:1098
+#: src/yafowil/common.py:1022
 msgid "yes"
 msgstr "Ja"
 
 #. Default: No
-#: src/yafowil/common.py:1099
+#: src/yafowil/common.py:1023
 msgid "no"
 msgstr "Nein"
 
 #. Default: Unset
 #. XXX: never used right now?
-#: src/yafowil/common.py:1100
+#: src/yafowil/common.py:1024
 msgid "unset"
 msgstr "Ohne Wert"
 
+#. Default: Cannot replace file. No file uploaded.
+#: src/yafowil/common.py:1453
+msgid "file_replace_no_upload"
+msgstr "Datei kann nicht ersetzt werden. Keine Datei hochgeladen"
+
+#. Default: Mimetype of uploaded file not matches
+#: src/yafowil/common.py:1487
+msgid "file_invalid_mimetype"
+msgstr "Ungültiger Dateityp hochgeladen"
+
 #. Default: No file
-#: src/yafowil/common.py:1557
+#: src/yafowil/common.py:1537
 msgid "no_file"
 msgstr "Keine Datei"
 
 #. Default: Unknown
-#: src/yafowil/common.py:1562
+#: src/yafowil/common.py:1542
 msgid "unknown"
 msgstr "Unbekannt"
 
 #. Default: Filename: 
-#: src/yafowil/common.py:1563
+#: src/yafowil/common.py:1543
 msgid "filename"
 msgstr "Dateiname:"
 
 #. Default: Mimetype: 
-#: src/yafowil/common.py:1564
+#: src/yafowil/common.py:1544
 msgid "mimetype"
 msgstr "Dateityp:"
 
 #. Default: Size: 
-#: src/yafowil/common.py:1565
+#: src/yafowil/common.py:1545
 msgid "size"
 msgstr "Größe:"
 
 #. Default: Keep Existing file
-#: src/yafowil/common.py:1627
+#: src/yafowil/common.py:1620
 msgid "file_keep"
 msgstr "Behalte bestehende Datei"
 
 #. Default: Replace existing file
-#: src/yafowil/common.py:1628
+#: src/yafowil/common.py:1621
 msgid "file_replace"
 msgstr "Ersetze bestehende Datei"
 
 #. Default: Delete existing file
-#: src/yafowil/common.py:1629
+#: src/yafowil/common.py:1622
 msgid "file_delete"
 msgstr "Lösche bestehende Datei"
 
 #. Default: Input not a valid email address.
-#: src/yafowil/common.py:1882
+#: src/yafowil/common.py:1901
 msgid "email_address_not_valid"
 msgstr "Eingabe ist keine gültige E-Mail Adresse."
 
 #. Default: Input not a valid web address.
-#: src/yafowil/common.py:1934
+#: src/yafowil/common.py:1954
 msgid "web_address_not_valid"
 msgstr "Eingabe ist keine gültige Webadresse."
 
 #. Default: Value has to be at minimum ${min}.
-#: src/yafowil/common.py:2010
+#: src/yafowil/common.py:2032
 msgid "input_number_minimum_value"
 msgstr "Wert muss mindestens ${min} betragen."
 
 #. Default: Value has to be at maximum ${max}.
-#: src/yafowil/common.py:2016
+#: src/yafowil/common.py:2038
 msgid "input_number_maximum_value"
 msgstr "Wert darf maximal ${max} betragen."
 
 #. Default: Value ${val} has to be in stepping of ${step} based on a floor
 #. value of ${minimum}
-#: src/yafowil/common.py:2025
+#: src/yafowil/common.py:2047
 msgid "input_number_step_and_minimum_value"
 msgstr ""
 "Wert ${val} muss mindestens ${minimum} betragen und durch ${step} teilbar "
 "sein."
 
 #. Default: Value ${val} has to be in stepping of ${step}
-#: src/yafowil/common.py:2035
+#: src/yafowil/common.py:2057
 msgid "input_number_step_value"
 msgstr "Wert ${val} muss durch ${step} teilbar sein."
-
-#: src/yafowil/tests/test_tsf.py:11
-msgid "foo"
-msgstr ""
-
-#. Default: Bar
-#: src/yafowil/tests/test_tsf.py:12
-msgid "bar"
-msgstr ""
-
-#. Default: Baz ${bam}
-#: src/yafowil/tests/test_tsf.py:14
-msgid "baz"
-msgstr ""
