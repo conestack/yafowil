@@ -1240,7 +1240,7 @@ class TestCommon(YafowilTestCase):
             value=2,
             props={
                 'vocabulary': vocab,
-                'datatype': 'int'
+                'datatype': int
             })
         self.checkOutput("""
         <select class="select" id="input-MYSELECT" name="MYSELECT">
@@ -1561,7 +1561,7 @@ class TestCommon(YafowilTestCase):
             value='b1116392-4a80-496d-86f1-3a2c87e09c59',
             props={
                 'vocabulary': vocab,
-                'datatype': 'uuid',
+                'datatype': uuid.UUID,
                 'format': 'single',
             })
         self.checkOutput("""
@@ -1878,7 +1878,7 @@ class TestCommon(YafowilTestCase):
             name='MYSELECT',
             value=[1.0, 2.0],
             props={
-                'datatype': 'float',
+                'datatype': float,
                 'multivalued': True,
                 'vocabulary': vocab,
                 'emptyvalue': []
@@ -3803,7 +3803,7 @@ class TestCommon(YafowilTestCase):
             'number',
             name='NUMBER',
             props={
-                'datatype': 'integer'
+                'datatype': int
             })
         data = widget.extract({'NUMBER': '10.0'})
         self.assertEqual(
@@ -3927,7 +3927,7 @@ class TestCommon(YafowilTestCase):
             'number',
             name='NUMBER',
             props={
-                'datatype': 'int'
+                'datatype': int
             })
         data = widget.extract({'NUMBER': '0'})
         self.assertEqual(data.extracted, 0)
@@ -3937,10 +3937,32 @@ class TestCommon(YafowilTestCase):
             'number',
             name='NUMBER',
             props={
-                'datatype': 'int'
+                'datatype': int
             })
         data = widget.extract({'NUMBER': '0'})
         model = dict()
         data.persist_writer = write_mapping_writer
         data.write(model)
         self.assertEqual(model, {'NUMBER': 0})
+
+    def test_bytes_datatype_rendering_and_extraction(self):
+        widget = factory(
+            'text',
+            value=b'\r\n\x01\x9a\x03\xff',
+            name='BYTES',
+            props={
+                'datatype': bytes
+            })
+        self.assertEqual(widget(), (
+            u'<input class="text" id="input-BYTES" name="BYTES" '
+            u'type="text" value="\\r\\n\\x01\\x9a\\x03\\xff" />'
+        ))
+
+        widget = factory(
+            'text',
+            name='BYTES',
+            props={
+                'datatype': bytes
+            })
+        data = widget.extract({'BYTES': u'\\r\\n\\x01\\x9a\\x03\\xff'})
+        self.assertEqual(data.extracted, b'\r\n\x01\x9a\x03\xff')

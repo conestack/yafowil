@@ -220,9 +220,12 @@ def generic_datatype_extractor(widget, data):
     """Convert extracted value to ``datatype``.
 
     If extracted value is ``UNSET`` return ``UNSET``.
+
     If no ``datatype`` given, return extracted value.
+
     Otherwise try to convert value to given ``datatype`` and return the
     converted value or raise an ``ExtractionError`` if conversion fails.
+
     Extraction error message can be customized with ``datatype_message``
     property. Value can also be a list, then all items inside the list are
     converted.
@@ -275,17 +278,17 @@ factory.doc['props']['datatype'] = """\
 Datatype is either a type or an instance of ``DatatypeConverter``.
 If datatype is a type, an instance of ``DatatypeConverter`` gets created.
 
-``datatype`` can also be defined as string with value out of ``'str'``,
-``'unicode'``, ``'int'``, ``'integer'``, ``'long'``, ``'float'`` or
-``'uuid'``.
+For B/C behavior, datatype can be a string out of 'str', 'unicode',
+'int', 'integer', 'long', 'float' or 'uuid'. This behavior is deprecated
+and will be removed as of yafowil 3.2.
 
-ATTENTION: In python 3, string identifiers should not be used at all, but if,
-    the following must be known:
-        * ``'str'`` refers to ``bytes`` type.
-        * ``'unicode'`` refers to ``str`` type.
-        * ``'long'`` refers to ``int`` type.
+**NOTE**: As of Python 3, string identifiers should not be used at all, but if
+you do so, the following rules apply:
+    * 'str' maps to ``bytes`` type.
+    * 'unicode' maps to ``str`` type.
+    * 'long' maps to ``int`` type.
 
-Custom converter callables must raise one out of the following exceptions if
+Custom datatype converters must raise one out of the following exceptions if
 conversion fails:
     * ``ValueError``
     * ``UnicodeDecodeError``
