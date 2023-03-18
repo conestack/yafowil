@@ -4,24 +4,25 @@ from yafowil.base import ExtractionError
 from yafowil.base import factory
 from yafowil.base import fetch_value
 from yafowil.compat import BYTES_TYPE
-from yafowil.compat import IS_PY2
 from yafowil.compat import ITER_TYPES
-from yafowil.compat import LONG_TYPE
 from yafowil.compat import STR_TYPE
 from yafowil.compat import UNICODE_TYPE
+from yafowil.datatypes import convert_value_to_datatype
+from yafowil.datatypes import convert_values_to_datatype
+from yafowil.datatypes import generic_datatype_extractor
+from yafowil.datatypes import generic_emptyvalue_extractor
+from yafowil.datatypes import lookup_datatype_converter
 from yafowil.tsf import _
 from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import as_data_attrs
 from yafowil.utils import attr_value
-from yafowil.utils import convert_value_to_datatype
-from yafowil.utils import convert_values_to_datatype
 from yafowil.utils import css_managed_props
 from yafowil.utils import cssclasses
 from yafowil.utils import cssid
 from yafowil.utils import managedprops
 from yafowil.utils import vocabulary
+from zope.deferredimport import deprecated
 import re
-import uuid
 
 
 ###############################################################################
@@ -79,43 +80,6 @@ Switch autocomplete explizit to ``on`` or ``off``.
 factory.defaults['placeholder'] = None
 factory.doc['props']['placeholder'] = """\
 Whether this input has a placeholder value or not (if browser supports it).
-"""
-
-factory.doc['props']['emptyvalue'] = """\
-If configured and received value in request is empty, return as extracted
-value.
-"""
-
-factory.defaults['datatype'] = None
-factory.doc['props']['datatype'] = """\
-Callable for converting extracted value to output datatype.
-
-``datatype`` can also be defined as string with value out of ``'str'``,
-``'unicode'``, ``'int'``, ``'integer'``, ``'long'``, ``'float'`` or
-``'uuid'``.
-
-ATTENTION: In python 3, string identifiers should not be used at all, but if,
-    the following must be known:
-        * ``'str'`` refers to ``bytes`` type.
-        * ``'unicode'`` refers to ``str`` type.
-        * ``'long'`` refers to ``int`` type.
-
-Custom converter callables must raise one out of the following exceptions if
-conversion fails:
-    * ``ValueError``
-    * ``UnicodeDecodeError``
-    * ``UnicodeEncodeError``
-"""
-
-factory.defaults['allowed_datatypes'] = UNSET
-factory.doc['props']['allowed_datatypes'] = """\
-List of allowed datatypes. If ``UNSET``, datatype converters are not
-restricted.
-"""
-
-factory.defaults['datatype_message'] = None
-factory.doc['props']['datatype_message'] = """\
-Custom extraction error message if ``datatype`` conversion fails.
 """
 
 factory.defaults['required'] = False
@@ -216,102 +180,27 @@ def generic_required_extractor(widget, data):
     raise ExtractionError(attr_value('required_message', widget, data))
 
 
-@managedprops('emptyvalue')
-def generic_emptyvalue_extractor(widget, data):
-    """Return emptyvalue if widget present in request and raw value is empty.
-    """
-    try:
-        if not data.request[widget.dottedpath]:
-            return attr_value('emptyvalue', widget, data, data.extracted)
-    except KeyError:
-        pass
-    return data.extracted
-
-
-DATATYPE_LABELS = {
-    BYTES_TYPE: _('datatype_str', default='string'),
-    UNICODE_TYPE: _('datatype_unicode', default='unicode'),
-    int: _('datatype_integer', default='integer'),
-    float: _('datatype_float', default='floating point number'),
-    uuid.UUID: _('datatype_uuid', default='UUID')
-}
-if IS_PY2:
-    DATATYPE_LABELS[LONG_TYPE] = _('datatype_long', default='long integer')  # pragma: no cover
-else:
-    DATATYPE_LABELS[LONG_TYPE] = DATATYPE_LABELS[int]  # pragma: no cover
-# B/C
-DATATYPE_LABELS['str'] = DATATYPE_LABELS[BYTES_TYPE]
-DATATYPE_LABELS['unicode'] = DATATYPE_LABELS[UNICODE_TYPE]
-DATATYPE_LABELS['int'] = DATATYPE_LABELS[int]
-DATATYPE_LABELS['integer'] = DATATYPE_LABELS[int]
-DATATYPE_LABELS['long'] = DATATYPE_LABELS[LONG_TYPE]
-DATATYPE_LABELS['float'] = DATATYPE_LABELS[float]
-DATATYPE_LABELS['uuid'] = DATATYPE_LABELS[uuid.UUID]
-
-
-@managedprops(
-    'datatype',
-    'allowed_datatypes',
-    'datatype_message',
-    'emptyvalue')
-def generic_datatype_extractor(widget, data):
-    """Convert extracted value to ``datatype``.
-
-    If extracted value is ``UNSET`` return ``UNSET``.
-    If no ``datatype`` given, return extracted value.
-    Otherwise try to convert value to given ``datatype`` and return the
-    converted value or raise an ``ExtractionError`` if conversion fails.
-    Extraction error message can be customized with ``datatype_message``
-    property. Value can also be a list, then all items inside the list are
-    converted.
-    """
-    extracted = data.extracted
-    if extracted is UNSET:
-        return extracted
-    # datatype is one of the rare cases where an attribute callable not follows
-    # the typical signature taking widget and data as arguments, but is just
-    # called with the value.
-    datatype = widget.attrs.get('datatype', None)
-    if not datatype:
-        return extracted
-    allowed_datatypes = attr_value('allowed_datatypes', widget, data)
-    if allowed_datatypes and datatype not in allowed_datatypes:
-        raise ValueError('Datatype not allowed: "{0}"'.format(datatype))
-    try:
-        emptyvalue = attr_value('emptyvalue', widget, data, EMPTY_VALUE)
-        return convert_values_to_datatype(
-            extracted,
-            datatype,
-            empty_value=emptyvalue
-        )
-    except KeyError:
-        raise ValueError('Datatype unknown: "{0}"'.format(datatype))
-    except (ValueError, UnicodeEncodeError, UnicodeDecodeError):
-        datatype_message = attr_value('datatype_message', widget, data)
-        if not datatype_message:
-            datatype_label = DATATYPE_LABELS.get(datatype)
-            if not datatype_label:
-                datatype_message = _(
-                    'generic_datatype_message',
-                    default=u'Input conversion failed.'
-                )
-            else:
-                if data.tag.translate:
-                    datatype_label = data.tag.translate(datatype_label)
-                datatype_message = _(
-                    'standard_datatype_message',
-                    default=u'Input is not a valid ${datatype}.',
-                    mapping={
-                        'datatype': datatype_label
-                    }
-                )
-        raise ExtractionError(datatype_message)
+# B/C 2023-03-16
+deprecated(
+    '``generic_emptyvalue_extractor`` has been moved to ``yafowil.datatypes``.',
+    generic_emptyvalue_extractor='yafowil.datatypes:generic_emptyvalue_extractor',
+)
+deprecated(
+    '``generic_datatype_extractor`` has been moved to ``yafowil.datatypes``.',
+    generic_datatype_extractor='yafowil.datatypes:generic_datatype_extractor',
+)
 
 
 def input_attributes_common(widget, data, excludes=list(), value=None):
     if value is None:
         value = fetch_value(widget, data)
-    if isinstance(value, STR_TYPE):
+    datatype = widget.attrs.get('datatype', None)
+    if datatype is not None:
+        converter = lookup_datatype_converter(datatype)
+        value = converter.to_form(value)
+    # XXX: get rid of this, we probaly want to have a default datatype
+    #      converter here
+    elif isinstance(value, STR_TYPE):
         value = value.replace('"', '&quot;')
     autofocus = attr_value('autofocus', widget, data) and 'autofocus' or None
     disabled = attr_value('disabled', widget, data)
@@ -410,8 +299,9 @@ def empty_display_renderer(widget, data):
     return data.rendered or u''
 
 
-def generic_positional_rendering_helper(tagname, message, attrs, rendered, pos,
-                                        tag):
+def generic_positional_rendering_helper(
+        tagname, message, attrs, rendered, pos, tag
+    ):
     """returns new tag with rendered content dependent on position
 
     tagname
