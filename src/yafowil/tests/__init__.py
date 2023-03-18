@@ -1,4 +1,5 @@
 from __future__ import print_function
+from importlib import reload
 from node.tests import NodeTestCase
 from yafowil import common
 from yafowil import compound
@@ -6,14 +7,9 @@ from yafowil import datatypes
 from yafowil import persistence
 from yafowil import table
 from yafowil.base import factory
-from yafowil.compat import IS_PY2
 import lxml.etree as etree
 import sys
 import unittest
-
-
-if not IS_PY2:
-    from importlib import reload
 
 
 class YafowilTestCase(NodeTestCase):

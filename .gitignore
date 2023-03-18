@@ -4,6 +4,5 @@
 /.coverage
 /dist/
 /htmlcov/
-/py2/
-/py3/
-/pypy3/
+/venv/
+/.mxmake/
