@@ -9,8 +9,10 @@ from yafowil.compat import STR_TYPE
 from yafowil.compat import UNICODE_TYPE
 from yafowil.datatypes import convert_value_to_datatype
 from yafowil.datatypes import convert_values_to_datatype
-from yafowil.datatypes import generic_datatype_extractor
-from yafowil.datatypes import generic_emptyvalue_extractor
+# alias generic_datatype_extractor and generic_emptyvalue_extractor imports
+# for now to make deprecated import warnings work
+from yafowil.datatypes import generic_datatype_extractor as generic_datatype_extractor_
+from yafowil.datatypes import generic_emptyvalue_extractor as generic_emptyvalue_extractor_
 from yafowil.datatypes import lookup_datatype_converter
 from yafowil.tsf import _
 from yafowil.utils import EMPTY_VALUE
@@ -24,6 +26,24 @@ from yafowil.utils import vocabulary
 from zope.deferredimport import deprecated
 import re
 
+
+###############################################################################
+#
+###############################################################################
+
+# B/C 2023-03-16
+deprecated(
+    '``generic_emptyvalue_extractor`` has been moved to ``yafowil.datatypes``.',
+    generic_emptyvalue_extractor='yafowil.datatypes:generic_emptyvalue_extractor',
+)
+deprecated(
+    '``generic_datatype_extractor`` has been moved to ``yafowil.datatypes``.',
+    generic_datatype_extractor='yafowil.datatypes:generic_datatype_extractor',
+)
+deprecated(
+    '``DATATYPE_LABELS`` has been moved to ``yafowil.datatypes``.',
+    DATATYPE_LABELS='yafowil.datatypes:DATATYPE_LABELS',
+)
 
 ###############################################################################
 # common defaults
@@ -178,17 +198,6 @@ def generic_required_extractor(widget, data):
     if isinstance(required, STR_TYPE):
         raise ExtractionError(required)
     raise ExtractionError(attr_value('required_message', widget, data))
-
-
-# B/C 2023-03-16
-deprecated(
-    '``generic_emptyvalue_extractor`` has been moved to ``yafowil.datatypes``.',
-    generic_emptyvalue_extractor='yafowil.datatypes:generic_emptyvalue_extractor',
-)
-deprecated(
-    '``generic_datatype_extractor`` has been moved to ``yafowil.datatypes``.',
-    generic_datatype_extractor='yafowil.datatypes:generic_datatype_extractor',
-)
 
 
 def input_attributes_common(widget, data, excludes=list(), value=None):
@@ -397,8 +406,8 @@ factory.register(
     extractors=[
         generic_extractor,
         generic_required_extractor,
-        generic_emptyvalue_extractor,
-        generic_datatype_extractor,
+        generic_emptyvalue_extractor_,
+        generic_datatype_extractor_,
     ],
     edit_renderers=[text_edit_renderer],
     display_renderers=[
@@ -438,8 +447,8 @@ factory.register(
     'hidden',
     extractors=[
         generic_extractor,
-        generic_emptyvalue_extractor,
-        generic_datatype_extractor
+        generic_emptyvalue_extractor_,
+        generic_datatype_extractor_
     ],
     edit_renderers=[input_generic_renderer],
     display_renderers=[empty_display_renderer]
@@ -488,8 +497,8 @@ factory.register(
     'proxy',
     extractors=[
         generic_extractor,
-        generic_emptyvalue_extractor,
-        generic_datatype_extractor
+        generic_emptyvalue_extractor_,
+        generic_datatype_extractor_
     ],
     edit_renderers=[input_proxy_renderer],
     display_renderers=[empty_display_renderer]
@@ -553,7 +562,7 @@ factory.register(
     extractors=[
         generic_extractor,
         generic_required_extractor,
-        generic_emptyvalue_extractor
+        generic_emptyvalue_extractor_
     ],
     edit_renderers=[textarea_renderer],
     display_renderers=[
@@ -642,8 +651,8 @@ factory.register(
         generic_extractor,
         generic_required_extractor,
         lines_extractor,
-        generic_emptyvalue_extractor,
-        generic_datatype_extractor,
+        generic_emptyvalue_extractor_,
+        generic_datatype_extractor_,
     ],
     edit_renderers=[lines_edit_renderer],
     display_renderers=[
@@ -829,7 +838,7 @@ factory.register(
     extractors=[
         generic_extractor,
         generic_required_extractor,
-        generic_emptyvalue_extractor,
+        generic_emptyvalue_extractor_,
         minlength_extractor,
         ascii_extractor,
         password_extractor
@@ -1297,8 +1306,8 @@ factory.register(
     extractors=[
         select_extractor,
         generic_required_extractor,
-        generic_emptyvalue_extractor,
-        generic_datatype_extractor,
+        generic_emptyvalue_extractor_,
+        generic_datatype_extractor_,
     ],
     edit_renderers=[select_edit_renderer],
     display_renderers=[
@@ -1909,8 +1918,8 @@ factory.register(
     extractors=[
         generic_extractor,
         generic_required_extractor,
-        generic_emptyvalue_extractor,
-        generic_datatype_extractor,
+        generic_emptyvalue_extractor_,
+        generic_datatype_extractor_,
         email_extractor
     ],
     edit_renderers=[input_generic_renderer],
@@ -1962,7 +1971,7 @@ factory.register(
     extractors=[
         generic_extractor,
         generic_required_extractor,
-        generic_emptyvalue_extractor,
+        generic_emptyvalue_extractor_,
         url_extractor
     ],
     edit_renderers=[input_generic_renderer],
@@ -1996,7 +2005,7 @@ factory.register(
     extractors=[
         generic_extractor,
         generic_required_extractor,
-        generic_emptyvalue_extractor,
+        generic_emptyvalue_extractor_,
     ],
     edit_renderers=[input_generic_renderer],
     display_renderers=[
@@ -2070,8 +2079,8 @@ factory.register(
     extractors=[
         generic_extractor,
         generic_required_extractor,
-        generic_emptyvalue_extractor,
-        generic_datatype_extractor,
+        generic_emptyvalue_extractor_,
+        generic_datatype_extractor_,
         number_extractor,
     ],
     edit_renderers=[input_generic_renderer],
