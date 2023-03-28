@@ -31,7 +31,7 @@ import re
 # B/C
 ###############################################################################
 
-# B/C 2023-03-16
+# datatypes
 deprecated(
     '``generic_emptyvalue_extractor`` has been moved to ``yafowil.datatypes``.',
     generic_emptyvalue_extractor='yafowil.datatypes:generic_emptyvalue_extractor',
@@ -44,6 +44,25 @@ deprecated(
     '``DATATYPE_LABELS`` has been moved to ``yafowil.datatypes``.',
     DATATYPE_LABELS='yafowil.datatypes:DATATYPE_LABELS',
 )
+
+# structure
+deprecated(
+    '``field_renderer`` has been moved to ``yafowil.structure``.',
+    field_renderer='yafowil.structure:field_renderer',
+)
+deprecated(
+    '``label_renderer`` has been moved to ``yafowil.structure``.',
+    label_renderer='yafowil.structure:label_renderer',
+)
+deprecated(
+    '``help_renderer`` has been moved to ``yafowil.structure``.',
+    help_renderer='yafowil.structure:help_renderer',
+)
+deprecated(
+    '``error_renderer`` has been moved to ``yafowil.structure``.',
+    error_renderer='yafowil.structure:error_renderer',
+)
+
 
 ###############################################################################
 # common defaults
