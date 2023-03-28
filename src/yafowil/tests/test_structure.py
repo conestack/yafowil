@@ -173,3 +173,58 @@ class TestStructure(YafowilTestCase):
                  type="text" value=""/>
         </div>
         """, fxml(widget()))
+
+    def test_error_blueprint(self):
+        # Chained password inside error inside field
+        widget = factory(
+            'field:error:password',
+            name='PASSWORD',
+            props={
+                'label': 'Password',
+                'required': 'No password given!'
+            })
+        data = widget.extract({'PASSWORD': ''})
+        self.checkOutput("""
+        <div class="field" id="field-PASSWORD">
+          <div class="error">
+            <div class="errormessage">No password given!</div>
+            <input class="password required" id="input-PASSWORD" name="PASSWORD"
+                   required="required" type="password" value=""/>
+          </div>
+        </div>
+        """, fxml(widget(data=data)))  # noqa
+
+        data = widget.extract({'PASSWORD': 'secret'})
+        self.checkOutput("""
+        <div class="field" id="field-PASSWORD">
+          <input class="password required" id="input-PASSWORD" name="PASSWORD"
+                 required="required" type="password" value="secret"/>
+        </div>
+        """, fxml(widget(data=data)))
+
+        widget = factory(
+            'error:text',
+            name='MYDISPLAY',
+            value='somevalue',
+            mode='display')
+        self.assertEqual(widget(), (
+            '<div class="display-text" id="display-MYDISPLAY">somevalue</div>'
+        ))
+
+        # Error wrapping in div element can be suppressed
+        widget = factory(
+            'field:error:password',
+            name='PASSWORD',
+            props={
+                'label': 'Password',
+                'required': 'No password given!',
+                'message_tag': None
+            })
+        data = widget.extract({'PASSWORD': ''})
+        self.checkOutput("""
+        <div class="field" id="field-PASSWORD">
+          <div class="error">No password given!<input class="password required"
+               id="input-PASSWORD" name="PASSWORD" required="required"
+               type="password" value=""/></div>
+        </div>
+        """, fxml(widget(data=data)))

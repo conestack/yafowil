@@ -121,7 +121,8 @@ def help_renderer(widget, data):
     elem_tag = attr_value('tag', widget, data)
     position = attr_value('position', widget, data)
     return generic_positional_rendering_helper(
-        elem_tag, help_val, attrs, data.rendered, position, tag)
+        elem_tag, help_val, attrs, data.rendered, position, tag
+    )
 
 
 factory.register(
@@ -156,5 +157,80 @@ factory.doc['props']['help.position'] = """\
 Help can be rendered at 3 different positions: ``before``/ ``after`` the
 prior rendered output or with ``inner-before``/ ``inner-after``  it puts the
 prior rendered output inside the tag used for the help message (beofre or
+after the message.
+"""
+
+
+###############################################################################
+# error
+###############################################################################
+
+@managedprops(
+    'tag',
+    'message_tag',
+    'message_class',
+    'position',
+    'render_empty',
+    *css_managed_props)
+def error_renderer(widget, data):
+    if not data.errors and not attr_value('render_empty', widget, data):
+        return data.rendered
+    tag = data.tag
+    msgs = u''
+    for error in data.errors:
+        message_tag = attr_value('message_tag', widget, data)
+        if message_tag:
+            msgs += tag(
+                message_tag,
+                error.msg,
+                class_=attr_value('message_class', widget, data)
+            )
+        else:
+            msgs += tag.translate(error.msg)
+    attrs = dict(class_=cssclasses(widget, data))
+    elem_tag = attr_value('tag', widget, data)
+    position = attr_value('position', widget, data)
+    return generic_positional_rendering_helper(
+        elem_tag, msgs, attrs, data.rendered, position, tag
+    )
+
+
+factory.register(
+    'error',
+    edit_renderers=[error_renderer],
+    display_renderers=[empty_display_renderer]
+)
+
+factory.doc['blueprint']['error'] = """\
+Renders a tag with an error-message and the prior rendered output.
+"""
+
+factory.defaults['error.class'] = 'error'
+
+factory.defaults['error.tag'] = 'div'
+factory.doc['props']['error.tag'] = """\
+HTML tag to use to enclose all error messages.
+"""
+
+factory.defaults['error.render_empty'] = False
+factory.doc['props']['error.render_empty'] = """\
+Render tag even if there is no error message.
+"""
+
+factory.defaults['error.message_tag'] = 'div'
+factory.doc['props']['error.message_tag'] = """\
+HTML tag to use to enclose each error message.
+"""
+
+factory.defaults['error.message_class'] = 'errormessage'
+factory.doc['props']['error.message_class'] = """\
+CSS class to apply to inner message-tag.
+"""
+
+factory.defaults['error.position'] = 'inner-before'
+factory.doc['props']['error.position'] = """\
+Error can be rendered at 3 different positions: ``before``/ ``after`` the
+prior rendered output or with ``inner-before``/ ``inner-after``  it puts the
+prior rendered output inside the tag used for the error message (beofre or
 after the message.
 """
