@@ -140,3 +140,36 @@ class TestStructure(YafowilTestCase):
                 'position': lambda x, y: 'inner',
             })
         self.assertEqual(widget(), '<label for="input-MYFILE">Fooo</label>')
+
+    def test_help_blueprint(self):
+        # Render some additional help text
+        widget = factory(
+            'field:help:text',
+            name='HELPEXAMPLE',
+            props={
+                'label': 'Help',
+                'help': 'Shout out loud here'
+            })
+        self.checkOutput("""
+        <div class="field" id="field-HELPEXAMPLE">
+          <div class="help">Shout out loud here</div>
+          <input class="text" id="input-HELPEXAMPLE" name="HELPEXAMPLE"
+                 type="text" value=""/>
+        </div>
+        """, fxml(widget()))
+
+        # Render empty (WHAT'S THIS GOOD FOR?)
+        widget = factory(
+            'field:help:text',
+            name='HELPEXAMPLE',
+            props={
+                'label': 'Help',
+                'help': False,
+                'render_empty': False
+            })
+        self.checkOutput("""
+        <div class="field" id="field-HELPEXAMPLE">
+          <input class="text" id="input-HELPEXAMPLE" name="HELPEXAMPLE"
+                 type="text" value=""/>
+        </div>
+        """, fxml(widget()))

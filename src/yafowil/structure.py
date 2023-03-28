@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from node.utils import UNSET
 from yafowil.base import factory
+from yafowil.common import empty_display_renderer
 from yafowil.common import generic_positional_rendering_helper
 from yafowil.utils import attr_value
 from yafowil.utils import css_managed_props
@@ -102,4 +103,58 @@ Text to be displayed as a label.
 factory.defaults['label.for'] = None
 factory.doc['props']['label.for'] = """\
 Optional dottedpath of widget to be labled
+"""
+
+
+###############################################################################
+# help
+###############################################################################
+
+@managedprops('tag', 'help', 'position', 'render_empty', *css_managed_props)
+def help_renderer(widget, data):
+    render_empty = attr_value('render_empty', widget, data)
+    help_val = attr_value('help', widget, data)
+    if not render_empty and not help_val:
+        return data.rendered
+    tag = data.tag
+    attrs = dict(class_=cssclasses(widget, data))
+    elem_tag = attr_value('tag', widget, data)
+    position = attr_value('position', widget, data)
+    return generic_positional_rendering_helper(
+        elem_tag, help_val, attrs, data.rendered, position, tag)
+
+
+factory.register(
+    'help',
+    edit_renderers=[help_renderer],
+    display_renderers=[empty_display_renderer]
+)
+
+factory.doc['blueprint']['help'] = """\
+Renders a tag with an help-message and the prior rendered output.
+"""
+
+factory.defaults['help.class'] = 'help'
+
+factory.defaults['help.tag'] = 'div'
+factory.doc['props']['help.tag'] = """\
+HTML tag to use to enclose all help messages.
+"""
+
+factory.defaults['help.help'] = ''
+factory.doc['props']['help.help'] = """\
+Help text.
+"""
+
+factory.defaults['help.render_empty'] = False
+factory.doc['props']['help.render_empty'] = """\
+Render tag even if there is no help message.
+"""
+
+factory.defaults['help.position'] = 'before'
+factory.doc['props']['help.position'] = """\
+Help can be rendered at 3 different positions: ``before``/ ``after`` the
+prior rendered output or with ``inner-before``/ ``inner-after``  it puts the
+prior rendered output inside the tag used for the help message (beofre or
+after the message.
 """
