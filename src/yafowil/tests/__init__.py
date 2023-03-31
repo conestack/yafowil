@@ -9,6 +9,7 @@ from yafowil import number
 from yafowil import persistence
 from yafowil import search
 from yafowil import table
+from yafowil import url
 from yafowil.base import factory
 from yafowil.utils import Tag
 import lxml.etree as etree
@@ -30,6 +31,7 @@ class YafowilTestCase(NodeTestCase):
         reload(persistence)
         reload(search)
         reload(table)
+        reload(url)
 
     def tearDown(self):
         factory.pop_state()
@@ -61,6 +63,7 @@ def test_suite():
     from yafowil.tests import test_search
     from yafowil.tests import test_table
     from yafowil.tests import test_tsf
+    from yafowil.tests import test_url
     from yafowil.tests import test_utils
 
     suite = unittest.TestSuite()
@@ -77,6 +80,7 @@ def test_suite():
     suite.addTest(unittest.findTestCases(test_search))
     suite.addTest(unittest.findTestCases(test_table))
     suite.addTest(unittest.findTestCases(test_tsf))
+    suite.addTest(unittest.findTestCases(test_url))
     suite.addTest(unittest.findTestCases(test_utils))
 
     return suite
