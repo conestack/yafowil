@@ -9,6 +9,7 @@ from yafowil import datatypes
 from yafowil import email
 from yafowil import field
 from yafowil import file
+from yafowil import hidden
 from yafowil import lines
 from yafowil import number
 from yafowil import password
@@ -41,6 +42,7 @@ class YafowilTestCase(NodeTestCase):
         reload(email)
         reload(field)
         reload(file)
+        reload(hidden)
         reload(lines)
         reload(number)
         reload(password)
@@ -81,6 +83,7 @@ def test_suite():
     from yafowil.tests import test_email
     from yafowil.tests import test_field
     from yafowil.tests import test_file
+    from yafowil.tests import test_hidden
     from yafowil.tests import test_lines
     from yafowil.tests import test_number
     from yafowil.tests import test_password
@@ -108,6 +111,7 @@ def test_suite():
     suite.addTest(unittest.findTestCases(test_email))
     suite.addTest(unittest.findTestCases(test_field))
     suite.addTest(unittest.findTestCases(test_file))
+    suite.addTest(unittest.findTestCases(test_hidden))
     suite.addTest(unittest.findTestCases(test_lines))
     suite.addTest(unittest.findTestCases(test_number))
     suite.addTest(unittest.findTestCases(test_password))

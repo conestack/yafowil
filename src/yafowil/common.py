@@ -571,34 +571,3 @@ Flag  input field is disabled.
 """
 
 factory.defaults['text.persist'] = True
-
-
-###############################################################################
-# hidden
-###############################################################################
-
-factory.register(
-    'hidden',
-    extractors=[
-        generic_extractor,
-        generic_emptyvalue_extractor_,
-        generic_datatype_extractor_
-    ],
-    edit_renderers=[input_generic_renderer],
-    display_renderers=[empty_display_renderer]
-)
-
-factory.doc['blueprint']['hidden'] = """\
-Hidden input blueprint.
-"""
-
-factory.defaults['hidden.type'] = 'hidden'
-factory.doc['props']['hidden.type'] = """\
-Type of input tag.
-"""
-
-factory.defaults['hidden.default'] = ''
-
-factory.defaults['hidden.class'] = 'hidden'
-
-factory.defaults['hidden.persist'] = True

@@ -12,6 +12,7 @@ def register():  # noqa
     import yafowil.email
     import yafowil.field
     import yafowil.file
+    import yafowil.hidden
     import yafowil.lines
     import yafowil.number
     import yafowil.password
