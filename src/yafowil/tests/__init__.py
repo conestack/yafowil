@@ -11,6 +11,7 @@ from yafowil import file
 from yafowil import number
 from yafowil import persistence
 from yafowil import search
+from yafowil import select
 from yafowil import table
 from yafowil import url
 from yafowil.base import factory
@@ -36,6 +37,7 @@ class YafowilTestCase(NodeTestCase):
         reload(number)
         reload(persistence)
         reload(search)
+        reload(select)
         reload(table)
         reload(url)
 
@@ -70,6 +72,7 @@ def test_suite():
     from yafowil.tests import test_persistence
     from yafowil.tests import test_resources
     from yafowil.tests import test_search
+    from yafowil.tests import test_select
     from yafowil.tests import test_table
     from yafowil.tests import test_tsf
     from yafowil.tests import test_url
@@ -90,6 +93,7 @@ def test_suite():
     suite.addTest(unittest.findTestCases(test_persistence))
     suite.addTest(unittest.findTestCases(test_resources))
     suite.addTest(unittest.findTestCases(test_search))
+    suite.addTest(unittest.findTestCases(test_select))
     suite.addTest(unittest.findTestCases(test_table))
     suite.addTest(unittest.findTestCases(test_tsf))
     suite.addTest(unittest.findTestCases(test_url))

@@ -14,6 +14,7 @@ def register():
     import yafowil.number  # noqa
     import yafowil.persistence  # noqa
     import yafowil.search  # noqa
+    import yafowil.select  # noqa
     import yafowil.table  # noqa
     import yafowil.url  # noqa
 
