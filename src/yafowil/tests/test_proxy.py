@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from yafowil.base import factory
 from yafowil.persistence import write_mapping_writer
 from yafowil.tests import YafowilTestCase

@@ -377,7 +377,10 @@ def cssclasses(widget, data, classattr='class', additional=[]):
     return _classes and ' '.join(sorted(_classes)) or None
 
 
-# B/C 2023-03-16
+###############################################################################
+# B/C imports
+###############################################################################
+
 deprecated(
     '``convert_value_to_datatype`` has been moved to ``yafowil.datatypes``.',
     convert_value_to_datatype='yafowil.datatypes:convert_value_to_datatype',

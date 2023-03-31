@@ -4,9 +4,6 @@ from yafowil.base import ExtractionError
 from yafowil.base import factory
 from yafowil.tests import YafowilTestCase
 from yafowil.tests import fxml
-import yafowil.common
-import yafowil.compound
-import yafowil.table  # noqa
 
 
 class TestTable(YafowilTestCase):

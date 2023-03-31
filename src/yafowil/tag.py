@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from yafowil.base import factory
 from yafowil.utils import as_data_attrs
 from yafowil.utils import attr_value

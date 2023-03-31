@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from yafowil.base import factory
 from yafowil.tests import YafowilTestCase
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from node.utils import UNSET
 from yafowil.base import factory
 from yafowil.base import fetch_value

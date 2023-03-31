@@ -21,7 +21,6 @@ from yafowil.utils import get_plugins
 from yafowil.utils import managedprops
 from yafowil.utils import tag as deprecated_tag
 from yafowil.utils import vocabulary
-import yafowil.loader  # noqa
 
 
 class TestUtils(YafowilTestCase):

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from node.utils import UNSET
 from yafowil.base import ExtractionError
 from yafowil.base import factory
@@ -15,7 +14,6 @@ from yafowil.tests import YafowilTestCase
 from yafowil.utils import EMPTY_VALUE
 import copy
 import uuid
-import yafowil.loader  # noqa
 
 
 class TestDatatypes(YafowilTestCase):

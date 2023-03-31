@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from node.utils import UNSET
 from yafowil.base import ExtractionError
 from yafowil.base import factory
@@ -7,7 +6,6 @@ from yafowil.tests import YafowilTestCase
 
 
 class TestNumber(YafowilTestCase):
-    # Number Blueprint
 
     def test_number_blueprint(self):
         # Display renderer

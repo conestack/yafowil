@@ -1,13 +1,14 @@
+# -*- coding: utf-8 -*-
 from yafowil.base import factory
 from yafowil.base import fetch_value
 from yafowil.common import display_proxy_renderer
 from yafowil.common import generic_extractor
 from yafowil.common import generic_required_extractor
-from yafowil.common import textarea_attributes
-from yafowil.common import textarea_managed_props
 from yafowil.compat import ITER_TYPES
 from yafowil.datatypes import generic_datatype_extractor
 from yafowil.datatypes import generic_emptyvalue_extractor
+from yafowil.textarea import textarea_attributes
+from yafowil.textarea import textarea_managed_props
 from yafowil.tsf import _
 from yafowil.utils import as_data_attrs
 from yafowil.utils import attr_value

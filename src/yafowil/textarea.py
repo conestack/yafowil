@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from yafowil.base import factory
 from yafowil.base import fetch_value
 from yafowil.common import display_proxy_renderer

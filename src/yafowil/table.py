@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from yafowil.base import factory
 from yafowil.compound import compound_extractor
 from yafowil.compound import compound_renderer

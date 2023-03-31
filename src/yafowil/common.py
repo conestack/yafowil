@@ -17,208 +17,6 @@ from zope.deferredimport import deprecated
 
 
 ###############################################################################
-# B/C
-###############################################################################
-
-# button
-deprecated(
-    '``submit_renderer`` has been moved to ``yafowil.button``.',
-    submit_renderer='yafowil.button:submit_renderer'
-)
-deprecated(
-    '``button_renderer`` has been moved to ``yafowil.button``.',
-    button_renderer='yafowil.button:button_renderer'
-)
-
-# checkbox
-deprecated(
-    '``checkbox_extractor`` has been moved to ``yafowil.checkbox``.',
-    checkbox_extractor='yafowil.checkbox:checkbox_extractor'
-)
-deprecated(
-    '``checkbox_edit_renderer`` has been moved to ``yafowil.checkbox``.',
-    checkbox_edit_renderer='yafowil.checkbox:checkbox_edit_renderer'
-)
-deprecated(
-    '``checkbox_display_renderer`` has been moved to ``yafowil.checkbox``.',
-    checkbox_display_renderer='yafowil.checkbox:checkbox_display_renderer'
-)
-
-# datatypes
-deprecated(
-    '``generic_emptyvalue_extractor`` has been moved to ``yafowil.datatypes``.',
-    generic_emptyvalue_extractor='yafowil.datatypes:generic_emptyvalue_extractor'
-)
-deprecated(
-    '``generic_datatype_extractor`` has been moved to ``yafowil.datatypes``.',
-    generic_datatype_extractor='yafowil.datatypes:generic_datatype_extractor'
-)
-deprecated(
-    '``DATATYPE_LABELS`` has been moved to ``yafowil.datatypes``.',
-    DATATYPE_LABELS='yafowil.datatypes:DATATYPE_LABELS'
-)
-
-# email
-deprecated(
-    '``email_extractor`` has been moved to ``yafowil.email``.',
-    email_extractor='yafowil.email:email_extractor'
-)
-
-# field
-deprecated(
-    '``field_renderer`` has been moved to ``yafowil.field``.',
-    field_renderer='yafowil.field:field_renderer'
-)
-deprecated(
-    '``label_renderer`` has been moved to ``yafowil.field``.',
-    label_renderer='yafowil.field:label_renderer'
-)
-deprecated(
-    '``help_renderer`` has been moved to ``yafowil.field``.',
-    help_renderer='yafowil.field:help_renderer'
-)
-deprecated(
-    '``error_renderer`` has been moved to ``yafowil.field``.',
-    error_renderer='yafowil.field:error_renderer'
-)
-
-# file
-deprecated(
-    '``file_extractor`` has been moved to ``yafowil.file``.',
-    file_extractor='yafowil.file:file_extractor'
-)
-deprecated(
-    '``mimetype_extractor`` has been moved to ``yafowil.file``.',
-    mimetype_extractor='yafowil.file:mimetype_extractor'
-)
-deprecated(
-    '``input_file_edit_renderer`` has been moved to ``yafowil.file``.',
-    input_file_edit_renderer='yafowil.file:input_file_edit_renderer'
-)
-deprecated(
-    '``convert_bytes`` has been moved to ``yafowil.file``.',
-    convert_bytes='yafowil.file:convert_bytes'
-)
-deprecated(
-    '``input_file_display_renderer`` has been moved to ``yafowil.file``.',
-    input_file_display_renderer='yafowil.file:input_file_display_renderer'
-)
-deprecated(
-    '``file_options_renderer`` has been moved to ``yafowil.file``.',
-    file_options_renderer='yafowil.file:file_options_renderer'
-)
-
-# lines
-deprecated(
-    '``lines_extractor`` has been moved to ``yafowil.lines``.',
-    lines_extractor='yafowil.lines:lines_extractor'
-)
-deprecated(
-    '``lines_edit_renderer`` has been moved to ``yafowil.lines``.',
-    lines_edit_renderer='yafowil.lines:lines_edit_renderer'
-)
-deprecated(
-    '``lines_display_renderer`` has been moved to ``yafowil.lines``.',
-    lines_display_renderer='yafowil.lines:lines_display_renderer'
-)
-
-# number
-deprecated(
-    '``number_extractor`` has been moved to ``yafowil.number``.',
-    number_extractor='yafowil.number:number_extractor'
-)
-
-# password
-deprecated(
-    '``minlength_extractor`` has been moved to ``yafowil.password``.',
-    minlength_extractor='yafowil.password:minlength_extractor'
-)
-deprecated(
-    '``ascii_extractor`` has been moved to ``yafowil.password``.',
-    ascii_extractor='yafowil.password:ascii_extractor'
-)
-deprecated(
-    '``password_extractor`` has been moved to ``yafowil.password``.',
-    password_extractor='yafowil.password:password_extractor'
-)
-deprecated(
-    '``password_edit_renderer`` has been moved to ``yafowil.password``.',
-    password_edit_renderer='yafowil.password:password_edit_renderer'
-)
-deprecated(
-    '``password_display_renderer`` has been moved to ``yafowil.password``.',
-    password_display_renderer='yafowil.password:password_display_renderer'
-)
-
-# proxy
-deprecated(
-    '``input_proxy_renderer`` has been moved to ``yafowil.proxy``.',
-    input_proxy_renderer='yafowil.proxy:input_proxy_renderer'
-)
-
-# select
-deprecated(
-    '``select_extractor`` has been moved to ``yafowil.select``.',
-    select_extractor='yafowil.select:select_extractor'
-)
-deprecated(
-    '``select_exists_marker`` has been moved to ``yafowil.select``.',
-    select_exists_marker='yafowil.select:select_exists_marker'
-)
-deprecated(
-    '``select_edit_renderer_props`` has been moved to ``yafowil.select``.',
-    select_edit_renderer_props='yafowil.select:select_edit_renderer_props'
-)
-deprecated(
-    '``select_block_edit_renderer`` has been moved to ``yafowil.select``.',
-    select_block_edit_renderer='yafowil.select:select_block_edit_renderer'
-)
-deprecated(
-    '``select_cb_edit_renderer`` has been moved to ``yafowil.select``.',
-    select_cb_edit_renderer='yafowil.select:select_cb_edit_renderer'
-)
-deprecated(
-    '``select_edit_renderer`` has been moved to ``yafowil.select``.',
-    select_edit_renderer='yafowil.select:select_edit_renderer'
-)
-deprecated(
-    '``select_display_renderer`` has been moved to ``yafowil.select``.',
-    select_display_renderer='yafowil.select:select_display_renderer'
-)
-
-# tag
-deprecated(
-    '``tag_renderer`` has been moved to ``yafowil.tag``.',
-    tag_renderer='yafowil.tag:tag_renderer'
-)
-
-# text
-deprecated(
-    '``text_edit_renderer`` has been moved to ``yafowil.text``.',
-    text_edit_renderer='yafowil.text:text_edit_renderer'
-)
-
-# textarea
-deprecated(
-    '``textarea_managed_props`` has been moved to ``yafowil.textarea``.',
-    textarea_managed_props='yafowil.textarea:textarea_managed_props'
-)
-deprecated(
-    '``textarea_attributes`` has been moved to ``yafowil.textarea``.',
-    textarea_attributes='yafowil.textarea:textarea_attributes'
-)
-deprecated(
-    '``textarea_renderer`` has been moved to ``yafowil.textarea``.',
-    textarea_renderer='yafowil.textarea:textarea_renderer'
-)
-
-# url
-deprecated(
-    '``url_extractor`` has been moved to ``yafowil.url``.',
-    url_extractor='yafowil.url:url_extractor'
-)
-
-###############################################################################
 # common defaults
 ###############################################################################
 
@@ -518,3 +316,206 @@ def generic_positional_rendering_helper(
         if pos == 'before':
             return newtag + rendered
         return rendered + newtag
+
+
+###############################################################################
+# B/C imports
+###############################################################################
+
+# button
+deprecated(
+    '``submit_renderer`` has been moved to ``yafowil.button``.',
+    submit_renderer='yafowil.button:submit_renderer'
+)
+deprecated(
+    '``button_renderer`` has been moved to ``yafowil.button``.',
+    button_renderer='yafowil.button:button_renderer'
+)
+
+# checkbox
+deprecated(
+    '``checkbox_extractor`` has been moved to ``yafowil.checkbox``.',
+    checkbox_extractor='yafowil.checkbox:checkbox_extractor'
+)
+deprecated(
+    '``checkbox_edit_renderer`` has been moved to ``yafowil.checkbox``.',
+    checkbox_edit_renderer='yafowil.checkbox:checkbox_edit_renderer'
+)
+deprecated(
+    '``checkbox_display_renderer`` has been moved to ``yafowil.checkbox``.',
+    checkbox_display_renderer='yafowil.checkbox:checkbox_display_renderer'
+)
+
+# datatypes
+deprecated(
+    '``generic_emptyvalue_extractor`` has been moved to ``yafowil.datatypes``.',
+    generic_emptyvalue_extractor='yafowil.datatypes:generic_emptyvalue_extractor'
+)
+deprecated(
+    '``generic_datatype_extractor`` has been moved to ``yafowil.datatypes``.',
+    generic_datatype_extractor='yafowil.datatypes:generic_datatype_extractor'
+)
+deprecated(
+    '``DATATYPE_LABELS`` has been moved to ``yafowil.datatypes``.',
+    DATATYPE_LABELS='yafowil.datatypes:DATATYPE_LABELS'
+)
+
+# email
+deprecated(
+    '``email_extractor`` has been moved to ``yafowil.email``.',
+    email_extractor='yafowil.email:email_extractor'
+)
+
+# field
+deprecated(
+    '``field_renderer`` has been moved to ``yafowil.field``.',
+    field_renderer='yafowil.field:field_renderer'
+)
+deprecated(
+    '``label_renderer`` has been moved to ``yafowil.field``.',
+    label_renderer='yafowil.field:label_renderer'
+)
+deprecated(
+    '``help_renderer`` has been moved to ``yafowil.field``.',
+    help_renderer='yafowil.field:help_renderer'
+)
+deprecated(
+    '``error_renderer`` has been moved to ``yafowil.field``.',
+    error_renderer='yafowil.field:error_renderer'
+)
+
+# file
+deprecated(
+    '``file_extractor`` has been moved to ``yafowil.file``.',
+    file_extractor='yafowil.file:file_extractor'
+)
+deprecated(
+    '``mimetype_extractor`` has been moved to ``yafowil.file``.',
+    mimetype_extractor='yafowil.file:mimetype_extractor'
+)
+deprecated(
+    '``input_file_edit_renderer`` has been moved to ``yafowil.file``.',
+    input_file_edit_renderer='yafowil.file:input_file_edit_renderer'
+)
+deprecated(
+    '``convert_bytes`` has been moved to ``yafowil.file``.',
+    convert_bytes='yafowil.file:convert_bytes'
+)
+deprecated(
+    '``input_file_display_renderer`` has been moved to ``yafowil.file``.',
+    input_file_display_renderer='yafowil.file:input_file_display_renderer'
+)
+deprecated(
+    '``file_options_renderer`` has been moved to ``yafowil.file``.',
+    file_options_renderer='yafowil.file:file_options_renderer'
+)
+
+# lines
+deprecated(
+    '``lines_extractor`` has been moved to ``yafowil.lines``.',
+    lines_extractor='yafowil.lines:lines_extractor'
+)
+deprecated(
+    '``lines_edit_renderer`` has been moved to ``yafowil.lines``.',
+    lines_edit_renderer='yafowil.lines:lines_edit_renderer'
+)
+deprecated(
+    '``lines_display_renderer`` has been moved to ``yafowil.lines``.',
+    lines_display_renderer='yafowil.lines:lines_display_renderer'
+)
+
+# number
+deprecated(
+    '``number_extractor`` has been moved to ``yafowil.number``.',
+    number_extractor='yafowil.number:number_extractor'
+)
+
+# password
+deprecated(
+    '``minlength_extractor`` has been moved to ``yafowil.password``.',
+    minlength_extractor='yafowil.password:minlength_extractor'
+)
+deprecated(
+    '``ascii_extractor`` has been moved to ``yafowil.password``.',
+    ascii_extractor='yafowil.password:ascii_extractor'
+)
+deprecated(
+    '``password_extractor`` has been moved to ``yafowil.password``.',
+    password_extractor='yafowil.password:password_extractor'
+)
+deprecated(
+    '``password_edit_renderer`` has been moved to ``yafowil.password``.',
+    password_edit_renderer='yafowil.password:password_edit_renderer'
+)
+deprecated(
+    '``password_display_renderer`` has been moved to ``yafowil.password``.',
+    password_display_renderer='yafowil.password:password_display_renderer'
+)
+
+# proxy
+deprecated(
+    '``input_proxy_renderer`` has been moved to ``yafowil.proxy``.',
+    input_proxy_renderer='yafowil.proxy:input_proxy_renderer'
+)
+
+# select
+deprecated(
+    '``select_extractor`` has been moved to ``yafowil.select``.',
+    select_extractor='yafowil.select:select_extractor'
+)
+deprecated(
+    '``select_exists_marker`` has been moved to ``yafowil.select``.',
+    select_exists_marker='yafowil.select:select_exists_marker'
+)
+deprecated(
+    '``select_edit_renderer_props`` has been moved to ``yafowil.select``.',
+    select_edit_renderer_props='yafowil.select:select_edit_renderer_props'
+)
+deprecated(
+    '``select_block_edit_renderer`` has been moved to ``yafowil.select``.',
+    select_block_edit_renderer='yafowil.select:select_block_edit_renderer'
+)
+deprecated(
+    '``select_cb_edit_renderer`` has been moved to ``yafowil.select``.',
+    select_cb_edit_renderer='yafowil.select:select_cb_edit_renderer'
+)
+deprecated(
+    '``select_edit_renderer`` has been moved to ``yafowil.select``.',
+    select_edit_renderer='yafowil.select:select_edit_renderer'
+)
+deprecated(
+    '``select_display_renderer`` has been moved to ``yafowil.select``.',
+    select_display_renderer='yafowil.select:select_display_renderer'
+)
+
+# tag
+deprecated(
+    '``tag_renderer`` has been moved to ``yafowil.tag``.',
+    tag_renderer='yafowil.tag:tag_renderer'
+)
+
+# text
+deprecated(
+    '``text_edit_renderer`` has been moved to ``yafowil.text``.',
+    text_edit_renderer='yafowil.text:text_edit_renderer'
+)
+
+# textarea
+deprecated(
+    '``textarea_managed_props`` has been moved to ``yafowil.textarea``.',
+    textarea_managed_props='yafowil.textarea:textarea_managed_props'
+)
+deprecated(
+    '``textarea_attributes`` has been moved to ``yafowil.textarea``.',
+    textarea_attributes='yafowil.textarea:textarea_attributes'
+)
+deprecated(
+    '``textarea_renderer`` has been moved to ``yafowil.textarea``.',
+    textarea_renderer='yafowil.textarea:textarea_renderer'
+)
+
+# url
+deprecated(
+    '``url_extractor`` has been moved to ``yafowil.url``.',
+    url_extractor='yafowil.url:url_extractor'
+)
