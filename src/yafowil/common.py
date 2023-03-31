@@ -45,10 +45,10 @@ deprecated(
     DATATYPE_LABELS='yafowil.datatypes:DATATYPE_LABELS',
 )
 
-# number
+# email
 deprecated(
-    '``number_extractor`` has been moved to ``yafowil.number``.',
-    number_extractor='yafowil.number:number_extractor',
+    '``email_extractor`` has been moved to ``yafowil.email``.',
+    email_extractor='yafowil.email:email_extractor',
 )
 
 # field
@@ -69,6 +69,17 @@ deprecated(
     error_renderer='yafowil.field:error_renderer',
 )
 
+# number
+deprecated(
+    '``number_extractor`` has been moved to ``yafowil.number``.',
+    number_extractor='yafowil.number:number_extractor',
+)
+
+# url
+deprecated(
+    '``url_extractor`` has been moved to ``yafowil.url``.',
+    url_extractor='yafowil.url:url_extractor',
+)
 
 ###############################################################################
 # common defaults
@@ -1915,59 +1926,3 @@ Unlike other browsers, Firefox persists the dynamic disabled state of a
 <button> across page loads. Setting autocomplete="off" on the button
 disables this feature
 """
-
-
-###############################################################################
-# email
-###############################################################################
-
-EMAIL_RE = r'^[a-zA-Z0-9\._\-]+@[a-zA-Z0-9\._\-]+.[a-zA-Z0-9]{2,6}$'
-
-
-def email_extractor(widget, data):
-    val = data.extracted
-    if not val:
-        return val
-    email_re = EMAIL_RE \
-        if isinstance(val, UNICODE_TYPE) \
-        else EMAIL_RE.encode()
-    if not re.match(email_re, val):
-        message = _('email_address_not_valid',
-                    default=u'Input not a valid email address.')
-        raise ExtractionError(message)
-    return val
-
-
-factory.register(
-    'email',
-    extractors=[
-        generic_extractor,
-        generic_required_extractor,
-        generic_emptyvalue_extractor_,
-        generic_datatype_extractor_,
-        email_extractor
-    ],
-    edit_renderers=[input_generic_renderer],
-    display_renderers=[
-        generic_display_renderer,
-        display_proxy_renderer
-    ]
-)
-
-factory.doc['blueprint']['email'] = """\
-Email (HTML5) input blueprint.
-"""
-
-factory.defaults['email.type'] = 'email'
-
-factory.defaults['email.default'] = ''
-
-factory.defaults['email.required_class'] = 'required'
-
-factory.defaults['email.class'] = 'email'
-
-factory.defaults['email.persist'] = True
-
-factory.defaults['email.allowed_datatypes'] = [
-    BYTES_TYPE, UNICODE_TYPE,
-]

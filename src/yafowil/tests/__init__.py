@@ -4,6 +4,7 @@ from node.tests import NodeTestCase
 from yafowil import common
 from yafowil import compound
 from yafowil import datatypes
+from yafowil import email
 from yafowil import field
 from yafowil import number
 from yafowil import persistence
@@ -26,6 +27,7 @@ class YafowilTestCase(NodeTestCase):
         reload(common)
         reload(compound)
         reload(datatypes)
+        reload(email)
         reload(field)
         reload(number)
         reload(persistence)
@@ -56,6 +58,7 @@ def test_suite():
     from yafowil.tests import test_compound
     from yafowil.tests import test_controller
     from yafowil.tests import test_datatypes
+    from yafowil.tests import test_email
     from yafowil.tests import test_field
     from yafowil.tests import test_number
     from yafowil.tests import test_persistence
@@ -73,6 +76,7 @@ def test_suite():
     suite.addTest(unittest.findTestCases(test_compound))
     suite.addTest(unittest.findTestCases(test_controller))
     suite.addTest(unittest.findTestCases(test_datatypes))
+    suite.addTest(unittest.findTestCases(test_email))
     suite.addTest(unittest.findTestCases(test_field))
     suite.addTest(unittest.findTestCases(test_number))
     suite.addTest(unittest.findTestCases(test_persistence))
