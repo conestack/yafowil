@@ -190,6 +190,12 @@ deprecated(
     select_display_renderer='yafowil.select:select_display_renderer'
 )
 
+# tag
+deprecated(
+    '``tag_renderer`` has been moved to ``yafowil.tag``.',
+    tag_renderer='yafowil.tag:tag_renderer'
+)
+
 # url
 deprecated(
     '``url_extractor`` has been moved to ``yafowil.url``.',
@@ -496,43 +502,6 @@ def generic_positional_rendering_helper(
         if pos == 'before':
             return newtag + rendered
         return rendered + newtag
-
-
-###############################################################################
-# tag
-###############################################################################
-
-@managedprops('tag', 'text', 'data', *css_managed_props)
-def tag_renderer(widget, data):
-    """Renderer for HTML tags.
-    """
-    attrs = {
-        'id': cssid(widget, 'tag'),
-        'class_': cssclasses(widget, data),
-    }
-    attrs.update(as_data_attrs(attr_value('data', widget, data)))
-    tag = attr_value('tag', widget, data)
-    text = attr_value('text', widget, data)
-    return data.tag(tag, text, **attrs)
-
-
-factory.register(
-    'tag',
-    edit_renderers=[tag_renderer],
-    display_renderers=[tag_renderer]
-)
-
-factory.doc['blueprint']['tag'] = """\
-Render HTML tags with text. Useful for rendering headings etc.
-"""
-
-factory.doc['props']['tag.tag'] = """\
-HTML tag name.
-"""
-
-factory.doc['props']['tag.text'] = """\
-Tag contents.
-"""
 
 
 ###############################################################################

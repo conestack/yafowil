@@ -20,6 +20,7 @@ def register():  # noqa
     import yafowil.search
     import yafowil.select
     import yafowil.table
+    import yafowil.tag
     import yafowil.url
 
 

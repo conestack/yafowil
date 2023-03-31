@@ -74,6 +74,9 @@ class TestCommon(YafowilTestCase):
         from yafowil.common import select_edit_renderer
         from yafowil.common import select_display_renderer
 
+        # tag
+        from yafowil.common import tag_renderer
+
         # url
         from yafowil.common import url_extractor
 
@@ -173,33 +176,6 @@ class TestCommon(YafowilTestCase):
         model = dict()
         data.write(model)
         self.assertEqual(model, {'myhidden': 10})
-
-    def test_tag_blueprint(self):
-        # Custom tag widget
-        widget = factory(
-            'tag',
-            name='MYTAG',
-            props={
-                'tag': 'h3',
-                'text': 'A Headline',
-                'class': 'form_heading'
-            })
-        self.assertEqual(
-            widget(),
-            '<h3 class="form_heading" id="tag-MYTAG">A Headline</h3>'
-        )
-
-        # Skip tag
-        widget = factory(
-            'tag',
-            name='MYTAG',
-            props={
-                'tag': 'h3',
-                'text': 'A Headline',
-                'class': 'form_heading'
-            },
-            mode='skip')
-        self.assertEqual(widget(), '')
 
     def test_text_blueprint(self):
         # Regular text input

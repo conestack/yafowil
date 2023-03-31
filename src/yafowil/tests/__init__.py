@@ -17,6 +17,7 @@ from yafowil import proxy
 from yafowil import search
 from yafowil import select
 from yafowil import table
+from yafowil import tag as tag_module
 from yafowil import url
 from yafowil.base import factory
 from yafowil.utils import Tag
@@ -47,6 +48,7 @@ class YafowilTestCase(NodeTestCase):
         reload(search)
         reload(select)
         reload(table)
+        reload(tag_module)
         reload(url)
 
     def tearDown(self):
@@ -86,6 +88,7 @@ def test_suite():
     from yafowil.tests import test_search
     from yafowil.tests import test_select
     from yafowil.tests import test_table
+    from yafowil.tests import test_tag
     from yafowil.tests import test_tsf
     from yafowil.tests import test_url
     from yafowil.tests import test_utils
@@ -111,6 +114,7 @@ def test_suite():
     suite.addTest(unittest.findTestCases(test_search))
     suite.addTest(unittest.findTestCases(test_select))
     suite.addTest(unittest.findTestCases(test_table))
+    suite.addTest(unittest.findTestCases(test_tag))
     suite.addTest(unittest.findTestCases(test_tsf))
     suite.addTest(unittest.findTestCases(test_url))
     suite.addTest(unittest.findTestCases(test_utils))
