@@ -5,6 +5,7 @@ import yafowil.utils
 @yafowil.utils.entry_point(order=0)
 def register():  # noqa
     import yafowil.button
+    import yafowil.checkbox
     import yafowil.common
     import yafowil.compound
     import yafowil.datatypes

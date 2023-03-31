@@ -2,6 +2,7 @@ from __future__ import print_function
 from importlib import reload
 from node.tests import NodeTestCase
 from yafowil import button
+from yafowil import checkbox
 from yafowil import common
 from yafowil import compound
 from yafowil import datatypes
@@ -31,6 +32,7 @@ class YafowilTestCase(NodeTestCase):
         factory.push_state()
         factory.clear()
         reload(button)
+        reload(checkbox)
         reload(common)
         reload(compound)
         reload(datatypes)
@@ -67,6 +69,7 @@ tag = Tag(lambda msg: msg)
 def test_suite():
     from yafowil.tests import test_base
     from yafowil.tests import test_button
+    from yafowil.tests import test_checkbox
     from yafowil.tests import test_common
     from yafowil.tests import test_compound
     from yafowil.tests import test_controller
@@ -91,6 +94,7 @@ def test_suite():
 
     suite.addTest(unittest.findTestCases(test_base))
     suite.addTest(unittest.findTestCases(test_button))
+    suite.addTest(unittest.findTestCases(test_checkbox))
     suite.addTest(unittest.findTestCases(test_common))
     suite.addTest(unittest.findTestCases(test_compound))
     suite.addTest(unittest.findTestCases(test_controller))
