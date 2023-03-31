@@ -24,9 +24,20 @@ else:  # pragma: no cover
 ###############################################################################
 
 class TestCommon(YafowilTestCase):
-    # Common Blueprints
 
-    # This test creates widgets from ist blueprints with different properties.
+    def test_BC_imports(self):
+        from yafowil.common import generic_emptyvalue_extractor
+        from yafowil.common import generic_datatype_extractor
+        from yafowil.common import DATATYPE_LABELS
+        from yafowil.common import number_extractor
+
+        from yafowil.common import field_renderer
+        from yafowil.common import label_renderer
+        from yafowil.common import help_renderer
+        from yafowil.common import error_renderer
+
+        from yafowil.utils import convert_value_to_datatype
+        from yafowil.utils import convert_values_to_datatype
 
     def test_hidden_blueprint(self):
         # Hidden input blueprint

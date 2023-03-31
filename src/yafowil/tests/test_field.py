@@ -7,8 +7,7 @@ from yafowil.tests import fxml
 from yafowil.tests import wrapped_fxml
 
 
-class TestStructure(YafowilTestCase):
-    # Structure Blueprints
+class TestField(YafowilTestCase):
 
     def test_field_blueprint(self):
         # Chained file inside field with label

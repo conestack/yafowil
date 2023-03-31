@@ -51,22 +51,22 @@ deprecated(
     number_extractor='yafowil.number:number_extractor',
 )
 
-# structure
+# field
 deprecated(
-    '``field_renderer`` has been moved to ``yafowil.structure``.',
-    field_renderer='yafowil.structure:field_renderer',
+    '``field_renderer`` has been moved to ``yafowil.field``.',
+    field_renderer='yafowil.field:field_renderer',
 )
 deprecated(
-    '``label_renderer`` has been moved to ``yafowil.structure``.',
-    label_renderer='yafowil.structure:label_renderer',
+    '``label_renderer`` has been moved to ``yafowil.field``.',
+    label_renderer='yafowil.field:label_renderer',
 )
 deprecated(
-    '``help_renderer`` has been moved to ``yafowil.structure``.',
-    help_renderer='yafowil.structure:help_renderer',
+    '``help_renderer`` has been moved to ``yafowil.field``.',
+    help_renderer='yafowil.field:help_renderer',
 )
 deprecated(
-    '``error_renderer`` has been moved to ``yafowil.structure``.',
-    error_renderer='yafowil.structure:error_renderer',
+    '``error_renderer`` has been moved to ``yafowil.field``.',
+    error_renderer='yafowil.field:error_renderer',
 )
 
 
