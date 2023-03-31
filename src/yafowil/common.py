@@ -3,10 +3,8 @@ from node.utils import UNSET
 from yafowil.base import ExtractionError
 from yafowil.base import factory
 from yafowil.base import fetch_value
-from yafowil.compat import BYTES_TYPE
 from yafowil.compat import ITER_TYPES
 from yafowil.compat import STR_TYPE
-from yafowil.compat import UNICODE_TYPE
 from yafowil.datatypes import convert_value_to_datatype
 from yafowil.datatypes import convert_values_to_datatype
 # alias generic_datatype_extractor and generic_emptyvalue_extractor imports
@@ -34,61 +32,87 @@ import re
 # button
 deprecated(
     '``submit_renderer`` has been moved to ``yafowil.button``.',
-    submit_renderer='yafowil.button:submit_renderer',
+    submit_renderer='yafowil.button:submit_renderer'
 )
 deprecated(
     '``button_renderer`` has been moved to ``yafowil.button``.',
-    button_renderer='yafowil.button:button_renderer',
+    button_renderer='yafowil.button:button_renderer'
 )
 
 # datatypes
 deprecated(
     '``generic_emptyvalue_extractor`` has been moved to ``yafowil.datatypes``.',
-    generic_emptyvalue_extractor='yafowil.datatypes:generic_emptyvalue_extractor',
+    generic_emptyvalue_extractor='yafowil.datatypes:generic_emptyvalue_extractor'
 )
 deprecated(
     '``generic_datatype_extractor`` has been moved to ``yafowil.datatypes``.',
-    generic_datatype_extractor='yafowil.datatypes:generic_datatype_extractor',
+    generic_datatype_extractor='yafowil.datatypes:generic_datatype_extractor'
 )
 deprecated(
     '``DATATYPE_LABELS`` has been moved to ``yafowil.datatypes``.',
-    DATATYPE_LABELS='yafowil.datatypes:DATATYPE_LABELS',
+    DATATYPE_LABELS='yafowil.datatypes:DATATYPE_LABELS'
 )
 
 # email
 deprecated(
     '``email_extractor`` has been moved to ``yafowil.email``.',
-    email_extractor='yafowil.email:email_extractor',
+    email_extractor='yafowil.email:email_extractor'
 )
 
 # field
 deprecated(
     '``field_renderer`` has been moved to ``yafowil.field``.',
-    field_renderer='yafowil.field:field_renderer',
+    field_renderer='yafowil.field:field_renderer'
 )
 deprecated(
     '``label_renderer`` has been moved to ``yafowil.field``.',
-    label_renderer='yafowil.field:label_renderer',
+    label_renderer='yafowil.field:label_renderer'
 )
 deprecated(
     '``help_renderer`` has been moved to ``yafowil.field``.',
-    help_renderer='yafowil.field:help_renderer',
+    help_renderer='yafowil.field:help_renderer'
 )
 deprecated(
     '``error_renderer`` has been moved to ``yafowil.field``.',
-    error_renderer='yafowil.field:error_renderer',
+    error_renderer='yafowil.field:error_renderer'
+)
+
+# file
+deprecated(
+    '``file_extractor`` has been moved to ``yafowil.file``.',
+    file_extractor='yafowil.file:file_extractor'
+)
+deprecated(
+    '``mimetype_extractor`` has been moved to ``yafowil.file``.',
+    mimetype_extractor='yafowil.file:mimetype_extractor'
+)
+deprecated(
+    '``input_file_edit_renderer`` has been moved to ``yafowil.file``.',
+    input_file_edit_renderer='yafowil.file:input_file_edit_renderer'
+)
+deprecated(
+    '``convert_bytes`` has been moved to ``yafowil.file``.',
+    convert_bytes='yafowil.file:convert_bytes'
+)
+deprecated(
+    '``input_file_display_renderer`` has been moved to ``yafowil.file``.',
+    input_file_display_renderer='yafowil.file:input_file_display_renderer'
+)
+deprecated(
+    '``file_options_renderer`` has been moved to ``yafowil.file``.',
+    file_options_renderer='yafowil.file:file_options_renderer'
 )
 
 # number
 deprecated(
     '``number_extractor`` has been moved to ``yafowil.number``.',
-    number_extractor='yafowil.number:number_extractor',
+    number_extractor='yafowil.number:number_extractor'
 )
 
 # url
 deprecated(
     '``url_extractor`` has been moved to ``yafowil.url``.',
-    url_extractor='yafowil.url:url_extractor',
+    url_extractor='yafowil.url:url_extractor'
 )
 
 ###############################################################################
@@ -1465,217 +1489,3 @@ disable, i.e. ``['foo', 'baz']``. Defaults to False.
 """
 
 factory.defaults['select.persist'] = True
-
-
-###############################################################################
-# file
-###############################################################################
-
-def file_extractor(widget, data):
-    """Return a dict with following keys:
-
-    mimetype
-        Mimetype of file.
-    headers
-        rfc822.Message instance.
-    original
-        Original file handle from underlying framework.
-    file
-        File descriptor containing the data.
-    filename
-        File name.
-    action
-        widget flags 'new', 'keep', 'replace', 'delete'
-    """
-    name = widget.dottedpath
-    if name not in data.request:
-        return UNSET
-    if not '{0}-action'.format(name) in data.request:
-        value = data.request[name]
-        if value:
-            value['action'] = 'new'
-        return value
-    value = data.value
-    action = value['action'] = data.request.get(
-        '{0}-action'.format(name),
-        'keep'
-    )
-    if action == 'delete':
-        value['file'] = UNSET
-    elif action == 'replace':
-        new_val = data.request[name]
-        if not new_val:
-            raise ExtractionError(_(
-                'file_replace_no_upload',
-                default='Cannot replace file. No file uploaded.'
-            ))
-        value = new_val
-        value['action'] = 'replace'
-    return value
-
-
-@managedprops('accept')
-def mimetype_extractor(widget, data):
-    accept = attr_value('accept', widget, data)
-    extracted = data.extracted
-    if not extracted or not accept:
-        return extracted
-    extracted_mimetype = extracted.get('mimetype')
-    if not extracted_mimetype:
-        return extracted
-    extracted_type, extracted_sub = extracted_mimetype.split('/')
-    matches = False
-    for mimetype in accept.split(','):
-        type_, sub = mimetype.split('/')
-        if type_ == '*':
-            matches = True
-            break
-        if type_ != extracted_type:
-            continue
-        if sub == '*':
-            matches = True
-            break
-        if sub == extracted_sub:
-            matches = True
-            break
-    if not matches:
-        message = _(
-            'file_invalid_mimetype',
-            default=u'Mimetype of uploaded file not matches'
-        )
-        raise ExtractionError(message)
-    return extracted
-
-
-@managedprops(
-    'accept',
-    'placeholder',
-    'autofocus',
-    'required',
-    *css_managed_props)
-def input_file_edit_renderer(widget, data):
-    tag = data.tag
-    input_attrs = input_attributes_common(widget, data, excludes=['value'])
-    input_attrs['type'] = 'file'
-    if attr_value('accept', widget, data):
-        input_attrs['accept'] = attr_value('accept', widget, data)
-    return tag('input', **input_attrs)
-
-
-def convert_bytes(value):
-    value = float(value)
-    if value >= 1099511627776:
-        terabytes = value / 1099511627776
-        size = '{0:.2f}T'.format(terabytes)
-    elif value >= 1073741824:
-        gigabytes = value / 1073741824
-        size = '{0:.2f}G'.format(gigabytes)
-    elif value >= 1048576:
-        megabytes = value / 1048576
-        size = '{0:.2f}M'.format(megabytes)
-    elif value >= 1024:
-        kilobytes = value / 1024
-        size = '{0:.2f}K'.format(kilobytes)
-    else:
-        size = '{0:.2f}b'.format(value)
-    return size
-
-
-def input_file_display_renderer(widget, data):
-    tag = data.tag
-    value = data.value
-    attrs = {
-        'class': cssclasses(widget, data),
-    }
-    attrs.update(as_data_attrs(attr_value('data', widget, data)))
-    if not value:
-        no_file_message = _('no_file', default=u'No file')
-        return tag('div', no_file_message, **attrs)
-    file_val = value['file']
-    size = convert_bytes(len(file_val.read()))
-    file_val.seek(0)
-    unknown_message = _('unknown', default=u'Unknown')
-    filename_message = _('filename', default=u'Filename: ')
-    mimetype_message = _('mimetype', default=u'Mimetype: ')
-    size_message = _('size', default=u'Size: ')
-    filename = value.get('filename', unknown_message)
-    mimetype = value.get('mimetype', unknown_message)
-    return tag(
-        'div',
-        tag(
-            'ul',
-            tag('li', tag('strong', filename_message), filename),
-            tag('li', tag('strong', mimetype_message), mimetype),
-            tag('li', tag('strong', size_message), size)),
-        **attrs
-    )
-
-
-@managedprops('vocabulary', *css_managed_props)
-def file_options_renderer(widget, data):
-    if data.value in [None, UNSET, '']:
-        return data.rendered
-    tag = data.tag
-    if data.request:
-        value = [
-            data.request.get('{0}-action'.format(widget.dottedpath), 'keep')
-        ]
-    else:
-        value = ['keep']
-    tags = []
-    vocab = attr_value('vocabulary', widget, data, [])
-    for key, term in vocabulary(vocab):
-        attrs = {
-            'type': 'radio',
-            'value': key,
-            'checked': (key in value) and 'checked' or None,
-            'name_': '{0}-action'.format(widget.dottedpath),
-            'id': cssid(widget, 'input', key),
-            'class_': cssclasses(widget, data),
-        }
-        taginput = tag('input', **attrs)
-        text = tag('span', term)
-        tags.append(tag(
-            'div',
-            taginput,
-            text,
-            **{'id': cssid(widget, 'radio', key)}
-        ))
-    return data.rendered + u''.join(tags)
-
-
-factory.register(
-    'file',
-    extractors=[
-        file_extractor,
-        mimetype_extractor,
-        generic_required_extractor
-    ],
-    edit_renderers=[
-        input_file_edit_renderer,
-        file_options_renderer
-    ],
-    display_renderers=[input_file_display_renderer]
-)
-
-factory.doc['blueprint']['file'] = """\
-A basic file upload blueprint.
-"""
-
-factory.defaults['file.accept'] = None
-factory.doc['props']['file.accept'] = """\
-The accept attribute value is a string that defines the file types the file
-input should accept. This string is a comma-separated list of unique file type
-specifiers. Because a given file type may be identified in more than one
-manner, it's useful to provide a thorough set of type specifiers when you need
-files of a given format.
-"""
-
-factory.defaults['file.vocabulary'] = [
-    ('keep', _('file_keep', default=u'Keep Existing file')),
-    ('replace', _('file_replace', default=u'Replace existing file')),
-    ('delete', _('file_delete', default=u'Delete existing file')),
-]
-factory.doc['props']['file.vocabulary'] = """\
-Vocabulary with available actions for existing files.
-"""

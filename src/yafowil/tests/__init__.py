@@ -7,6 +7,7 @@ from yafowil import compound
 from yafowil import datatypes
 from yafowil import email
 from yafowil import field
+from yafowil import file
 from yafowil import number
 from yafowil import persistence
 from yafowil import search
@@ -31,6 +32,7 @@ class YafowilTestCase(NodeTestCase):
         reload(datatypes)
         reload(email)
         reload(field)
+        reload(file)
         reload(number)
         reload(persistence)
         reload(search)
@@ -63,6 +65,7 @@ def test_suite():
     from yafowil.tests import test_datatypes
     from yafowil.tests import test_email
     from yafowil.tests import test_field
+    from yafowil.tests import test_file
     from yafowil.tests import test_number
     from yafowil.tests import test_persistence
     from yafowil.tests import test_resources
@@ -82,6 +85,7 @@ def test_suite():
     suite.addTest(unittest.findTestCases(test_datatypes))
     suite.addTest(unittest.findTestCases(test_email))
     suite.addTest(unittest.findTestCases(test_field))
+    suite.addTest(unittest.findTestCases(test_file))
     suite.addTest(unittest.findTestCases(test_number))
     suite.addTest(unittest.findTestCases(test_persistence))
     suite.addTest(unittest.findTestCases(test_resources))
