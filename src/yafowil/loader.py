@@ -22,6 +22,7 @@ def register():  # noqa
     import yafowil.select
     import yafowil.table
     import yafowil.tag
+    import yafowil.text
     import yafowil.textarea
     import yafowil.url
 

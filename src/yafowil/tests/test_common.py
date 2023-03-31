@@ -1,150 +1,12 @@
-# -*- coding: utf-8 -*-
 from node.utils import UNSET
 from yafowil.base import ExtractionError
 from yafowil.base import factory
-from yafowil.persistence import write_mapping_writer
 from yafowil.tests import YafowilTestCase
 from yafowil.tests import fxml
 from yafowil.tests import wrapped_fxml
-from yafowil.utils import EMPTY_VALUE
 
 
 class TestCommon(YafowilTestCase):
-
-    def test_BC_imports(self):
-        # button
-        from yafowil.common import submit_renderer
-        from yafowil.common import button_renderer
-
-        # checkbox
-        from yafowil.common import checkbox_extractor
-        from yafowil.common import checkbox_edit_renderer
-        from yafowil.common import checkbox_display_renderer
-
-        # datatypes
-        from yafowil.common import generic_emptyvalue_extractor
-        from yafowil.common import generic_datatype_extractor
-        from yafowil.common import DATATYPE_LABELS
-
-        # email
-        from yafowil.common import email_extractor
-
-        # field
-        from yafowil.common import field_renderer
-        from yafowil.common import label_renderer
-        from yafowil.common import help_renderer
-        from yafowil.common import error_renderer
-
-        # file
-        from yafowil.common import file_extractor
-        from yafowil.common import mimetype_extractor
-        from yafowil.common import input_file_edit_renderer
-        from yafowil.common import convert_bytes
-        from yafowil.common import input_file_display_renderer
-        from yafowil.common import file_options_renderer
-
-        # lines
-        from yafowil.common import lines_extractor
-        from yafowil.common import lines_edit_renderer
-        from yafowil.common import lines_display_renderer
-
-        # number
-        from yafowil.common import number_extractor
-
-        # password
-        from yafowil.common import minlength_extractor
-        from yafowil.common import ascii_extractor
-        from yafowil.common import password_extractor
-        from yafowil.common import password_edit_renderer
-        from yafowil.common import password_display_renderer
-
-        # proxy
-        from yafowil.common import input_proxy_renderer
-
-        # select
-        from yafowil.common import select_extractor
-        from yafowil.common import select_exists_marker
-        from yafowil.common import select_edit_renderer_props
-        from yafowil.common import select_block_edit_renderer
-        from yafowil.common import select_cb_edit_renderer
-        from yafowil.common import select_edit_renderer
-        from yafowil.common import select_display_renderer
-
-        # tag
-        from yafowil.common import tag_renderer
-
-        # textarea
-        from yafowil.common import textarea_managed_props
-        from yafowil.common import textarea_attributes
-        from yafowil.common import textarea_renderer
-
-        # url
-        from yafowil.common import url_extractor
-
-        # utils
-        from yafowil.utils import convert_value_to_datatype
-        from yafowil.utils import convert_values_to_datatype
-
-    def test_text_blueprint(self):
-        # Regular text input
-        widget = factory(
-            'text',
-            name='MYTEXT',
-            value='Test Text "Some Text"')
-        self.assertEqual(widget(), (
-            '<input class="text" id="input-MYTEXT" name="MYTEXT" type="text" '
-            'value="Test Text &quot;Some Text&quot;" />'
-        ))
-
-        widget.mode = 'display'
-        self.assertEqual(widget(), (
-            '<div class="display-text" id="display-MYTEXT">'
-            'Test Text "Some Text"</div>'
-        ))
-
-        # Render with title attribute
-        widget = factory(
-            'text',
-            name='MYTEXT',
-            value='ja ha!',
-            props={
-                'title': 'My awesome title'
-            })
-        self.assertEqual(widget(), (
-            '<input class="text" id="input-MYTEXT" name="MYTEXT" '
-            'title="My awesome title" type="text" value="ja ha!" />'
-        ))
-
-        # Generic HTML5 Data
-        widget = factory(
-            'text',
-            name='MYTEXT',
-            value='ja ha!',
-            props={
-                'title': 'My awesome title',
-                'data': {'foo': 'bar'}
-            })
-        self.assertEqual(widget(), (
-            '<input class="text" data-foo=\'bar\' id="input-MYTEXT" '
-            'name="MYTEXT" title="My awesome title" type="text" '
-            'value="ja ha!" />'
-        ))
-
-        # Extract and persist
-        widget = factory(
-            'text',
-            name='MYTEXT',
-            props={
-                'persist_writer': write_mapping_writer
-            })
-        data = widget.extract(request={'MYTEXT': '10'})
-        self.assertEqual(data.name, 'MYTEXT')
-        self.assertEqual(data.value, UNSET)
-        self.assertEqual(data.extracted, '10')
-
-        model = dict()
-        data.write(model)
-        self.assertEqual(model, {'MYTEXT': '10'})
 
     def test_emptyvalue_extraction(self):
         # Empty values
@@ -406,3 +268,80 @@ class TestCommon(YafowilTestCase):
             })
         data = widget.extract({'BYTES': u'\\r\\n\\x01\\x9a\\x03\\xff'})
         self.assertEqual(data.extracted, b'\r\n\x01\x9a\x03\xff')
+
+    def test_BC_imports(self):
+        # button
+        from yafowil.common import submit_renderer
+        from yafowil.common import button_renderer
+
+        # checkbox
+        from yafowil.common import checkbox_extractor
+        from yafowil.common import checkbox_edit_renderer
+        from yafowil.common import checkbox_display_renderer
+
+        # datatypes
+        from yafowil.common import generic_emptyvalue_extractor
+        from yafowil.common import generic_datatype_extractor
+        from yafowil.common import DATATYPE_LABELS
+
+        # email
+        from yafowil.common import email_extractor
+
+        # field
+        from yafowil.common import field_renderer
+        from yafowil.common import label_renderer
+        from yafowil.common import help_renderer
+        from yafowil.common import error_renderer
+
+        # file
+        from yafowil.common import file_extractor
+        from yafowil.common import mimetype_extractor
+        from yafowil.common import input_file_edit_renderer
+        from yafowil.common import convert_bytes
+        from yafowil.common import input_file_display_renderer
+        from yafowil.common import file_options_renderer
+
+        # lines
+        from yafowil.common import lines_extractor
+        from yafowil.common import lines_edit_renderer
+        from yafowil.common import lines_display_renderer
+
+        # number
+        from yafowil.common import number_extractor
+
+        # password
+        from yafowil.common import minlength_extractor
+        from yafowil.common import ascii_extractor
+        from yafowil.common import password_extractor
+        from yafowil.common import password_edit_renderer
+        from yafowil.common import password_display_renderer
+
+        # proxy
+        from yafowil.common import input_proxy_renderer
+
+        # select
+        from yafowil.common import select_extractor
+        from yafowil.common import select_exists_marker
+        from yafowil.common import select_edit_renderer_props
+        from yafowil.common import select_block_edit_renderer
+        from yafowil.common import select_cb_edit_renderer
+        from yafowil.common import select_edit_renderer
+        from yafowil.common import select_display_renderer
+
+        # tag
+        from yafowil.common import tag_renderer
+
+        # text
+        from yafowil.common import text_edit_renderer
+
+        # textarea
+        from yafowil.common import textarea_managed_props
+        from yafowil.common import textarea_attributes
+        from yafowil.common import textarea_renderer
+
+        # url
+        from yafowil.common import url_extractor
+
+        # utils
+        from yafowil.utils import convert_value_to_datatype
+        from yafowil.utils import convert_values_to_datatype

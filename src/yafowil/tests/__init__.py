@@ -19,6 +19,7 @@ from yafowil import search
 from yafowil import select
 from yafowil import table
 from yafowil import tag as tag_module
+from yafowil import text
 from yafowil import textarea
 from yafowil import url
 from yafowil.base import factory
@@ -52,6 +53,7 @@ class YafowilTestCase(NodeTestCase):
         reload(select)
         reload(table)
         reload(tag_module)
+        reload(text)
         reload(textarea)
         reload(url)
 
@@ -94,6 +96,7 @@ def test_suite():
     from yafowil.tests import test_select
     from yafowil.tests import test_table
     from yafowil.tests import test_tag
+    from yafowil.tests import test_text
     from yafowil.tests import test_textarea
     from yafowil.tests import test_tsf
     from yafowil.tests import test_url
@@ -122,6 +125,7 @@ def test_suite():
     suite.addTest(unittest.findTestCases(test_select))
     suite.addTest(unittest.findTestCases(test_table))
     suite.addTest(unittest.findTestCases(test_tag))
+    suite.addTest(unittest.findTestCases(test_text))
     suite.addTest(unittest.findTestCases(test_textarea))
     suite.addTest(unittest.findTestCases(test_tsf))
     suite.addTest(unittest.findTestCases(test_url))

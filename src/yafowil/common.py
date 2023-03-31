@@ -5,10 +5,6 @@ from yafowil.base import factory
 from yafowil.base import fetch_value
 from yafowil.compat import ITER_TYPES
 from yafowil.compat import STR_TYPE
-# alias generic_datatype_extractor and generic_emptyvalue_extractor imports
-# for now to make deprecated import warnings work
-from yafowil.datatypes import generic_datatype_extractor as generic_datatype_extractor_
-from yafowil.datatypes import generic_emptyvalue_extractor as generic_emptyvalue_extractor_
 from yafowil.datatypes import lookup_datatype_converter
 from yafowil.tsf import _
 from yafowil.utils import as_data_attrs
@@ -194,6 +190,12 @@ deprecated(
 deprecated(
     '``tag_renderer`` has been moved to ``yafowil.tag``.',
     tag_renderer='yafowil.tag:tag_renderer'
+)
+
+# text
+deprecated(
+    '``text_edit_renderer`` has been moved to ``yafowil.text``.',
+    text_edit_renderer='yafowil.text:text_edit_renderer'
 )
 
 # textarea
@@ -516,58 +518,3 @@ def generic_positional_rendering_helper(
         if pos == 'before':
             return newtag + rendered
         return rendered + newtag
-
-
-###############################################################################
-# text
-###############################################################################
-
-@managedprops(
-    'data',
-    'title',
-    'size',
-    'disabled',
-    'autofocus',
-    'placeholder',
-    'autocomplete',
-    *css_managed_props)
-def text_edit_renderer(widget, data):
-    return input_generic_renderer(widget, data)
-
-
-factory.register(
-    'text',
-    extractors=[
-        generic_extractor,
-        generic_required_extractor,
-        generic_emptyvalue_extractor_,
-        generic_datatype_extractor_,
-    ],
-    edit_renderers=[text_edit_renderer],
-    display_renderers=[
-        generic_display_renderer,
-        display_proxy_renderer
-    ]
-)
-
-factory.doc['blueprint']['text'] = """\
-One line text input blueprint.
-"""
-
-factory.defaults['text.type'] = 'text'
-factory.doc['props']['text.type'] = """\
-Type of input tag.
-"""
-
-factory.defaults['text.required_class'] = 'required'
-
-factory.defaults['text.default'] = ''
-
-factory.defaults['text.class'] = 'text'
-
-factory.defaults['text.disabled'] = False
-factory.doc['props']['text.disabled'] = """\
-Flag  input field is disabled.
-"""
-
-factory.defaults['text.persist'] = True
