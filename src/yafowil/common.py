@@ -2019,34 +2019,3 @@ factory.defaults['url.required_class'] = 'required'
 factory.defaults['url.class'] = 'url'
 
 factory.defaults['url.persist'] = True
-
-
-###############################################################################
-# search
-###############################################################################
-
-factory.register(
-    'search',
-    extractors=[
-        generic_extractor,
-        generic_required_extractor,
-        generic_emptyvalue_extractor_,
-    ],
-    edit_renderers=[input_generic_renderer],
-    display_renderers=[
-        generic_display_renderer,
-        display_proxy_renderer
-    ]
-)
-
-factory.doc['blueprint']['search'] = """\
-Search blueprint (HTML5).
-"""
-
-factory.defaults['search.type'] = 'search'
-
-factory.defaults['search.default'] = ''
-
-factory.defaults['search.required_class'] = 'required'
-
-factory.defaults['search.class'] = 'search'

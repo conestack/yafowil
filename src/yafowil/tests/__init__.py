@@ -7,6 +7,7 @@ from yafowil import datatypes
 from yafowil import field
 from yafowil import number
 from yafowil import persistence
+from yafowil import search
 from yafowil import table
 from yafowil.base import factory
 from yafowil.utils import Tag
@@ -27,6 +28,7 @@ class YafowilTestCase(NodeTestCase):
         reload(field)
         reload(number)
         reload(persistence)
+        reload(search)
         reload(table)
 
     def tearDown(self):
@@ -56,6 +58,7 @@ def test_suite():
     from yafowil.tests import test_number
     from yafowil.tests import test_persistence
     from yafowil.tests import test_resources
+    from yafowil.tests import test_search
     from yafowil.tests import test_table
     from yafowil.tests import test_tsf
     from yafowil.tests import test_utils
@@ -71,6 +74,7 @@ def test_suite():
     suite.addTest(unittest.findTestCases(test_number))
     suite.addTest(unittest.findTestCases(test_persistence))
     suite.addTest(unittest.findTestCases(test_resources))
+    suite.addTest(unittest.findTestCases(test_search))
     suite.addTest(unittest.findTestCases(test_table))
     suite.addTest(unittest.findTestCases(test_tsf))
     suite.addTest(unittest.findTestCases(test_utils))
