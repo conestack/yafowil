@@ -4,10 +4,17 @@ import yafowil.utils
 
 @yafowil.utils.entry_point(order=0)
 def register():
-    import yafowil.persistence
-    import yafowil.common
-    import yafowil.compound
+    import yafowil.persistence  # noqa
+    import yafowil.button  # noqa
+    import yafowil.common  # noqa
+    import yafowil.compound  # noqa
+    import yafowil.datatypes  # noqa
+    import yafowil.email  # noqa
+    import yafowil.field  # noqa
+    import yafowil.number  # noqa
+    import yafowil.search  # noqa
     import yafowil.table  # noqa
+    import yafowil.url  # noqa
 
 
 # execute all register entry points. supposed to be used for widget and theme
