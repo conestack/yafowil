@@ -11,6 +11,7 @@ from yafowil import file
 from yafowil import number
 from yafowil import password
 from yafowil import persistence
+from yafowil import proxy
 from yafowil import search
 from yafowil import select
 from yafowil import table
@@ -38,6 +39,7 @@ class YafowilTestCase(NodeTestCase):
         reload(number)
         reload(password)
         reload(persistence)
+        reload(proxy)
         reload(search)
         reload(select)
         reload(table)
@@ -73,6 +75,7 @@ def test_suite():
     from yafowil.tests import test_number
     from yafowil.tests import test_password
     from yafowil.tests import test_persistence
+    from yafowil.tests import test_proxy
     from yafowil.tests import test_resources
     from yafowil.tests import test_search
     from yafowil.tests import test_select
@@ -95,6 +98,7 @@ def test_suite():
     suite.addTest(unittest.findTestCases(test_number))
     suite.addTest(unittest.findTestCases(test_password))
     suite.addTest(unittest.findTestCases(test_persistence))
+    suite.addTest(unittest.findTestCases(test_proxy))
     suite.addTest(unittest.findTestCases(test_resources))
     suite.addTest(unittest.findTestCases(test_search))
     suite.addTest(unittest.findTestCases(test_select))

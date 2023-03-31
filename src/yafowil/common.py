@@ -127,6 +127,12 @@ deprecated(
     password_display_renderer='yafowil.password:password_display_renderer'
 )
 
+# proxy
+deprecated(
+    '``input_proxy_renderer`` has been moved to ``yafowil.proxy``.',
+    input_proxy_renderer='yafowil.proxy:input_proxy_renderer'
+)
+
 # select
 deprecated(
     '``select_extractor`` has been moved to ``yafowil.select``.',
@@ -586,47 +592,6 @@ factory.defaults['hidden.default'] = ''
 factory.defaults['hidden.class'] = 'hidden'
 
 factory.defaults['hidden.persist'] = True
-
-
-###############################################################################
-# proxy
-###############################################################################
-
-@managedprops(*css_managed_props)
-def input_proxy_renderer(widget, data):
-    """Render hidden input ignoring ``widget.dottedpath``, just using widget
-    name.
-    """
-    tag = data.tag
-    value = data.value
-    if data.request is not UNSET and data.request.get(widget.__name__):
-        value = data.request.get(widget.__name__)
-    input_attrs = {
-        'type': 'hidden',
-        'value': value,
-        'name_': widget.__name__,
-        'id': cssid(widget, 'input'),
-        'class_': cssclasses(widget, data),
-    }
-    return tag('input', **input_attrs)
-
-
-factory.register(
-    'proxy',
-    extractors=[
-        generic_extractor,
-        generic_emptyvalue_extractor_,
-        generic_datatype_extractor_
-    ],
-    edit_renderers=[input_proxy_renderer],
-    display_renderers=[empty_display_renderer]
-)
-
-factory.doc['blueprint']['proxy'] = """\
-Bypass arguments out of form namespace using a hidden field.
-"""
-
-factory.defaults['proxy.class'] = None
 
 
 ###############################################################################

@@ -46,11 +46,14 @@ class TestCommon(YafowilTestCase):
         from yafowil.common import number_extractor
 
         # password
-        from yafowil.password import minlength_extractor
-        from yafowil.password import ascii_extractor
-        from yafowil.password import password_extractor
-        from yafowil.password import password_edit_renderer
-        from yafowil.password import password_display_renderer
+        from yafowil.common import minlength_extractor
+        from yafowil.common import ascii_extractor
+        from yafowil.common import password_extractor
+        from yafowil.common import password_edit_renderer
+        from yafowil.common import password_display_renderer
+
+        # proxy
+        from yafowil.common import input_proxy_renderer
 
         # select
         from yafowil.common import select_extractor
@@ -1101,81 +1104,6 @@ class TestCommon(YafowilTestCase):
         model = dict()
         data.write(model)
         self.assertEqual(model, {'MYLINES': ['1', '2']})
-
-    def test_proxy_blueprint(self):
-        # Used to pass hidden arguments out of form namespace
-        widget = factory(
-            'proxy',
-            name='PROXY',
-            value='1')
-        self.assertEqual(widget(), (
-            '<input id="input-PROXY" name="PROXY" type="hidden" value="1" />'
-        ))
-        self.assertEqual(widget(request={'PROXY': '2'}), (
-            '<input id="input-PROXY" name="PROXY" type="hidden" value="2" />'
-        ))
-
-        # Emptyvalue
-        widget = factory(
-            'proxy',
-            name='PROXY',
-            value='',
-            props={
-                'emptyvalue': '1.0'
-            })
-        data = widget.extract(request={'PROXY': ''})
-        self.assertEqual(data.name, 'PROXY')
-        self.assertEqual(data.value, '')
-        self.assertEqual(data.extracted, '1.0')
-        self.assertEqual(data.errors, [])
-
-        # Datatype
-        widget = factory(
-            'proxy',
-            name='PROXY',
-            value='',
-            props={
-                'emptyvalue': '1.0',
-                'datatype': float
-            })
-        data = widget.extract(request={'PROXY': '2.0'})
-        self.assertEqual(data.name, 'PROXY')
-        self.assertEqual(data.value, '')
-        self.assertEqual(data.extracted, 2.0)
-        self.assertEqual(data.errors, [])
-
-        data = widget.extract(request={'PROXY': ''})
-        self.assertEqual(data.name, 'PROXY')
-        self.assertEqual(data.value, '')
-        self.assertEqual(data.extracted, 1.0)
-        self.assertEqual(data.errors, [])
-
-        # Default emptyvalue extraction
-        del widget.attrs['emptyvalue']
-        data = widget.extract(request={'PROXY': ''})
-        self.assertEqual(data.name, 'PROXY')
-        self.assertEqual(data.value, '')
-        self.assertEqual(data.extracted, EMPTY_VALUE)
-        self.assertEqual(data.errors, [])
-
-        # Persist defaults to false
-        widget = factory(
-            'proxy',
-            name='PROXY',
-            props={
-                'persist_writer': write_mapping_writer
-            })
-        data = widget.extract(request={'PROXY': '10'})
-        model = dict()
-        data.write(model)
-        self.assertEqual(model, {})
-
-        # If proxy widgets really need to be persisted, ``persist`` property
-        # needs to be set explicitely
-        widget.attrs['persist'] = True
-        data = widget.extract(request={'PROXY': '10'})
-        data.write(model)
-        self.assertEqual(model, {'PROXY': '10'})
 
     def test_bytes_datatype_rendering_and_extraction(self):
         widget = factory(
