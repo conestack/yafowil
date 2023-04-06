@@ -4,9 +4,9 @@ from node.behaviors import DictStorage
 from node.behaviors import MappingAdopt
 from node.behaviors import MappingConstraints
 from node.behaviors import MappingNode
+from node.behaviors import MappingOrder
 from node.behaviors import NodeAttributes
 from node.behaviors import OdictStorage
-from node.behaviors import Order
 from node.utils import UNSET
 from node.utils import instance_property
 from plumber import plumbing
@@ -260,7 +260,7 @@ class WidgetAttributes(object):
     Attributes,
     MappingConstraints,
     MappingAdopt,
-    Order,
+    MappingOrder,
     MappingNode,
     OdictStorage)
 class Widget(object):

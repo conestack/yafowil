@@ -7,7 +7,6 @@ from yafowil.persistence import node_attribute_writer
 from yafowil.persistence import write_mapping_writer
 from yafowil.tests import YafowilTestCase
 import uuid
-import yafowil.loader  # noqa
 
 
 class TestPersistence(YafowilTestCase):

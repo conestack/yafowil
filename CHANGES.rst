@@ -2,10 +2,36 @@
 History
 =======
 
-3.0.2 (unreleased)
+3.1.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Refactor datatype conversion. Datatype related extractors and utils are
+  contained in ``yafowil.datatype`` now. Fix datatype conversion for ``bytes``
+  type.
+  [rnix]
+
+- Split up ``yafowil.common`` module:
+  - Move ``button`` and ``submit`` blueprints to ``yafowil.button``.
+  - Move ``checkbox`` blueprint to ``yafowil.checkbox``.
+  - Move ``email`` blueprint to ``yafowil.email``.
+  - Move ``field``, ``label``, ``help`` and ``error`` blueprints to
+    ``yafowil.field``.
+  - Move ``file`` blueprint to ``yafowil.file``.
+  - Move ``hidden`` blueprint to ``yafowil.hidden``.
+  - Move ``lines`` blueprint to ``yafowil.lines``.
+  - Move ``number`` blueprint to ``yafowil.number``.
+  - Move ``password`` blueprint to ``yafowil.password``.
+  - Move ``proxy`` blueprint to ``yafowil.proxy``.
+  - Move ``search`` blueprint to ``yafowil.search``.
+  - Move ``select`` blueprint to ``yafowil.select``.
+  - Move ``tag`` blueprint to ``yafowil.tag``.
+  - Move ``text`` blueprint to ``yafowil.text``.
+  - Move ``textarea`` blueprint to ``yafowil.textarea``.
+  - Move ``url`` blueprint to ``yafowil.url``.
+  [rnix]
+
+- Tests work with pytest.
+  [rnix]
 
 
 3.0.1 (2022-12-05)

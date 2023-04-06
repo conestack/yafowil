@@ -13,11 +13,11 @@ import webresource as wr
 # Helpers
 ###############################################################################
 
-def test_extractor(widget, data):
+def _test_extractor(widget, data):
     return 'e1'
 
 
-def test_edit_renderer(widget, data):
+def _test_edit_renderer(widget, data):
     return 'r1, {}, {}, {}'.format(
         widget.__name__,
         str(data),
@@ -25,12 +25,12 @@ def test_edit_renderer(widget, data):
     )
 
 
-def test_getter(widget, data):
+def _test_getter(widget, data):
     return 'Test Value'
 
 
-def test_preprocessor(widget, data):
-    data.attrs['test_preprocessor'] = 'called'
+def _test_preprocessor(widget, data):
+    data.attrs['_test_preprocessor'] = 'called'
     return data
 
 
@@ -95,10 +95,10 @@ class TestBase(NodeTestCase):
             data['fieldset']['age'].fetch('root.unknown')
 
     def test_Widget(self):
-        def test_extractor2(widget, data):
+        def _test_extractor2(widget, data):
             return 'e2'
 
-        def test_extractor3(widget, data):
+        def _test_extractor3(widget, data):
             number = data.request[widget.__name__]
             try:
                 return int(number)
@@ -109,7 +109,7 @@ class TestBase(NodeTestCase):
         def fail_extractor(widget, data):
             raise ValueError('extractor has to fail')
 
-        def test_edit_renderer2(widget, data):
+        def _test_edit_renderer2(widget, data):
             return 'r2, {}, {}, {}'.format(
                 widget.__name__,
                 str(data),
@@ -129,26 +129,26 @@ class TestBase(NodeTestCase):
         def fail_display_renderer(widget, data):
             raise ValueError('display renderer has to fail')
 
-        def test_getter2(widget, data):
+        def _test_getter2(widget, data):
             return 999
 
         # The widget class
         test_request = {'MYUID': 'New Test Value'}
         testwidget = Widget(
             'blueprint_names_goes_here',
-            [('1', test_extractor)],
-            [('1', test_edit_renderer)],
+            [('1', _test_extractor)],
+            [('1', _test_edit_renderer)],
             [('1', test_display_renderer)],
-            [('1', test_preprocessor)],
+            [('1', _test_preprocessor)],
             'MYUID',
-            test_getter,
+            _test_getter,
             dict(test1='Test1', test2='Test2'))
 
         self.checkOutput("""
         r1,
         MYUID,
         <RuntimeData MYUID, value='Test Value', extracted=<UNSET>,
-        attrs={'test_preprocessor': 'called'} at ...>,
+        attrs={'_test_preprocessor': 'called'} at ...>,
         {...'test1': 'Test1'...}
         """, testwidget())
 
@@ -157,7 +157,7 @@ class TestBase(NodeTestCase):
         r1,
         MYUID,
         <RuntimeData MYUID, value='Test Value', extracted=<UNSET>,
-        attrs={'test_preprocessor': 'called'} at ...>,
+        attrs={'_test_preprocessor': 'called'} at ...>,
         {...'test2': 'Test2'...}
         """, testwidget(request=test_request))
 
@@ -165,27 +165,27 @@ class TestBase(NodeTestCase):
         data = testwidget.extract(test_request)
         self.checkOutput("""
         <RuntimeData MYUID, value='Test Value', extracted='e1',
-        attrs={'test_preprocessor': 'called'} at ...>
+        attrs={'_test_preprocessor': 'called'} at ...>
         """, str(data))
 
-        self.assertEqual(data.attrs['test_preprocessor'], 'called')
+        self.assertEqual(data.attrs['_test_preprocessor'], 'called')
 
         # Preprocessor is only called once!
-        data.attrs['test_preprocessor'] = 'reset'
+        data.attrs['_test_preprocessor'] = 'reset'
         data = testwidget._runpreprocessors(data)
-        self.assertEqual(data.attrs['test_preprocessor'], 'reset')
+        self.assertEqual(data.attrs['_test_preprocessor'], 'reset')
 
         # Different cases
 
         # a.1) defaults: edit
         testwidget = Widget(
             'blueprint_names_goes_here',
-            [('1', test_extractor)],
-            [('1', test_edit_renderer)],
+            [('1', _test_extractor)],
+            [('1', _test_edit_renderer)],
             [('1', test_display_renderer)],
             [],
             'MYUID',
-            test_getter,
+            _test_getter,
             dict(test1='Test1', test2='Test2'))
         self.checkOutput("""
         r1,
@@ -197,12 +197,12 @@ class TestBase(NodeTestCase):
         # a.2) mode display
         testwidget = Widget(
             'blueprint_names_goes_here',
-            [('1', test_extractor)],
-            [('1', test_edit_renderer)],
+            [('1', _test_extractor)],
+            [('1', _test_edit_renderer)],
             [('1', test_display_renderer)],
             [],
             'MYUID',
-            test_getter,
+            _test_getter,
             dict(test1='Test1', test2='Test2'),
             mode='display')
         self.checkOutput("""
@@ -215,12 +215,12 @@ class TestBase(NodeTestCase):
         # a.3) mode skip
         testwidget = Widget(
             'blueprint_names_goes_here',
-            [('1', test_extractor)],
-            [('1', test_edit_renderer)],
+            [('1', _test_extractor)],
+            [('1', _test_edit_renderer)],
             [('1', test_display_renderer)],
             [],
             'MYUID',
-            test_getter,
+            _test_getter,
             dict(test1='Test1', test2='Test2'),
             mode='skip')
         self.assertEqual(testwidget(), u'')
@@ -228,12 +228,12 @@ class TestBase(NodeTestCase):
         # a.4) mode w/o renderer
         testwidget = Widget(
             'blueprint_names_goes_here',
-            [('1', test_extractor)],
+            [('1', _test_extractor)],
             [],
             [],
             [],
             'MYUID',
-            test_getter,
+            _test_getter,
             dict(test1='Test1', test2='Test2'),
             mode='display')
         with self.assertRaises(ValueError) as arc:
@@ -244,12 +244,12 @@ class TestBase(NodeTestCase):
         # b.1) two extractors w/o request
         testwidget = Widget(
             'blueprint_names_goes_here',
-            [('1', test_extractor), ('2', test_extractor2)],
-            [('1', test_edit_renderer), ('2', test_edit_renderer2)],
+            [('1', _test_extractor), ('2', _test_extractor2)],
+            [('1', _test_edit_renderer), ('2', _test_edit_renderer2)],
             [('1', test_display_renderer)],
             [],
             'MYUID2',
-            test_getter,
+            _test_getter,
             dict(test1='Test1', test2='Test2'))
         self.checkOutput("""
         r2,
@@ -261,12 +261,12 @@ class TestBase(NodeTestCase):
         # b.2) extractor with request, non int has to fail
         testwidget = Widget(
             'blueprint_names_goes_here',
-            [('1', test_extractor3)],
-            [('1', test_edit_renderer)],
+            [('1', _test_extractor3)],
+            [('1', _test_edit_renderer)],
             [('1', test_display_renderer)],
             [],
             'MYUID2',
-            test_getter2,
+            _test_getter2,
             dict(test1='Test1', test2='Test2'))
 
         self.checkOutput("""
@@ -276,12 +276,12 @@ class TestBase(NodeTestCase):
         # b.3) extractor with request, but mode display
         testwidget = Widget(
             'blueprint_names_goes_here',
-            [('1', test_extractor3)],
-            [('1', test_edit_renderer)],
+            [('1', _test_extractor3)],
+            [('1', _test_edit_renderer)],
             [('1', test_display_renderer)],
             [],
             'MYUID2',
-            test_getter2,
+            _test_getter2,
             dict(test1='Test1', test2='Test2'),
             mode='display')
         self.checkOutput("""
@@ -291,12 +291,12 @@ class TestBase(NodeTestCase):
         # b.4) two extractors with request
         testwidget = Widget(
             'blueprint_names_goes_here',
-            [('1', test_extractor3)],
-            [('1', test_edit_renderer)],
+            [('1', _test_extractor3)],
+            [('1', _test_edit_renderer)],
             [('1', test_display_renderer)],
             [],
             'MYUID2',
-            test_getter2,
+            _test_getter2,
             dict(test1='Test1', test2='Test2'))
         self.checkOutput("""
         <RuntimeData MYUID2, value=999, extracted=123 at ...>
@@ -463,20 +463,20 @@ class TestBase(NodeTestCase):
     def test_factory(self):
         # Fill factory with test blueprints
         factory = Factory()
-        factory.register('widget_test', [test_extractor], [test_edit_renderer])
+        factory.register('widget_test', [_test_extractor], [_test_edit_renderer])
         self.assertEqual(
             factory.extractors('widget_test'),
-            [test_extractor]
+            [_test_extractor]
         )
         self.assertEqual(
             factory.edit_renderers('widget_test'),
-            [test_edit_renderer]
+            [_test_edit_renderer]
         )
 
         testwidget = factory(
             'widget_test',
             name='MYFAC',
-            value=test_getter,
+            value=_test_getter,
             props=dict(foo='bar'))
         self.checkOutput("""
         r1,
@@ -487,27 +487,27 @@ class TestBase(NodeTestCase):
 
         factory.register(
             'widget_test',
-            [test_extractor],
-            [test_edit_renderer],
-            preprocessors=[test_preprocessor])
+            [_test_extractor],
+            [_test_edit_renderer],
+            preprocessors=[_test_preprocessor])
         self.assertEqual(
             factory.preprocessors('widget_test'),
-            [test_preprocessor]
+            [_test_preprocessor]
         )
 
-        def test_global_preprocessor(widget, data):
+        def _test_global_preprocessor(widget, data):
             return data
 
-        factory.register_global_preprocessors([test_global_preprocessor])
+        factory.register_global_preprocessors([_test_global_preprocessor])
         self.assertEqual(
             factory.preprocessors('widget_test'),
-            [test_global_preprocessor, test_preprocessor]
+            [_test_global_preprocessor, _test_preprocessor]
         )
 
         testwidget = factory(
             'widget_test',
             name='MYFAC',
-            value=test_getter,
+            value=_test_getter,
             props=dict(foo='bar'), mode='display')
         data = testwidget.extract({})
         self.assertEqual(data.mode, 'display')
@@ -814,7 +814,7 @@ class TestBase(NodeTestCase):
         # at a specific place in an existing widget tree
 
         factory = Factory()
-        factory.register('widget_test', [test_extractor], [test_edit_renderer])
+        factory.register('widget_test', [_test_extractor], [_test_edit_renderer])
 
         widget = factory('widget_test', name='root')
         widget['1'] = factory('widget_test')

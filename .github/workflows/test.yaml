@@ -17,11 +17,11 @@ jobs:
           - macos-latest
 
         python:
-          - "2.7"
           - "3.7"
           - "3.8"
           - "3.9"
           - "3.10"
+          - "3.11"
 
     steps:
       - uses: actions/checkout@v2
@@ -34,7 +34,6 @@ jobs:
       - name: Install
         run: |
           pip install wheel coverage
-          pip install https://github.com/conestack/webresource/archive/master.zip
           pip install -e .[test]
 
       - name: Run tests

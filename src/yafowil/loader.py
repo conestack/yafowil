@@ -3,11 +3,28 @@ import yafowil.utils
 
 
 @yafowil.utils.entry_point(order=0)
-def register():
-    import yafowil.persistence
+def register():  # noqa
+    import yafowil.button
+    import yafowil.checkbox
     import yafowil.common
     import yafowil.compound
-    import yafowil.table  # noqa
+    import yafowil.datatypes
+    import yafowil.email
+    import yafowil.field
+    import yafowil.file
+    import yafowil.hidden
+    import yafowil.lines
+    import yafowil.number
+    import yafowil.password
+    import yafowil.persistence
+    import yafowil.proxy
+    import yafowil.search
+    import yafowil.select
+    import yafowil.table
+    import yafowil.tag
+    import yafowil.text
+    import yafowil.textarea
+    import yafowil.url
 
 
 # execute all register entry points. supposed to be used for widget and theme

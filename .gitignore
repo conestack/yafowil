@@ -2,8 +2,8 @@
 *.pyc
 *.pyo
 /.coverage
+/.mxmake/
 /dist/
 /htmlcov/
-/py2/
-/py3/
-/pypy3/
+/requirements-mxdev.txt
+/venv/

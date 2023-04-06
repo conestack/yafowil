@@ -2,8 +2,6 @@ from yafowil.base import factory
 from yafowil.controller import Controller
 from yafowil.tests import fxml
 from yafowil.tests import YafowilTestCase
-import yafowil.common
-import yafowil.compound  # noqa
 
 
 class TestController(YafowilTestCase):

@@ -6,8 +6,6 @@ from yafowil.controller import Controller
 from yafowil.tests import YafowilTestCase
 from yafowil.tests import fxml
 from yafowil.utils import Tag
-import yafowil.common
-import yafowil.compound  # noqa
 
 
 ###############################################################################
