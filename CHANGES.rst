@@ -2,7 +2,7 @@
 History
 =======
 
-3.1.0 (unreleased)
+3.1.0 (2023-05-15)
 ------------------
 
 - Refactor datatype conversion. Datatype related extractors and utils are
