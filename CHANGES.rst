@@ -44,6 +44,7 @@ History
   - Move ``textarea`` blueprint to ``yafowil.textarea``.
 
   - Move ``url`` blueprint to ``yafowil.url``.
+
   [rnix]
 
 - Tests work with pytest.
