@@ -60,11 +60,13 @@ setup(
         'webresource'
     ],
     tests_require=[
+        'coverage',
         'lxml',
         'zope.testrunner'
     ],
     test_suite='yafowil.tests.test_suite',
     extras_require=dict(test=[
+        'coverage',
         'lxml',
         'zope.testrunner'
     ]),

@@ -28,6 +28,11 @@ RUN_TARGET?=
 # No default value.
 CLEAN_FS?=
 
+# Optional makefile to include before default targets. This can
+# be used to provide custom targets or hook up to existing targets.
+# Default: include.mk
+INCLUDE_MAKEFILE?=include.mk
+
 ## core.mxenv
 
 # Python interpreter to use.
@@ -58,12 +63,12 @@ VENV_CREATE?=true
 VENV_FOLDER?=venv
 
 # mxdev to install in virtual environment.
-# Default: https://github.com/mxstack/mxdev/archive/main.zip
-MXDEV?=https://github.com/mxstack/mxdev/archive/main.zip
+# Default: mxdev
+MXDEV?=mxdev
 
 # mxmake to install in virtual environment.
-# Default: https://github.com/mxstack/mxmake/archive/develop.zip
-MXMAKE?=https://github.com/mxstack/mxmake/archive/develop.zip
+# Default: mxmake
+MXMAKE?=mxmake
 
 ## core.mxfiles
 
@@ -76,7 +81,7 @@ PROJECT_CONFIG?=mx.ini
 # The command which gets executed. Defaults to the location the
 # :ref:`run-tests` template gets rendered to if configured.
 # Default: .mxmake/files/run-tests.sh
-TEST_COMMAND?=.mxmake/files/run-tests.sh
+TEST_COMMAND?=$(VENV_FOLDER)/bin/python -m yafowil.tests.__init__
 
 # Additional Python requirements for running tests to be
 # installed (via pip).
@@ -92,7 +97,11 @@ TEST_DEPENDENCY_TARGETS?=
 # The command which gets executed. Defaults to the location the
 # :ref:`run-coverage` template gets rendered to if configured.
 # Default: .mxmake/files/run-coverage.sh
-COVERAGE_COMMAND?=.mxmake/files/run-coverage.sh
+COVERAGE_COMMAND?=\
+	$(VENV_FOLDER)/bin/coverage run \
+		--source src/yafowil \
+		-m yafowil.tests.__init__ \
+	&& $(VENV_FOLDER)/bin/coverage report --fail-under=99
 
 ## i18n.gettext
 
@@ -104,7 +113,7 @@ GETTEXT_LOCALES_PATH?=src/yafowil/i18n/locales
 # No default value.
 GETTEXT_DOMAIN?=yafowil
 
-# List of language identifiers.
+# Space separated list of language identifiers.
 # No default value.
 GETTEXT_LANGUAGES?=en de
 
@@ -127,6 +136,7 @@ DIRTY_TARGETS?=
 CLEAN_TARGETS?=
 PURGE_TARGETS?=
 CHECK_TARGETS?=
+TYPECHECK_TARGETS?=
 FORMAT_TARGETS?=
 
 # Defensive settings for make: https://tech.davis-hansson.com/p/make/
@@ -179,8 +189,10 @@ endif
 MXENV_TARGET:=$(SENTINEL_FOLDER)/mxenv.sentinel
 $(MXENV_TARGET): $(SENTINEL)
 ifeq ("$(VENV_ENABLED)", "true")
+ifeq ("$(VENV_CREATE)", "true")
 	@echo "Setup Python Virtual Environment under '$(VENV_FOLDER)'"
 	@$(PYTHON_BIN) -m venv $(VENV_FOLDER)
+endif
 endif
 	@$(MXENV_PATH)pip install -U pip setuptools wheel
 	@$(MXENV_PATH)pip install -U $(MXDEV)
@@ -197,7 +209,9 @@ mxenv-dirty:
 .PHONY: mxenv-clean
 mxenv-clean: mxenv-dirty
 ifeq ("$(VENV_ENABLED)", "true")
+ifeq ("$(VENV_CREATE)", "true")
 	@rm -rf $(VENV_FOLDER)
+endif
 else
 	@$(MXENV_PATH)pip uninstall -y $(MXDEV)
 	@$(MXENV_PATH)pip uninstall -y $(MXMAKE)
@@ -245,6 +259,7 @@ $(FILES_TARGET): $(PROJECT_CONFIG) $(MXENV_TARGET) $(SOURCES_TARGET) $(LOCAL_PAC
 	$(call set_mxfiles_env,$(MXENV_PATH),$(MXMAKE_FILES))
 	@$(MXENV_PATH)mxdev -n -c $(PROJECT_CONFIG)
 	$(call unset_mxfiles_env,$(MXENV_PATH),$(MXMAKE_FILES))
+	@test -e $(MXMAKE_FILES)/pip.conf && cp $(MXMAKE_FILES)/pip.conf $(VENV_FOLDER)/pip.conf || :
 	@touch $(FILES_TARGET)
 
 .PHONY: mxfiles
@@ -432,6 +447,8 @@ INSTALL_TARGETS+=$(LINGUA_TARGET)
 DIRTY_TARGETS+=lingua-dirty
 CLEAN_TARGETS+=lingua-clean
 
+-include $(INCLUDE_MAKEFILE)
+
 ##############################################################################
 # Default targets
 ##############################################################################
@@ -470,6 +487,9 @@ runtime-clean:
 
 .PHONY: check
 check: $(CHECK_TARGETS)
+
+.PHONY: typecheck
+typecheck: $(TYPECHECK_TARGETS)
 
 .PHONY: format
 format: $(FORMAT_TARGETS)
