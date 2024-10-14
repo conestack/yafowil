@@ -158,7 +158,7 @@ def input_file_display_renderer(widget, data):
     )
 
 
-@managedprops('vocabulary', *css_managed_props)
+@managedprops('vocabulary', 'radio_class', 'radio_input_class', *css_managed_props)
 def file_options_renderer(widget, data):
     if data.value in [None, UNSET, '']:
         return data.rendered
@@ -169,6 +169,8 @@ def file_options_renderer(widget, data):
         ]
     else:
         value = ['keep']
+    radio_class = attr_value('radio_class', widget, data)
+    radio_input_class = attr_value('radio_input_class', widget, data)
     tags = []
     vocab = attr_value('vocabulary', widget, data, [])
     for key, term in vocabulary(vocab):
@@ -178,7 +180,8 @@ def file_options_renderer(widget, data):
             'checked': (key in value) and 'checked' or None,
             'name_': '{0}-action'.format(widget.dottedpath),
             'id': cssid(widget, 'input', key),
-            'class_': cssclasses(widget, data),
+            'class_': radio_input_class
+            # 'class_': cssclasses(widget, data), # XXX: is this necessary?
         }
         taginput = tag('input', **attrs)
         text = tag('span', term)
@@ -186,7 +189,7 @@ def file_options_renderer(widget, data):
             'div',
             taginput,
             text,
-            **{'id': cssid(widget, 'radio', key)}
+            **{'id': cssid(widget, 'radio', key), 'class': radio_class}
         ))
     return data.rendered + u''.join(tags)
 
@@ -225,4 +228,14 @@ factory.defaults['file.vocabulary'] = [
 ]
 factory.doc['props']['file.vocabulary'] = """\
 Vocabulary with available actions for existing files.
+"""
+
+factory.defaults['file.radio_class'] = ''
+factory.doc['props']['file.radio_class'] = """\
+CSS class for the wrapper div of radio options.
+"""
+
+factory.defaults['file.radio_input_class'] = ''
+factory.doc['props']['file.radio_input_class'] = """\
+CSS class for radio options.
 """
