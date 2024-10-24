@@ -54,6 +54,7 @@ setup(
     extras_require=dict(test=[
         'coverage',
         'lxml',
+        'pytest',
         'zope.testrunner'
     ]),
     entry_points="""
