@@ -38,9 +38,9 @@ jobs:
       - name: Run tests
         run: |
           python --version
-          python -m pytest yafowil/tests
+          python -m pytest src/yafowil/tests
 
       - name: Run coverage
         run: |
-          coverage run --source=src/yafowil -m pytest yafowil/tests
+          coverage run --source=src/yafowil -m pytest src/yafowil/tests
           coverage report -m --fail-under=99
