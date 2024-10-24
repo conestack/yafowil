@@ -16,7 +16,6 @@ jobs:
           - macos-latest
 
         python:
-          - "3.7"
           - "3.8"
           - "3.9"
           - "3.10"
@@ -39,9 +38,9 @@ jobs:
       - name: Run tests
         run: |
           python --version
-          python -m yafowil.tests.__init__
+          python -m pytest yafowil/tests
 
       - name: Run coverage
         run: |
-          coverage run --source=src/yafowil -m yafowil.tests.__init__
+          coverage run --source=src/yafowil -m pytest yafowil/tests
           coverage report -m --fail-under=99

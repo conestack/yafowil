@@ -1,4 +1,3 @@
-from __future__ import print_function
 from importlib import reload
 from node.tests import NodeTestCase
 from yafowil import button
@@ -25,8 +24,6 @@ from yafowil import url
 from yafowil.base import factory
 from yafowil.utils import Tag
 import lxml.etree as etree
-import sys
-import unittest
 
 
 class YafowilTestCase(NodeTestCase):
@@ -72,75 +69,3 @@ def wrapped_fxml(value):
 
 
 tag = Tag(lambda msg: msg)
-
-
-def test_suite():
-    from yafowil.tests import test_base
-    from yafowil.tests import test_button
-    from yafowil.tests import test_checkbox
-    from yafowil.tests import test_common
-    from yafowil.tests import test_compound
-    from yafowil.tests import test_controller
-    from yafowil.tests import test_datatypes
-    from yafowil.tests import test_email
-    from yafowil.tests import test_field
-    from yafowil.tests import test_file
-    from yafowil.tests import test_hidden
-    from yafowil.tests import test_lines
-    from yafowil.tests import test_number
-    from yafowil.tests import test_password
-    from yafowil.tests import test_persistence
-    from yafowil.tests import test_proxy
-    from yafowil.tests import test_resources
-    from yafowil.tests import test_search
-    from yafowil.tests import test_select
-    from yafowil.tests import test_table
-    from yafowil.tests import test_tag
-    from yafowil.tests import test_text
-    from yafowil.tests import test_textarea
-    from yafowil.tests import test_tsf
-    from yafowil.tests import test_url
-    from yafowil.tests import test_utils
-
-    suite = unittest.TestSuite()
-
-    suite.addTest(unittest.findTestCases(test_base))
-    suite.addTest(unittest.findTestCases(test_button))
-    suite.addTest(unittest.findTestCases(test_checkbox))
-    suite.addTest(unittest.findTestCases(test_common))
-    suite.addTest(unittest.findTestCases(test_compound))
-    suite.addTest(unittest.findTestCases(test_controller))
-    suite.addTest(unittest.findTestCases(test_datatypes))
-    suite.addTest(unittest.findTestCases(test_email))
-    suite.addTest(unittest.findTestCases(test_field))
-    suite.addTest(unittest.findTestCases(test_file))
-    suite.addTest(unittest.findTestCases(test_hidden))
-    suite.addTest(unittest.findTestCases(test_lines))
-    suite.addTest(unittest.findTestCases(test_number))
-    suite.addTest(unittest.findTestCases(test_password))
-    suite.addTest(unittest.findTestCases(test_persistence))
-    suite.addTest(unittest.findTestCases(test_proxy))
-    suite.addTest(unittest.findTestCases(test_resources))
-    suite.addTest(unittest.findTestCases(test_search))
-    suite.addTest(unittest.findTestCases(test_select))
-    suite.addTest(unittest.findTestCases(test_table))
-    suite.addTest(unittest.findTestCases(test_tag))
-    suite.addTest(unittest.findTestCases(test_text))
-    suite.addTest(unittest.findTestCases(test_textarea))
-    suite.addTest(unittest.findTestCases(test_tsf))
-    suite.addTest(unittest.findTestCases(test_url))
-    suite.addTest(unittest.findTestCases(test_utils))
-
-    return suite
-
-
-def run_tests():
-    from zope.testrunner.runner import Runner
-
-    runner = Runner(found_suites=[test_suite()])
-    runner.run()
-    sys.exit(int(runner.failed))
-
-
-if __name__ == '__main__':
-    run_tests()
