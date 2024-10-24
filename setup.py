@@ -54,8 +54,7 @@ setup(
     extras_require=dict(test=[
         'coverage',
         'lxml',
-        'pytest',
-        'zope.testrunner'
+        'pytest'
     ]),
     entry_points="""
     [yafowil.plugin]
