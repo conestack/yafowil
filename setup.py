@@ -1,6 +1,5 @@
 from setuptools import find_packages
 from setuptools import setup
-from setuptools.command.test import test
 import os
 
 
@@ -16,13 +15,6 @@ longdesc = '\n\n'.join([read_file(name) for name in [
     'CHANGES.rst',
     'LICENSE.rst'
 ]])
-
-
-class Test(test):
-
-    def run_tests(self):
-        from yafowil import tests
-        tests.run_tests()
 
 
 setup(
@@ -59,16 +51,10 @@ setup(
         'setuptools',
         'webresource'
     ],
-    tests_require=[
-        'coverage',
-        'lxml',
-        'zope.testrunner'
-    ],
-    test_suite='yafowil.tests.test_suite',
     extras_require=dict(test=[
         'coverage',
         'lxml',
-        'zope.testrunner'
+        'pytest'
     ]),
     entry_points="""
     [yafowil.plugin]

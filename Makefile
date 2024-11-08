@@ -33,18 +33,39 @@ CLEAN_FS?=
 # Default: include.mk
 INCLUDE_MAKEFILE?=include.mk
 
+# Optional additional directories to be added to PATH in format
+# `/path/to/dir/:/path/to/other/dir`. Gets inserted first, thus gets searched
+# first.
+# No default value.
+EXTRA_PATH?=
+
 ## core.mxenv
 
-# Python interpreter to use.
+# Primary Python interpreter to use. It is used to create the
+# virtual environment if `VENV_ENABLED` and `VENV_CREATE` are set to `true`.
 # Default: python3
-PYTHON_BIN?=python3
+PRIMARY_PYTHON?=python3
 
 # Minimum required Python version.
-# Default: 3.7
-PYTHON_MIN_VERSION?=3.7
+# Default: 3.9
+PYTHON_MIN_VERSION?=3.9
+
+# Install packages using the given package installer method.
+# Supported are `pip` and `uv`. If uv is used, its global availability is
+# checked. Otherwise, it is installed, either in the virtual environment or
+# using the `PRIMARY_PYTHON`, dependent on the `VENV_ENABLED` setting. If
+# `VENV_ENABLED` and uv is selected, uv is used to create the virtual
+# environment.
+# Default: pip
+PYTHON_PACKAGE_INSTALLER?=uv
+
+# Flag whether to use a global installed 'uv' or install
+# it in the virtual environment.
+# Default: false
+MXENV_UV_GLOBAL?=false
 
 # Flag whether to use virtual environment. If `false`, the
-# interpreter according to `PYTHON_BIN` found in `PATH` is used.
+# interpreter according to `PRIMARY_PYTHON` found in `PATH` is used.
 # Default: true
 VENV_ENABLED?=true
 
@@ -59,7 +80,7 @@ VENV_CREATE?=true
 # target folder for the virtual environment. If `VENV_ENABLED` is `true` and
 # `VENV_CREATE` is false it is expected to point to an existing virtual
 # environment. If `VENV_ENABLED` is `false` it is ignored.
-# Default: venv
+# Default: .venv
 VENV_FOLDER?=venv
 
 # mxdev to install in virtual environment.
@@ -76,12 +97,19 @@ MXMAKE?=mxmake
 # Default: mx.ini
 PROJECT_CONFIG?=mx.ini
 
+## core.packages
+
+# Allow prerelease and development versions.
+# By default, the package installer only finds stable versions.
+# Default: false
+PACKAGES_ALLOW_PRERELEASES?=false
+
 ## qa.test
 
 # The command which gets executed. Defaults to the location the
 # :ref:`run-tests` template gets rendered to if configured.
 # Default: .mxmake/files/run-tests.sh
-TEST_COMMAND?=$(VENV_FOLDER)/bin/python -m yafowil.tests.__init__
+TEST_COMMAND?=$(VENV_FOLDER)/bin/pytest src/yafowil/tests
 
 # Additional Python requirements for running tests to be
 # installed (via pip).
@@ -100,7 +128,7 @@ TEST_DEPENDENCY_TARGETS?=
 COVERAGE_COMMAND?=\
 	$(VENV_FOLDER)/bin/coverage run \
 		--source src/yafowil \
-		-m yafowil.tests.__init__ \
+		-m pytest src/yafowil/tests \
 	&& $(VENV_FOLDER)/bin/coverage report --fail-under=99
 
 ## i18n.gettext
@@ -127,6 +155,10 @@ LINGUA_SEARCH_PATH?=src/yafowil
 # No default value.
 LINGUA_PLUGINS?=
 
+# Command line options passed to `pot-create`
+# No default value.
+LINGUA_OPTIONS?=
+
 ##############################################################################
 # END SETTINGS - DO NOT EDIT BELOW THIS LINE
 ##############################################################################
@@ -138,6 +170,8 @@ PURGE_TARGETS?=
 CHECK_TARGETS?=
 TYPECHECK_TARGETS?=
 FORMAT_TARGETS?=
+
+export PATH:=$(if $(EXTRA_PATH),$(EXTRA_PATH):,)$(PATH)
 
 # Defensive settings for make: https://tech.davis-hansson.com/p/make/
 SHELL:=bash
@@ -155,7 +189,7 @@ MXMAKE_FOLDER?=.mxmake
 # Sentinel files
 SENTINEL_FOLDER?=$(MXMAKE_FOLDER)/sentinels
 SENTINEL?=$(SENTINEL_FOLDER)/about.txt
-$(SENTINEL):
+$(SENTINEL): $(firstword $(MAKEFILE_LIST))
 	@mkdir -p $(SENTINEL_FOLDER)
 	@echo "Sentinels for the Makefile process." > $(SENTINEL)
 
@@ -163,40 +197,58 @@ $(SENTINEL):
 # mxenv
 ##############################################################################
 
-# Check if given Python is installed
-ifeq (,$(shell which $(PYTHON_BIN)))
-$(error "PYTHON=$(PYTHON_BIN) not found in $(PATH)")
-endif
+export OS:=$(OS)
 
-# Check if given Python version is ok
-PYTHON_VERSION_OK=$(shell $(PYTHON_BIN) -c "import sys; print((int(sys.version_info[0]), int(sys.version_info[1])) >= tuple(map(int, '$(PYTHON_MIN_VERSION)'.split('.'))))")
-ifeq ($(PYTHON_VERSION_OK),0)
-$(error "Need Python >= $(PYTHON_MIN_VERSION)")
-endif
-
-# Check if venv folder is configured if venv is enabled
-ifeq ($(shell [[ "$(VENV_ENABLED)" == "true" && "$(VENV_FOLDER)" == "" ]] && echo "true"),"true")
-$(error "VENV_FOLDER must be configured if VENV_ENABLED is true")
-endif
-
-# determine the executable path
+# Determine the executable path
 ifeq ("$(VENV_ENABLED)", "true")
-MXENV_PATH=$(VENV_FOLDER)/bin/
+export VIRTUAL_ENV=$(abspath $(VENV_FOLDER))
+ifeq ("$(OS)", "Windows_NT")
+VENV_EXECUTABLE_FOLDER=$(VIRTUAL_ENV)/Scripts
 else
-MXENV_PATH=
+VENV_EXECUTABLE_FOLDER=$(VIRTUAL_ENV)/bin
+endif
+export PATH:=$(VENV_EXECUTABLE_FOLDER):$(PATH)
+MXENV_PYTHON=python
+else
+MXENV_PYTHON=$(PRIMARY_PYTHON)
+endif
+
+# Determine the package installer
+ifeq ("$(PYTHON_PACKAGE_INSTALLER)","uv")
+PYTHON_PACKAGE_COMMAND=uv pip
+else
+PYTHON_PACKAGE_COMMAND=$(MXENV_PYTHON) -m pip
 endif
 
 MXENV_TARGET:=$(SENTINEL_FOLDER)/mxenv.sentinel
 $(MXENV_TARGET): $(SENTINEL)
+	@$(PRIMARY_PYTHON) -c "import sys; vi = sys.version_info; sys.exit(1 if (int(vi[0]), int(vi[1])) >= tuple(map(int, '$(PYTHON_MIN_VERSION)'.split('.'))) else 0)" \
+		&& echo "Need Python >= $(PYTHON_MIN_VERSION)" && exit 1 || :
+	@[[ "$(VENV_ENABLED)" == "true" && "$(VENV_FOLDER)" == "" ]] \
+		&& echo "VENV_FOLDER must be configured if VENV_ENABLED is true" && exit 1 || :
+	@[[ "$(VENV_ENABLED)$(PYTHON_PACKAGE_INSTALLER)" == "falseuv" ]] \
+		&& echo "Package installer uv does not work with a global Python interpreter." && exit 1 || :
 ifeq ("$(VENV_ENABLED)", "true")
 ifeq ("$(VENV_CREATE)", "true")
-	@echo "Setup Python Virtual Environment under '$(VENV_FOLDER)'"
-	@$(PYTHON_BIN) -m venv $(VENV_FOLDER)
+ifeq ("$(PYTHON_PACKAGE_INSTALLER)$(MXENV_UV_GLOBAL)","uvtrue")
+	@echo "Setup Python Virtual Environment using package 'uv' at '$(VENV_FOLDER)'"
+	@uv venv -p $(PRIMARY_PYTHON) --seed $(VENV_FOLDER)
+else
+	@echo "Setup Python Virtual Environment using module 'venv' at '$(VENV_FOLDER)'"
+	@$(PRIMARY_PYTHON) -m venv $(VENV_FOLDER)
+	@$(MXENV_PYTHON) -m ensurepip -U
 endif
 endif
-	@$(MXENV_PATH)pip install -U pip setuptools wheel
-	@$(MXENV_PATH)pip install -U $(MXDEV)
-	@$(MXENV_PATH)pip install -U $(MXMAKE)
+else
+	@echo "Using system Python interpreter"
+endif
+ifeq ("$(PYTHON_PACKAGE_INSTALLER)$(MXENV_UV_GLOBAL)","uvfalse")
+	@echo "Install uv"
+	@$(MXENV_PYTHON) -m pip install uv
+endif
+	@$(PYTHON_PACKAGE_COMMAND) install -U pip setuptools wheel
+	@echo "Install/Update MXStack Python packages"
+	@$(PYTHON_PACKAGE_COMMAND) install -U $(MXDEV) $(MXMAKE)
 	@touch $(MXENV_TARGET)
 
 .PHONY: mxenv
@@ -213,8 +265,8 @@ ifeq ("$(VENV_CREATE)", "true")
 	@rm -rf $(VENV_FOLDER)
 endif
 else
-	@$(MXENV_PATH)pip uninstall -y $(MXDEV)
-	@$(MXENV_PATH)pip uninstall -y $(MXMAKE)
+	@$(PYTHON_PACKAGE_COMMAND) uninstall -y $(MXDEV)
+	@$(PYTHON_PACKAGE_COMMAND) uninstall -y $(MXMAKE)
 endif
 
 INSTALL_TARGETS+=mxenv
@@ -233,13 +285,11 @@ MXMAKE_FILES?=$(MXMAKE_FOLDER)/files
 
 # set environment variables for mxmake
 define set_mxfiles_env
-	@export MXMAKE_MXENV_PATH=$(1)
-	@export MXMAKE_FILES=$(2)
+	@export MXMAKE_FILES=$(1)
 endef
 
 # unset environment variables for mxmake
 define unset_mxfiles_env
-	@unset MXMAKE_MXENV_PATH
 	@unset MXMAKE_FILES
 endef
 
@@ -256,9 +306,9 @@ FILES_TARGET:=requirements-mxdev.txt
 $(FILES_TARGET): $(PROJECT_CONFIG) $(MXENV_TARGET) $(SOURCES_TARGET) $(LOCAL_PACKAGE_FILES)
 	@echo "Create project files"
 	@mkdir -p $(MXMAKE_FILES)
-	$(call set_mxfiles_env,$(MXENV_PATH),$(MXMAKE_FILES))
-	@$(MXENV_PATH)mxdev -n -c $(PROJECT_CONFIG)
-	$(call unset_mxfiles_env,$(MXENV_PATH),$(MXMAKE_FILES))
+	$(call set_mxfiles_env,$(MXMAKE_FILES))
+	@mxdev -n -c $(PROJECT_CONFIG)
+	$(call unset_mxfiles_env)
 	@test -e $(MXMAKE_FILES)/pip.conf && cp $(MXMAKE_FILES)/pip.conf $(VENV_FOLDER)/pip.conf || :
 	@touch $(FILES_TARGET)
 
@@ -287,11 +337,21 @@ ADDITIONAL_SOURCES_TARGETS?=
 
 INSTALLED_PACKAGES=$(MXMAKE_FILES)/installed.txt
 
+ifeq ("$(PACKAGES_ALLOW_PRERELEASES)","true")
+ifeq ("$(PYTHON_PACKAGE_INSTALLER)","uv")
+PACKAGES_PRERELEASES=--prerelease=allow
+else
+PACKAGES_PRERELEASES=--pre
+endif
+else
+PACKAGES_PRERELEASES=
+endif
+
 PACKAGES_TARGET:=$(INSTALLED_PACKAGES)
 $(PACKAGES_TARGET): $(FILES_TARGET) $(ADDITIONAL_SOURCES_TARGETS)
 	@echo "Install python packages"
-	@$(MXENV_PATH)pip install -r $(FILES_TARGET)
-	@$(MXENV_PATH)pip freeze > $(INSTALLED_PACKAGES)
+	@$(PYTHON_PACKAGE_COMMAND) install $(PACKAGES_PRERELEASES) -r $(FILES_TARGET)
+	@$(PYTHON_PACKAGE_COMMAND) freeze > $(INSTALLED_PACKAGES)
 	@touch $(PACKAGES_TARGET)
 
 .PHONY: packages
@@ -304,8 +364,8 @@ packages-dirty:
 .PHONY: packages-clean
 packages-clean:
 	@test -e $(FILES_TARGET) \
-		&& test -e $(MXENV_PATH)pip \
-		&& $(MXENV_PATH)pip uninstall -y -r $(FILES_TARGET) \
+		&& test -e $(MXENV_PYTHON) \
+		&& $(MXENV_PYTHON) -m pip uninstall -y -r $(FILES_TARGET) \
 		|| :
 	@rm -f $(PACKAGES_TARGET)
 
@@ -320,14 +380,14 @@ CLEAN_TARGETS+=packages-clean
 TEST_TARGET:=$(SENTINEL_FOLDER)/test.sentinel
 $(TEST_TARGET): $(MXENV_TARGET)
 	@echo "Install $(TEST_REQUIREMENTS)"
-	@$(MXENV_PATH)pip install $(TEST_REQUIREMENTS)
+	@$(PYTHON_PACKAGE_COMMAND) install $(TEST_REQUIREMENTS)
 	@touch $(TEST_TARGET)
 
 .PHONY: test
 test: $(FILES_TARGET) $(SOURCES_TARGET) $(PACKAGES_TARGET) $(TEST_TARGET) $(TEST_DEPENDENCY_TARGETS)
-	@echo "Run tests"
-	@test -z "$(TEST_COMMAND)" && echo "No test command defined"
-	@test -z "$(TEST_COMMAND)" || bash -c "$(TEST_COMMAND)"
+	@test -z "$(TEST_COMMAND)" && echo "No test command defined" && exit 1 || :
+	@echo "Run tests using $(TEST_COMMAND)"
+	@/usr/bin/env bash -c "$(TEST_COMMAND)"
 
 .PHONY: test-dirty
 test-dirty:
@@ -335,7 +395,7 @@ test-dirty:
 
 .PHONY: test-clean
 test-clean: test-dirty
-	@test -e $(MXENV_PATH)pip && $(MXENV_PATH)pip uninstall -y $(TEST_REQUIREMENTS) || :
+	@test -e $(MXENV_PYTHON) && $(MXENV_PYTHON) -m pip uninstall -y $(TEST_REQUIREMENTS) || :
 	@rm -rf .pytest_cache
 
 INSTALL_TARGETS+=$(TEST_TARGET)
@@ -349,14 +409,14 @@ DIRTY_TARGETS+=test-dirty
 COVERAGE_TARGET:=$(SENTINEL_FOLDER)/coverage.sentinel
 $(COVERAGE_TARGET): $(TEST_TARGET)
 	@echo "Install Coverage"
-	@$(MXENV_PATH)pip install -U coverage
+	@$(PYTHON_PACKAGE_COMMAND) install -U coverage
 	@touch $(COVERAGE_TARGET)
 
 .PHONY: coverage
 coverage: $(FILES_TARGET) $(SOURCES_TARGET) $(PACKAGES_TARGET) $(COVERAGE_TARGET)
-	@echo "Run coverage"
-	@test -z "$(COVERAGE_COMMAND)" && echo "No coverage command defined"
-	@test -z "$(COVERAGE_COMMAND)" || bash -c "$(COVERAGE_COMMAND)"
+	@test -z "$(COVERAGE_COMMAND)" && echo "No coverage command defined" && exit 1 || :
+	@echo "Run coverage using $(COVERAGE_COMMAND)"
+	@/usr/bin/env bash -c "$(COVERAGE_COMMAND)"
 
 .PHONY: coverage-dirty
 coverage-dirty:
@@ -364,7 +424,7 @@ coverage-dirty:
 
 .PHONY: coverage-clean
 coverage-clean: coverage-dirty
-	@test -e $(MXENV_PATH)pip && $(MXENV_PATH)pip uninstall -y coverage || :
+	@test -e $(MXENV_PYTHON) && $(MXENV_PYTHON) -m pip uninstall -y coverage || :
 	@rm -rf .coverage htmlcov
 
 INSTALL_TARGETS+=$(COVERAGE_TARGET)
@@ -421,14 +481,14 @@ gettext-compile:
 LINGUA_TARGET:=$(SENTINEL_FOLDER)/lingua.sentinel
 $(LINGUA_TARGET): $(MXENV_TARGET)
 	@echo "Install Lingua"
-	@$(MXENV_PATH)pip install chameleon lingua $(LINGUA_PLUGINS)
+	@$(PYTHON_PACKAGE_COMMAND) install chameleon lingua $(LINGUA_PLUGINS)
 	@touch $(LINGUA_TARGET)
 
 PHONY: lingua-extract
 lingua-extract: $(LINGUA_TARGET)
 	@echo "Extract messages"
-	@$(MXENV_PATH)pot-create \
-		"$(LINGUA_SEARCH_PATH)" \
+	@pot-create \
+		"$(LINGUA_SEARCH_PATH)" $(LINGUA_OPTIONS) \
 		-o "$(GETTEXT_LOCALES_PATH)/$(GETTEXT_DOMAIN).pot"
 
 PHONY: lingua
@@ -440,12 +500,16 @@ lingua-dirty:
 
 .PHONY: lingua-clean
 lingua-clean: lingua-dirty
-	@test -e $(MXENV_PATH)pip && $(MXENV_PATH)pip uninstall -y \
+	@test -e $(MXENV_PYTHON) && $(MXENV_PYTHON) -m pip uninstall -y \
 		chameleon lingua $(LINGUA_PLUGINS) || :
 
 INSTALL_TARGETS+=$(LINGUA_TARGET)
 DIRTY_TARGETS+=lingua-dirty
 CLEAN_TARGETS+=lingua-clean
+
+##############################################################################
+# Custom includes
+##############################################################################
 
 -include $(INCLUDE_MAKEFILE)
 
