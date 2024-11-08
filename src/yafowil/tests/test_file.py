@@ -57,18 +57,18 @@ class TestFile(YafowilTestCase):
         self.checkOutput("""
         <div>
           <input id="input-MYFILE" name="MYFILE" type="file"/>
-          <div class="" id="radio-MYFILE-keep">
-            <input checked="checked" class="" id="input-MYFILE-keep"
+          <div id="radio-MYFILE-keep">
+            <input checked="checked" id="input-MYFILE-keep"
                    name="MYFILE-action" type="radio" value="keep"/>
             <span>Keep Existing file</span>
           </div>
-          <div class="" id="radio-MYFILE-replace">
-            <input class="" id="input-MYFILE-replace" name="MYFILE-action"
+          <div id="radio-MYFILE-replace">
+            <input id="input-MYFILE-replace" name="MYFILE-action"
                    type="radio" value="replace"/>
             <span>Replace existing file</span>
           </div>
-          <div class="" id="radio-MYFILE-delete">
-            <input class="" id="input-MYFILE-delete" name="MYFILE-action"
+          <div id="radio-MYFILE-delete">
+            <input id="input-MYFILE-delete" name="MYFILE-action"
                    type="radio" value="delete"/>
             <span>Delete existing file</span>
           </div>
@@ -128,18 +128,18 @@ class TestFile(YafowilTestCase):
         self.checkOutput("""
         <div>
           <input id="input-MYFILE" name="MYFILE" type="file"/>
-          <div class="" id="radio-MYFILE-keep">
-            <input class="" id="input-MYFILE-keep" name="MYFILE-action"
+          <div id="radio-MYFILE-keep">
+            <input id="input-MYFILE-keep" name="MYFILE-action"
                    type="radio" value="keep"/>
             <span>Keep Existing file</span>
           </div>
-          <div class="" id="radio-MYFILE-replace">
-            <input class="" id="input-MYFILE-replace" name="MYFILE-action"
+          <div id="radio-MYFILE-replace">
+            <input id="input-MYFILE-replace" name="MYFILE-action"
                    type="radio" value="replace"/>
             <span>Replace existing file</span>
           </div>
-          <div class="" id="radio-MYFILE-delete">
-            <input checked="checked" class="" id="input-MYFILE-delete"
+          <div id="radio-MYFILE-delete">
+            <input checked="checked" id="input-MYFILE-delete"
                    name="MYFILE-action" type="radio" value="delete"/>
             <span>Delete existing file</span>
           </div>
@@ -173,13 +173,13 @@ class TestFile(YafowilTestCase):
         self.checkOutput("""
         <div>
           <input id="input-MYFILE" name="MYFILE" type="file"/>
-          <div class="" id="radio-MYFILE-keep">
-            <input checked="checked" class="" id="input-MYFILE-keep"
+          <div id="radio-MYFILE-keep">
+            <input checked="checked" id="input-MYFILE-keep"
                    name="MYFILE-action" type="radio" value="keep"/>
             <span>Keep Existing file</span>
           </div>
-          <div class="" id="radio-MYFILE-replace">
-            <input class="" id="input-MYFILE-replace" name="MYFILE-action"
+          <div id="radio-MYFILE-replace">
+            <input id="input-MYFILE-replace" name="MYFILE-action"
                    type="radio" value="replace"/>
             <span>Replace existing file</span>
           </div>
@@ -317,3 +317,34 @@ class TestFile(YafowilTestCase):
 
         widget.mode = 'display'
         self.assertEqual(widget(), "<div data-foo='bar'>No file</div>")
+
+        # File actions vocabulary with radio_input_class and radio_class
+        widget = factory(
+            'file',
+            name='MYFILE',
+            value={
+                'file': StringIO('321')
+            },
+            props={
+                'radio_class': 'my_radio',
+                'radio_input_class': 'my_radio_input',
+                'vocabulary': [
+                    ('keep', 'Keep Existing file'),
+                    ('replace', 'Replace existing file')
+                ]
+            })
+        self.checkOutput("""
+        <div>
+          <input id="input-MYFILE" name="MYFILE" type="file"/>
+          <div class="my_radio" id="radio-MYFILE-keep">
+            <input checked="checked" class="my_radio_input" id="input-MYFILE-keep"
+                   name="MYFILE-action" type="radio" value="keep"/>
+            <span>Keep Existing file</span>
+          </div>
+          <div class="my_radio" id="radio-MYFILE-replace">
+            <input class="my_radio_input" id="input-MYFILE-replace"
+                   name="MYFILE-action" type="radio" value="replace"/>
+            <span>Replace existing file</span>
+          </div>
+        </div>
+        """, wrapped_fxml(widget()))

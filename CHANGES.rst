@@ -5,7 +5,8 @@ History
 3.1.1 (unreleased)
 ------------------
 
-- No changes yet.
+- Add ``radio_class`` and ``radio_input_class`` properties to ``yafowil.file``.
+  [lenadax]
 
 
 3.1.0 (2023-05-15)

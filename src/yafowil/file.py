@@ -180,8 +180,8 @@ def file_options_renderer(widget, data):
             'checked': (key in value) and 'checked' or None,
             'name_': '{0}-action'.format(widget.dottedpath),
             'id': cssid(widget, 'input', key),
-            'class_': radio_input_class
-            # 'class_': cssclasses(widget, data), # XXX: is this necessary?
+            'class_': (cssclasses(widget, data) and radio_input_class)
+                      or cssclasses(widget, data) or radio_input_class
         }
         taginput = tag('input', **attrs)
         text = tag('span', term)
@@ -189,7 +189,10 @@ def file_options_renderer(widget, data):
             'div',
             taginput,
             text,
-            **{'id': cssid(widget, 'radio', key), 'class': radio_class}
+            **{
+                'id': cssid(widget, 'radio', key),
+                'class': radio_class or None
+            }
         ))
     return data.rendered + u''.join(tags)
 
@@ -230,12 +233,12 @@ factory.doc['props']['file.vocabulary'] = """\
 Vocabulary with available actions for existing files.
 """
 
-factory.defaults['file.radio_class'] = ''
+factory.defaults['file.radio_class'] = None
 factory.doc['props']['file.radio_class'] = """\
 CSS class for the wrapper div of radio options.
 """
 
-factory.defaults['file.radio_input_class'] = ''
+factory.defaults['file.radio_input_class'] = None
 factory.doc['props']['file.radio_input_class'] = """\
 CSS class for radio options.
 """
