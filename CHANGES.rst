@@ -2,7 +2,7 @@
 History
 =======
 
-3.1.1 (unreleased)
+3.1.1 (2024-11-08)
 ------------------
 
 - Add ``radio_class`` and ``radio_input_class`` properties to ``yafowil.file``.
