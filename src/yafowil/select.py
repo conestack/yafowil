@@ -198,7 +198,7 @@ def select_cb_edit_renderer(widget, data, custom_attrs={}):
             'class': wrapper_class,
         })
         tags.append(item_wrapper)
-    wrapper_attrs = {'id': cssid(widget, tagtype, 'wrapper')}
+    wrapper_attrs = {'id': cssid(widget, tagtype, 'wrapper'), 'class': cssclasses(widget, data)}
     wrapper_attrs.update(as_data_attrs(attr_value('data', widget, data)))
     wrapper_attrs.update(custom_attrs)
     taglisting = data.tag(listing_tag, *tags, **wrapper_attrs)
