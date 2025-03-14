@@ -198,7 +198,10 @@ def select_cb_edit_renderer(widget, data, custom_attrs={}):
             'class': wrapper_class,
         })
         tags.append(item_wrapper)
-    wrapper_attrs = {'id': cssid(widget, tagtype, 'wrapper'), 'class': cssclasses(widget, data)}
+    wrapper_attrs = {
+        'id': cssid(widget, tagtype, 'wrapper'),
+        'class': cssclasses(widget, data, classattr='wrapper_class')
+    }
     wrapper_attrs.update(as_data_attrs(attr_value('data', widget, data)))
     wrapper_attrs.update(custom_attrs)
     taglisting = data.tag(listing_tag, *tags, **wrapper_attrs)
@@ -306,6 +309,11 @@ factory.defaults['select.class'] = 'select'
 factory.defaults['select.block_class'] = None
 factory.doc['props']['select.block_class'] = """\
 CSS class to render on selection if block format.
+"""
+
+factory.defaults['select.wrapper_class'] = None
+factory.doc['props']['select.wrapper_class'] = """\
+CSS class to render on selection wrapper.
 """
 
 factory.defaults['select.checkbox_wrapper_class'] = None
