@@ -350,27 +350,27 @@ css_managed_props = [
 ]
 
 
-def cssclasses(widget, data, classattr='class', additional=[]):
+def cssclasses(widget, data, classattr='class', additional=[], ignores=[]):
     _classes = list()
     attrs = widget.attrs
-    if attrs['error_class'] and data.errors:
+    if not 'error_class' in ignores and attrs['error_class'] and data.errors:
         if isinstance(attrs['error_class'], STR_TYPE):
             _classes.append(attrs['error_class'])
         else:
             _classes.append(attrs['error_class_default'])
-    elif attrs['valid_class'] and data.root.extracted:
+    elif not 'valid_class' in ignores and attrs['valid_class'] and data.root.extracted:
         if isinstance(attrs['valid_class'], STR_TYPE):
             _classes.append(attrs['valid_class'])
         else:
             _classes.append(attrs['valid_class_default'])
-    if attrs['required_class'] and attrs['required']:
+    if not 'required_class' in ignores and attrs['required_class'] and attrs['required']:
         if isinstance(attrs['required_class'], STR_TYPE):
             _classes.append(attrs['required_class'])
         else:
             _classes.append(attrs['required_class_default'])
-    if attrs[classattr]:
+    if classattr and attrs[classattr]:
         _classes += attr_value(classattr, widget, data).split()
-    if attrs['class_add']:
+    if not 'class_add' in ignores and attrs['class_add']:
         _classes += attr_value('class_add', widget, data).split()
     additional = [add for add in additional if add]
     _classes += additional
