@@ -251,6 +251,10 @@ def select_display_renderer(widget, data):
     vocab = dict(attr_value('vocabulary', widget, data, []))
     if not multivalued or not value:
         value = vocab.get(value, value)
+        if not value:
+            value = attr_value('empty_display_value', widget, data)
+            if not value:
+                value = u''
         if data.tag.translate:
             value = data.tag.translate(value)
         return generic_display_renderer(widget, data, value=value)
