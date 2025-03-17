@@ -244,7 +244,9 @@ def select_edit_renderer(widget, data, custom_attrs={}):
 def select_display_renderer(widget, data):
     value = fetch_value(widget, data)
     if type(value) in ITER_TYPES and not value:
-        value = u''
+        value = attr_value('empty_display_value', widget, data)
+        if not value:
+            value = u''
     multivalued = attr_value('multivalued', widget, data)
     vocab = dict(attr_value('vocabulary', widget, data, []))
     if not multivalued or not value:
@@ -252,16 +254,21 @@ def select_display_renderer(widget, data):
         if data.tag.translate:
             value = data.tag.translate(value)
         return generic_display_renderer(widget, data, value=value)
+    cssclasses = [
+        attr_value("display_class", widget, data),
+        f'display-{attr_value("class", widget, data) or "generic"}'
+    ]
     attrs = {
         'id': cssid(widget, 'display'),
-        'class_': 'display-{0}'.format(attr_value('class', widget, data))
+        'class_': ' '.join([_ for _ in cssclasses if _ is not None])
     }
     attrs.update(as_data_attrs(attr_value('data', widget, data)))
     content = u''
     if multivalued and isinstance(value, STR_TYPE):
         value = [value]
     for key in value:
-        content += data.tag('li', vocab.get(key, key))
+        content += data.tag('li', vocab.get(key, key),
+                            **{'class_': attr_value("display_item_class", widget, data)})
     return data.tag('ul', content, **attrs)
 
 

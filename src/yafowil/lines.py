@@ -48,9 +48,13 @@ def lines_display_renderer(widget, data):
     value = fetch_value(widget, data)
     if type(value) in ITER_TYPES and not value:
         value = u''
+    cssclasses = [
+        attr_value("display_class", widget, data),
+        f'display-{attr_value("class", widget, data) or "generic"}'
+    ]
     attrs = {
         'id': cssid(widget, 'display'),
-        'class_': 'display-{0}'.format(attr_value('class', widget, data))
+        'class_': ' '.join([_ for _ in cssclasses if _ is not None])
     }
     attrs.update(as_data_attrs(attr_value('data', widget, data)))
     content = u''
