@@ -5,7 +5,9 @@ History
 3.1.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Introduce ``display_class`` widget property. Display renderers will add the
+  given value to the widget class list.
+  [lenadax]
 
 
 3.1.1 (2024-11-08)

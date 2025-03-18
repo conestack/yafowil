@@ -87,9 +87,13 @@ def checkbox_display_renderer(widget, data):
         content = vocab[bool(value)]
         if data.tag.translate:
             content = data.tag.translate(content)
+    cssclasses = [
+        attr_value("display_class", widget, data),
+        f'display-{attr_value("class", widget, data) or "generic"}'
+    ]
     attrs = {
         'id': cssid(widget, 'display'),
-        'class_': 'display-{0}'.format(attr_value('class', widget, data))
+        'class_': ' '.join([_ for _ in cssclasses if _ is not None])
     }
     if attr_value('display_proxy', widget, data):
         widget.attrs['type'] = 'hidden'

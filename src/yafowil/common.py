@@ -263,11 +263,13 @@ def generic_display_renderer(widget, data, value=None):
         content = widget.attrs['template'] % value
     else:
         content = widget.attrs['template'] % value
+    cssclasses = [
+        attr_value("display_class", widget, data),
+        f'display-{attr_value("class", widget, data) or "generic"}'
+    ]
     attrs = {
         'id': cssid(widget, 'display'),
-        'class_': 'display-{0}'.format(
-            attr_value('class', widget, data) or 'generic'
-        )
+        'class_': ' '.join([_ for _ in cssclasses if _ is not None])
     }
     attrs.update(as_data_attrs(attr_value('data', widget, data)))
     return data.tag('div', content, **attrs)
