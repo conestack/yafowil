@@ -375,8 +375,8 @@ CSS class to render on radio button input tag.
 
 factory.defaults['select.empty_display_value'] = None
 factory.doc['props']['select.empty_display_value'] = """\
-Displayed value if widget gets rendered in display mode and vocabulary contains
-no value for term.
+Displayed value if widget gets rendered in display mode and vocabulary not
+contains value.
 """
 
 factory.defaults['select.listing_tag'] = 'div'

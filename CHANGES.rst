@@ -5,6 +5,10 @@ History
 3.1.2 (unreleased)
 ------------------
 
+- Introduce ``empty_display_value`` widget property. Select display renderer
+  uses it if vocabulary not contains value.
+  [lenadax]
+
 - Introduce ``display_class`` widget property. Display renderers will add the
   given value to the widget class list.
   [lenadax]
