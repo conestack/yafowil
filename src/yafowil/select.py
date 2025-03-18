@@ -240,7 +240,7 @@ def select_edit_renderer(widget, data, custom_attrs={}):
     return select_cb_edit_renderer(widget, data, custom_attrs=custom_attrs)
 
 
-@managedprops('data', 'template', 'class', 'multivalued')
+@managedprops('data', 'template', 'class', 'multivalued', 'empty_display_value')
 def select_display_renderer(widget, data):
     value = fetch_value(widget, data)
     if type(value) in ITER_TYPES and not value:
@@ -371,6 +371,12 @@ This property is deprecated and will be remove as of yafowil 2.2. Use
 factory.defaults['select.radio_input_class'] = None
 factory.doc['props']['select.radio_input_class'] = """\
 CSS class to render on radio button input tag.
+"""
+
+factory.defaults['select.empty_display_value'] = None
+factory.doc['props']['select.empty_display_value'] = """\
+Displayed value if widget gets rendered in display mode and vocabulary contains
+no value for term.
 """
 
 factory.defaults['select.listing_tag'] = 'div'

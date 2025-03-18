@@ -57,6 +57,11 @@ Fallback CSS-class to put on in case of valid value if no specific class was
 given.
 """
 
+factory.defaults['display_class'] = None
+factory.doc['props']['display_class'] = """\
+CSS-class to put on widgets in display mode.
+"""
+
 factory.defaults['autofocus'] = None
 factory.doc['props']['autofocus'] = """\
 Whether this field gets the focus automatically or not (if browser supports
@@ -89,6 +94,12 @@ factory.doc['props']['required_class'] = """\
 CSS-class to put on in case if required condition was not met.
 """
 
+factory.defaults['required_class_default'] = 'required'
+factory.doc['props']['required_class_default'] = """\
+CSS-class to apply if required condition was not met - if no specific class
+was given.
+"""
+
 factory.defaults['type'] = None
 factory.doc['props']['type'] = """\
 HTML type attribute.
@@ -107,12 +118,6 @@ Input maxlength.
 factory.defaults['disabled'] = None
 factory.doc['props']['disabled'] = """\
 Disables input.
-"""
-
-factory.defaults['required_class_default'] = 'required'
-factory.doc['props']['required_class_default'] = """\
-CSS-class to apply if required condition was not met - if no specific class
-was given.
 """
 
 factory.defaults['template'] = '%s'
@@ -250,7 +255,7 @@ def display_proxy_renderer(widget, data):
     return rendered
 
 
-@managedprops('template', 'class')
+@managedprops('template', 'class', 'display_class')
 def generic_display_renderer(widget, data, value=None):
     """Generic display renderer to render a value.
     """
@@ -264,7 +269,7 @@ def generic_display_renderer(widget, data, value=None):
     else:
         content = widget.attrs['template'] % value
     cssclasses = [
-        attr_value("display_class", widget, data),
+        attr_value('display_class', widget, data),
         f'display-{attr_value("class", widget, data) or "generic"}'
     ]
     attrs = {

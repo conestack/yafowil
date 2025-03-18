@@ -73,7 +73,7 @@ def checkbox_edit_renderer(widget, data):
     return checkbox + exists_marker
 
 
-@managedprops('class', 'format', 'vocabulary', 'display_proxy')
+@managedprops('class', 'format', 'vocabulary', 'display_proxy', 'display_class')
 def checkbox_display_renderer(widget, data):
     """Generic display renderer to render a value.
     """
@@ -88,7 +88,7 @@ def checkbox_display_renderer(widget, data):
         if data.tag.translate:
             content = data.tag.translate(content)
     cssclasses = [
-        attr_value("display_class", widget, data),
+        attr_value('display_class', widget, data),
         f'display-{attr_value("class", widget, data) or "generic"}'
     ]
     attrs = {
