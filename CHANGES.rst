@@ -5,6 +5,9 @@ History
 3.1.2 (unreleased)
 ------------------
 
+- Prevent loading of duplicate entry points.
+  [rnix]
+
 - Introduce ``empty_display_value`` widget property. Select display renderer
   uses it if vocabulary not contains value.
   [lenadax]

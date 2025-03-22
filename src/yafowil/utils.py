@@ -70,6 +70,9 @@ def get_plugins(ns=None):
     if _yafowil_plugins is None:
         _yafowil_plugins = list()
         for ep in iter_entry_points('yafowil.plugin'):
+            # prevent loading of duplicate entry points
+            if not ep.module_name.startswith(ep.dist.project_name):
+                continue
             cb = ep.load()
             _yafowil_plugins.append((ep, cb))
         _yafowil_plugins = sorted(
