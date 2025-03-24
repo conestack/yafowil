@@ -248,7 +248,11 @@ def select_display_renderer(widget, data):
         if not value:
             value = u''
     multivalued = attr_value('multivalued', widget, data)
-    vocab = dict(attr_value('vocabulary', widget, data, []))
+    vocab = attr_value('vocabulary', widget, data, [])
+    # fallback for list of strings
+    if type(vocab) == list and all(isinstance(item, str) for item in vocab):
+        vocab = enumerate(vocab)
+    vocab = dict(vocab)
     if not multivalued or not value:
         value = vocab.get(value, value)
         if not value:
