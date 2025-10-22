@@ -5,7 +5,7 @@ History
 4.0 (unreleased)
 ----------------
 
-- QA for Python 3.9 to 3.14. Other versions may work though.
+- Support Python 3.10 to 3.14.
   [rnix]
 
 - Refactor plugin system to use ``importlib.metadata.entry_points`` instead
