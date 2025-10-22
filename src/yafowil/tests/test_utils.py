@@ -25,23 +25,22 @@ from yafowil.utils import vocabulary
 
 class TestUtils(YafowilTestCase):
 
-    def test_entry_point(self):
-        # Test entry_point support tools
+    def test_get_plugins(self):
         self.checkOutput("""
-        [...(EntryPoint.parse('register = yafowil.loader:register'),
-        <function register at ...)...]
+        [...(EntryPoint(name='register', value='yafowil.loader:register', group='yafowil.plugin'), <function register at ...>)...]
         """, str(list(get_plugins())))
 
         self.assertEqual(list(get_plugins('nonexisting')), [])
 
+    def test_get_plugin_names(self):
+        example_names = get_example_names()
         self.checkOutput("""
         [...'yafowil'...]
-        """, str((get_plugin_names())))
+        """, str(example_names))
 
         self.assertEqual(get_plugin_names('nonexisting'), [])
 
     def test_examples_lookup(self):
-        # Test examples lookup
         self.checkOutput("""
         ['yafowil'...]
         """, str(sorted(get_example_names())))
@@ -61,7 +60,6 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(examples[0]['widget'].name, 'yafowil-plaintext')
 
     def test_vocabulary(self):
-        # Test the Vocabulary
         self.assertEqual(vocabulary('foo'), [('foo', 'foo')])
         self.assertEqual(vocabulary({'key': 'value'}), [('key', 'value')])
         self.assertEqual(
@@ -83,7 +81,6 @@ class TestUtils(YafowilTestCase):
         self.assertTrue(vocabulary(None) is None)
 
     def test_Tag(self):
-        # Test Tag
         tag = Tag(lambda msg: msg)
         t = tag('p', b'Lorem Ipsum. ', u'Hello World!',
                 class_=b'fancy', id=u'2f5b8a234ff')
@@ -100,7 +97,6 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(deprecated_tag('div', 'foo'), u'<div>foo</div>')
 
     def test_cssid(self):
-        # Test CSS id
         @plumbing(Attributes)
         class CSSTestNode(OrderedNode):
             @property
@@ -123,7 +119,6 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(cssid(child, 'PREFIX'), 'PREFIX-form-Hallo_World')
 
     def test_css_classes(self):
-        # Test CSS Classes
         @plumbing(Attributes)
         class CSSTestNode(OrderedNode):
             pass
@@ -226,7 +221,6 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(cssclasses(widget, data), 'custom_valid')
 
     def test_managedprops(self):
-        # Test managedprops annotation
         @managedprops('foo', 'bar')
         def somefunc(a, b, c):
             return a, b, c
@@ -239,7 +233,6 @@ class TestUtils(YafowilTestCase):
         )
 
     def test_attr_value(self):
-        # Test attr_value
         widget = AttributedNode()
         data = AttributedNode()
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
+from importlib.metadata import entry_points
 from node.utils import UNSET
-from pkg_resources import iter_entry_points
 from yafowil.compat import STR_TYPE
 from yafowil.compat import UNICODE_TYPE
 from zope.deferredimport import deprecated
@@ -69,9 +69,9 @@ def get_plugins(ns=None):
     global _yafowil_plugins
     if _yafowil_plugins is None:
         _yafowil_plugins = list()
-        for ep in iter_entry_points('yafowil.plugin'):
+        for ep in entry_points(group='yafowil.plugin'):
             # prevent loading of duplicate entry points
-            if not ep.module_name.startswith(ep.dist.project_name):
+            if not ep.module.startswith(ep.dist.name):
                 continue
             cb = ep.load()
             _yafowil_plugins.append((ep, cb))
@@ -91,14 +91,14 @@ _plugin_names = dict()
 def get_plugin_names(ns=None):
     if ns not in _plugin_names:
         _plugin_names[ns] = list(set(
-            [ep.dist.project_name for ep, cb in get_plugins(ns=ns)]
+            [ep.dist.name for ep, cb in get_plugins(ns=ns)]
         ))
     return _plugin_names[ns]
 
 
 def get_example(example_name):
     for ep, cb in get_plugins(ns='example'):
-        if ep.dist.project_name != example_name:
+        if ep.dist.name != example_name:
             continue
         info = cb()
         return info
@@ -107,7 +107,7 @@ def get_example(example_name):
 def get_example_names():
     result = []
     for ep, cb in get_plugins(ns='example'):
-        result.append(ep.dist.project_name)
+        result.append(ep.dist.name)
     return result
 
 
