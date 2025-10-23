@@ -64,7 +64,7 @@ class TestPersistence(YafowilTestCase):
             'form.my_field': 'value'
         })
         self.checkOutput("""
-        <RuntimeData form, value=<UNSET>, extracted=odict(...) at ...>
+        <RuntimeData form, value=<UNSET>, extracted=...odict(...) at ...>
           <RuntimeData form.my_field, value=<UNSET>, extracted='value' at ...>
         """, data.treerepr())
 
