@@ -47,7 +47,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'node>=1.2',
+        'node>=1.2,<2.0.0',
         'setuptools',
         'webresource'
     ],

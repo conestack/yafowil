@@ -5,6 +5,9 @@ History
 3.1.2 (unreleased)
 ------------------
 
+- Pin upper versions of dependencies.
+  [rnix]
+
 - Prevent loading of duplicate entry points.
   [rnix]
 
