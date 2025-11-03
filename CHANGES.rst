@@ -2,8 +2,8 @@
 History
 =======
 
-4.0 (unreleased)
-----------------
+4.0.0 (unreleased)
+------------------
 
 - Support Python 3.10 to 3.14.
   [rnix]

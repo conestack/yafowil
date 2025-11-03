@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "yafowil"
-version = "3.1.2.dev0"
+version = "4.0.0.dev0"
 description = "YAFOWIL - declarative, framework independent, flexible HTML forms"
 readme = "README.rst"
 license = {text = "Simplified BSD"}
