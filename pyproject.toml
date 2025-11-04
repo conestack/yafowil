@@ -25,8 +25,8 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    "node>=1.2",
-    "webresource",
+    "node>1.99",
+    "webresource>1.2.99",
 ]
 
 [project.optional-dependencies]
