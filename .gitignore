@@ -8,3 +8,5 @@
 /htmlcov/
 /requirements-mxdev.txt
 /venv
+/constraints-mxdev.txt
+/sources/
