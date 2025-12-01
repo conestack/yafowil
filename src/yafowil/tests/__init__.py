@@ -24,6 +24,7 @@ from yafowil import url
 from yafowil.base import factory
 from yafowil.utils import Tag
 import lxml.etree as etree
+import yafowil.loader
 
 
 class YafowilTestCase(NodeTestCase):

@@ -2,8 +2,18 @@
 History
 =======
 
-3.1.2 (unreleased)
+4.0.0 (unreleased)
 ------------------
+
+- Support Python 3.10 to 3.14.
+  [rnix]
+
+- Refactor plugin system to use ``importlib.metadata.entry_points`` instead
+  of ``pkg_resources.iter_entry_points``.
+  [rnix]
+
+- Update package layout to use ``pyproject.toml`` and ``hatchling``.
+  [rnix]
 
 - Prevent loading of duplicate entry points.
   [rnix]
