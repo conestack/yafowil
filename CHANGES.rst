@@ -12,7 +12,7 @@ History
   of ``pkg_resources.iter_entry_points``.
   [rnix]
 
-- Update package layout to use ``pyproject.toml`` and ``hatchling``.
+- Refactor package layout to use ``pyproject.toml``.
   [rnix]
 
 
