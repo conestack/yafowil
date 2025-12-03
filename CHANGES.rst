@@ -15,6 +15,13 @@ History
 - Update package layout to use ``pyproject.toml`` and ``hatchling``.
   [rnix]
 
+
+3.1.2 (2025-10-28)
+------------------
+
+- Pin upper versions of dependencies.
+  [rnix]
+
 - Prevent loading of duplicate entry points.
   [rnix]
 
