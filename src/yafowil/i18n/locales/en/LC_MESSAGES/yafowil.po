@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: yafowil 2.1pre1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-03-21 10:31+0100\n"
+"POT-Creation-Date: 2025-12-05 08:31+0100\n"
 "PO-Revision-Date: 2014-04-30 17:34+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -17,37 +17,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "Generated-By: Babel 1.3\n"
-
-#. Default: Input not a valid web address.
-#: src/yafowil/url.py:28
-msgid "web_address_not_valid"
-msgstr "Input not a valid web address."
-
-#. Default: Yes
-#: src/yafowil/checkbox.py:151
-msgid "yes"
-msgstr "Yes"
-
-#. Default: No
-#: src/yafowil/checkbox.py:152
-msgid "no"
-msgstr "No"
-
-#. Default: Unset
-#. XXX: never used right now?
-#: src/yafowil/checkbox.py:153
-msgid "unset"
-msgstr "Unset"
-
-#. Default: Input not a valid email address.
-#: src/yafowil/email.py:32
-msgid "email_address_not_valid"
-msgstr "Input not a valid email address."
-
-#. Default: Mandatory field was empty
-#: src/yafowil/common.py:86
-msgid "required_message"
-msgstr "Mandatory field was empty"
 
 #. Default: Input must have at least ${len} characters.
 #: src/yafowil/password.py:37
@@ -86,6 +55,27 @@ msgstr ""
 #: src/yafowil/number.py:53
 msgid "input_number_step_value"
 msgstr "Value ${val} has to be in stepping of ${step}"
+
+#. Default: Yes
+#: src/yafowil/checkbox.py:151
+msgid "yes"
+msgstr "Yes"
+
+#. Default: No
+#: src/yafowil/checkbox.py:152
+msgid "no"
+msgstr "No"
+
+#. Default: Unset
+#. XXX: never used right now?
+#: src/yafowil/checkbox.py:153
+msgid "unset"
+msgstr "Unset"
+
+#. Default: Mandatory field was empty
+#: src/yafowil/common.py:86
+msgid "required_message"
+msgstr "Mandatory field was empty"
 
 #. Default: Cannot replace file. No file uploaded.
 #: src/yafowil/file.py:55
@@ -136,6 +126,16 @@ msgstr "Replace existing file"
 #: src/yafowil/file.py:230
 msgid "file_delete"
 msgstr "Delete existing file"
+
+#. Default: Input not a valid web address.
+#: src/yafowil/url.py:28
+msgid "web_address_not_valid"
+msgstr "Input not a valid web address."
+
+#. Default: Input not a valid email address.
+#: src/yafowil/email.py:32
+msgid "email_address_not_valid"
+msgstr "Input not a valid email address."
 
 #. Default: string
 #: src/yafowil/datatypes.py:194
