@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "yafowil"
-version = "4.0.0"
+version = "4.0.1.dev0"
 description = "YAFOWIL - declarative, framework independent, flexible HTML forms"
 dynamic = ["readme"]
 requires-python = ">=3.10"
