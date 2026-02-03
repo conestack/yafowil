@@ -2,7 +2,7 @@
 History
 =======
 
-4.0.0 (unreleased)
+4.0.0 (2026-02-03)
 ------------------
 
 - Support Python 3.10 to 3.14.
