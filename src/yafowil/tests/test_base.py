@@ -126,9 +126,6 @@ class TestBase(NodeTestCase):
                 str(widget.attributes)
             )
 
-        def fail_display_renderer(widget, data):
-            raise ValueError('display renderer has to fail')
-
         def _test_getter2(widget, data):
             return 999
 
@@ -257,6 +254,7 @@ class TestBase(NodeTestCase):
         <RuntimeData MYUID2, value='Test Value', extracted=<UNSET> at ...>,
         {...'test1': 'Test1'...}
         """, testwidget())
+        self.assertEqual(testwidget.extract({}).extracted, 'e2')
 
         # b.2) extractor with request, non int has to fail
         testwidget = Widget(
@@ -903,6 +901,11 @@ class TestBase(NodeTestCase):
             ['extracted inner', 'extracted outer']
         )
         self.assertEqual(widget(data), u'<OUTER><INNER /></OUTER>')
+        widget = factory('outer:inner', name='OUTER_INNER', mode='display')
+        self.assertEqual(
+            widget(),
+            u'<OUTERDISPLAY><INNERDISPLAY /></OUTERDISPLAY>'
+        )
 
         # Blueprint chain definition as list
         widget = factory(['outer', 'inner'], name='OUTER_INNER')

@@ -3,6 +3,9 @@ from node.base import OrderedNode
 from node.behaviors import Attributes
 from node.utils import UNSET
 from plumber import plumbing
+from types import SimpleNamespace
+from unittest import mock
+from yafowil import utils
 from yafowil.base import factory
 from yafowil.tests import YafowilTestCase
 from yafowil.utils import Tag
@@ -30,6 +33,25 @@ class TestUtils(YafowilTestCase):
         """, str(list(get_plugins())))
 
         self.assertEqual(list(get_plugins('nonexisting')), [])
+
+    def test_get_plugins_skips_entry_points_of_foreign_distributions(self):
+        register = mock.Mock()
+
+        def entry_point(module, dist_name):
+            return SimpleNamespace(
+                name='register',
+                module=module,
+                dist=SimpleNamespace(name=dist_name),
+                load=lambda: register
+            )
+
+        own = entry_point('yafowil.foo', 'yafowil.foo')
+        foreign = entry_point('yafowil.foo', 'other')
+        with mock.patch.object(utils, '_yafowil_plugins', None), \
+                mock.patch.object(utils, 'entry_points', return_value=[
+                    own, foreign
+                ]):
+            self.assertEqual(list(get_plugins()), [(own, register)])
 
     def test_get_plugin_names(self):
         example_names = get_example_names()
