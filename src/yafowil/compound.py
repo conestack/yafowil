@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from node.utils import UNSET
 from odict import odict
 from yafowil.base import factory

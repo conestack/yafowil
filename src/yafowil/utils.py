@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
 from importlib.metadata import entry_points
 from node.utils import UNSET
-from yafowil.compat import STR_TYPE
-from yafowil.compat import UNICODE_TYPE
 from zope.deferredimport import deprecated
 import json
 import logging
@@ -14,10 +11,8 @@ class EmptyValue(object):
     """Used to identify empty values in conjunction with data type conversion.
     """
 
-    def __nonzero__(self):
+    def __bool__(self):
         return False
-
-    __bool__ = __nonzero__
 
     def __str__(self):
         return ''
@@ -116,7 +111,7 @@ def vocabulary(definition):
     """
     if callable(definition):
         definition = definition()
-    if isinstance(definition, STR_TYPE):
+    if isinstance(definition, str):
         return [(definition, definition), ]
     # dict-like
     if hasattr(definition, '__getitem__') and hasattr(definition, 'keys'):
@@ -125,7 +120,7 @@ def vocabulary(definition):
     if hasattr(definition, '__iter__'):
         new_vocab = []
         for entry in definition:
-            if isinstance(entry, STR_TYPE):
+            if isinstance(entry, str):
                 # entry is a string
                 new_vocab.append((entry, entry))
             elif hasattr(entry, '__iter__'):
@@ -172,7 +167,7 @@ class Tag(object):
             if value is None or value is UNSET:
                 continue
             value = self.translate(value)
-            if not isinstance(value, UNICODE_TYPE):
+            if not isinstance(value, str):
                 if isinstance(value, bytes):
                     value = value.decode(self.encoding)
                 else:
@@ -195,7 +190,7 @@ class Tag(object):
         cl = list()
         for inner in inners:
             inner = self.translate(inner)
-            if not isinstance(inner, UNICODE_TYPE):
+            if not isinstance(inner, str):
                 # XXX: inner = str(inner).decode(self.encoding)
                 if isinstance(inner, bytes):
                     inner = inner.decode(self.encoding)
@@ -297,7 +292,7 @@ def as_data_attrs(data):
         if val is UNSET:
             continue
         # convert value to JSON dump if no string.
-        if not isinstance(val, STR_TYPE):
+        if not isinstance(val, str):
             # also remove leading and trailing double quotes,
             # they are not needed for data-attributes
             val = json.dumps(val).strip('"')
@@ -357,17 +352,17 @@ def cssclasses(widget, data, classattr='class', additional=[], ignores=[]):
     _classes = list()
     attrs = widget.attrs
     if not 'error_class' in ignores and attrs['error_class'] and data.errors:
-        if isinstance(attrs['error_class'], STR_TYPE):
+        if isinstance(attrs['error_class'], str):
             _classes.append(attrs['error_class'])
         else:
             _classes.append(attrs['error_class_default'])
     elif not 'valid_class' in ignores and attrs['valid_class'] and data.root.extracted:
-        if isinstance(attrs['valid_class'], STR_TYPE):
+        if isinstance(attrs['valid_class'], str):
             _classes.append(attrs['valid_class'])
         else:
             _classes.append(attrs['valid_class_default'])
     if not 'required_class' in ignores and attrs['required_class'] and attrs['required']:
-        if isinstance(attrs['required_class'], STR_TYPE):
+        if isinstance(attrs['required_class'], str):
             _classes.append(attrs['required_class'])
         else:
             _classes.append(attrs['required_class_default'])

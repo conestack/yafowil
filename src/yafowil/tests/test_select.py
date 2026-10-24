@@ -1,7 +1,6 @@
 from node.utils import UNSET
 from yafowil.base import ExtractionError
 from yafowil.base import factory
-from yafowil.compat import UNICODE_TYPE
 from yafowil.persistence import write_mapping_writer
 from yafowil.tests import YafowilTestCase
 from yafowil.tests import fxml
@@ -1454,7 +1453,7 @@ class TestSelect(YafowilTestCase):
                 'multivalued': True,
                 'disabled': ['two', 'three', 'four', 'five'],
                 'vocabulary': vocab,
-                'datatype': UNICODE_TYPE,
+                'datatype': str,
             })
         request = {
             'MYSELECT': ['one', 'two', 'five'],

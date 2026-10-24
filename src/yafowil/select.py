@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from node.utils import UNSET
 from yafowil.base import factory
 from yafowil.base import fetch_value
@@ -7,8 +6,6 @@ from yafowil.common import generic_display_renderer
 from yafowil.common import generic_extractor
 from yafowil.common import generic_positional_rendering_helper
 from yafowil.common import generic_required_extractor
-from yafowil.compat import ITER_TYPES
-from yafowil.compat import STR_TYPE
 from yafowil.datatypes import convert_value_to_datatype
 from yafowil.datatypes import convert_values_to_datatype
 from yafowil.datatypes import generic_datatype_extractor
@@ -39,7 +36,7 @@ def select_extractor(widget, data):
             extracted = ''
     if extracted is UNSET:
         return extracted
-    if multivalued and isinstance(extracted, STR_TYPE):
+    if multivalued and isinstance(extracted, str):
         extracted = [extracted]
     disabled = widget.attrs.get('disabled', False)
     if not disabled:
@@ -47,7 +44,7 @@ def select_extractor(widget, data):
     if not multivalued:
         return data.value
     disabled_items = disabled is True and data.value or disabled
-    if isinstance(disabled_items, STR_TYPE):
+    if isinstance(disabled_items, str):
         disabled_items = [disabled_items]
     for item in disabled_items:
         if item in extracted and item not in data.value:
@@ -71,7 +68,7 @@ def select_exists_marker(widget, data):
 def select_edit_renderer_props(widget, data):
     value = fetch_value(widget, data)
     multivalued = attr_value('multivalued', widget, data)
-    if isinstance(value, STR_TYPE) or not hasattr(value, '__iter__'):
+    if isinstance(value, str) or not hasattr(value, '__iter__'):
         value = [value]
     datatype = widget.attrs.get('datatype', None)
     if datatype:
@@ -243,7 +240,7 @@ def select_edit_renderer(widget, data, custom_attrs={}):
 @managedprops('data', 'template', 'class', 'multivalued', 'empty_display_value')
 def select_display_renderer(widget, data):
     value = fetch_value(widget, data)
-    if type(value) in ITER_TYPES and not value:
+    if type(value) in (list, tuple) and not value:
         value = attr_value('empty_display_value', widget, data)
         if not value:
             value = u''
@@ -272,7 +269,7 @@ def select_display_renderer(widget, data):
     }
     attrs.update(as_data_attrs(attr_value('data', widget, data)))
     content = u''
-    if multivalued and isinstance(value, STR_TYPE):
+    if multivalued and isinstance(value, str):
         value = [value]
     for key in value:
         content += data.tag('li', vocab.get(key, key),

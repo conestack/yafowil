@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from yafowil.base import factory
 from yafowil.common import empty_display_renderer
 from yafowil.common import input_attributes_common

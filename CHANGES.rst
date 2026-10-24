@@ -2,10 +2,23 @@
 History
 =======
 
-4.0.1 (unreleased)
+4.1.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Deprecate the Python 2 compatibility names in ``yafowil.compat``:
+  ``IS_PY2``, ``BYTES_TYPE``, ``STR_TYPE``, ``UNICODE_TYPE``, ``LONG_TYPE``
+  and ``ITER_TYPES``. Use the builtins instead. They will be removed in
+  yafowil 5.0.
+  [rnix]
+
+- Drop the Python 2 remnants: ``yafowil.compat`` usage, ``IS_PY2`` branches,
+  ``# -*- coding: utf-8 -*-``, ``EmptyValue.__nonzero__`` and the
+  ``long integer`` datatype label.
+  [rnix]
+
+- Declare ``zope.deprecation`` as dependency, it came in through ``node``
+  only.
+  [rnix]
 
 
 4.0.0 (2026-02-03)

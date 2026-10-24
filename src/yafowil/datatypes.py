@@ -1,12 +1,6 @@
-# -*- coding: utf-8 -*-
 from node.utils import UNSET
 from yafowil.base import ExtractionError
 from yafowil.base import factory
-from yafowil.compat import BYTES_TYPE
-from yafowil.compat import IS_PY2
-from yafowil.compat import LONG_TYPE
-from yafowil.compat import STR_TYPE
-from yafowil.compat import UNICODE_TYPE
 from yafowil.tsf import _
 from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import attr_value
@@ -52,7 +46,7 @@ class DatatypeConverter(object):
 
     def to_form(self, value):
         """Convert given value to unicode string for rendering."""
-        if not isinstance(value, UNICODE_TYPE):
+        if not isinstance(value, str):
             value = u'{}'.format(value)
         return value.replace('"', '&quot;')
 
@@ -61,13 +55,13 @@ class BytesDatatypeConverter(DatatypeConverter):
     """Datatype converter for bytes."""
 
     def to_value(self, value):
-        if isinstance(value, BYTES_TYPE):
+        if isinstance(value, bytes):
             return value
         # passed unicode value must contain ascii characters only
         return codecs.escape_decode(value.encode('ascii'))[0]
 
     def to_form(self, value):
-        if isinstance(value, UNICODE_TYPE):
+        if isinstance(value, str):
             return value
         return codecs.escape_encode(value)[0].decode('ascii')
 
@@ -76,7 +70,7 @@ class UnicodeDatatypeConverter(DatatypeConverter):
     """Datatype converter for unicode."""
 
     def __init__(self):
-        super(UnicodeDatatypeConverter, self).__init__(UNICODE_TYPE)
+        super(UnicodeDatatypeConverter, self).__init__(str)
 
     def to_value(self, value):
         if isinstance(value, self.type_):
@@ -91,14 +85,14 @@ class FloatDatatypeConverter(DatatypeConverter):
         super(FloatDatatypeConverter, self).__init__(float)
 
     def to_value(self, value):
-        if isinstance(value, STR_TYPE):
+        if isinstance(value, str):
             value = value.replace(',', '.')
         return self.type_(value)
 
 
 DATATYPE_CONVERTERS = {
-    BYTES_TYPE: BytesDatatypeConverter(),
-    UNICODE_TYPE: UnicodeDatatypeConverter(),
+    bytes: BytesDatatypeConverter(),
+    str: UnicodeDatatypeConverter(),
     float: FloatDatatypeConverter()
 }
 
@@ -108,7 +102,7 @@ LEGACY_DATATYPE_CONVERTERS = {
     'unicode': UnicodeDatatypeConverter(),
     'int': int,
     'integer': int,
-    'long': LONG_TYPE,  # long only exists in python 2
+    'long': int,
     'float': FloatDatatypeConverter(),
     'uuid': uuid.UUID
 }
@@ -124,7 +118,7 @@ def lookup_datatype_converter(datatype):
     'int', 'integer', 'long', 'float' or 'uuid'. This behavior is deprecated
     and will be removed as of yafowil 3.2.
     """
-    if isinstance(datatype, STR_TYPE):
+    if isinstance(datatype, str):
         warnings.warn(
             'Passing ``datatype`` as string to ``convert_value_to_datatype`` '
             'is deprecated and will be removed as of yafowil 3.2.'
@@ -191,22 +185,18 @@ def convert_values_to_datatype(value, datatype, empty_value=EMPTY_VALUE):
 
 
 DATATYPE_LABELS = {
-    BYTES_TYPE: _('datatype_str', default='string'),
-    UNICODE_TYPE: _('datatype_unicode', default='unicode'),
+    bytes: _('datatype_str', default='string'),
+    str: _('datatype_unicode', default='unicode'),
     int: _('datatype_integer', default='integer'),
     float: _('datatype_float', default='floating point number'),
     uuid.UUID: _('datatype_uuid', default='UUID')
 }
-if IS_PY2:  # pragma: no cover
-    DATATYPE_LABELS[LONG_TYPE] = _('datatype_long', default='long integer')
-else:  # pragma: no cover
-    DATATYPE_LABELS[LONG_TYPE] = DATATYPE_LABELS[int]
 # B/C, will be removed as of yafowil 3.2
-DATATYPE_LABELS['str'] = DATATYPE_LABELS[BYTES_TYPE]
-DATATYPE_LABELS['unicode'] = DATATYPE_LABELS[UNICODE_TYPE]
+DATATYPE_LABELS['str'] = DATATYPE_LABELS[bytes]
+DATATYPE_LABELS['unicode'] = DATATYPE_LABELS[str]
 DATATYPE_LABELS['int'] = DATATYPE_LABELS[int]
 DATATYPE_LABELS['integer'] = DATATYPE_LABELS[int]
-DATATYPE_LABELS['long'] = DATATYPE_LABELS[LONG_TYPE]
+DATATYPE_LABELS['long'] = DATATYPE_LABELS[int]
 DATATYPE_LABELS['float'] = DATATYPE_LABELS[float]
 DATATYPE_LABELS['uuid'] = DATATYPE_LABELS[uuid.UUID]
 

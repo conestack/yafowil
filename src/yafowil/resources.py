@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from yafowil.base import factory
 from yafowil.utils import get_plugin_names
 import copy

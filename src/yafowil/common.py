@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
 from node.utils import UNSET
 from yafowil.base import ExtractionError
 from yafowil.base import factory
 from yafowil.base import fetch_value
-from yafowil.compat import ITER_TYPES
-from yafowil.compat import STR_TYPE
 from yafowil.datatypes import lookup_datatype_converter
 from yafowil.tsf import _
 from yafowil.utils import as_data_attrs
@@ -171,7 +168,7 @@ def generic_required_extractor(widget, data):
     required = attr_value('required', widget, data)
     if not required or bool(data.extracted) or data.extracted is UNSET:
         return data.extracted
-    if isinstance(required, STR_TYPE):
+    if isinstance(required, str):
         raise ExtractionError(required)
     raise ExtractionError(attr_value('required_message', widget, data))
 
@@ -185,7 +182,7 @@ def input_attributes_common(widget, data, excludes=list(), value=None):
         value = converter.to_form(value)
     # XXX: get rid of this, we probaly want to have a default datatype
     #      converter here
-    elif isinstance(value, STR_TYPE):
+    elif isinstance(value, str):
         value = value.replace('"', '&quot;')
     autofocus = attr_value('autofocus', widget, data) and 'autofocus' or None
     disabled = attr_value('disabled', widget, data)
@@ -240,9 +237,9 @@ def display_proxy_renderer(widget, data):
         widget.attrs['type'] = 'hidden'
         value = fetch_value(widget, data)
         multivalued = attr_value('multivalued', widget, data)
-        if multivalued and isinstance(value, STR_TYPE):
+        if multivalued and isinstance(value, str):
             value = [value]
-        if multivalued or type(value) in ITER_TYPES:
+        if multivalued or type(value) in (list, tuple):
             for val in value:
                 input_attrs = input_attributes_full(widget, data, value=val)
                 rendered += data.tag('input', **input_attrs)

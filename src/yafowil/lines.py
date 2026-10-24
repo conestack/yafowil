@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 from yafowil.base import factory
 from yafowil.base import fetch_value
 from yafowil.common import display_proxy_renderer
 from yafowil.common import generic_extractor
 from yafowil.common import generic_required_extractor
-from yafowil.compat import ITER_TYPES
 from yafowil.datatypes import generic_datatype_extractor
 from yafowil.datatypes import generic_emptyvalue_extractor
 from yafowil.textarea import textarea_attributes
@@ -46,7 +44,7 @@ def lines_edit_renderer(widget, data):
 @managedprops('class', 'data')
 def lines_display_renderer(widget, data):
     value = fetch_value(widget, data)
-    if type(value) in ITER_TYPES and not value:
+    if type(value) in (list, tuple) and not value:
         value = u''
     cssclasses = [
         attr_value("display_class", widget, data),

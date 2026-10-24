@@ -1,16 +1,11 @@
+from io import StringIO
 from node.utils import UNSET
 from yafowil.base import ExtractionError
 from yafowil.base import factory
-from yafowil.compat import IS_PY2
 from yafowil.file import convert_bytes
 from yafowil.tests import YafowilTestCase
 from yafowil.tests import fxml
 from yafowil.tests import wrapped_fxml
-
-if IS_PY2:  # pragma: no cover
-    from StringIO import StringIO
-else:  # pragma: no cover
-    from io import StringIO
 
 
 class TestFile(YafowilTestCase):

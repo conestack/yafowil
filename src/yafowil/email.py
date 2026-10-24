@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from yafowil.base import ExtractionError
 from yafowil.base import factory
 from yafowil.common import display_proxy_renderer
@@ -6,8 +5,6 @@ from yafowil.common import generic_display_renderer
 from yafowil.common import generic_extractor
 from yafowil.common import generic_required_extractor
 from yafowil.common import input_generic_renderer
-from yafowil.compat import BYTES_TYPE
-from yafowil.compat import UNICODE_TYPE
 from yafowil.datatypes import generic_datatype_extractor
 from yafowil.datatypes import generic_emptyvalue_extractor
 from yafowil.tsf import _
@@ -26,7 +23,7 @@ def email_extractor(widget, data):
     if not val:
         return val
     email_re = EMAIL_RE \
-        if isinstance(val, UNICODE_TYPE) \
+        if isinstance(val, str) \
         else EMAIL_RE.encode()
     if not re.match(email_re, val):
         raise ExtractionError(_(
@@ -67,5 +64,5 @@ factory.defaults['email.class'] = 'email'
 factory.defaults['email.persist'] = True
 
 factory.defaults['email.allowed_datatypes'] = [
-    BYTES_TYPE, UNICODE_TYPE,
+    bytes, str,
 ]

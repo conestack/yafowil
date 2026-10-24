@@ -1,9 +1,23 @@
-import sys
-import types
+from zope.deprecation import deprecated
 
-IS_PY2 = sys.version_info[0] < 3
-BYTES_TYPE = str if IS_PY2 else bytes
-STR_TYPE = basestring if IS_PY2 else str
-UNICODE_TYPE = unicode if IS_PY2 else str
-LONG_TYPE = long if IS_PY2 else int
-ITER_TYPES = (types.ListType, types.TupleType) if IS_PY2 else (list, tuple)
+
+# Python 2 compatibility, kept for B/C only
+IS_PY2 = False
+BYTES_TYPE = bytes
+STR_TYPE = str
+UNICODE_TYPE = str
+LONG_TYPE = int
+ITER_TYPES = (list, tuple)
+
+deprecated(
+    [
+        'IS_PY2',
+        'BYTES_TYPE',
+        'STR_TYPE',
+        'UNICODE_TYPE',
+        'LONG_TYPE',
+        'ITER_TYPES',
+    ],
+    'Python 2 compatibility is gone, use the builtins instead. Will be '
+    'removed in yafowil 5.0.'
+)

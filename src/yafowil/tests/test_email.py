@@ -1,8 +1,6 @@
 from node.utils import UNSET
 from yafowil.base import ExtractionError
 from yafowil.base import factory
-from yafowil.compat import BYTES_TYPE
-from yafowil.compat import UNICODE_TYPE
 from yafowil.persistence import write_mapping_writer
 from yafowil.tests import YafowilTestCase
 
@@ -80,23 +78,23 @@ class TestEmail(YafowilTestCase):
             'email',
             name='EMAIL',
             props={
-                'datatype': UNICODE_TYPE
+                'datatype': str
             })
         data = widget.extract(request={'EMAIL': u'foo@example.com'})
         self.assertEqual(data.extracted, u'foo@example.com')
-        self.assertTrue(isinstance(data.extracted, UNICODE_TYPE))
-        self.assertFalse(isinstance(data.extracted, BYTES_TYPE))
+        self.assertTrue(isinstance(data.extracted, str))
+        self.assertFalse(isinstance(data.extracted, bytes))
 
         widget = factory(
             'email',
             name='EMAIL',
             props={
-                'datatype': BYTES_TYPE
+                'datatype': bytes
             })
         data = widget.extract(request={'EMAIL': u'foo@example.com'})
         self.assertEqual(data.extracted, b'foo@example.com')
-        self.assertFalse(isinstance(data.extracted, UNICODE_TYPE))
-        self.assertTrue(isinstance(data.extracted, BYTES_TYPE))
+        self.assertFalse(isinstance(data.extracted, str))
+        self.assertTrue(isinstance(data.extracted, bytes))
 
         # Persist
         widget = factory(

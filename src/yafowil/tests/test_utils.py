@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from node.base import AttributedNode
 from node.base import OrderedNode
 from node.behaviors import Attributes

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from node.behaviors import Attributes
 from node.behaviors import DictStorage
 from node.behaviors import MappingAdopt
@@ -11,8 +10,6 @@ from node.utils import UNSET
 from node.utils import instance_property
 from plumber import plumbing
 from threading import RLock
-from yafowil.compat import ITER_TYPES
-from yafowil.compat import STR_TYPE
 from yafowil.utils import Tag
 from yafowil.utils import attr_value
 import copy
@@ -113,7 +110,7 @@ class RuntimeData(object):
         return Tag(self.translate_callable)
 
     def fetch(self, path):
-        if isinstance(path, STR_TYPE):
+        if isinstance(path, str):
             path = path.split('.')
         data = self.root
         if path[0] != data.name:
@@ -566,7 +563,7 @@ class Factory(object):
 
     def register_macro(self, name, blueprints, props):
         self._name_check(name)
-        if isinstance(blueprints, STR_TYPE):
+        if isinstance(blueprints, str):
             blueprints = blueprints.split(':')
         self._macros[name] = blueprints, props
 
@@ -676,7 +673,7 @@ class Factory(object):
 
     def _expand_blueprints(self, blueprints, props):
         result = list()
-        if isinstance(blueprints, STR_TYPE):
+        if isinstance(blueprints, str):
             blueprints = blueprints.split(':')
         for blueprint in blueprints:
             if blueprint.startswith('#'):
@@ -751,7 +748,7 @@ class Factory(object):
         for blueprint in blueprints:
             if blueprint.startswith('*'):
                 part_name = blueprint[1:]
-                if type(custom[part_name]) in ITER_TYPES:
+                if type(custom[part_name]) in (list, tuple):
                     if len(custom[part_name]) < 5:
                         # BBB:
                         ex, eren, pre, bui = custom[part_name]
