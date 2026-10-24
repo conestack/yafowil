@@ -1,7 +1,6 @@
 from yafowil.base import factory
 from yafowil.common import empty_display_renderer
 from yafowil.common import input_attributes_common
-from yafowil.tsf import _
 from yafowil.utils import attr_value
 from yafowil.utils import managedprops
 
@@ -10,32 +9,26 @@ from yafowil.utils import managedprops
 # submit
 ###############################################################################
 
+
 @managedprops(
-    'tag_type',
-    'label',
-    'class',
-    'action',
-    'handler',
-    'next',
-    'skip',
-    'expression')
+    'tag_type', 'label', 'class', 'action', 'handler', 'next', 'skip', 'expression'
+)
 def submit_renderer(widget, data):
     expression = attr_value('expression', widget, data)
     if not expression:
-        return u''
+        return ''
     tag = data.tag
     input_attrs = input_attributes_common(widget, data)
     input_attrs['type'] = 'submit'
-    input_attrs['name_'] = attr_value('action', widget, data) \
-        and 'action.{0}'.format(widget.dottedpath)
+    input_attrs['name_'] = (
+        attr_value('action', widget, data) and f'action.{widget.dottedpath}'
+    )
     input_attrs['value'] = attr_value('label', widget, data, widget.name)
     return tag(attr_value('tag_type', widget, data), **input_attrs)
 
 
 factory.register(
-    'submit',
-    edit_renderers=[submit_renderer],
-    display_renderers=[empty_display_renderer]
+    'submit', edit_renderers=[submit_renderer], display_renderers=[empty_display_renderer]
 )
 
 factory.doc['blueprint']['submit'] = """\
@@ -87,6 +80,7 @@ Flag the submit field as disabled.
 # button
 ###############################################################################
 
+
 @managedprops(
     'text',
     'action',
@@ -105,11 +99,12 @@ Flag the submit field as disabled.
     'disabled',
     'class',
     'class_add',
-    'accesskey')
+    'accesskey',
+)
 def button_renderer(widget, data):
     expression = attr_value('expression', widget, data)
     if not expression:
-        return u''
+        return ''
     tag = data.tag
     input_attrs = input_attributes_common(widget, data)
     input_attrs['type'] = attr_value('type', widget, data)
@@ -124,18 +119,16 @@ def button_renderer(widget, data):
         # only 'submit' type sends data to the server
         if attr_value('action', widget, data):
             # only if an server side action is set this makes sense:
-            input_attrs['name_'] = 'action.{0}'.format(widget.dottedpath)
+            input_attrs['name_'] = f'action.{widget.dottedpath}'
         else:
             # otherwise check for a custom name
             input_attrs['name_'] = attr_value('name', widget, data)
     text = attr_value('text', widget, data)
-    return tag("button", text, **input_attrs)
+    return tag('button', text, **input_attrs)
 
 
 factory.register(
-    'button',
-    edit_renderers=[button_renderer],
-    display_renderers=[empty_display_renderer]
+    'button', edit_renderers=[button_renderer], display_renderers=[empty_display_renderer]
 )
 
 factory.defaults['button.type'] = 'submit'

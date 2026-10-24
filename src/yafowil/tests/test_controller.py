@@ -5,11 +5,11 @@ from yafowil.tests import YafowilTestCase
 
 
 class TestController(YafowilTestCase):
-
     def test_controller(self):
         # Dummy context
-        class Context(object):
+        class Context:
             value = 'hello world'
+
         context = Context()
 
         # Dummy getter
@@ -17,21 +17,9 @@ class TestController(YafowilTestCase):
             return data.request.context.value
 
         # Create Widget tree
-        form = factory(
-            u'form',
-            name='testform',
-            props={
-                'action': 'http://fubar.com'
-            })
-        form['field1'] = factory(
-            'text',
-            value=getter)
-        form['field2'] = factory(
-            'text',
-            value='',
-            props={
-                'required': True
-            })
+        form = factory('form', name='testform', props={'action': 'http://fubar.com'})
+        form['field1'] = factory('text', value=getter)
+        form['field2'] = factory('text', value='', props={'required': True})
 
         # Define action ``handler``
         def handler(widget, data):
@@ -69,14 +57,17 @@ class TestController(YafowilTestCase):
         form['cancel'] = factory('submit', props=props)
 
         # Check widget tree
-        self.assertEqual(form.treerepr().split('\n'), [
-            "<class 'yafowil.base.Widget'>: testform",
-            "  <class 'yafowil.base.Widget'>: field1",
-            "  <class 'yafowil.base.Widget'>: field2",
-            "  <class 'yafowil.base.Widget'>: save",
-            "  <class 'yafowil.base.Widget'>: cancel",
-            ""
-        ])
+        self.assertEqual(
+            form.treerepr().split('\n'),
+            [
+                "<class 'yafowil.base.Widget'>: testform",
+                "  <class 'yafowil.base.Widget'>: field1",
+                "  <class 'yafowil.base.Widget'>: field2",
+                "  <class 'yafowil.base.Widget'>: save",
+                "  <class 'yafowil.base.Widget'>: cancel",
+                '',
+            ],
+        )
 
         # Dummy request
         class Request(dict):
@@ -87,7 +78,8 @@ class TestController(YafowilTestCase):
 
         # Render form with empty request
         data = form.extract(request)
-        self.checkOutput("""
+        self.checkOutput(
+            """
         <form action="http://fubar.com" enctype="multipart/form-data"
               id="form-testform" method="post" novalidate="novalidate">
           <input class="text" id="input-testform-field1" name="testform.field1"
@@ -100,7 +92,9 @@ class TestController(YafowilTestCase):
           <input id="input-testform-cancel" name="action.testform.cancel"
                  type="submit" value="Cancel"/>
         </form>
-        """, fxml(form(data)))
+        """,
+            fxml(form(data)),
+        )
 
         # Create controller for form
         controller = Controller(form, request)
@@ -139,7 +133,8 @@ class TestController(YafowilTestCase):
         self.assertTrue(controller.performed)
 
         # Render the form performed
-        self.checkOutput("""
+        self.checkOutput(
+            """
         <form action="http://fubar.com" enctype="multipart/form-data"
               id="form-testform" method="post" novalidate="novalidate">
           <input class="text" id="input-testform-field1" name="testform.field1"
@@ -152,7 +147,9 @@ class TestController(YafowilTestCase):
           <input id="input-testform-cancel" name="action.testform.cancel"
                  type="submit" value="Cancel"/>
         </form>
-        """, fxml(controller.rendered))
+        """,
+            fxml(controller.rendered),
+        )
 
         # Trigger cancel action. performing is skipped
         del request['action.testform.save']
@@ -162,7 +159,8 @@ class TestController(YafowilTestCase):
         self.assertFalse(controller.performed)
 
         # Render form not performed
-        self.checkOutput("""
+        self.checkOutput(
+            """
         <form action="http://fubar.com" enctype="multipart/form-data"
               id="form-testform" method="post" novalidate="novalidate">
           <input class="text" id="input-testform-field1" name="testform.field1"
@@ -175,32 +173,19 @@ class TestController(YafowilTestCase):
           <input id="input-testform-cancel" name="action.testform.cancel"
                  type="submit" value="Cancel"/>
         </form>
-        """, fxml(controller.rendered))
+        """,
+            fxml(controller.rendered),
+        )
 
         # Try recursive lookup of actions
-        form = factory(
-            u'form',
-            name='testform',
-            props={
-                'action': 'http://fubar.com'
-            })
-        form['level1'] = factory(
-            'submit',
-            props={
-                'action': 'l1action'
-            })
+        form = factory('form', name='testform', props={'action': 'http://fubar.com'})
+        form['level1'] = factory('submit', props={'action': 'l1action'})
         form['fieldset'] = factory('fieldset')
-        form['fieldset']['level2'] = factory(
-            'submit',
-            props={
-                'action': 'l2action'
-            })
+        form['fieldset']['level2'] = factory('submit', props={'action': 'l2action'})
         form['fieldset']['subset'] = factory('fieldset')
         form['fieldset']['subset']['level3'] = factory(
-            'submit',
-            props={
-                'action': 'l3action'
-            })
+            'submit', props={'action': 'l3action'}
+        )
         controller = Controller(form, {})
         self.assertEqual(len(controller.actions), 3)
         self.assertEqual(controller.actions[0].name, 'level1')

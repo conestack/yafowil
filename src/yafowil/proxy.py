@@ -14,6 +14,7 @@ from yafowil.utils import managedprops
 # proxy
 ###############################################################################
 
+
 @managedprops(*css_managed_props)
 def input_proxy_renderer(widget, data):
     """Render hidden input ignoring ``widget.dottedpath``, just using widget
@@ -38,10 +39,10 @@ factory.register(
     extractors=[
         generic_extractor,
         generic_emptyvalue_extractor,
-        generic_datatype_extractor
+        generic_datatype_extractor,
     ],
     edit_renderers=[input_proxy_renderer],
-    display_renderers=[empty_display_renderer]
+    display_renderers=[empty_display_renderer],
 )
 
 factory.doc['blueprint']['proxy'] = """\

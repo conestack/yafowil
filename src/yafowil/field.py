@@ -13,23 +13,19 @@ from yafowil.utils import managedprops
 # field
 ###############################################################################
 
+
 @managedprops('witherror', *css_managed_props)
 def field_renderer(widget, data):
     tag = data.tag
-    div_attrs = {
-        'id': cssid(widget, 'field'),
-        'class_': cssclasses(widget, data)
-    }
+    div_attrs = {'id': cssid(widget, 'field'), 'class_': cssclasses(widget, data)}
     witherror = attr_value('witherror', widget, data)
     if witherror and data.errors:
-        div_attrs['class_'] += u' {0}'.format(witherror)
+        div_attrs['class_'] += f' {witherror}'
     return tag('div', data.rendered, **div_attrs)
 
 
 factory.register(
-    'field',
-    edit_renderers=[field_renderer],
-    display_renderers=[field_renderer]
+    'field', edit_renderers=[field_renderer], display_renderers=[field_renderer]
 )
 
 factory.doc['blueprint']['field'] = """\
@@ -49,13 +45,12 @@ Put the class given with this property on the div if an error happened.
 # label
 ###############################################################################
 
+
 @managedprops('position', 'label', 'for', *css_managed_props)
 def label_renderer(widget, data):
     tag = data.tag
     label_text = attr_value('label', widget, data, widget.name)
-    label_attrs = {
-        'class_': cssclasses(widget, data)
-    }
+    label_attrs = {'class_': cssclasses(widget, data)}
     if data.mode == 'edit':
         for_path = attr_value('for', widget, data)
         if for_path:
@@ -72,16 +67,14 @@ def label_renderer(widget, data):
     if pos == 'inner':
         # deprecated, use explicit inner-after or inner-before
         pos = 'inner-before'
-    rendered = data.rendered is not UNSET and data.rendered or u''
+    rendered = data.rendered is not UNSET and data.rendered or ''
     return generic_positional_rendering_helper(
         'label', label_text, label_attrs, rendered, pos, tag
     )
 
 
 factory.register(
-    'label',
-    edit_renderers=[label_renderer],
-    display_renderers=[label_renderer]
+    'label', edit_renderers=[label_renderer], display_renderers=[label_renderer]
 )
 
 factory.doc['blueprint']['label'] = """\
@@ -109,6 +102,7 @@ Optional dottedpath of widget to be labled
 # help
 ###############################################################################
 
+
 @managedprops('tag', 'help', 'position', 'render_empty', *css_managed_props)
 def help_renderer(widget, data):
     render_empty = attr_value('render_empty', widget, data)
@@ -125,9 +119,7 @@ def help_renderer(widget, data):
 
 
 factory.register(
-    'help',
-    edit_renderers=[help_renderer],
-    display_renderers=[empty_display_renderer]
+    'help', edit_renderers=[help_renderer], display_renderers=[empty_display_renderer]
 )
 
 factory.doc['blueprint']['help'] = """\
@@ -164,25 +156,20 @@ after the message.
 # error
 ###############################################################################
 
+
 @managedprops(
-    'tag',
-    'message_tag',
-    'message_class',
-    'position',
-    'render_empty',
-    *css_managed_props)
+    'tag', 'message_tag', 'message_class', 'position', 'render_empty', *css_managed_props
+)
 def error_renderer(widget, data):
     if not data.errors and not attr_value('render_empty', widget, data):
         return data.rendered
     tag = data.tag
-    msgs = u''
+    msgs = ''
     for error in data.errors:
         message_tag = attr_value('message_tag', widget, data)
         if message_tag:
             msgs += tag(
-                message_tag,
-                error.msg,
-                class_=attr_value('message_class', widget, data)
+                message_tag, error.msg, class_=attr_value('message_class', widget, data)
             )
         else:
             msgs += tag.translate(error.msg)
@@ -195,9 +182,7 @@ def error_renderer(widget, data):
 
 
 factory.register(
-    'error',
-    edit_renderers=[error_renderer],
-    display_renderers=[empty_display_renderer]
+    'error', edit_renderers=[error_renderer], display_renderers=[empty_display_renderer]
 )
 
 factory.doc['blueprint']['error'] = """\

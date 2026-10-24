@@ -7,9 +7,8 @@ import re
 import unicodedata
 
 
-class EmptyValue(object):
-    """Used to identify empty values in conjunction with data type conversion.
-    """
+class EmptyValue:
+    """Used to identify empty values in conjunction with data type conversion."""
 
     def __bool__(self):
         return False
@@ -45,9 +44,8 @@ class EmptyValue(object):
 EMPTY_VALUE = EmptyValue()
 
 
-class entry_point(object):
-    """Decorator for yafowil entry points.
-    """
+class entry_point:
+    """Decorator for yafowil entry points."""
 
     def __init__(self, order=0):
         self.order = order
@@ -71,8 +69,7 @@ def get_plugins(ns=None):
             cb = ep.load()
             _yafowil_plugins.append((ep, cb))
         _yafowil_plugins = sorted(
-            _yafowil_plugins,
-            key=lambda x: getattr(x[1], 'order', 0)
+            _yafowil_plugins, key=lambda x: getattr(x[1], 'order', 0)
         )
     for ep, cb in _yafowil_plugins:
         if ns is not None and ep.name != ns:
@@ -85,9 +82,7 @@ _plugin_names = dict()
 
 def get_plugin_names(ns=None):
     if ns not in _plugin_names:
-        _plugin_names[ns] = list(set(
-            [ep.dist.name for ep, cb in get_plugins(ns=ns)]
-        ))
+        _plugin_names[ns] = list(set([ep.dist.name for ep, cb in get_plugins(ns=ns)]))
     return _plugin_names[ns]
 
 
@@ -107,12 +102,13 @@ def get_example_names():
 
 
 def vocabulary(definition):
-    """Convert different kinds of input into a list of bi-tuples, both strings.
-    """
+    """Convert different kinds of input into a list of bi-tuples, both strings."""
     if callable(definition):
         definition = definition()
     if isinstance(definition, str):
-        return [(definition, definition), ]
+        return [
+            (definition, definition),
+        ]
     # dict-like
     if hasattr(definition, '__getitem__') and hasattr(definition, 'keys'):
         return [(_, definition[_]) for _ in definition.keys()]
@@ -136,8 +132,7 @@ def vocabulary(definition):
     return definition
 
 
-class Tag(object):
-
+class Tag:
     def __init__(self, translate):
         self.translate = translate
         self.encoding = 'utf-8'
@@ -173,7 +168,7 @@ class Tag(object):
                 else:
                     value = str(value)
             cl.append((key.strip('_'), value))
-        attributes = u''
+        attributes = ''
         # NOTE: data attributes are enclosed in single quotes, since this makes
         # passing json lists possible. jQuery only recognizes JSON lists in
         # data attributes as such, if they are enclosed in single quotes,
@@ -183,10 +178,10 @@ class Tag(object):
             attributes = list()
             for attr in cl:
                 if 'data-' in attr[0]:
-                    attributes.append(u"{0}='{1}'".format(*attr))
+                    attributes.append("{}='{}'".format(*attr))
                 else:
-                    attributes.append(u'{0}="{1}"'.format(*attr))
-            attributes = u' {0}'.format(u' '.join(sorted(attributes)))
+                    attributes.append('{}="{}"'.format(*attr))
+            attributes = ' {}'.format(' '.join(sorted(attributes)))
         cl = list()
         for inner in inners:
             inner = self.translate(inner)
@@ -198,22 +193,26 @@ class Tag(object):
                     inner = str(inner)
             cl.append(inner)
         if not cl:
-            return u'<{name}{attrs} />'.format(**{
+            return '<{name}{attrs} />'.format(
+                **{
+                    'name': tag_name,
+                    'attrs': attributes,
+                }
+            )
+        return '<{name}{attrs}>{value}</{name}>'.format(
+            **{
                 'name': tag_name,
                 'attrs': attributes,
-            })
-        return u'<{name}{attrs}>{value}</{name}>'.format(**{
-            'name': tag_name,
-            'attrs': attributes,
-            'value': u''.join(i for i in cl),
-        })
+                'value': ''.join(i for i in cl),
+            }
+        )
 
 
 # Deprecation message
 def _deprecated_null_localization(msg):
     logging.warning(
         "Deprecated usage of 'yafowil.utils.tag', please "
-        "use the tag factory on RuntimeData instead."
+        'use the tag factory on RuntimeData instead.'
     )
     return msg
 
@@ -221,8 +220,7 @@ def _deprecated_null_localization(msg):
 tag = Tag(_deprecated_null_localization)
 
 
-class managedprops(object):
-
+class managedprops:
     def __init__(self, *args):
         self.__yafowil_managed_props__ = args
 
@@ -234,13 +232,16 @@ class managedprops(object):
 def cssid(widget, prefix, postfix=None):
     if widget.attrs.get('structural', False):
         return None
-    path = widget.dottedpath.replace(u'.', u'-')
-    cssid = u'{0}-{1}'.format(prefix, path)
+    path = widget.dottedpath.replace('.', '-')
+    cssid = f'{prefix}-{path}'
     if postfix is not None:
-        cssid = u'{0}-{1}'.format(cssid, postfix)
-    return unicodedata.normalize('NFKD', cssid)\
-        .encode('ASCII', 'ignore')\
-        .replace(b' ', b'_').decode()
+        cssid = f'{cssid}-{postfix}'
+    return (
+        unicodedata.normalize('NFKD', cssid)
+        .encode('ASCII', 'ignore')
+        .replace(b' ', b'_')
+        .decode()
+    )
 
 
 def callable_value(value, widget, data):
@@ -256,11 +257,7 @@ def attr_value(key, widget, data, default=None):
     """Return widget attribute value by key or default. If value is callable,
     it's return value is used.
     """
-    return callable_value(
-        widget.attrs.get(key, default),
-        widget,
-        data
-    )
+    return callable_value(widget.attrs.get(key, default), widget, data)
 
 
 def as_data_attrs(data):
@@ -298,7 +295,7 @@ def as_data_attrs(data):
             val = json.dumps(val).strip('"')
         # replace camelCase with camel-case
         key = re.sub(r'([a-z])([A-Z])', r'\g<1>-\g<2>', key).lower()
-        data_attrs['data-{0}'.format(key)] = val
+        data_attrs[f'data-{key}'] = val
     return data_attrs
 
 
@@ -341,34 +338,38 @@ def data_attrs_helper(widget, data, attrs):
 
 
 css_managed_props = [
-    'class', 'class_add',
-    'valid_class', 'valid_class_default',
-    'error_class', 'error_class_default',
-    'required_class', 'required_class_default',
+    'class',
+    'class_add',
+    'valid_class',
+    'valid_class_default',
+    'error_class',
+    'error_class_default',
+    'required_class',
+    'required_class_default',
 ]
 
 
 def cssclasses(widget, data, classattr='class', additional=[], ignores=[]):
     _classes = list()
     attrs = widget.attrs
-    if not 'error_class' in ignores and attrs['error_class'] and data.errors:
+    if 'error_class' not in ignores and attrs['error_class'] and data.errors:
         if isinstance(attrs['error_class'], str):
             _classes.append(attrs['error_class'])
         else:
             _classes.append(attrs['error_class_default'])
-    elif not 'valid_class' in ignores and attrs['valid_class'] and data.root.extracted:
+    elif 'valid_class' not in ignores and attrs['valid_class'] and data.root.extracted:
         if isinstance(attrs['valid_class'], str):
             _classes.append(attrs['valid_class'])
         else:
             _classes.append(attrs['valid_class_default'])
-    if not 'required_class' in ignores and attrs['required_class'] and attrs['required']:
+    if 'required_class' not in ignores and attrs['required_class'] and attrs['required']:
         if isinstance(attrs['required_class'], str):
             _classes.append(attrs['required_class'])
         else:
             _classes.append(attrs['required_class_default'])
     if classattr and attrs[classattr]:
         _classes += attr_value(classattr, widget, data).split()
-    if not 'class_add' in ignores and attrs['class_add']:
+    if 'class_add' not in ignores and attrs['class_add']:
         _classes += attr_value('class_add', widget, data).split()
     additional = [add for add in additional if add]
     _classes += additional

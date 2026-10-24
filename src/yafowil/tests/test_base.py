@@ -13,16 +13,13 @@ import webresource as wr
 # Helpers
 ###############################################################################
 
+
 def _test_extractor(widget, data):
     return 'e1'
 
 
 def _test_edit_renderer(widget, data):
-    return 'r1, {}, {}, {}'.format(
-        widget.__name__,
-        str(data),
-        str(widget.attributes)
-    )
+    return f'r1, {widget.__name__}, {str(data)}, {str(widget.attributes)}'
 
 
 def _test_getter(widget, data):
@@ -38,8 +35,8 @@ def _test_preprocessor(widget, data):
 # Tests
 ###############################################################################
 
-class TestBase(NodeTestCase):
 
+class TestBase(NodeTestCase):
     def test_RuntimeData(self):
         # Initial RuntimeData is empty
         data = RuntimeData()
@@ -110,21 +107,13 @@ class TestBase(NodeTestCase):
             raise ValueError('extractor has to fail')
 
         def _test_edit_renderer2(widget, data):
-            return 'r2, {}, {}, {}'.format(
-                widget.__name__,
-                str(data),
-                str(widget.attributes)
-            )
+            return f'r2, {widget.__name__}, {str(data)}, {str(widget.attributes)}'
 
         def fail_edit_renderer(widget, data):
             raise ValueError('renderer has to fail')
 
         def test_display_renderer(widget, data):
-            return 'disr1, {}, {}, {}'.format(
-                widget.__name__,
-                str(data),
-                str(widget.attributes)
-            )
+            return f'disr1, {widget.__name__}, {str(data)}, {str(widget.attributes)}'
 
         def _test_getter2(widget, data):
             return 999
@@ -139,31 +128,41 @@ class TestBase(NodeTestCase):
             [('1', _test_preprocessor)],
             'MYUID',
             _test_getter,
-            dict(test1='Test1', test2='Test2'))
+            dict(test1='Test1', test2='Test2'),
+        )
 
-        self.checkOutput("""
+        self.checkOutput(
+            """
         r1,
         MYUID,
         <RuntimeData MYUID, value='Test Value', extracted=<UNSET>,
         attrs={'_test_preprocessor': 'called'} at ...>,
         {...'test1': 'Test1'...}
-        """, testwidget())
+        """,
+            testwidget(),
+        )
 
         # A passed in request does not trigger extraction
-        self.checkOutput("""
+        self.checkOutput(
+            """
         r1,
         MYUID,
         <RuntimeData MYUID, value='Test Value', extracted=<UNSET>,
         attrs={'_test_preprocessor': 'called'} at ...>,
         {...'test2': 'Test2'...}
-        """, testwidget(request=test_request))
+        """,
+            testwidget(request=test_request),
+        )
 
         # Extraction is an explicit task
         data = testwidget.extract(test_request)
-        self.checkOutput("""
+        self.checkOutput(
+            """
         <RuntimeData MYUID, value='Test Value', extracted='e1',
         attrs={'_test_preprocessor': 'called'} at ...>
-        """, str(data))
+        """,
+            str(data),
+        )
 
         self.assertEqual(data.attrs['_test_preprocessor'], 'called')
 
@@ -183,13 +182,17 @@ class TestBase(NodeTestCase):
             [],
             'MYUID',
             _test_getter,
-            dict(test1='Test1', test2='Test2'))
-        self.checkOutput("""
+            dict(test1='Test1', test2='Test2'),
+        )
+        self.checkOutput(
+            """
         r1,
         MYUID,
         <RuntimeData MYUID, value='Test Value', extracted=<UNSET> at ...>,
         {...'test1': 'Test1'...}
-        """, testwidget())
+        """,
+            testwidget(),
+        )
 
         # a.2) mode display
         testwidget = Widget(
@@ -201,13 +204,17 @@ class TestBase(NodeTestCase):
             'MYUID',
             _test_getter,
             dict(test1='Test1', test2='Test2'),
-            mode='display')
-        self.checkOutput("""
+            mode='display',
+        )
+        self.checkOutput(
+            """
         disr1,
         MYUID,
         <RuntimeData MYUID, value='Test Value', extracted=<UNSET> at ...>,
         {...'test2': 'Test2'...}
-        """, testwidget())
+        """,
+            testwidget(),
+        )
 
         # a.3) mode skip
         testwidget = Widget(
@@ -219,8 +226,9 @@ class TestBase(NodeTestCase):
             'MYUID',
             _test_getter,
             dict(test1='Test1', test2='Test2'),
-            mode='skip')
-        self.assertEqual(testwidget(), u'')
+            mode='skip',
+        )
+        self.assertEqual(testwidget(), '')
 
         # a.4) mode w/o renderer
         testwidget = Widget(
@@ -232,7 +240,8 @@ class TestBase(NodeTestCase):
             'MYUID',
             _test_getter,
             dict(test1='Test1', test2='Test2'),
-            mode='display')
+            mode='display',
+        )
         with self.assertRaises(ValueError) as arc:
             testwidget()
         msg = "no renderers given for widget 'MYUID' at mode 'display'"
@@ -247,13 +256,17 @@ class TestBase(NodeTestCase):
             [],
             'MYUID2',
             _test_getter,
-            dict(test1='Test1', test2='Test2'))
-        self.checkOutput("""
+            dict(test1='Test1', test2='Test2'),
+        )
+        self.checkOutput(
+            """
         r2,
         MYUID2,
         <RuntimeData MYUID2, value='Test Value', extracted=<UNSET> at ...>,
         {...'test1': 'Test1'...}
-        """, testwidget())
+        """,
+            testwidget(),
+        )
         self.assertEqual(testwidget.extract({}).extracted, 'e2')
 
         # b.2) extractor with request, non int has to fail
@@ -265,11 +278,15 @@ class TestBase(NodeTestCase):
             [],
             'MYUID2',
             _test_getter2,
-            dict(test1='Test1', test2='Test2'))
+            dict(test1='Test1', test2='Test2'),
+        )
 
-        self.checkOutput("""
+        self.checkOutput(
+            """
         <RuntimeData MYUID2, value=999, extracted=<UNSET>, 1 error(s) at ...>
-        """, str(testwidget.extract({'MYUID2': 'ABC'})))
+        """,
+            str(testwidget.extract({'MYUID2': 'ABC'})),
+        )
 
         # b.3) extractor with request, but mode display
         testwidget = Widget(
@@ -281,10 +298,14 @@ class TestBase(NodeTestCase):
             'MYUID2',
             _test_getter2,
             dict(test1='Test1', test2='Test2'),
-            mode='display')
-        self.checkOutput("""
+            mode='display',
+        )
+        self.checkOutput(
+            """
         <RuntimeData MYUID2, value=999, extracted=<UNSET> ...>
-        """, str(testwidget.extract({'MYUID2': '123'})))
+        """,
+            str(testwidget.extract({'MYUID2': '123'})),
+        )
 
         # b.4) two extractors with request
         testwidget = Widget(
@@ -295,10 +316,14 @@ class TestBase(NodeTestCase):
             [],
             'MYUID2',
             _test_getter2,
-            dict(test1='Test1', test2='Test2'))
-        self.checkOutput("""
+            dict(test1='Test1', test2='Test2'),
+        )
+        self.checkOutput(
+            """
         <RuntimeData MYUID2, value=999, extracted=123 at ...>
-        """, str(testwidget.extract({'MYUID2': '123'})))
+        """,
+            str(testwidget.extract({'MYUID2': '123'})),
+        )
 
         # A failing widget
         testwidget = Widget(
@@ -309,7 +334,8 @@ class TestBase(NodeTestCase):
             [],
             'MYFAIL',
             '',
-            dict())
+            dict(),
+        )
 
         with self.assertRaises(ValueError):
             testwidget.extract({})
@@ -335,72 +361,60 @@ class TestBase(NodeTestCase):
         # At this test level the factory is not used,
         # so we pass it directly to Widget
         testwidget = Widget(
-            'blueprint_names_goes_here', [], [], [], [], uniquename='root')
+            'blueprint_names_goes_here', [], [], [], [], uniquename='root'
+        )
         self.assertEqual(testwidget.dottedpath, 'root')
 
-        testwidget['child'] = Widget(
-            'blueprint_names_goes_here', [], [], [], [])
+        testwidget['child'] = Widget('blueprint_names_goes_here', [], [], [], [])
         self.assertEqual(testwidget['child'].dottedpath, 'root.child')
 
         testwidget['child']['level3'] = Widget(
-            'blueprint_names_goes_here', [], [], [], [])
-        self.assertEqual(
-            testwidget['child']['level3'].dottedpath,
-            'root.child.level3'
+            'blueprint_names_goes_here', [], [], [], []
         )
+        self.assertEqual(testwidget['child']['level3'].dottedpath, 'root.child.level3')
 
         # The mode
         testwidget = Widget(
-            'blueprint_names_goes_here', [], [], [], [], uniquename='root')
+            'blueprint_names_goes_here', [], [], [], [], uniquename='root'
+        )
         data = testwidget.extract({})
         self.assertEqual(data.mode, 'edit')
 
         testwidget = Widget(
-            'blueprint_names_goes_here',
-            [], [], [], [],
-            uniquename='root',
-            mode='display')
+            'blueprint_names_goes_here', [], [], [], [], uniquename='root', mode='display'
+        )
         data = testwidget.extract({})
         self.assertEqual(data.mode, 'display')
 
         testwidget = Widget(
-            'blueprint_names_goes_here',
-            [], [], [], [],
-            uniquename='root',
-            mode='skip')
+            'blueprint_names_goes_here', [], [], [], [], uniquename='root', mode='skip'
+        )
         data = testwidget.extract({})
         self.assertEqual(data.mode, 'skip')
 
         testwidget = Widget(
-            'blueprint_names_goes_here',
-            [], [], [], [],
-            uniquename='root',
-            mode='other')
+            'blueprint_names_goes_here', [], [], [], [], uniquename='root', mode='other'
+        )
         with self.assertRaises(ValueError) as arc:
             testwidget.extract({})
-        msg = (
-            "mode must be one out of 'edit', 'display', 'skip', "
-            "but 'other' was given"
-        )
+        msg = "mode must be one out of 'edit', 'display', 'skip', but 'other' was given"
         self.assertEqual(str(arc.exception), msg)
 
         def mode(widget, data):
             return 'edit'
+
         testwidget = Widget(
-            'blueprint_names_goes_here',
-            [], [], [], [],
-            uniquename='root',
-            mode=mode)
+            'blueprint_names_goes_here', [], [], [], [], uniquename='root', mode=mode
+        )
         data = testwidget.extract({})
         self.assertEqual(data.mode, 'edit')
 
         def mode(widget, data):
             return 'display'
+
         testwidget = Widget(
-            'blueprint_names_goes_here',
-            [], [], [], [],
-            uniquename='root',
-            mode=mode)
+            'blueprint_names_goes_here', [], [], [], [], uniquename='root', mode=mode
+        )
         data = testwidget.extract({})
         self.assertEqual(data.mode, 'display')
 
@@ -422,37 +436,40 @@ class TestBase(NodeTestCase):
             [],
             [],
             [],
-            uniquename='root')
+            uniquename='root',
+        )
         root['child_0'] = Widget(
-            'child_blueprint',
-            [('value_extractor', value_extractor)],
-            [],
-            [],
-            [])
+            'child_blueprint', [('value_extractor', value_extractor)], [], [], []
+        )
         root['child_1'] = Widget(
-            'child_blueprint',
-            [('error_extractor', error_extractor)],
-            [],
-            [],
-            [])
+            'child_blueprint', [('error_extractor', error_extractor)], [], [], []
+        )
 
-        self.checkOutput("""
+        self.checkOutput(
+            """
         <class 'yafowil.base.Widget'>: root
         <class 'yafowil.base.Widget'>: child_0
         <class 'yafowil.base.Widget'>: child_1
-        """, root.treerepr())
+        """,
+            root.treerepr(),
+        )
 
-        data = root.extract({
-            'root.child_0': 'a',
-            'root.child_1': 'b',
-        })
-        self.checkOutput("""
+        data = root.extract(
+            {
+                'root.child_0': 'a',
+                'root.child_1': 'b',
+            }
+        )
+        self.checkOutput(
+            """
         <RuntimeData root, value=<UNSET>, extracted=None at ...>
         <RuntimeData root.child_0,
             value=<UNSET>, extracted='a' at ...>
         <RuntimeData root.child_1,
             value=<UNSET>, extracted=<UNSET>, 1 error(s) at ...>
-        """, data.treerepr())
+        """,
+            data.treerepr(),
+        )
 
         self.assertTrue(data.has_errors, True)
         self.assertFalse(data['child_0'].has_errors, False)
@@ -462,36 +479,29 @@ class TestBase(NodeTestCase):
         # Fill factory with test blueprints
         factory = Factory()
         factory.register('widget_test', [_test_extractor], [_test_edit_renderer])
-        self.assertEqual(
-            factory.extractors('widget_test'),
-            [_test_extractor]
-        )
-        self.assertEqual(
-            factory.edit_renderers('widget_test'),
-            [_test_edit_renderer]
-        )
+        self.assertEqual(factory.extractors('widget_test'), [_test_extractor])
+        self.assertEqual(factory.edit_renderers('widget_test'), [_test_edit_renderer])
 
         testwidget = factory(
-            'widget_test',
-            name='MYFAC',
-            value=_test_getter,
-            props=dict(foo='bar'))
-        self.checkOutput("""
+            'widget_test', name='MYFAC', value=_test_getter, props=dict(foo='bar')
+        )
+        self.checkOutput(
+            """
         r1,
         MYFAC,
         <RuntimeData MYFAC, value='Test Value', extracted=<UNSET> at ...>,
         {'foo': 'bar'}
-        """, testwidget())
+        """,
+            testwidget(),
+        )
 
         factory.register(
             'widget_test',
             [_test_extractor],
             [_test_edit_renderer],
-            preprocessors=[_test_preprocessor])
-        self.assertEqual(
-            factory.preprocessors('widget_test'),
-            [_test_preprocessor]
+            preprocessors=[_test_preprocessor],
         )
+        self.assertEqual(factory.preprocessors('widget_test'), [_test_preprocessor])
 
         def _test_global_preprocessor(widget, data):
             return data
@@ -499,14 +509,16 @@ class TestBase(NodeTestCase):
         factory.register_global_preprocessors([_test_global_preprocessor])
         self.assertEqual(
             factory.preprocessors('widget_test'),
-            [_test_global_preprocessor, _test_preprocessor]
+            [_test_global_preprocessor, _test_preprocessor],
         )
 
         testwidget = factory(
             'widget_test',
             name='MYFAC',
             value=_test_getter,
-            props=dict(foo='bar'), mode='display')
+            props=dict(foo='bar'),
+            mode='display',
+        )
         data = testwidget.extract({})
         self.assertEqual(data.mode, 'display')
 
@@ -516,14 +528,10 @@ class TestBase(NodeTestCase):
             widget['one'] = factory('widget_test', widget.attrs)
             widget['two'] = factory('widget_test', widget.attrs)
 
-        factory.register(
-            'static_compound', [], [], builders=[create_static_compound])
+        factory.register('static_compound', [], [], builders=[create_static_compound])
         widget = factory('static_compound', props={})
         self.assertEqual(widget.keys(), ['one', 'two'])
-        self.assertEqual(
-            factory.builders('static_compound'),
-            [create_static_compound]
-        )
+        self.assertEqual(factory.builders('static_compound'), [create_static_compound])
 
         # Some basic name checks are done
         with self.assertRaises(ValueError) as arc:
@@ -539,26 +547,19 @@ class TestBase(NodeTestCase):
         self.assertEqual(str(arc.exception), '"#" as char not allowed as name.')
 
         # Test the macros
-        factory.register_macro(
-            'test_macro', 'foo:*bar:baz', {'foo.newprop': 'abc'})
+        factory.register_macro('test_macro', 'foo:*bar:baz', {'foo.newprop': 'abc'})
 
         self.assertEqual(
             factory._macros,
-            {'test_macro': (['foo', '*bar', 'baz'], {'foo.newprop': 'abc'})}
+            {'test_macro': (['foo', '*bar', 'baz'], {'foo.newprop': 'abc'})},
         )
         self.assertEqual(
             factory._expand_blueprints('#test_macro', {'foo.newprop': '123'}),
-            (['foo', '*bar', 'baz'], {'foo.newprop': '123'})
+            (['foo', '*bar', 'baz'], {'foo.newprop': '123'}),
         )
         self.assertEqual(
-            factory._expand_blueprints(
-                '#test_macro',
-                {'foo.newprop2': '123'}
-            ),
-            (
-                ['foo', '*bar', 'baz'],
-                {'foo.newprop': 'abc', 'foo.newprop2': '123'}
-            )
+            factory._expand_blueprints('#test_macro', {'foo.newprop2': '123'}),
+            (['foo', '*bar', 'baz'], {'foo.newprop': 'abc', 'foo.newprop2': '123'}),
         )
 
         with self.assertRaises(ValueError) as arc:
@@ -570,7 +571,7 @@ class TestBase(NodeTestCase):
 
         self.assertEqual(
             factory._expand_blueprints('#test_macro2', {}),
-            (['alpha', 'foo', '*bar', 'baz', 'beta'], {'foo.newprop': 'abc'})
+            (['alpha', 'foo', '*bar', 'baz', 'beta'], {'foo.newprop': 'abc'}),
         )
 
     def test_BC_theme_registry(self):
@@ -583,141 +584,144 @@ class TestBase(NodeTestCase):
             'default',
             'yafowil.widget.someaddon',
             '/foo/bar/resources',
-            js=[{
-                'resource': 'default/widget.js',
-                'thirdparty': False,
-                'order': 10,
-                'merge': False
-            }],
-            css=[{
-                'resource': 'default/widget.css',
-                'thirdparty': False,
-                'order': 10,
-                'merge': False
-            }])
+            js=[
+                {
+                    'resource': 'default/widget.js',
+                    'thirdparty': False,
+                    'order': 10,
+                    'merge': False,
+                }
+            ],
+            css=[
+                {
+                    'resource': 'default/widget.css',
+                    'thirdparty': False,
+                    'order': 10,
+                    'merge': False,
+                }
+            ],
+        )
 
         # Register addon widget resources for multiple themes
         factory.register_theme(
             ['custom', 'other'],
             'yafowil.widget.someaddon',
             '/foo/bar/resources',
-            js=[{
-                'resource': 'custom/widget.js',
-                'thirdparty': False,
-                'order': 10,
-                'merge': False
-            }],
-            css=[{
-                'resource': 'custom/widget.css',
-                'thirdparty': False,
-                'order': 10,
-                'merge': False
-            }])
+            js=[
+                {
+                    'resource': 'custom/widget.js',
+                    'thirdparty': False,
+                    'order': 10,
+                    'merge': False,
+                }
+            ],
+            css=[
+                {
+                    'resource': 'custom/widget.css',
+                    'thirdparty': False,
+                    'order': 10,
+                    'merge': False,
+                }
+            ],
+        )
 
         # Lookup resouces for addon widget
         default_resources = {
             'resourcedir': '/foo/bar/resources',
-            'css': [{
-                'merge': False,
-                'thirdparty': False,
-                'resource': 'default/widget.css',
-                'order': 10
-            }],
-            'js': [{
-                'merge': False,
-                'thirdparty': False,
-                'resource': 'default/widget.js',
-                'order': 10
-            }]
+            'css': [
+                {
+                    'merge': False,
+                    'thirdparty': False,
+                    'resource': 'default/widget.css',
+                    'order': 10,
+                }
+            ],
+            'js': [
+                {
+                    'merge': False,
+                    'thirdparty': False,
+                    'resource': 'default/widget.js',
+                    'order': 10,
+                }
+            ],
         }
         self.assertEqual(
-            factory.resources_for('yafowil.widget.someaddon'),
-            default_resources
+            factory.resources_for('yafowil.widget.someaddon'), default_resources
         )
 
         # Set theme on factory
         factory.theme = 'custom'
         theme_resources = {
             'resourcedir': '/foo/bar/resources',
-            'css': [{
-                'merge': False,
-                'thirdparty': False,
-                'resource': 'custom/widget.css',
-                'order': 10
-            }],
-            'js': [{
-                'merge': False,
-                'thirdparty': False,
-                'resource': 'custom/widget.js',
-                'order': 10
-            }]
+            'css': [
+                {
+                    'merge': False,
+                    'thirdparty': False,
+                    'resource': 'custom/widget.css',
+                    'order': 10,
+                }
+            ],
+            'js': [
+                {
+                    'merge': False,
+                    'thirdparty': False,
+                    'resource': 'custom/widget.js',
+                    'order': 10,
+                }
+            ],
         }
         self.assertEqual(
-            factory.resources_for('yafowil.widget.someaddon'),
-            theme_resources
+            factory.resources_for('yafowil.widget.someaddon'), theme_resources
         )
 
         # resources also have been registered for 'other' theme
         factory.theme = 'other'
         self.assertEqual(
-            factory.resources_for('yafowil.widget.someaddon'),
-            theme_resources
+            factory.resources_for('yafowil.widget.someaddon'), theme_resources
         )
 
         # If no resources found for theme name, return default resources
         factory.theme = 'inexistent'
         self.assertEqual(
-            factory.resources_for('yafowil.widget.someaddon'),
-            default_resources
+            factory.resources_for('yafowil.widget.someaddon'), default_resources
         )
 
         # If no resources registered at all for widget, None is returned
         factory.theme = 'default'
-        self.assertTrue(
-            factory.resources_for('yafowil.widget.inexistent') is None
-        )
+        self.assertTrue(factory.resources_for('yafowil.widget.inexistent') is None)
 
         # Resources are returned as deepcopy of the original resources
         # definition by default
         resources = factory.resources_for('yafowil.widget.someaddon')
-        self.assertFalse(
-            resources is factory.resources_for('yafowil.widget.someaddon')
-        )
+        self.assertFalse(resources is factory.resources_for('yafowil.widget.someaddon'))
 
         # Some might want the resource definitions as original instance
         resources = factory.resources_for(
-            'yafowil.widget.someaddon',
-            copy_resources=False
+            'yafowil.widget.someaddon', copy_resources=False
         )
-        self.assertTrue(resources is factory.resources_for(
-            'yafowil.widget.someaddon',
-            copy_resources=False
-        ))
+        self.assertTrue(
+            resources
+            is factory.resources_for('yafowil.widget.someaddon', copy_resources=False)
+        )
 
     def test_theme_registry(self):
         factory = Factory()
         self.assertEqual(factory.theme, 'default')
 
         default_resources = wr.ResourceGroup(name='default-resources')
-        default_resources.add(wr.ScriptResource(
-            name='script',
-            resource='default-script.js'
-        ))
-        default_resources.add(wr.StyleResource(
-            name='style',
-            resource='default-style.css'
-        ))
+        default_resources.add(
+            wr.ScriptResource(name='script', resource='default-script.js')
+        )
+        default_resources.add(
+            wr.StyleResource(name='style', resource='default-style.css')
+        )
         factory.register_resources('default', 'widget', default_resources)
 
         theme_resources = wr.ResourceGroup(name='theme-resources')
-        theme_resources.add(wr.ScriptResource(
-            name='script-2',
-            resource='theme-script.js'
-        ))
-        theme_resources.add(wr.StyleResource(
-            name='style',
-            resource='theme-style.css'
-        ))
+        theme_resources.add(
+            wr.ScriptResource(name='script-2', resource='theme-script.js')
+        )
+        theme_resources.add(wr.StyleResource(name='style', resource='theme-style.css'))
         factory.register_resources('theme', 'widget', theme_resources)
 
         self.assertTrue(
@@ -741,62 +745,32 @@ class TestBase(NodeTestCase):
         self.assertEqual(resources.members[1].resource, 'theme-style.css')
 
         other_resources = wr.ResourceGroup(name='other-resources')
-        other_resources.add(wr.ScriptResource(
-            name='other-script',
-            resource='other-script.js'
-        ))
-        other_resources.add(wr.StyleResource(
-            name='other-style',
-            resource='other-style.css'
-        ))
-        factory.register_resources(
-            ['default', 'other'],
-            'other',
-            other_resources
+        other_resources.add(
+            wr.ScriptResource(name='other-script', resource='other-script.js')
         )
+        other_resources.add(
+            wr.StyleResource(name='other-style', resource='other-style.css')
+        )
+        factory.register_resources(['default', 'other'], 'other', other_resources)
 
         resources = factory.get_resources()
         self.assertEqual(len(resources.members), 2)
         self.assertEqual(len(resources.members[0].members), 2)
         self.assertEqual(len(resources.members[1].members), 2)
-        self.assertEqual(
-            resources.members[0].members[0].resource,
-            'other-script.js'
-        )
-        self.assertEqual(
-            resources.members[0].members[1].resource,
-            'other-style.css'
-        )
-        self.assertEqual(
-            resources.members[1].members[0].resource,
-            'theme-script.js'
-        )
-        self.assertEqual(
-            resources.members[1].members[1].resource,
-            'theme-style.css'
-        )
+        self.assertEqual(resources.members[0].members[0].resource, 'other-script.js')
+        self.assertEqual(resources.members[0].members[1].resource, 'other-style.css')
+        self.assertEqual(resources.members[1].members[0].resource, 'theme-script.js')
+        self.assertEqual(resources.members[1].members[1].resource, 'theme-style.css')
 
         factory.theme = 'other'
         resources = factory.get_resources()
         self.assertEqual(len(resources.members), 2)
         self.assertEqual(len(resources.members[0].members), 2)
         self.assertEqual(len(resources.members[1].members), 2)
-        self.assertEqual(
-            resources.members[0].members[0].resource,
-            'other-script.js'
-        )
-        self.assertEqual(
-            resources.members[0].members[1].resource,
-            'other-style.css'
-        )
-        self.assertEqual(
-            resources.members[1].members[0].resource,
-            'default-script.js'
-        )
-        self.assertEqual(
-            resources.members[1].members[1].resource,
-            'default-style.css'
-        )
+        self.assertEqual(resources.members[0].members[0].resource, 'other-script.js')
+        self.assertEqual(resources.members[0].members[1].resource, 'other-style.css')
+        self.assertEqual(resources.members[1].members[0].resource, 'default-script.js')
+        self.assertEqual(resources.members[1].members[1].resource, 'default-style.css')
 
         factory.theme = 'default'
         resources = factory.get_resources()
@@ -817,24 +791,30 @@ class TestBase(NodeTestCase):
         widget = factory('widget_test', name='root')
         widget['1'] = factory('widget_test')
         widget['2'] = factory('widget_test')
-        self.checkOutput("""
+        self.checkOutput(
+            """
         <class 'yafowil.base.Widget'>: root
         <class 'yafowil.base.Widget'>: 1
         <class 'yafowil.base.Widget'>: 2
-        """, widget.treerepr())
+        """,
+            widget.treerepr(),
+        )
 
         new = factory('widget_test', name='3')
         ref = widget['1']
         widget.insertbefore(new, ref)
         new = factory('widget_test', name='4')
         widget.insertafter(new, ref)
-        self.checkOutput("""
+        self.checkOutput(
+            """
         <class 'yafowil.base.Widget'>: root
         <class 'yafowil.base.Widget'>: 3
         <class 'yafowil.base.Widget'>: 1
         <class 'yafowil.base.Widget'>: 4
         <class 'yafowil.base.Widget'>: 2
-        """, widget.treerepr())
+        """,
+            widget.treerepr(),
+        )
 
     def test_factory_chain(self):
         # Sometimes we want to wrap inputs by UI candy, primary for usability
@@ -848,46 +828,32 @@ class TestBase(NodeTestCase):
         # instead of a colon seperated string as well
 
         def inner_renderer(widget, data):
-            return u'<INNER />'
+            return '<INNER />'
 
         def inner_display_renderer(widget, data):
-            return u'<INNERDISPLAY />'
+            return '<INNERDISPLAY />'
 
         def inner_extractor(widget, data):
             return ['extracted inner']
 
         def outer_renderer(widget, data):
-            return u'<OUTER>%s</OUTER>' % data.rendered
+            return '<OUTER>%s</OUTER>' % data.rendered
 
         def outer_display_renderer(widget, data):
-            return u'<OUTERDISPLAY>%s</OUTERDISPLAY>' % data.rendered
+            return '<OUTERDISPLAY>%s</OUTERDISPLAY>' % data.rendered
 
         def outer_extractor(widget, data):
             return data.extracted + ['extracted outer']
 
         factory = Factory()
         factory.register(
-            'inner',
-            [inner_extractor],
-            [inner_renderer],
-            [],
-            [],
-            [inner_display_renderer])
+            'inner', [inner_extractor], [inner_renderer], [], [], [inner_display_renderer]
+        )
         factory.register(
-            'outer',
-            [outer_extractor],
-            [outer_renderer],
-            [],
-            [],
-            [outer_display_renderer])
-        self.assertEqual(
-            factory.display_renderers('inner'),
-            [inner_display_renderer]
+            'outer', [outer_extractor], [outer_renderer], [], [], [outer_display_renderer]
         )
-        self.assertEqual(
-            factory.edit_renderers('inner'),
-            [inner_renderer]
-        )
+        self.assertEqual(factory.display_renderers('inner'), [inner_display_renderer])
+        self.assertEqual(factory.edit_renderers('inner'), [inner_renderer])
         with self.assertRaises(RuntimeError) as arc:
             factory.renderers('inner')
         msg = 'Deprecated since 1.2, use edit_renderers or display_renderers'
@@ -896,25 +862,16 @@ class TestBase(NodeTestCase):
         # Colon seperated blueprint chain definition
         widget = factory('outer:inner', name='OUTER_INNER')
         data = widget.extract({})
-        self.assertEqual(
-            data.extracted,
-            ['extracted inner', 'extracted outer']
-        )
-        self.assertEqual(widget(data), u'<OUTER><INNER /></OUTER>')
+        self.assertEqual(data.extracted, ['extracted inner', 'extracted outer'])
+        self.assertEqual(widget(data), '<OUTER><INNER /></OUTER>')
         widget = factory('outer:inner', name='OUTER_INNER', mode='display')
-        self.assertEqual(
-            widget(),
-            u'<OUTERDISPLAY><INNERDISPLAY /></OUTERDISPLAY>'
-        )
+        self.assertEqual(widget(), '<OUTERDISPLAY><INNERDISPLAY /></OUTERDISPLAY>')
 
         # Blueprint chain definition as list
         widget = factory(['outer', 'inner'], name='OUTER_INNER')
         data = widget.extract({})
-        self.assertEqual(
-            data.extracted,
-            ['extracted inner', 'extracted outer']
-        )
-        self.assertEqual(widget(data), u'<OUTER><INNER /></OUTER>')
+        self.assertEqual(data.extracted, ['extracted inner', 'extracted outer'])
+        self.assertEqual(widget(data), '<OUTER><INNER /></OUTER>')
 
         # Inject custom specials blueprints into chain
 
@@ -923,7 +880,7 @@ class TestBase(NodeTestCase):
         # into the chain
 
         def special_renderer(widget, data):
-            return u'<SPECIAL>%s</SPECIAL>' % data.rendered
+            return '<SPECIAL>%s</SPECIAL>' % data.rendered
 
         def special_extractor(widget, data):
             return data.extracted + ['extracted special']
@@ -935,58 +892,37 @@ class TestBase(NodeTestCase):
             custom={
                 'special': {
                     'extractors': [special_extractor],
-                    'edit_renderers': [special_renderer]
+                    'edit_renderers': [special_renderer],
                 }
-            })
+            },
+        )
         data = widget.extract({})
         self.assertEqual(
-            data.extracted,
-            ['extracted inner', 'extracted special', 'extracted outer']
+            data.extracted, ['extracted inner', 'extracted special', 'extracted outer']
         )
-        self.assertEqual(
-            widget(data),
-            u'<OUTER><SPECIAL><INNER /></SPECIAL></OUTER>'
-        )
+        self.assertEqual(widget(data), '<OUTER><SPECIAL><INNER /></SPECIAL></OUTER>')
 
         # Inject as list
         widget = factory(
             'outer:*special:inner',
             name='OUTER_SPECIAL_INNER',
-            custom={
-                'special': (
-                    [special_extractor],
-                    [special_renderer],
-                    [],
-                    [],
-                    []
-                )
-            })
+            custom={'special': ([special_extractor], [special_renderer], [], [], [])},
+        )
         data = widget.extract({})
         self.assertEqual(
-            data.extracted,
-            ['extracted inner', 'extracted special', 'extracted outer']
+            data.extracted, ['extracted inner', 'extracted special', 'extracted outer']
         )
-        self.assertEqual(
-            widget(data),
-            u'<OUTER><SPECIAL><INNER /></SPECIAL></OUTER>'
-        )
+        self.assertEqual(widget(data), '<OUTER><SPECIAL><INNER /></SPECIAL></OUTER>')
 
         # BBB, w/o display_renderer
         widget = factory(
             'outer:*special:inner',
             name='OUTER_SPECIAL_INNER',
-            custom={
-                'special': (
-                    [special_extractor],
-                    [special_renderer],
-                    [],
-                    []
-                )
-            })
+            custom={'special': ([special_extractor], [special_renderer], [], [])},
+        )
         data = widget.extract({})
         self.assertEqual(
-            data.extracted,
-            ['extracted inner', 'extracted special', 'extracted outer']
+            data.extracted, ['extracted inner', 'extracted special', 'extracted outer']
         )
 
     def test_prefixes_and_defaults(self):
@@ -995,15 +931,15 @@ class TestBase(NodeTestCase):
         # with a prefix
 
         def prefix_renderer(widget, data):
-            return u'<ID>%s</ID>' % widget.attrs['id']
+            return '<ID>%s</ID>' % widget.attrs['id']
 
         factory = Factory()
         factory.register('prefix', [], [prefix_renderer])
         widget = factory('prefix', props={'prefix.id': 'Test'})
-        self.assertEqual(widget(), u'<ID>Test</ID>')
+        self.assertEqual(widget(), '<ID>Test</ID>')
 
         widget = factory('prefix', name='test', props={'id': 'Test2'})
-        self.assertEqual(widget(), u'<ID>Test2</ID>')
+        self.assertEqual(widget(), '<ID>Test2</ID>')
 
         # modify defaults for widgets attributes via factory
 
@@ -1019,54 +955,61 @@ class TestBase(NodeTestCase):
         widget = factory('prefix', name='test')
         with self.assertRaises(KeyError) as arc:
             widget()
-        msg = (
-            "'Property with key \"id\" is not given on "
-            "widget \"test\" (no default)'"
-        )
+        msg = '\'Property with key "id" is not given on widget "test" (no default)\''
         self.assertEqual(str(arc.exception), msg)
 
         # Case for (4): Unprefixed default
         factory.defaults['id'] = 'Test4'
         widget = factory('prefix', name='test')
-        self.assertEqual(widget(), u'<ID>Test4</ID>')
+        self.assertEqual(widget(), '<ID>Test4</ID>')
 
         # Case for (3): Prefixed default overrides unprefixed
         factory.defaults['prefix.id'] = 'Test3'
         widget = factory('prefix', name='test')
-        self.assertEqual(widget(), u'<ID>Test3</ID>')
+        self.assertEqual(widget(), '<ID>Test3</ID>')
 
         # Case for (2): Unprefixed property overides any default
         widget = factory('prefix', name='test', props={'id': 'Test2'})
-        self.assertEqual(widget(), u'<ID>Test2</ID>')
+        self.assertEqual(widget(), '<ID>Test2</ID>')
 
         # Case for (1): Prefixed property overrules all others
         widget = factory('prefix', name='test', props={'prefix.id': 'Test1'})
-        self.assertEqual(widget(), u'<ID>Test1</ID>')
+        self.assertEqual(widget(), '<ID>Test1</ID>')
 
     def test_fetch_value(self):
         dmarker = list()
         defaults = dict(default=dmarker)
         widget_no_return = Widget(
-            'blueprint_names_goes_here', [], [], [], 'empty', defaults=defaults)  # noqa
+            'blueprint_names_goes_here', [], [], [], 'empty', defaults=defaults
+        )  # noqa
         widget_with_value = Widget(
             'blueprint_names_goes_here',
-            [], [], [],
+            [],
+            [],
+            [],
             'value',
             value_or_getter='withvalue',
-            defaults=defaults)
+            defaults=defaults,
+        )
         widget_with_default = Widget(
             'blueprint_names_goes_here',
-            [], [], [],
+            [],
+            [],
+            [],
             'default',
             properties=dict(default='defaultvalue'),
-            defaults=defaults)
+            defaults=defaults,
+        )
         widget_with_both = Widget(
             'blueprint_names_goes_here',
-            [], [], [],
+            [],
+            [],
+            [],
             'both',
             value_or_getter='valueboth',
             properties=dict(default='defaultboth'),
-            defaults=defaults)
+            defaults=defaults,
+        )
         data_empty = RuntimeData()
         data_filled = RuntimeData()
         data_filled.extracted = 'extractedvalue'
@@ -1075,49 +1018,28 @@ class TestBase(NodeTestCase):
         self.assertTrue(fetch_value(widget_no_return, data_empty) is dmarker)
 
         data_filled.value = widget_no_return.getter
-        self.assertEqual(
-            fetch_value(widget_no_return, data_filled),
-            'extractedvalue'
-        )
+        self.assertEqual(fetch_value(widget_no_return, data_filled), 'extractedvalue')
 
         data_empty.value = widget_with_value.getter
-        self.assertEqual(
-            fetch_value(widget_with_value, data_empty),
-            'withvalue'
-        )
+        self.assertEqual(fetch_value(widget_with_value, data_empty), 'withvalue')
 
         data_filled.value = widget_with_value.getter
-        self.assertEqual(
-            fetch_value(widget_with_value, data_filled),
-            'extractedvalue'
-        )
+        self.assertEqual(fetch_value(widget_with_value, data_filled), 'extractedvalue')
 
         data_empty.value = widget_with_default.getter
-        self.assertEqual(
-            fetch_value(widget_with_default, data_empty),
-            'defaultvalue'
-        )
+        self.assertEqual(fetch_value(widget_with_default, data_empty), 'defaultvalue')
 
         data_filled.value = widget_with_default.getter
-        self.assertEqual(
-            fetch_value(widget_with_default, data_filled),
-            'extractedvalue'
-        )
+        self.assertEqual(fetch_value(widget_with_default, data_filled), 'extractedvalue')
 
         data_empty.value = widget_with_both.getter
-        self.assertEqual(
-            fetch_value(widget_with_both, data_empty),
-            'valueboth'
-        )
+        self.assertEqual(fetch_value(widget_with_both, data_empty), 'valueboth')
 
         data_filled.value = widget_with_both.getter
-        self.assertEqual(
-            fetch_value(widget_with_default, data_filled),
-            'extractedvalue'
-        )
+        self.assertEqual(fetch_value(widget_with_default, data_filled), 'extractedvalue')
 
     def test_TBSupplementWidget(self):
-        class NoNameMock(object):
+        class NoNameMock:
             blueprints = 'blue:prints:here'
 
             @property
@@ -1125,36 +1047,44 @@ class TestBase(NodeTestCase):
                 raise ValueError('fail')
 
         mock = NoNameMock()
-        suppl = TBSupplementWidget(
-            mock, lambda x: x, 'testtask', 'some description')
+        suppl = TBSupplementWidget(mock, lambda x: x, 'testtask', 'some description')
 
-        self.checkOutput("""
+        self.checkOutput(
+            """
         yafowil widget processing info:
             - path      : (name not set)
             - blueprints: blue:prints:here
             - task      : testtask
             - descr     : some description
-        """, suppl.getInfo())
+        """,
+            suppl.getInfo(),
+        )
 
-        class Mock(object):
+        class Mock:
             dottedpath = 'test.path.abc'
             blueprints = 'blue:prints:here'
-        mock = Mock()
-        suppl = TBSupplementWidget(mock, lambda x: x, 'testtask',
-                                   'some description')
 
-        self.checkOutput("""
+        mock = Mock()
+        suppl = TBSupplementWidget(mock, lambda x: x, 'testtask', 'some description')
+
+        self.checkOutput(
+            """
         yafowil widget processing info:
             - path      : test.path.abc
             - blueprints: blue:prints:here
             - task      : testtask
             - descr     : some description
-        """, suppl.getInfo())
+        """,
+            suppl.getInfo(),
+        )
 
-        self.checkOutput("""
+        self.checkOutput(
+            """
         <p>yafowil widget processing info:<ul><li>path:
         <strong>test.path.abc</strong></li><li>blueprints:
         <strong>blue:prints:here</strong></li><li>task:
         <strong>testtask</strong></li><li>description: <strong>some
         description</strong></li></ul></p>
-        """, suppl.getInfo(as_html=1))
+        """,
+            suppl.getInfo(as_html=1),
+        )

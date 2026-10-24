@@ -14,6 +14,7 @@ from yafowil.utils import managedprops
 # text
 ###############################################################################
 
+
 @managedprops(
     'data',
     'title',
@@ -22,7 +23,8 @@ from yafowil.utils import managedprops
     'autofocus',
     'placeholder',
     'autocomplete',
-    *css_managed_props)
+    *css_managed_props,
+)
 def text_edit_renderer(widget, data):
     return input_generic_renderer(widget, data)
 
@@ -36,10 +38,7 @@ factory.register(
         generic_datatype_extractor,
     ],
     edit_renderers=[text_edit_renderer],
-    display_renderers=[
-        generic_display_renderer,
-        display_proxy_renderer
-    ]
+    display_renderers=[generic_display_renderer, display_proxy_renderer],
 )
 
 factory.doc['blueprint']['text'] = """\

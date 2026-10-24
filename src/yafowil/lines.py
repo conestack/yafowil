@@ -7,7 +7,6 @@ from yafowil.datatypes import generic_datatype_extractor
 from yafowil.datatypes import generic_emptyvalue_extractor
 from yafowil.textarea import textarea_attributes
 from yafowil.textarea import textarea_managed_props
-from yafowil.tsf import _
 from yafowil.utils import as_data_attrs
 from yafowil.utils import attr_value
 from yafowil.utils import cssid
@@ -18,9 +17,9 @@ from yafowil.utils import managedprops
 # lines
 ###############################################################################
 
+
 def lines_extractor(widget, data):
-    """Extract textarea value as list of lines.
-    """
+    """Extract textarea value as list of lines."""
     extracted = data.extracted
     if not extracted:
         return list()
@@ -29,15 +28,14 @@ def lines_extractor(widget, data):
 
 @managedprops(*textarea_managed_props)
 def lines_edit_renderer(widget, data):
-    """Renders text area with list value as lines.
-    """
+    """Renders text area with list value as lines."""
     tag = data.tag
     area_attrs = textarea_attributes(widget, data)
     value = fetch_value(widget, data)
     if value is None:
-        value = u''
+        value = ''
     else:
-        value = u'\n'.join(value)
+        value = '\n'.join(value)
     return tag('textarea', value, **area_attrs)
 
 
@@ -45,17 +43,17 @@ def lines_edit_renderer(widget, data):
 def lines_display_renderer(widget, data):
     value = fetch_value(widget, data)
     if type(value) in (list, tuple) and not value:
-        value = u''
+        value = ''
     cssclasses = [
-        attr_value("display_class", widget, data),
-        f'display-{attr_value("class", widget, data) or "generic"}'
+        attr_value('display_class', widget, data),
+        f'display-{attr_value("class", widget, data) or "generic"}',
     ]
     attrs = {
         'id': cssid(widget, 'display'),
-        'class_': ' '.join([_ for _ in cssclasses if _ is not None])
+        'class_': ' '.join([_ for _ in cssclasses if _ is not None]),
     }
     attrs.update(as_data_attrs(attr_value('data', widget, data)))
-    content = u''
+    content = ''
     for line in value:
         content += data.tag('li', line)
     return data.tag('ul', content, **attrs)
@@ -71,10 +69,7 @@ factory.register(
         generic_datatype_extractor,
     ],
     edit_renderers=[lines_edit_renderer],
-    display_renderers=[
-        lines_display_renderer,
-        display_proxy_renderer
-    ]
+    display_renderers=[lines_display_renderer, display_proxy_renderer],
 )
 
 factory.doc['blueprint']['lines'] = """\

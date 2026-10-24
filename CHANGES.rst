@@ -5,6 +5,20 @@ History
 4.1.0 (unreleased)
 ------------------
 
+- Modernise the code ruff flags as outdated: ``u''`` prefixes, ``class
+  X(object)``, ``.format()`` over f-strings and ``type(x) == y`` over ``is``.
+  Behaviour unchanged. ``super(Class, self)`` is kept, see ``cone.app``.
+  [rnix]
+
+- Sort the imports with ruff (one per line, ``from`` imports first, no
+  sections) and format the code with ``ruff format`` (90 characters per line,
+  single quotes).
+  [rnix]
+
+- Add ``qa.ruff`` domain to Makefile and pin the ruff configuration in
+  ``pyproject.toml``, ``make check`` runs ``ruff check``.
+  [rnix]
+
 - Deprecate the Python 2 compatibility names in ``yafowil.compat``:
   ``IS_PY2``, ``BYTES_TYPE``, ``STR_TYPE``, ``UNICODE_TYPE``, ``LONG_TYPE``
   and ``ITER_TYPES``. Use the builtins instead. They will be removed in

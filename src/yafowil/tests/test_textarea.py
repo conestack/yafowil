@@ -5,37 +5,41 @@ from yafowil.tests import YafowilTestCase
 
 
 class TestTextarea(YafowilTestCase):
-
     def test_textarea_blueprint(self):
         # Textarea widget
-        widget = factory(
-            'textarea',
-            name='MYTEXTAREA',
-            value=None)
-        self.assertEqual(widget(), (
-            '<textarea class="textarea" cols="80" id="input-MYTEXTAREA" '
-            'name="MYTEXTAREA" rows="25"></textarea>'
-        ))
+        widget = factory('textarea', name='MYTEXTAREA', value=None)
+        self.assertEqual(
+            widget(),
+            (
+                '<textarea class="textarea" cols="80" id="input-MYTEXTAREA" '
+                'name="MYTEXTAREA" rows="25"></textarea>'
+            ),
+        )
 
         widget = factory(
             'textarea',
             name='MYTEXTAREA',
             value=None,
             props={
-                'data': {
-                    'foo': 'bar'
-                },
-            })
-        self.assertEqual(widget(), (
-            '<textarea class="textarea" cols="80" data-foo=\'bar\' '
-            'id="input-MYTEXTAREA" name="MYTEXTAREA" rows="25"></textarea>'
-        ))
+                'data': {'foo': 'bar'},
+            },
+        )
+        self.assertEqual(
+            widget(),
+            (
+                '<textarea class="textarea" cols="80" data-foo=\'bar\' '
+                'id="input-MYTEXTAREA" name="MYTEXTAREA" rows="25"></textarea>'
+            ),
+        )
 
         widget.mode = 'display'
-        self.assertEqual(widget(), (
-            '<div class="display-textarea" data-foo=\'bar\' '
-            'id="display-MYTEXTAREA"></div>'
-        ))
+        self.assertEqual(
+            widget(),
+            (
+                '<div class="display-textarea" data-foo=\'bar\' '
+                'id="display-MYTEXTAREA"></div>'
+            ),
+        )
 
         # Emptyvalue
         widget = factory(
@@ -43,7 +47,8 @@ class TestTextarea(YafowilTestCase):
             name='MYTEXTAREA',
             props={
                 'emptyvalue': 'EMPTYVALUE',
-            })
+            },
+        )
         data = widget.extract(request={'MYTEXTAREA': ''})
         self.assertEqual(data.name, 'MYTEXTAREA')
         self.assertEqual(data.value, UNSET)
@@ -58,11 +63,8 @@ class TestTextarea(YafowilTestCase):
 
         # Persist
         widget = factory(
-            'textarea',
-            name='MYTEXTAREA',
-            props={
-                'persist_writer': write_mapping_writer
-            })
+            'textarea', name='MYTEXTAREA', props={'persist_writer': write_mapping_writer}
+        )
         data = widget.extract(request={'MYTEXTAREA': 'Text'})
         model = dict()
         data.write(model)

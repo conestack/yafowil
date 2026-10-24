@@ -2,8 +2,8 @@ from node.utils import UNSET
 from yafowil.base import ExtractionError
 from yafowil.base import factory
 from yafowil.tsf import _
-from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import attr_value
+from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import managedprops
 import codecs
 import uuid
@@ -12,8 +12,7 @@ import warnings
 
 @managedprops('emptyvalue')
 def generic_emptyvalue_extractor(widget, data):
-    """Return emptyvalue if widget present in request and raw value is empty.
-    """
+    """Return emptyvalue if widget present in request and raw value is empty."""
     try:
         if not data.request[widget.dottedpath]:
             return attr_value('emptyvalue', widget, data, data.extracted)
@@ -28,7 +27,7 @@ value.
 """
 
 
-class DatatypeConverter(object):
+class DatatypeConverter:
     """Value conversion for extraction and rendering."""
 
     def __init__(self, type_=None):
@@ -47,7 +46,7 @@ class DatatypeConverter(object):
     def to_form(self, value):
         """Convert given value to unicode string for rendering."""
         if not isinstance(value, str):
-            value = u'{}'.format(value)
+            value = f'{value}'
         return value.replace('"', '&quot;')
 
 
@@ -93,7 +92,7 @@ class FloatDatatypeConverter(DatatypeConverter):
 DATATYPE_CONVERTERS = {
     bytes: BytesDatatypeConverter(),
     str: UnicodeDatatypeConverter(),
-    float: FloatDatatypeConverter()
+    float: FloatDatatypeConverter(),
 }
 
 # B/C, will be removed as of yafowil 3.2
@@ -104,7 +103,7 @@ LEGACY_DATATYPE_CONVERTERS = {
     'integer': int,
     'long': int,
     'float': FloatDatatypeConverter(),
-    'uuid': uuid.UUID
+    'uuid': uuid.UUID,
 }
 
 
@@ -175,11 +174,7 @@ def convert_values_to_datatype(value, datatype, empty_value=EMPTY_VALUE):
     if isinstance(value, list):
         res = list()
         for item in value:
-            res.append(convert_value_to_datatype(
-                item,
-                datatype,
-                empty_value=empty_value
-            ))
+            res.append(convert_value_to_datatype(item, datatype, empty_value=empty_value))
         return res
     return convert_value_to_datatype(value, datatype, empty_value=empty_value)
 
@@ -189,7 +184,7 @@ DATATYPE_LABELS = {
     str: _('datatype_unicode', default='unicode'),
     int: _('datatype_integer', default='integer'),
     float: _('datatype_float', default='floating point number'),
-    uuid.UUID: _('datatype_uuid', default='UUID')
+    uuid.UUID: _('datatype_uuid', default='UUID'),
 }
 # B/C, will be removed as of yafowil 3.2
 DATATYPE_LABELS['str'] = DATATYPE_LABELS[bytes]
@@ -201,11 +196,7 @@ DATATYPE_LABELS['float'] = DATATYPE_LABELS[float]
 DATATYPE_LABELS['uuid'] = DATATYPE_LABELS[uuid.UUID]
 
 
-@managedprops(
-    'datatype',
-    'allowed_datatypes',
-    'datatype_message',
-    'emptyvalue')
+@managedprops('datatype', 'allowed_datatypes', 'datatype_message', 'emptyvalue')
 def generic_datatype_extractor(widget, data):
     """Convert extracted value to ``datatype``.
 
@@ -231,34 +222,27 @@ def generic_datatype_extractor(widget, data):
         return extracted
     allowed_datatypes = attr_value('allowed_datatypes', widget, data)
     if allowed_datatypes and datatype not in allowed_datatypes:
-        raise ValueError('Datatype not allowed: "{0}"'.format(datatype))
+        raise ValueError(f'Datatype not allowed: "{datatype}"')
     try:
         emptyvalue = attr_value('emptyvalue', widget, data, EMPTY_VALUE)
-        return convert_values_to_datatype(
-            extracted,
-            datatype,
-            empty_value=emptyvalue
-        )
+        return convert_values_to_datatype(extracted, datatype, empty_value=emptyvalue)
     except KeyError:
-        raise ValueError('Datatype unknown: "{0}"'.format(datatype))
+        raise ValueError(f'Datatype unknown: "{datatype}"')
     except (ValueError, UnicodeEncodeError, UnicodeDecodeError):
         datatype_message = attr_value('datatype_message', widget, data)
         if not datatype_message:
             datatype_label = DATATYPE_LABELS.get(datatype)
             if not datatype_label:
                 datatype_message = _(
-                    'generic_datatype_message',
-                    default=u'Input conversion failed.'
+                    'generic_datatype_message', default='Input conversion failed.'
                 )
             else:
                 if data.tag.translate:
                     datatype_label = data.tag.translate(datatype_label)
                 datatype_message = _(
                     'standard_datatype_message',
-                    default=u'Input is not a valid ${datatype}.',
-                    mapping={
-                        'datatype': datatype_label
-                    }
+                    default='Input is not a valid ${datatype}.',
+                    mapping={'datatype': datatype_label},
                 )
         raise ExtractionError(datatype_message)
 

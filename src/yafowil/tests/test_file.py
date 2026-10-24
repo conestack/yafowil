@@ -3,21 +3,17 @@ from node.utils import UNSET
 from yafowil.base import ExtractionError
 from yafowil.base import factory
 from yafowil.file import convert_bytes
-from yafowil.tests import YafowilTestCase
 from yafowil.tests import fxml
 from yafowil.tests import wrapped_fxml
+from yafowil.tests import YafowilTestCase
 
 
 class TestFile(YafowilTestCase):
-
     def test_file_blueprint(self):
         # Render file input
-        widget = factory(
-            'file',
-            name='MYFILE')
+        widget = factory('file', name='MYFILE')
         self.assertEqual(
-            widget(),
-            '<input id="input-MYFILE" name="MYFILE" type="file" />'
+            widget(), '<input id="input-MYFILE" name="MYFILE" type="file" />'
         )
 
         # Extract empty
@@ -48,8 +44,10 @@ class TestFile(YafowilTestCase):
             name='MYFILE',
             value={
                 'file': StringIO('321'),
-            })
-        self.checkOutput("""
+            },
+        )
+        self.checkOutput(
+            """
         <div>
           <input id="input-MYFILE" name="MYFILE" type="file"/>
           <div id="radio-MYFILE-keep">
@@ -68,13 +66,12 @@ class TestFile(YafowilTestCase):
             <span>Delete existing file</span>
           </div>
         </div>
-        """, wrapped_fxml(widget()))
+        """,
+            wrapped_fxml(widget()),
+        )
 
         # Extract ``keep`` returns original value
-        request = {
-            'MYFILE': {'file': StringIO('123')},
-            'MYFILE-action': 'keep'
-        }
+        request = {'MYFILE': {'file': StringIO('123')}, 'MYFILE-action': 'keep'}
         data = widget.extract(request)
 
         self.assertEqual(data.name, 'MYFILE')
@@ -99,28 +96,23 @@ class TestFile(YafowilTestCase):
         self.assertEqual(data.extracted['file'].read(), '123')
 
         # Extract empty ``replace`` results in extraction error
-        request = {
-            'MYFILE': '',
-            'MYFILE-action': 'replace'
-        }
+        request = {'MYFILE': '', 'MYFILE-action': 'replace'}
         data = widget.extract(request)
 
-        self.assertEqual(data.errors, [
-            ExtractionError('Cannot replace file. No file uploaded.')
-        ])
+        self.assertEqual(
+            data.errors, [ExtractionError('Cannot replace file. No file uploaded.')]
+        )
         self.assertEqual(data.extracted, UNSET)
 
         # Extract ``delete`` returns UNSET
         request['MYFILE-action'] = 'delete'
         data = widget.extract(request)
-        self.assertEqual(
-            data.extracted,
-            {'action': 'delete', 'file': UNSET}
-        )
+        self.assertEqual(data.extracted, {'action': 'delete', 'file': UNSET})
 
         self.assertEqual(data.extracted['action'], 'delete')
 
-        self.checkOutput("""
+        self.checkOutput(
+            """
         <div>
           <input id="input-MYFILE" name="MYFILE" type="file"/>
           <div id="radio-MYFILE-keep">
@@ -139,33 +131,30 @@ class TestFile(YafowilTestCase):
             <span>Delete existing file</span>
           </div>
         </div>
-        """, wrapped_fxml(widget(request=request)))
+        """,
+            wrapped_fxml(widget(request=request)),
+        )
 
-        widget = factory(
-            'file',
-            name='MYFILE',
-            props={
-                'accept': 'foo/bar'
-            })
-        self.assertEqual(widget(), (
-            '<input accept="foo/bar" id="input-MYFILE" '
-            'name="MYFILE" type="file" />'
-        ))
+        widget = factory('file', name='MYFILE', props={'accept': 'foo/bar'})
+        self.assertEqual(
+            widget(),
+            ('<input accept="foo/bar" id="input-MYFILE" name="MYFILE" type="file" />'),
+        )
 
         # File actions vocabulary
         widget = factory(
             'file',
             name='MYFILE',
-            value={
-                'file': StringIO('321')
-            },
+            value={'file': StringIO('321')},
             props={
                 'vocabulary': [
                     ('keep', 'Keep Existing file'),
-                    ('replace', 'Replace existing file')
+                    ('replace', 'Replace existing file'),
                 ]
-            })
-        self.checkOutput("""
+            },
+        )
+        self.checkOutput(
+            """
         <div>
           <input id="input-MYFILE" name="MYFILE" type="file"/>
           <div id="radio-MYFILE-keep">
@@ -179,80 +168,45 @@ class TestFile(YafowilTestCase):
             <span>Replace existing file</span>
           </div>
         </div>
-        """, wrapped_fxml(widget()))
+        """,
+            wrapped_fxml(widget()),
+        )
 
         # Mimetype extractor
-        widget = factory(
-            'file',
-            name='MYFILE',
-            props={
-                'accept': '*/*'
-            })
-        request = {
-            'MYFILE': {
-                'file': StringIO('123'),
-                'mimetype': 'image/jpeg'
-            }
-        }
+        widget = factory('file', name='MYFILE', props={'accept': '*/*'})
+        request = {'MYFILE': {'file': StringIO('123'), 'mimetype': 'image/jpeg'}}
         data = widget.extract(request)
         expected = {
             'action': 'new',
             'file': request['MYFILE']['file'],
-            'mimetype': 'image/jpeg'
+            'mimetype': 'image/jpeg',
         }
         self.assertEqual(data.extracted, expected)
 
-        widget = factory(
-            'file',
-            name='MYFILE',
-            props={
-                'accept': 'image/*'
-            })
+        widget = factory('file', name='MYFILE', props={'accept': 'image/*'})
         data = widget.extract(request)
         self.assertEqual(data.extracted, expected)
 
-        widget = factory(
-            'file',
-            name='MYFILE',
-            props={
-                'accept': 'image/png,image/jpeg'
-            })
+        widget = factory('file', name='MYFILE', props={'accept': 'image/png,image/jpeg'})
         data = widget.extract(request)
         self.assertEqual(data.extracted, expected)
 
-        widget = factory(
-            'file',
-            name='MYFILE',
-            props={
-                'accept': 'video/webm,image/*'
-            })
+        widget = factory('file', name='MYFILE', props={'accept': 'video/webm,image/*'})
         data = widget.extract(request)
         self.assertEqual(data.extracted, expected)
 
-        widget = factory(
-            'file',
-            name='MYFILE',
-            props={
-                'accept': 'image/png'
-            })
+        widget = factory('file', name='MYFILE', props={'accept': 'image/png'})
         data = widget.extract(request)
-        self.assertEqual(data.errors, [
-            ExtractionError('Mimetype of uploaded file not matches')
-        ])
+        self.assertEqual(
+            data.errors, [ExtractionError('Mimetype of uploaded file not matches')]
+        )
 
         # no validation if mimetype not on extracted file
         # happens with keep and replace actions.
         widget = factory(
-            'file',
-            name='MYFILE',
-            value=dict(),
-            props={
-                'accept': 'image/png'
-            })
-        request = {
-            'MYFILE': {},
-            'MYFILE-action': 'keep'
-        }
+            'file', name='MYFILE', value=dict(), props={'accept': 'image/png'}
+        )
+        request = {'MYFILE': {}, 'MYFILE-action': 'keep'}
         data = widget.extract(request)
         self.assertEqual(data.extracted, {'action': 'keep'})
 
@@ -267,25 +221,22 @@ class TestFile(YafowilTestCase):
         self.assertEqual(convert_bytes(1 * 1024), '1.00K')
         self.assertEqual(convert_bytes(1), '1.00b')
 
-        widget = factory(
-            'file',
-            name='MYFILE',
-            mode='display')
-        self.checkOutput("""
+        widget = factory('file', name='MYFILE', mode='display')
+        self.checkOutput(
+            """
         <div>No file</div>
-        """, fxml(widget()))
+        """,
+            fxml(widget()),
+        )
 
         value = {
             'file': StringIO('12345'),
             'mimetype': 'text/plain',
             'filename': 'foo.txt',
         }
-        widget = factory(
-            'file',
-            name='MYFILE',
-            value=value,
-            mode='display')
-        self.checkOutput("""
+        widget = factory('file', name='MYFILE', value=value, mode='display')
+        self.checkOutput(
+            """
         <div>
           <ul>
             <li><strong>Filename: </strong>foo.txt</li>
@@ -293,22 +244,21 @@ class TestFile(YafowilTestCase):
             <li><strong>Size: </strong>5.00b</li>
           </ul>
         </div>
-        """, fxml(widget()))
+        """,
+            fxml(widget()),
+        )
 
         # Generic HTML5 Data
         widget = factory(
-            'file',
-            name='MYFILE',
-            props={
-                'accept': 'foo/bar',
-                'data': {
-                    'foo': 'bar'
-                }
-            })
-        self.assertEqual(widget(), (
-            '<input accept="foo/bar" data-foo=\'bar\' id="input-MYFILE" '
-            'name="MYFILE" type="file" />'
-        ))
+            'file', name='MYFILE', props={'accept': 'foo/bar', 'data': {'foo': 'bar'}}
+        )
+        self.assertEqual(
+            widget(),
+            (
+                '<input accept="foo/bar" data-foo=\'bar\' id="input-MYFILE" '
+                'name="MYFILE" type="file" />'
+            ),
+        )
 
         widget.mode = 'display'
         self.assertEqual(widget(), "<div data-foo='bar'>No file</div>")
@@ -317,18 +267,18 @@ class TestFile(YafowilTestCase):
         widget = factory(
             'file',
             name='MYFILE',
-            value={
-                'file': StringIO('321')
-            },
+            value={'file': StringIO('321')},
             props={
                 'radio_class': 'my_radio',
                 'radio_input_class': 'my_radio_input',
                 'vocabulary': [
                     ('keep', 'Keep Existing file'),
-                    ('replace', 'Replace existing file')
-                ]
-            })
-        self.checkOutput("""
+                    ('replace', 'Replace existing file'),
+                ],
+            },
+        )
+        self.checkOutput(
+            """
         <div>
           <input id="input-MYFILE" name="MYFILE" type="file"/>
           <div class="my_radio" id="radio-MYFILE-keep">
@@ -342,4 +292,6 @@ class TestFile(YafowilTestCase):
             <span>Replace existing file</span>
           </div>
         </div>
-        """, wrapped_fxml(widget()))
+        """,
+            wrapped_fxml(widget()),
+        )

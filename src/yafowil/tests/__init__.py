@@ -24,11 +24,10 @@ from yafowil import url
 from yafowil.base import factory
 from yafowil.utils import Tag
 import lxml.etree as etree
-import yafowil.loader
+import yafowil.loader  # noqa
 
 
 class YafowilTestCase(NodeTestCase):
-
     def setUp(self):
         super(YafowilTestCase, self).setUp()
         factory.push_state()
@@ -66,7 +65,7 @@ def fxml(xml):
 
 
 def wrapped_fxml(value):
-    return fxml(u'<div>' + value + u'</div>')
+    return fxml('<div>' + value + '</div>')
 
 
 tag = Tag(lambda msg: msg)

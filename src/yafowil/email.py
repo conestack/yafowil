@@ -22,14 +22,11 @@ def email_extractor(widget, data):
     val = data.extracted
     if not val:
         return val
-    email_re = EMAIL_RE \
-        if isinstance(val, str) \
-        else EMAIL_RE.encode()
+    email_re = EMAIL_RE if isinstance(val, str) else EMAIL_RE.encode()
     if not re.match(email_re, val):
-        raise ExtractionError(_(
-            'email_address_not_valid',
-            default=u'Input not a valid email address.'
-        ))
+        raise ExtractionError(
+            _('email_address_not_valid', default='Input not a valid email address.')
+        )
     return val
 
 
@@ -40,13 +37,10 @@ factory.register(
         generic_required_extractor,
         generic_emptyvalue_extractor,
         generic_datatype_extractor,
-        email_extractor
+        email_extractor,
     ],
     edit_renderers=[input_generic_renderer],
-    display_renderers=[
-        generic_display_renderer,
-        display_proxy_renderer
-    ]
+    display_renderers=[generic_display_renderer, display_proxy_renderer],
 )
 
 factory.doc['blueprint']['email'] = """\
@@ -64,5 +58,6 @@ factory.defaults['email.class'] = 'email'
 factory.defaults['email.persist'] = True
 
 factory.defaults['email.allowed_datatypes'] = [
-    bytes, str,
+    bytes,
+    str,
 ]

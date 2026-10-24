@@ -15,20 +15,18 @@ from yafowil.utils import vocabulary
 # checkbox
 ###############################################################################
 
+
 @managedprops('format')
 def checkbox_extractor(widget, data):
-    """Extracts data from a single input with type checkbox.
-    """
-    if '{0}-exists'.format(widget.dottedpath) not in data.request:
+    """Extracts data from a single input with type checkbox."""
+    if f'{widget.dottedpath}-exists' not in data.request:
         return UNSET
     fmt = attr_value('format', widget, data)
     if fmt == 'bool':
         return widget.dottedpath in data.request
     elif fmt == 'string':
         return data.request.get(widget.dottedpath, '')
-    raise ValueError(
-        "Checkbox widget has invalid format '{0}' set".format(fmt)
-    )
+    raise ValueError(f"Checkbox widget has invalid format '{fmt}' set")
 
 
 @managedprops(
@@ -41,7 +39,8 @@ def checkbox_extractor(widget, data):
     'disabled',
     'checked',
     'with_label',
-    *css_managed_props)
+    *css_managed_props,
+)
 def checkbox_edit_renderer(widget, data):
     tag = data.tag
     input_attrs = input_attributes_common(widget, data)
@@ -57,15 +56,12 @@ def checkbox_edit_renderer(widget, data):
     checkbox = tag('input', **input_attrs)
     if attr_value('with_label', widget, data):
         checkbox += tag(
-            'label',
-            '&nbsp;',
-            for_=cssid(widget, 'input'),
-            class_='checkbox_label'
+            'label', '&nbsp;', for_=cssid(widget, 'input'), class_='checkbox_label'
         )
     input_attrs = {
         'type': 'hidden',
         'value': 'checkboxexists',
-        'name_': "{0}-exists".format(widget.dottedpath),
+        'name_': f'{widget.dottedpath}-exists',
         'id': cssid(widget, 'checkboxexists'),
     }
     exists_marker = tag('input', **input_attrs)
@@ -74,8 +70,7 @@ def checkbox_edit_renderer(widget, data):
 
 @managedprops('class', 'format', 'vocabulary', 'display_proxy', 'display_class')
 def checkbox_display_renderer(widget, data):
-    """Generic display renderer to render a value.
-    """
+    """Generic display renderer to render a value."""
     value = fetch_value(widget, data)
     fmt = attr_value('format', widget, data)
     if fmt == 'string' and bool(value):
@@ -88,11 +83,11 @@ def checkbox_display_renderer(widget, data):
             content = data.tag.translate(content)
     cssclasses = [
         attr_value('display_class', widget, data),
-        f'display-{attr_value("class", widget, data) or "generic"}'
+        f'display-{attr_value("class", widget, data) or "generic"}',
     ]
     attrs = {
         'id': cssid(widget, 'display'),
-        'class_': ' '.join([_ for _ in cssclasses if _ is not None])
+        'class_': ' '.join([_ for _ in cssclasses if _ is not None]),
     }
     if attr_value('display_proxy', widget, data):
         widget.attrs['type'] = 'hidden'
@@ -106,7 +101,7 @@ def checkbox_display_renderer(widget, data):
         input_attrs = {
             'type': 'hidden',
             'value': 'checkboxexists',
-            'name_': "{0}-exists".format(widget.dottedpath),
+            'name_': f'{widget.dottedpath}-exists',
             'id': cssid(widget, 'checkboxexists'),
         }
         content += data.tag('input', **input_attrs)
@@ -115,12 +110,9 @@ def checkbox_display_renderer(widget, data):
 
 factory.register(
     'checkbox',
-    extractors=[
-        checkbox_extractor,
-        generic_required_extractor
-    ],
+    extractors=[checkbox_extractor, generic_required_extractor],
     edit_renderers=[checkbox_edit_renderer],
-    display_renderers=[checkbox_display_renderer]
+    display_renderers=[checkbox_display_renderer],
 )
 
 factory.doc['blueprint']['checkbox'] = """\
@@ -147,9 +139,9 @@ Set 'checked' attribute explicit. If not given, compute by value.
 """
 
 factory.defaults['checkbox.vocabulary'] = {
-    True: _('yes', default=u'Yes'),
-    False: _('no', default=u'No'),
-    UNSET: _('unset', default=u'Unset'),  # XXX: never used right now?
+    True: _('yes', default='Yes'),
+    False: _('no', default='No'),
+    UNSET: _('unset', default='Unset'),  # XXX: never used right now?
 }
 
 factory.doc['props']['checkbox.vocabulary'] = """\

@@ -15,10 +15,10 @@ factory.register(
     extractors=[
         generic_extractor,
         generic_emptyvalue_extractor,
-        generic_datatype_extractor
+        generic_datatype_extractor,
     ],
     edit_renderers=[input_generic_renderer],
-    display_renderers=[empty_display_renderer]
+    display_renderers=[empty_display_renderer],
 )
 
 factory.doc['blueprint']['hidden'] = """\

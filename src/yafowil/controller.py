@@ -1,6 +1,5 @@
-class Controller(object):
-    """Form controller.
-    """
+class Controller:
+    """Form controller."""
 
     def __init__(self, widget, request):
         """Initialize controller
@@ -53,7 +52,7 @@ class Controller(object):
         return result
 
     def triggered(self, action):
-        action_name = 'action.{0}'.format(action.dottedpath)
+        action_name = f'action.{action.dottedpath}'
         return self.request.get(action_name) is not None
 
     def _error(self, data):

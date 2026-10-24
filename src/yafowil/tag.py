@@ -11,10 +11,10 @@ from yafowil.utils import managedprops
 # tag
 ###############################################################################
 
+
 @managedprops('tag', 'text', 'data', *css_managed_props)
 def tag_renderer(widget, data):
-    """Renderer for HTML tags.
-    """
+    """Renderer for HTML tags."""
     attrs = {
         'id': cssid(widget, 'tag'),
         'class_': cssclasses(widget, data),
@@ -25,11 +25,7 @@ def tag_renderer(widget, data):
     return data.tag(tag, text, **attrs)
 
 
-factory.register(
-    'tag',
-    edit_renderers=[tag_renderer],
-    display_renderers=[tag_renderer]
-)
+factory.register('tag', edit_renderers=[tag_renderer], display_renderers=[tag_renderer])
 
 factory.doc['blueprint']['tag'] = """\
 Render HTML tags with text. Useful for rendering headings etc.

@@ -5,28 +5,19 @@ from yafowil.utils import EMPTY_VALUE
 
 
 class TestProxy(YafowilTestCase):
-
     def test_proxy_blueprint(self):
         # Used to pass hidden arguments out of form namespace
-        widget = factory(
-            'proxy',
-            name='PROXY',
-            value='1')
-        self.assertEqual(widget(), (
-            '<input id="input-PROXY" name="PROXY" type="hidden" value="1" />'
-        ))
-        self.assertEqual(widget(request={'PROXY': '2'}), (
-            '<input id="input-PROXY" name="PROXY" type="hidden" value="2" />'
-        ))
+        widget = factory('proxy', name='PROXY', value='1')
+        self.assertEqual(
+            widget(), ('<input id="input-PROXY" name="PROXY" type="hidden" value="1" />')
+        )
+        self.assertEqual(
+            widget(request={'PROXY': '2'}),
+            ('<input id="input-PROXY" name="PROXY" type="hidden" value="2" />'),
+        )
 
         # Emptyvalue
-        widget = factory(
-            'proxy',
-            name='PROXY',
-            value='',
-            props={
-                'emptyvalue': '1.0'
-            })
+        widget = factory('proxy', name='PROXY', value='', props={'emptyvalue': '1.0'})
         data = widget.extract(request={'PROXY': ''})
         self.assertEqual(data.name, 'PROXY')
         self.assertEqual(data.value, '')
@@ -38,10 +29,8 @@ class TestProxy(YafowilTestCase):
             'proxy',
             name='PROXY',
             value='',
-            props={
-                'emptyvalue': '1.0',
-                'datatype': float
-            })
+            props={'emptyvalue': '1.0', 'datatype': float},
+        )
         data = widget.extract(request={'PROXY': '2.0'})
         self.assertEqual(data.name, 'PROXY')
         self.assertEqual(data.value, '')
@@ -64,11 +53,8 @@ class TestProxy(YafowilTestCase):
 
         # Persist defaults to false
         widget = factory(
-            'proxy',
-            name='PROXY',
-            props={
-                'persist_writer': write_mapping_writer
-            })
+            'proxy', name='PROXY', props={'persist_writer': write_mapping_writer}
+        )
         data = widget.extract(request={'PROXY': '10'})
         model = dict()
         data.write(model)

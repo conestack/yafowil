@@ -6,47 +6,39 @@ from node.behaviors import MappingNode
 from node.behaviors import MappingOrder
 from node.behaviors import NodeAttributes
 from node.behaviors import OdictStorage
-from node.utils import UNSET
 from node.utils import instance_property
+from node.utils import UNSET
 from plumber import plumbing
 from threading import RLock
-from yafowil.utils import Tag
 from yafowil.utils import attr_value
+from yafowil.utils import Tag
 import copy
 import webresource as wr
 
 
 def _dict__repr__(self):
-    return '{{{0}}}'.format(
-        ', '.join(['{0}: {1}'.format(
-            repr(k),
-            repr(v)
-        ) for k, v in self.items()])
-    )
+    return '{{{}}}'.format(', '.join([f'{repr(k)}: {repr(v)}' for k, v in self.items()]))
 
 
 class RuntimeDataAttributes(NodeAttributes):
     __str__ = __repr__ = _dict__repr__
 
 
-@plumbing(
-    Attributes,
-    MappingConstraints,
-    MappingAdopt,
-    MappingNode,
-    OdictStorage)
-class RuntimeData(object):
-    """Holds Runtime data of widget.
-    """
+@plumbing(Attributes, MappingConstraints, MappingAdopt, MappingNode, OdictStorage)
+class RuntimeData:
+    """Holds Runtime data of widget."""
+
     attributes_factory = RuntimeDataAttributes
 
-    def __init__(self,
-                 name=None,
-                 parent=None,
-                 request=UNSET,
-                 persist=None,
-                 persist_target=None,
-                 persist_writer=None):
+    def __init__(
+        self,
+        name=None,
+        parent=None,
+        request=UNSET,
+        persist=None,
+        persist_target=None,
+        persist_writer=None,
+    ):
         self.__name__ = name
         self.__parent__ = parent
         if parent is not None:
@@ -115,22 +107,18 @@ class RuntimeData(object):
         data = self.root
         if path[0] != data.name:
             raise KeyError('Invalid name of root element')
-        __traceback_info__ = 'fetch path: {0}'.format(path)
+        __traceback_info__ = f'fetch path: {path}'
         for key in path[1:]:
             data = data[key]
         return data
 
     def write(self, model, writer=None, recursiv=True):
         if self.has_errors:
-            raise RuntimeError(
-                'Attempt to persist data which failed to extract'
-            )
+            raise RuntimeError('Attempt to persist data which failed to extract')
         current_writer = self.persist_writer or writer
         # XXX: if persist and not current_writer
         if not current_writer:
-            msg = 'No persistence writer found for "{}"'.format(
-                '.'.join(self.path)
-            )
+            msg = 'No persistence writer found for "{}"'.format('.'.join(self.path))
             raise ValueError(msg)
         if not writer:
             writer = current_writer
@@ -145,16 +133,14 @@ class RuntimeData(object):
             child.write(model, writer=writer, recursiv=recursiv)
 
     def __repr__(self):
-        rep = "<RuntimeData {0}, value={1}, extracted={2}".format(
-            '.'.join([str(_) for _ in self.path]),
-            repr(self.value),
-            repr(self.extracted)
+        rep = '<RuntimeData {}, value={}, extracted={}'.format(
+            '.'.join([str(_) for _ in self.path]), repr(self.value), repr(self.extracted)
         )
         if self.errors:
-            rep += ', {0} error(s)'.format(len(self.errors))
+            rep += f', {len(self.errors)} error(s)'
         if len(self.attrs):
-            rep += ', attrs={0}'.format(repr(self.attrs))
-        rep += ' at {0}>'.format(hex(id(self))[:-1])
+            rep += f', attrs={repr(self.attrs)}'
+        rep += f' at {hex(id(self))[:-1]}>'
         return rep
 
     __str__ = __repr__
@@ -181,13 +167,13 @@ class ExtractionError(Exception):
         self.abort = abort
 
     def __repr__(self):
-        return u"ExtractionError('{0}',)".format(str(self))
+        return f"ExtractionError('{str(self)}',)"
 
     def __eq__(self, other):
         return repr(self) == repr(other)
 
 
-class TBSupplementWidget(object):
+class TBSupplementWidget:
     """Supplement for Tracebacks in case a widget chain part fails.
 
     - in conjunction with ```zExceptions``` or ```zope.exceptions```
@@ -214,10 +200,10 @@ class TBSupplementWidget(object):
         """
         if not as_html:
             info = '    yafowil widget processing info:\n'
-            info += '    - path      : {0}\n'.format(self.name)
-            info += '    - blueprints: {0}\n'.format(self.blueprints)
-            info += '    - task      : {0}\n'.format(self.task)
-            info += '    - descr     : {0}'.format(self.descr)
+            info += f'    - path      : {self.name}\n'
+            info += f'    - blueprints: {self.blueprints}\n'
+            info += f'    - task      : {self.task}\n'
+            info += f'    - descr     : {self.descr}'
             return info
         tag = Tag(lambda x: x)
         li = tag('li', 'path: ', tag('strong', self.name))
@@ -228,8 +214,7 @@ class TBSupplementWidget(object):
 
 
 @plumbing(MappingNode, DictStorage)
-class WidgetAttributes(object):
-
+class WidgetAttributes:
     __str__ = __repr__ = _dict__repr__
 
     def __init__(self, name=None, parent=None):
@@ -237,7 +222,7 @@ class WidgetAttributes(object):
         self.__parent__ = parent
 
     def __getitem__(self, name):
-        prefixed = '{0}.{1}'.format(self.parent.current_prefix, name)
+        prefixed = f'{self.parent.current_prefix}.{name}'
         storage = self.storage
         if prefixed in storage:
             return storage[prefixed]
@@ -248,35 +233,33 @@ class WidgetAttributes(object):
             return defaults[prefixed]
         if name in defaults:
             return defaults[name]
-        raise KeyError((
-            'Property with key "{0}" is not given on widget "{1}" (no default)'
-        ).format(name, self.parent.dottedpath))
+        raise KeyError(
+            f'Property with key "{name}" is not given on widget "{self.parent.dottedpath}" (no default)'
+        )
 
 
 @plumbing(
-    Attributes,
-    MappingConstraints,
-    MappingAdopt,
-    MappingOrder,
-    MappingNode,
-    OdictStorage)
-class Widget(object):
-    """Base Widget Class.
-    """
+    Attributes, MappingConstraints, MappingAdopt, MappingOrder, MappingNode, OdictStorage
+)
+class Widget:
+    """Base Widget Class."""
+
     attributes_factory = WidgetAttributes
 
-    def __init__(self,
-                 blueprints,
-                 extractors,
-                 edit_renderers,
-                 display_renderers,
-                 preprocessors,
-                 uniquename=None,
-                 value_or_getter=UNSET,
-                 properties=dict(),
-                 custom=dict(),
-                 defaults=dict(),
-                 mode='edit'):
+    def __init__(
+        self,
+        blueprints,
+        extractors,
+        edit_renderers,
+        display_renderers,
+        preprocessors,
+        uniquename=None,
+        value_or_getter=UNSET,
+        properties=dict(),
+        custom=dict(),
+        defaults=dict(),
+        mode='edit',
+    ):
         """Initialize the widget.
 
         :param blueprints: The blueprint names used to create this widget as
@@ -350,12 +333,9 @@ class Widget(object):
         if data is None:
             if request is None:
                 request = UNSET
-            data = self._runpreprocessors(RuntimeData(
-                name=self.name,
-                request=request
-            ))
+            data = self._runpreprocessors(RuntimeData(name=self.name, request=request))
         if data.mode == 'skip':
-            data.rendered = u''
+            data.rendered = ''
             return data.rendered
         elif data.mode == 'display':
             renderers = self.display_renderers
@@ -363,10 +343,7 @@ class Widget(object):
             renderers = self.edit_renderers
         if not renderers:
             raise ValueError(
-                "no renderers given for widget '{0}' at mode '{1}'".format(
-                    self.dottedpath,
-                    data.mode
-                )
+                f"no renderers given for widget '{self.dottedpath}' at mode '{data.mode}'"
             )
         with self._lock:
             try:
@@ -377,10 +354,7 @@ class Widget(object):
                         self,
                         renderer,
                         'render',
-                        "failed at '{0}' in mode '{1}'".format(
-                            ren_name,
-                            data.mode
-                        )
+                        f"failed at '{ren_name}' in mode '{data.mode}'",
                     )
                     data.rendered = renderer(self, data)
             finally:
@@ -393,14 +367,16 @@ class Widget(object):
         :param request: Expects a dict-like object
         :param parent: Parent data
         """
-        data = self._runpreprocessors(RuntimeData(
-            name=self.name,
-            parent=parent,
-            request=request,
-            persist=self.attrs.get('persist'),
-            persist_target=self.attrs.get('persist_target'),
-            persist_writer=self.attrs.get('persist_writer')
-        ))
+        data = self._runpreprocessors(
+            RuntimeData(
+                name=self.name,
+                parent=parent,
+                request=request,
+                persist=self.attrs.get('persist'),
+                persist_target=self.attrs.get('persist_target'),
+                persist_writer=self.attrs.get('persist_writer'),
+            )
+        )
         # don't extract if skip mode
         if data.mode == 'skip':
             return data
@@ -427,7 +403,7 @@ class Widget(object):
                         self,
                         extractor,
                         'extract',
-                        "failed at '{0}'".format(ex_name)
+                        f"failed at '{ex_name}'",
                     )
                     try:
                         data.extracted = extractor(self, data)
@@ -458,7 +434,7 @@ class Widget(object):
             self,
             self._runpreprocessors,
             'run preprocessors',
-            'execute'
+            'execute',
         )
         if data.preprocessed:
             return data
@@ -473,7 +449,7 @@ class Widget(object):
         if data.mode not in ('edit', 'display', 'skip'):
             raise ValueError(
                 "mode must be one out of 'edit', 'display', 'skip', but "
-                "'{0}' was given".format(data.mode)
+                f"'{data.mode}' was given"
             )
         for pp_name, pp in self.preprocessors:
             data.current_prefix = pp_name
@@ -482,7 +458,7 @@ class Widget(object):
                 self,
                 pp,
                 'preprocessor',
-                "failed at '{0}'".format(pp_name)
+                f"failed at '{pp_name}'",
             )
             data = pp(self, data)
         data.current_prefix = ''
@@ -490,8 +466,7 @@ class Widget(object):
         return data
 
 
-class Factory(object):
-
+class Factory:
     def __init__(self):
         self._blueprints = dict()
         self._global_preprocessors = list()
@@ -511,15 +486,17 @@ class Factory(object):
         self._states = states
 
     def push_state(self):
-        self._states.append(dict(
-            _blueprints=copy.deepcopy(self._blueprints),
-            _global_preprocessors=copy.deepcopy(self._global_preprocessors),
-            _macros=copy.deepcopy(self._macros),
-            _themes=copy.deepcopy(self._themes),
-            theme=copy.deepcopy(self.theme),
-            defaults=copy.deepcopy(self.defaults),
-            doc=copy.deepcopy(self.doc)
-        ))
+        self._states.append(
+            dict(
+                _blueprints=copy.deepcopy(self._blueprints),
+                _global_preprocessors=copy.deepcopy(self._global_preprocessors),
+                _macros=copy.deepcopy(self._macros),
+                _themes=copy.deepcopy(self._themes),
+                theme=copy.deepcopy(self.theme),
+                defaults=copy.deepcopy(self.defaults),
+                doc=copy.deepcopy(self.doc),
+            )
+        )
 
     def pop_state(self):
         state = self._states.pop()
@@ -534,9 +511,7 @@ class Factory(object):
     def _name_check(self, name):
         for chara in '*:#':
             if chara in name:
-                raise ValueError(
-                    '"{0}" as char not allowed as name.'.format(chara)
-                )
+                raise ValueError(f'"{chara}" as char not allowed as name.')
 
     def register(
         self,
@@ -545,17 +520,16 @@ class Factory(object):
         edit_renderers=[],
         preprocessors=[],
         builders=[],
-        display_renderers=[]
+        display_renderers=[],
     ):
-        """Registers a blueprint in the factory.
-        """
+        """Registers a blueprint in the factory."""
         self._name_check(name)
         self._blueprints[name] = (
             extractors,
             edit_renderers,
             preprocessors,
             builders,
-            display_renderers
+            display_renderers,
         )
 
     def register_global_preprocessors(self, preprocessors):
@@ -567,14 +541,7 @@ class Factory(object):
             blueprints = blueprints.split(':')
         self._macros[name] = blueprints, props
 
-    def register_theme(
-        self,
-        themename,
-        widgetname,
-        resourcedir=None,
-        js=[],
-        css=[]
-    ):
+    def register_theme(self, themename, widgetname, resourcedir=None, js=[], css=[]):
         """B/C resources registration for addon widgets.
 
         This function will be deprecated as of yafowil 4.0 and removed in a
@@ -586,11 +553,7 @@ class Factory(object):
         :param js: Registration list of widget related javascripts.
         :param css: Registration list of widget related stylesheets.
         """
-        themenames = (
-            themename
-            if isinstance(themename, (list, tuple))
-            else [themename]
-        )
+        themenames = themename if isinstance(themename, (list, tuple)) else [themename]
         for name in themenames:
             theme = self._themes.setdefault(name, {})
             widget_theme = theme.setdefault(widgetname, {})
@@ -627,9 +590,7 @@ class Factory(object):
         :param resources: webresource.ResourceGroup containing widget resources.
         """
         theme_names = (
-            theme_name
-            if isinstance(theme_name, (list, tuple))
-            else [theme_name]
+            theme_name if isinstance(theme_name, (list, tuple)) else [theme_name]
         )
         for name in theme_names:
             theme = self._themes.setdefault(name, {})
@@ -680,9 +641,7 @@ class Factory(object):
                 macro_name = blueprint[1:]
                 if macro_name not in self._macros:
                     raise ValueError(
-                        "Macro named '{}' is not registered in factory".format(
-                            macro_name
-                        )
+                        f"Macro named '{macro_name}' is not registered in factory"
                     )
                 macro_chain, macro_props = self._macros[macro_name]
                 for key in macro_props:
@@ -695,13 +654,7 @@ class Factory(object):
         return result, props
 
     def __call__(
-        self,
-        blueprints,
-        name=None,
-        value=UNSET,
-        props=dict(),
-        custom=dict(),
-        mode='edit'
+        self, blueprints, name=None, value=UNSET, props=dict(), custom=dict(), mode='edit'
     ):
         """Creates a widget from blueprints.
 
@@ -781,7 +734,7 @@ class Factory(object):
             properties=props,
             custom=custom,
             defaults=self.defaults,
-            mode=mode
+            mode=mode,
         )
         for part_name, builder_func in builders:
             widget.current_prefix = part_name
@@ -814,8 +767,7 @@ factory = Factory()
 
 
 def fetch_value(widget, data):
-    """Fetch extracted, either form-data, value or default .
-    """
+    """Fetch extracted, either form-data, value or default ."""
     if data.extracted is not UNSET:
         return data.extracted
     if data.value is not UNSET:

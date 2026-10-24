@@ -13,7 +13,6 @@ import uuid
 
 
 class TestDatatypes(YafowilTestCase):
-
     def test_EMPTY_VALUE(self):
         self.assertEqual(repr(EMPTY_VALUE), '<EMPTY_VALUE>')
         self.assertEqual(str(EMPTY_VALUE), '')
@@ -26,14 +25,10 @@ class TestDatatypes(YafowilTestCase):
         self.assertFalse(EMPTY_VALUE > EMPTY_VALUE)
         self.assertFalse(EMPTY_VALUE >= EMPTY_VALUE)
 
-
     def test_generic_emptyvalue_extractor(self):
         factory.register(
             'emptyvalue_test',
-            extractors=[
-                generic_extractor,
-                generic_emptyvalue_extractor
-            ]
+            extractors=[generic_extractor, generic_emptyvalue_extractor],
         )
         widget = factory('emptyvalue_test', name='widget')
         data = widget.extract({})
@@ -43,9 +38,7 @@ class TestDatatypes(YafowilTestCase):
         self.assertEqual(data.extracted, '')
 
         widget = factory(
-            'emptyvalue_test',
-            name='widget',
-            props={'emptyvalue': EMPTY_VALUE}
+            'emptyvalue_test', name='widget', props={'emptyvalue': EMPTY_VALUE}
         )
         data = widget.extract({})
         self.assertEqual(data.extracted, UNSET)
@@ -53,11 +46,7 @@ class TestDatatypes(YafowilTestCase):
         data = widget.extract({'widget': ''})
         self.assertEqual(data.extracted, EMPTY_VALUE)
 
-        widget = factory(
-            'emptyvalue_test',
-            name='widget',
-            props={'emptyvalue': 'EMPTY'}
-        )
+        widget = factory('emptyvalue_test', name='widget', props={'emptyvalue': 'EMPTY'})
         data = widget.extract({})
         self.assertEqual(data.extracted, UNSET)
 
@@ -68,7 +57,7 @@ class TestDatatypes(YafowilTestCase):
         from yafowil.datatypes import DatatypeConverter
 
         converter = DatatypeConverter()
-        self.assertEqual(converter.to_form(u'"quoted"'), u'&quot;quoted&quot;')
+        self.assertEqual(converter.to_form('"quoted"'), '&quot;quoted&quot;')
 
         converter = DatatypeConverter(int)
         self.assertEqual(converter.to_form(1), '1')
@@ -87,30 +76,22 @@ class TestDatatypes(YafowilTestCase):
 
         converter = BytesDatatypeConverter()
         self.assertEqual(
-            converter.to_form(b'\r\n\x01\x9a\x03\xff'),
-            u'\\r\\n\\x01\\x9a\\x03\\xff'
+            converter.to_form(b'\r\n\x01\x9a\x03\xff'), '\\r\\n\\x01\\x9a\\x03\\xff'
         )
-        self.assertEqual(
-            converter.to_form(u'aaa'),
-            u'aaa'
-        )
+        self.assertEqual(converter.to_form('aaa'), 'aaa')
         with self.assertRaises(UnicodeEncodeError):
-            converter.to_value(u'ä')
+            converter.to_value('ä')
         self.assertEqual(
-            converter.to_value(u'\\r\\n\\x01\\x9a\\x03\\xff'),
-            b'\r\n\x01\x9a\x03\xff'
+            converter.to_value('\\r\\n\\x01\\x9a\\x03\\xff'), b'\r\n\x01\x9a\x03\xff'
         )
-        self.assertEqual(
-            converter.to_value(b'aaa'),
-            b'aaa'
-        )
+        self.assertEqual(converter.to_value(b'aaa'), b'aaa')
 
     def test_UnicodeDatatypeConverter(self):
         from yafowil.datatypes import UnicodeDatatypeConverter
 
         converter = UnicodeDatatypeConverter()
-        self.assertEqual(converter.to_value(u'äöü'), u'äöü')
-        self.assertEqual(converter.to_value(b'aou'), u'aou')
+        self.assertEqual(converter.to_value('äöü'), 'äöü')
+        self.assertEqual(converter.to_value(b'aou'), 'aou')
 
     def test_FloatDatatypeConverter(self):
         from yafowil.datatypes import FloatDatatypeConverter
@@ -122,6 +103,7 @@ class TestDatatypes(YafowilTestCase):
 
     def test_lookup_datatype_converter(self):
         from yafowil.datatypes import DatatypeConverter
+
         converter = lookup_datatype_converter(int)
         self.assertIsInstance(converter, DatatypeConverter)
         self.assertEqual(converter.type_, int)
@@ -156,42 +138,48 @@ class TestDatatypes(YafowilTestCase):
         # Convert to string by id
         self.assertEqual(convert_value_to_datatype(UNSET, 'str'), UNSET)
 
-        converted = convert_value_to_datatype(u'string', 'str')
+        converted = convert_value_to_datatype('string', 'str')
         self.assertEqual(converted, b'string')
         self.assertTrue(isinstance(converted, bytes))
 
         with self.assertRaises(UnicodeEncodeError) as arc:
-            convert_value_to_datatype(u'äöü', 'str')
-        self.checkOutput("""
+            convert_value_to_datatype('äöü', 'str')
+        self.checkOutput(
+            """
         'ascii' codec can't encode character...: ordinal not in range(128)
-        """, str(arc.exception))
+        """,
+            str(arc.exception),
+        )
 
         # Convert to string by type
         self.assertEqual(convert_value_to_datatype(UNSET, bytes), UNSET)
 
-        converted = convert_value_to_datatype(u'string', bytes)
+        converted = convert_value_to_datatype('string', bytes)
         self.assertEqual(converted, b'string')
         self.assertTrue(isinstance(converted, bytes))
 
         with self.assertRaises(UnicodeEncodeError) as arc:
-            convert_value_to_datatype(u'äöü', bytes)
-        self.checkOutput("""
+            convert_value_to_datatype('äöü', bytes)
+        self.checkOutput(
+            """
         'ascii' codec can't encode character...: ordinal not in range(128)
-        """, str(arc.exception))
+        """,
+            str(arc.exception),
+        )
 
     def test_convert_value_to_datatype_unicode(self):
         # Convert to unicode by id
         self.assertEqual(convert_value_to_datatype(UNSET, 'unicode'), UNSET)
 
         converted = convert_value_to_datatype(b'unicode', 'unicode')
-        self.assertEqual(converted, u'unicode')
+        self.assertEqual(converted, 'unicode')
         self.assertTrue(isinstance(converted, str))
 
         # Convert to unicode by type
         self.assertEqual(convert_value_to_datatype(UNSET, str), UNSET)
 
         converted = convert_value_to_datatype(b'unicode', str)
-        self.assertEqual(converted, u'unicode')
+        self.assertEqual(converted, 'unicode')
         self.assertTrue(isinstance(converted, str))
 
     def test_convert_value_to_datatype_int(self):
@@ -242,19 +230,18 @@ class TestDatatypes(YafowilTestCase):
         self.assertEqual(convert_value_to_datatype(UNSET, 'long'), UNSET)
 
         converted = convert_value_to_datatype('1', 'long')
-        self.assertEqual(converted, int(1))
+        self.assertEqual(converted, 1)
         self.assertTrue(isinstance(converted, int))
 
         converted = convert_value_to_datatype(2.0, 'long')
-        self.assertEqual(converted, int(2))
+        self.assertEqual(converted, 2)
         self.assertTrue(isinstance(converted, int))
 
         with self.assertRaises(ValueError) as arc:
             convert_value_to_datatype('a', 'long')
         # there is no long type in python 3, falls back to int
         self.assertEqual(
-            str(arc.exception),
-            "invalid literal for int() with base 10: 'a'"
+            str(arc.exception), "invalid literal for int() with base 10: 'a'"
         )
 
     def test_convert_value_to_datatype_float(self):
@@ -271,10 +258,7 @@ class TestDatatypes(YafowilTestCase):
 
         with self.assertRaises(ValueError) as arc:
             convert_value_to_datatype('a', 'float')
-        self.assertEqual(
-            str(arc.exception),
-            "could not convert string to float: 'a'"
-        )
+        self.assertEqual(str(arc.exception), "could not convert string to float: 'a'")
 
         converted = convert_value_to_datatype(3, 'float')
         self.assertEqual(converted, 3.0)
@@ -293,10 +277,7 @@ class TestDatatypes(YafowilTestCase):
 
         with self.assertRaises(ValueError) as arc:
             convert_value_to_datatype('b', float)
-        self.assertEqual(
-            str(arc.exception),
-            "could not convert string to float: 'b'"
-        )
+        self.assertEqual(str(arc.exception), "could not convert string to float: 'b'")
 
         converted = convert_value_to_datatype(6, float)
         self.assertEqual(converted, 6.0)
@@ -329,13 +310,10 @@ class TestDatatypes(YafowilTestCase):
         # Custom converter as function
         def convert_func(val):
             if val == 'a':
-                return 'convertet: {0}'.format(val)
+                return f'convertet: {val}'
             raise ValueError("Value not 'a'")
 
-        self.assertEqual(
-            convert_value_to_datatype('a', convert_func),
-            'convertet: a'
-        )
+        self.assertEqual(convert_value_to_datatype('a', convert_func), 'convertet: a')
 
         with self.assertRaises(ValueError) as arc:
             convert_value_to_datatype('b', convert_func)
@@ -343,8 +321,7 @@ class TestDatatypes(YafowilTestCase):
 
     def test_convert_value_to_datatype_class(self):
         # Custom converters as class
-        class Converter(object):
-
+        class Converter:
             def __init__(self, val):
                 if val != 'a':
                     raise ValueError("Value not 'a'")
@@ -358,17 +335,13 @@ class TestDatatypes(YafowilTestCase):
 
     def test_convert_value_to_datatype_instance(self):
         # Custom converter as class instance with ``__call__`` function
-        class ConverterInst(object):
-
+        class ConverterInst:
             def __call__(self, val):
                 if val != 'a':
                     raise ValueError("Value not 'a'")
-                return 'convertet: {0}'.format(val)
+                return f'convertet: {val}'
 
-        self.assertEqual(
-            convert_value_to_datatype('a', ConverterInst()),
-            'convertet: a'
-        )
+        self.assertEqual(convert_value_to_datatype('a', ConverterInst()), 'convertet: a')
 
         with self.assertRaises(ValueError) as arc:
             convert_value_to_datatype('b', ConverterInst())
@@ -382,11 +355,8 @@ class TestDatatypes(YafowilTestCase):
 
     def test_datatype_extractor(self):
         # No datatype given, no datatype conversion happens at all
-        widget = factory(
-            'text',
-            name='MYFIELD',
-            value='')
-        data = widget.extract({'MYFIELD': u''})
+        widget = factory('text', name='MYFIELD', value='')
+        data = widget.extract({'MYFIELD': ''})
         self.assertEqual(data.errors, [])
         self.assertEqual(data.extracted, '')
 
@@ -397,7 +367,8 @@ class TestDatatypes(YafowilTestCase):
             value='',
             props={
                 'datatype': 'str',
-            })
+            },
+        )
 
         # Default emptyvalue
         data = widget.extract({})
@@ -438,7 +409,7 @@ class TestDatatypes(YafowilTestCase):
         self.assertEqual(data.extracted, b'abc')
 
         # Unicode emptyvalue
-        widget.attrs['emptyvalue'] = u''
+        widget.attrs['emptyvalue'] = ''
         data = widget.extract({})
         self.assertEqual(data.errors, [])
         self.assertEqual(data.extracted, UNSET)
@@ -450,7 +421,8 @@ class TestDatatypes(YafowilTestCase):
             value='',
             props={
                 'datatype': 'int',
-            })
+            },
+        )
 
         # Default emptyvalue
         data = widget.extract({})
@@ -508,7 +480,8 @@ class TestDatatypes(YafowilTestCase):
             value='',
             props={
                 'datatype': 'long',
-            })
+            },
+        )
 
         # Default emptyvalue
         data = widget.extract({})
@@ -547,7 +520,7 @@ class TestDatatypes(YafowilTestCase):
 
         data = widget.extract({'MYDATATYPEFIELD': ''})
         self.assertEqual(data.errors, [])
-        self.assertEqual(data.extracted, int(-1))
+        self.assertEqual(data.extracted, (-1))
 
         # String emptyvalue. If convertable still fine
         widget.attrs['emptyvalue'] = '0'
@@ -557,7 +530,7 @@ class TestDatatypes(YafowilTestCase):
 
         data = widget.extract({'MYDATATYPEFIELD': ''})
         self.assertEqual(data.errors, [])
-        self.assertEqual(data.extracted, int(0))
+        self.assertEqual(data.extracted, 0)
 
         # Test emptyvalue if ``float`` datatype set
         widget = factory(
@@ -566,7 +539,8 @@ class TestDatatypes(YafowilTestCase):
             value='',
             props={
                 'datatype': 'float',
-            })
+            },
+        )
 
         # Default emptyvalue
         data = widget.extract({})
@@ -624,7 +598,8 @@ class TestDatatypes(YafowilTestCase):
             value='',
             props={
                 'datatype': 'uuid',
-            })
+            },
+        )
 
         # Default emptyvalue
         data = widget.extract({})
@@ -683,16 +658,14 @@ class TestDatatypes(YafowilTestCase):
             value='',
             props={
                 'datatype': 'int',
-            })
+            },
+        )
         data = widget.extract({'MYDATATYPEFIELD': '1'})
         self.assertEqual(data.errors, [])
         self.assertEqual(data.extracted, 1)
 
         data = widget.extract({'MYDATATYPEFIELD': 'a'})
-        self.assertEqual(
-            data.errors,
-            [ExtractionError('Input is not a valid integer.')]
-        )
+        self.assertEqual(data.errors, [ExtractionError('Input is not a valid integer.')])
 
         # Float extraction
         widget = factory(
@@ -701,15 +674,15 @@ class TestDatatypes(YafowilTestCase):
             value='',
             props={
                 'datatype': 'float',
-            })
+            },
+        )
         data = widget.extract({'MYDATATYPEFIELD': '1.2'})
         self.assertEqual(data.errors, [])
         self.assertEqual(data.extracted, 1.2)
 
         data = widget.extract({'MYDATATYPEFIELD': 'a'})
         self.assertEqual(
-            data.errors,
-            [ExtractionError('Input is not a valid floating point number.')]
+            data.errors, [ExtractionError('Input is not a valid floating point number.')]
         )
 
         # UUID extraction
@@ -719,21 +692,16 @@ class TestDatatypes(YafowilTestCase):
             value='',
             props={
                 'datatype': 'uuid',
-            })
-        data = widget.extract({
-            'MYDATATYPEFIELD': '3b8449f3-0456-4baa-a670-3066b0fcbda0'
-        })
+            },
+        )
+        data = widget.extract({'MYDATATYPEFIELD': '3b8449f3-0456-4baa-a670-3066b0fcbda0'})
         self.assertEqual(data.errors, [])
         self.assertEqual(
-            data.extracted,
-            uuid.UUID('3b8449f3-0456-4baa-a670-3066b0fcbda0')
+            data.extracted, uuid.UUID('3b8449f3-0456-4baa-a670-3066b0fcbda0')
         )
 
         data = widget.extract({'MYDATATYPEFIELD': 'a'})
-        self.assertEqual(
-            data.errors,
-            [ExtractionError('Input is not a valid UUID.')]
-        )
+        self.assertEqual(data.errors, [ExtractionError('Input is not a valid UUID.')])
 
         # Test ``datatype`` not allowed
         widget = factory(
@@ -743,11 +711,10 @@ class TestDatatypes(YafowilTestCase):
             props={
                 'datatype': 'uuid',
                 'allowed_datatypes': [int],
-            })
+            },
+        )
 
-        request = {
-            'MYDATATYPEFIELD': '3b8449f3-0456-4baa-a670-3066b0fcbda0'
-        }
+        request = {'MYDATATYPEFIELD': '3b8449f3-0456-4baa-a670-3066b0fcbda0'}
         with self.assertRaises(ValueError) as arc:
             widget.extract(request)
         self.assertEqual(str(arc.exception), 'Datatype not allowed: "uuid"')
@@ -757,13 +724,9 @@ class TestDatatypes(YafowilTestCase):
             'text',
             name='MYDATATYPEFIELD',
             value='',
-            props={
-                'datatype': int,
-                'datatype_message': 'This did not work'
-            })
-        request = {
-            'MYDATATYPEFIELD': 'a'
-        }
+            props={'datatype': int, 'datatype_message': 'This did not work'},
+        )
+        request = {'MYDATATYPEFIELD': 'a'}
         data = widget.extract(request)
         self.assertEqual(data.errors, [ExtractionError('This did not work')])
         self.assertEqual(data.extracted, 'a')
@@ -779,15 +742,11 @@ class TestDatatypes(YafowilTestCase):
             value='',
             props={
                 'datatype': custom_converter,
-            })
-        request = {
-            'MYDATATYPEFIELD': 'a'
-        }
-        data = widget.extract(request)
-        self.assertEqual(
-            data.errors,
-            [ExtractionError('Input conversion failed.')]
+            },
         )
+        request = {'MYDATATYPEFIELD': 'a'}
+        data = widget.extract(request)
+        self.assertEqual(data.errors, [ExtractionError('Input conversion failed.')])
         self.assertEqual(data.extracted, 'a')
 
         # Test unknown string ``datatype`` identifier
@@ -797,7 +756,8 @@ class TestDatatypes(YafowilTestCase):
             value='',
             props={
                 'datatype': 'inexistent',
-            })
+            },
+        )
         with self.assertRaises(ValueError) as arc:
             widget.extract({'MYDATATYPEFIELD': 'a'})
         self.assertEqual(str(arc.exception), 'Datatype unknown: "inexistent"')

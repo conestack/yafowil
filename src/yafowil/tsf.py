@@ -1,16 +1,14 @@
 import os
 
 
-class DummyTranslationStringFactory(object):
-    """Dummy Translations string factory.
-    """
+class DummyTranslationStringFactory:
+    """Dummy Translations string factory."""
 
     def __init__(self, domain):
         self.domain = domain
 
     def __call__(self, message, default='', mapping={}):
-        """Directly create message and return it as is.
-        """
+        """Directly create message and return it as is."""
         message = default or message
         if mapping:
             for k, v in mapping.items():

@@ -8,7 +8,6 @@ from unittest import mock
 from yafowil import utils
 from yafowil.base import factory
 from yafowil.tests import YafowilTestCase
-from yafowil.utils import Tag
 from yafowil.utils import as_data_attrs
 from yafowil.utils import attr_value
 from yafowil.utils import callable_value
@@ -21,16 +20,19 @@ from yafowil.utils import get_example_names
 from yafowil.utils import get_plugin_names
 from yafowil.utils import get_plugins
 from yafowil.utils import managedprops
+from yafowil.utils import Tag
 from yafowil.utils import tag as deprecated_tag
 from yafowil.utils import vocabulary
 
 
 class TestUtils(YafowilTestCase):
-
     def test_get_plugins(self):
-        self.checkOutput("""
+        self.checkOutput(
+            """
         [...(EntryPoint(name='register', value='yafowil.loader:register', group='yafowil.plugin'), <function register at ...>)...]
-        """, str(list(get_plugins())))
+        """,
+            str(list(get_plugins())),
+        )
 
         self.assertEqual(list(get_plugins('nonexisting')), [])
 
@@ -42,40 +44,49 @@ class TestUtils(YafowilTestCase):
                 name='register',
                 module=module,
                 dist=SimpleNamespace(name=dist_name),
-                load=lambda: register
+                load=lambda: register,
             )
 
         own = entry_point('yafowil.foo', 'yafowil.foo')
         foreign = entry_point('yafowil.foo', 'other')
-        with mock.patch.object(utils, '_yafowil_plugins', None), \
-                mock.patch.object(utils, 'entry_points', return_value=[
-                    own, foreign
-                ]):
+        with (
+            mock.patch.object(utils, '_yafowil_plugins', None),
+            mock.patch.object(utils, 'entry_points', return_value=[own, foreign]),
+        ):
             self.assertEqual(list(get_plugins()), [(own, register)])
 
     def test_get_plugin_names(self):
         example_names = get_example_names()
-        self.checkOutput("""
+        self.checkOutput(
+            """
         [...'yafowil'...]
-        """, str(example_names))
+        """,
+            str(example_names),
+        )
 
         self.assertEqual(get_plugin_names('nonexisting'), [])
 
     def test_examples_lookup(self):
-        self.checkOutput("""
+        self.checkOutput(
+            """
         ['yafowil'...]
-        """, str(sorted(get_example_names())))
+        """,
+            str(sorted(get_example_names())),
+        )
 
         factory.register_macro('field', 'field:label:error', {})
 
         self.assertEqual(get_example('inexistent'), None)
 
         examples = get_example('yafowil')
-        self.checkOutput("""
+        self.checkOutput(
+            """
         Plain Text
         ----------
         ...
-        """, examples[0]['doc'])
+        """,
+            examples[0]['doc'],
+        )
 
         self.assertEqual(examples[0]['title'], 'Plain Text')
         self.assertEqual(examples[0]['widget'].name, 'yafowil-plaintext')
@@ -84,45 +95,40 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(vocabulary('foo'), [('foo', 'foo')])
         self.assertEqual(vocabulary({'key': 'value'}), [('key', 'value')])
         self.assertEqual(
-            vocabulary(['value', 'value2']),
-            [('value', 'value'), ('value2', 'value2')]
+            vocabulary(['value', 'value2']), [('value', 'value'), ('value2', 'value2')]
         )
         self.assertEqual(
-            vocabulary([
-                ('key', 'value'),
-                ('key2', 'value2', 'v2.3'),
-                ('key3',)
-            ]),
-            [('key', 'value'), ('key2', 'value2'), ('key3', 'key3')]
+            vocabulary([('key', 'value'), ('key2', 'value2', 'v2.3'), ('key3',)]),
+            [('key', 'value'), ('key2', 'value2'), ('key3', 'key3')],
         )
 
         def callme():
             return 'bar'
+
         self.assertEqual(vocabulary(callme), [('bar', 'bar')])
         self.assertTrue(vocabulary(None) is None)
 
     def test_Tag(self):
         tag = Tag(lambda msg: msg)
-        t = tag('p', b'Lorem Ipsum. ', u'Hello World!',
-                class_=b'fancy', id=u'2f5b8a234ff')
-        self.assertEqual(t, (
-            u'<p class="fancy" id="2f5b8a234ff">Lorem Ipsum. Hello World!</p>'
-        ))
+        t = tag('p', b'Lorem Ipsum. ', 'Hello World!', class_=b'fancy', id='2f5b8a234ff')
+        self.assertEqual(
+            t, ('<p class="fancy" id="2f5b8a234ff">Lorem Ipsum. Hello World!</p>')
+        )
         self.assertEqual(
             tag('dummy', name='foo', **{'data-foo': 'bar'}),
-            u'<dummy data-foo=\'bar\' name="foo" />'
+            '<dummy data-foo=\'bar\' name="foo" />',
         )
-        self.assertEqual(tag('dummy', name=None), u'<dummy />')
-        self.assertEqual(tag('dummy', name=UNSET), u'<dummy />')
+        self.assertEqual(tag('dummy', name=None), '<dummy />')
+        self.assertEqual(tag('dummy', name=UNSET), '<dummy />')
         # deprecated test
-        self.assertEqual(deprecated_tag('div', 'foo'), u'<div>foo</div>')
+        self.assertEqual(deprecated_tag('div', 'foo'), '<div>foo</div>')
 
     def test_cssid(self):
         @plumbing(Attributes)
         class CSSTestNode(OrderedNode):
             @property
             def dottedpath(self):
-                return u'.'.join([it for it in self.path if it])
+                return '.'.join([it for it in self.path if it])
 
         widget = CSSTestNode(name='form')
 
@@ -132,11 +138,10 @@ class TestUtils(YafowilTestCase):
         child = widget['child'] = CSSTestNode()
         self.assertEqual(cssid(child, 'PREFIX'), 'PREFIX-form-child')
         self.assertEqual(
-            cssid(child, 'PREFIX', postfix='POSTFIX'),
-            'PREFIX-form-child-POSTFIX'
+            cssid(child, 'PREFIX', postfix='POSTFIX'), 'PREFIX-form-child-POSTFIX'
         )
 
-        child = widget[u'Hällo Wörld'] = CSSTestNode()
+        child = widget['Hällo Wörld'] = CSSTestNode()
         self.assertEqual(cssid(child, 'PREFIX'), 'PREFIX-form-Hallo_World')
 
     def test_css_classes(self):
@@ -155,7 +160,7 @@ class TestUtils(YafowilTestCase):
         widget.attrs['class'] = None
         widget.attrs['class_add'] = None
 
-        class DummyData(object):
+        class DummyData:
             def __init__(self):
                 self.errors = []
                 self.extracted = UNSET
@@ -189,10 +194,7 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(cssclasses(widget, data), 'baz error')
 
         widget.attrs['class_add'] = lambda w, d: 'addclass_from_callable'
-        self.assertEqual(
-            cssclasses(widget, data),
-            'addclass_from_callable baz error'
-        )
+        self.assertEqual(cssclasses(widget, data), 'addclass_from_callable baz error')
 
         widget.attrs['class_add'] = 'addclass'
         self.assertEqual(cssclasses(widget, data), 'addclass baz error')
@@ -220,14 +222,11 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(cssclasses(widget, data), 'error required')
 
         widget.attrs['class'] = 'foo bar'
-        self.assertEqual(
-            cssclasses(widget, data),
-            'bar error foo required'
-        )
+        self.assertEqual(cssclasses(widget, data), 'bar error foo required')
 
         self.assertEqual(
             cssclasses(widget, data, additional=['zika', 'akiz']),
-            'akiz bar error foo required zika'
+            'akiz bar error foo required zika',
         )
 
         data.errors = []
@@ -248,10 +247,7 @@ class TestUtils(YafowilTestCase):
 
         self.assertEqual(somefunc(1, 2, 3), (1, 2, 3))
 
-        self.assertEqual(
-            somefunc.__yafowil_managed_props__,
-            ('foo', 'bar')
-        )
+        self.assertEqual(somefunc.__yafowil_managed_props__, ('foo', 'bar'))
 
     def test_attr_value(self):
         widget = AttributedNode()
@@ -264,10 +260,7 @@ class TestUtils(YafowilTestCase):
             return 'func_callback value'
 
         widget.attrs['attr'] = func_callback
-        self.assertEqual(
-            attr_value('attr', widget, data),
-            'func_callback value'
-        )
+        self.assertEqual(attr_value('attr', widget, data), 'func_callback value')
 
         def failing_func_callback(widget, data):
             raise Exception('failing_func_callback')
@@ -277,7 +270,7 @@ class TestUtils(YafowilTestCase):
             attr_value('attr', widget, data)
         self.assertEqual(str(arc.exception), 'failing_func_callback')
 
-        class FormContext(object):
+        class FormContext:
             def instance_callback(self, widget, data):
                 return 'instance_callback'
 
@@ -286,10 +279,7 @@ class TestUtils(YafowilTestCase):
 
         context = FormContext()
         widget.attrs['attr'] = context.instance_callback
-        self.assertEqual(
-            attr_value('attr', widget, data),
-            'instance_callback'
-        )
+        self.assertEqual(attr_value('attr', widget, data), 'instance_callback')
 
         widget.attrs['attr'] = context.failing_instance_callback
         with self.assertRaises(Exception) as arc:
@@ -298,16 +288,10 @@ class TestUtils(YafowilTestCase):
 
     def test_as_data_attrs(self):
         self.assertTrue(as_data_attrs is generic_html5_attrs)
-        html5_attrs = as_data_attrs({
-            'foo': 'bar',
-            'baz': ['bam'],
-            'nada': None,
-            'unset': UNSET
-        })
-        self.assertEqual(
-            html5_attrs,
-            {'data-baz': '["bam"]', 'data-foo': 'bar'}
+        html5_attrs = as_data_attrs(
+            {'foo': 'bar', 'baz': ['bam'], 'nada': None, 'unset': UNSET}
         )
+        self.assertEqual(html5_attrs, {'data-baz': '["bam"]', 'data-foo': 'bar'})
         html5_attrs = as_data_attrs(None)
         self.assertEqual(html5_attrs, {})
         html5_attrs = as_data_attrs(UNSET)
@@ -321,18 +305,21 @@ class TestUtils(YafowilTestCase):
         widget.attrs['testattr3'] = False
         widget.attrs['testattr4'] = None
         widget.attrs['testattr5'] = ['item1', 'item2', 'item3']
-        widget.attrs['testattr6'] = {
-            'key1': 'item1',
-            'key2': 'item2',
-            'key3': 'item3'
-        }
+        widget.attrs['testattr6'] = {'key1': 'item1', 'key2': 'item2', 'key3': 'item3'}
         widget.attrs['testattr7'] = 1234
         widget.attrs['testattr8'] = 1234.5678
         widget.attrs['testattr9'] = UNSET
         widget.attrs['camelAttrName'] = 'camelValue'
         data_attrs_keys = [
-            'testattr1', 'testattr2', 'testattr3', 'testattr4', 'testattr5',
-            'testattr6', 'testattr7', 'testattr8', 'camelAttrName'
+            'testattr1',
+            'testattr2',
+            'testattr3',
+            'testattr4',
+            'testattr5',
+            'testattr6',
+            'testattr7',
+            'testattr8',
+            'camelAttrName',
         ]
         data_attrs = data_attrs_helper(widget, data, data_attrs_keys)
 
@@ -340,10 +327,7 @@ class TestUtils(YafowilTestCase):
         self.assertEqual(data_attrs['data-testattr2'], 'true')
         self.assertEqual(data_attrs['data-testattr3'], 'false')
         self.assertFalse('data-testattr4' in data_attrs)
-        self.assertEqual(
-            data_attrs['data-testattr5'],
-            '["item1", "item2", "item3"]'
-        )
+        self.assertEqual(data_attrs['data-testattr5'], '["item1", "item2", "item3"]')
         self.assertTrue(data_attrs['data-testattr6'].find('"key1": "item1"'))
         self.assertTrue(data_attrs['data-testattr6'].find('"key2": "item2"'))
         self.assertTrue(data_attrs['data-testattr6'].find('"key3": "item3"'))
@@ -356,7 +340,8 @@ class TestUtils(YafowilTestCase):
 
         # Test with Tag renderer
         tag = Tag(lambda msg: msg)
-        self.checkOutput("""
+        self.checkOutput(
+            """
         <dummy
           data-camel-attr-name='camelValue'
           data-testattr1='value'
@@ -367,7 +352,9 @@ class TestUtils(YafowilTestCase):
           data-testattr7='1234'
           data-testattr8='1234.5678'
           name="foo" />
-        """, tag('dummy', name='foo', **data_attrs))
+        """,
+            tag('dummy', name='foo', **data_attrs),
+        )
 
     def test_callable_value(self):
         # non callbale is returned as is
@@ -375,10 +362,12 @@ class TestUtils(YafowilTestCase):
 
         # callable expects widget and data
         def dummy_callable(widget, data):
-            return "2"
+            return '2'
+
         self.assertEqual(callable_value(dummy_callable, None, None), '2')
 
         # callable with no parameters raises type error
         def invalid_signature():
             pass  # pragma: no cover
+
         self.assertRaises(TypeError, invalid_signature, None, None)

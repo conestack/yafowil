@@ -10,12 +10,12 @@ from yafowil.datatypes import convert_value_to_datatype
 from yafowil.datatypes import convert_values_to_datatype
 from yafowil.datatypes import generic_datatype_extractor
 from yafowil.datatypes import generic_emptyvalue_extractor
-from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import as_data_attrs
 from yafowil.utils import attr_value
 from yafowil.utils import css_managed_props
 from yafowil.utils import cssclasses
 from yafowil.utils import cssid
+from yafowil.utils import EMPTY_VALUE
 from yafowil.utils import managedprops
 from yafowil.utils import vocabulary
 
@@ -24,11 +24,12 @@ from yafowil.utils import vocabulary
 # select
 ###############################################################################
 
+
 @managedprops('multivalued', 'disabled')
 def select_extractor(widget, data):
     extracted = generic_extractor(widget, data)
     multivalued = attr_value('multivalued', widget, data)
-    exists_marker = '{0}-exists'.format(widget.dottedpath)
+    exists_marker = f'{widget.dottedpath}-exists'
     if extracted is UNSET and exists_marker in data.request:
         if multivalued:
             extracted = []
@@ -59,7 +60,7 @@ def select_exists_marker(widget, data):
     attrs = {
         'type': 'hidden',
         'value': 'exists',
-        'name_': "{0}-exists".format(widget.dottedpath),
+        'name_': f'{widget.dottedpath}-exists',
         'id': cssid(widget, 'exists'),
     }
     return tag('input', **attrs)
@@ -75,24 +76,21 @@ def select_edit_renderer_props(widget, data):
         value = convert_values_to_datatype(value, datatype)
     emptyvalue = attr_value('emptyvalue', widget, data, EMPTY_VALUE)
     if not multivalued and len(value) > 1:
-        raise ValueError(u'Multiple values for single selection.')
+        raise ValueError('Multiple values for single selection.')
     disabled = attr_value('disabled', widget, data, False)
     return value, multivalued, datatype, emptyvalue, disabled
 
 
 def select_block_edit_renderer(widget, data, custom_attrs={}):
-    value, multivalued, datatype, emptyvalue, disabled = \
-        select_edit_renderer_props(widget, data)
+    value, multivalued, datatype, emptyvalue, disabled = select_edit_renderer_props(
+        widget, data
+    )
     optiontags = []
     vocab = attr_value('vocabulary', widget, data, [])
     for key, term in vocabulary(vocab):
         vval = key
         if datatype:
-            vval = convert_value_to_datatype(
-                key,
-                datatype,
-                empty_value=emptyvalue
-            )
+            vval = convert_value_to_datatype(key, datatype, empty_value=emptyvalue)
         key = '' if key in [None, UNSET] else key
         attrs = {
             'selected': 'selected' if vval in value else None,
@@ -102,8 +100,7 @@ def select_block_edit_renderer(widget, data, custom_attrs={}):
         if disabled and disabled is not True and vval in disabled:
             attrs['disabled'] = 'disabled'
         optiontags.append(data.tag('option', term, **attrs))
-    autofocus = \
-        attr_value('autofocus', widget, data) and 'autofocus' or None
+    autofocus = attr_value('autofocus', widget, data) and 'autofocus' or None
     required = attr_value('required', widget, data) and 'required' or None
     block_class = attr_value('block_class', widget, data)
     select_attrs = {
@@ -128,7 +125,7 @@ def select_block_edit_renderer(widget, data, custom_attrs={}):
         attrs = {
             'type': 'hidden',
             'value': 'exists',
-            'name_': '{0}-exists'.format(widget.dottedpath),
+            'name_': f'{widget.dottedpath}-exists',
             'id': cssid(widget, 'exists'),
         }
         rendered = select_exists_marker(widget, data) + rendered
@@ -136,8 +133,9 @@ def select_block_edit_renderer(widget, data, custom_attrs={}):
 
 
 def select_cb_edit_renderer(widget, data, custom_attrs={}):
-    value, multivalued, datatype, emptyvalue, disabled = \
-        select_edit_renderer_props(widget, data)
+    value, multivalued, datatype, emptyvalue, disabled = select_edit_renderer_props(
+        widget, data
+    )
     tags = []
     label_pos = attr_value('listing_label_position', widget, data)
     if label_pos == 'inner':
@@ -165,11 +163,7 @@ def select_cb_edit_renderer(widget, data, custom_attrs={}):
     for key, term in vocabulary(vocab):
         vval = key
         if datatype:
-            vval = convert_value_to_datatype(
-                key,
-                datatype,
-                empty_value=emptyvalue
-            )
+            vval = convert_value_to_datatype(key, datatype, empty_value=emptyvalue)
         key = '' if key in [None, UNSET] else key
         input_attrs = {
             'type': tagtype,
@@ -177,27 +171,27 @@ def select_cb_edit_renderer(widget, data, custom_attrs={}):
             'checked': 'checked' if vval in value else None,
             'name_': widget.dottedpath,
             'id': cssid(widget, 'input', key),
-            'class_': cssclasses(
-                widget,
-                data,
-                additional=[input_class_additional]
-            ),
+            'class_': cssclasses(widget, data, additional=[input_class_additional]),
         }
-        if (disabled and disabled is not True and vval in disabled) \
-           or disabled is True:
+        if (disabled and disabled is not True and vval in disabled) or disabled is True:
             input_attrs['disabled'] = 'disabled'
         inputtag = data.tag('input', **input_attrs)
         label_attrs = dict(for_=input_attrs['id'], _class=label_class)
         item = generic_positional_rendering_helper(
-            'label', term, label_attrs, inputtag, label_pos, data.tag)
-        item_wrapper = data.tag(item_tag, item, **{
-            'id': cssid(widget, tagtype, key),
-            'class': wrapper_class,
-        })
+            'label', term, label_attrs, inputtag, label_pos, data.tag
+        )
+        item_wrapper = data.tag(
+            item_tag,
+            item,
+            **{
+                'id': cssid(widget, tagtype, key),
+                'class': wrapper_class,
+            },
+        )
         tags.append(item_wrapper)
     wrapper_attrs = {
         'id': cssid(widget, tagtype, 'wrapper'),
-        'class': cssclasses(widget, data, classattr='wrapper_class')
+        'class': cssclasses(widget, data, classattr='wrapper_class'),
     }
     wrapper_attrs.update(as_data_attrs(attr_value('data', widget, data)))
     wrapper_attrs.update(custom_attrs)
@@ -226,14 +220,11 @@ def select_cb_edit_renderer(widget, data, custom_attrs={}):
     'radio_wrapper_class',
     'radio_label_class',
     'radio_input_class',
-    *css_managed_props)
+    *css_managed_props,
+)
 def select_edit_renderer(widget, data, custom_attrs={}):
     if attr_value('format', widget, data) == 'block':
-        return select_block_edit_renderer(
-            widget,
-            data,
-            custom_attrs=custom_attrs
-        )
+        return select_block_edit_renderer(widget, data, custom_attrs=custom_attrs)
     return select_cb_edit_renderer(widget, data, custom_attrs=custom_attrs)
 
 
@@ -243,11 +234,11 @@ def select_display_renderer(widget, data):
     if type(value) in (list, tuple) and not value:
         value = attr_value('empty_display_value', widget, data)
         if not value:
-            value = u''
+            value = ''
     multivalued = attr_value('multivalued', widget, data)
     vocab = attr_value('vocabulary', widget, data, [])
     # fallback for list of strings
-    if type(vocab) == list and all(isinstance(item, str) for item in vocab):
+    if type(vocab) is list and all(isinstance(item, str) for item in vocab):
         vocab = enumerate(vocab)
     vocab = dict(vocab)
     if not multivalued or not value:
@@ -255,25 +246,28 @@ def select_display_renderer(widget, data):
         if not value:
             value = attr_value('empty_display_value', widget, data)
             if not value:
-                value = u''
+                value = ''
         if data.tag.translate:
             value = data.tag.translate(value)
         return generic_display_renderer(widget, data, value=value)
     cssclasses = [
-        attr_value("display_class", widget, data),
-        f'display-{attr_value("class", widget, data) or "generic"}'
+        attr_value('display_class', widget, data),
+        f'display-{attr_value("class", widget, data) or "generic"}',
     ]
     attrs = {
         'id': cssid(widget, 'display'),
-        'class_': ' '.join([_ for _ in cssclasses if _ is not None])
+        'class_': ' '.join([_ for _ in cssclasses if _ is not None]),
     }
     attrs.update(as_data_attrs(attr_value('data', widget, data)))
-    content = u''
+    content = ''
     if multivalued and isinstance(value, str):
         value = [value]
     for key in value:
-        content += data.tag('li', vocab.get(key, key),
-                            **{'class_': attr_value("display_item_class", widget, data)})
+        content += data.tag(
+            'li',
+            vocab.get(key, key),
+            **{'class_': attr_value('display_item_class', widget, data)},
+        )
     return data.tag('ul', content, **attrs)
 
 
@@ -286,10 +280,7 @@ factory.register(
         generic_datatype_extractor,
     ],
     edit_renderers=[select_edit_renderer],
-    display_renderers=[
-        select_display_renderer,
-        display_proxy_renderer
-    ]
+    display_renderers=[select_display_renderer, display_proxy_renderer],
 )
 
 factory.doc['blueprint']['select'] = """\

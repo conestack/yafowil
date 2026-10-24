@@ -24,8 +24,7 @@ def url_extractor(widget, data):
     if not val:
         return val
     if not re.match(URL_RE, val is not UNSET and val or ''):
-        message = _('web_address_not_valid',
-                    default=u'Input not a valid web address.')
+        message = _('web_address_not_valid', default='Input not a valid web address.')
         raise ExtractionError(message)
     return val
 
@@ -36,13 +35,10 @@ factory.register(
         generic_extractor,
         generic_required_extractor,
         generic_emptyvalue_extractor,
-        url_extractor
+        url_extractor,
     ],
     edit_renderers=[input_generic_renderer],
-    display_renderers=[
-        generic_display_renderer,
-        display_proxy_renderer
-    ]
+    display_renderers=[generic_display_renderer, display_proxy_renderer],
 )
 
 factory.doc['blueprint']['url'] = """\

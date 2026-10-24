@@ -6,19 +6,19 @@ from yafowil.tests import YafowilTestCase
 
 
 class TestPassword(YafowilTestCase):
-
     def test_password_blueprint(self):
         # Password widget has some additional properties, ``strength``,
         # ``minlength`` and ``ascii``.
 
         # Use in add forms, no password set yet
-        widget = factory(
-            'password',
-            name='PWD')
-        self.assertEqual(widget(), (
-            '<input class="password" id="input-PWD" name="PWD" '
-            'type="password" value="" />'
-        ))
+        widget = factory('password', name='PWD')
+        self.assertEqual(
+            widget(),
+            (
+                '<input class="password" id="input-PWD" name="PWD" '
+                'type="password" value="" />'
+            ),
+        )
 
         data = widget.extract({})
         self.assertEqual(data.extracted, UNSET)
@@ -33,14 +33,14 @@ class TestPassword(YafowilTestCase):
         # but a placeholder is used when a password is already set. Thus, if a
         # extracted password value is UNSET, this means that password was not
         # changed
-        widget = factory(
-            'password',
-            name='PASSWORD',
-            value='secret')
-        self.assertEqual(widget(), (
-            '<input class="password" id="input-PASSWORD" name="PASSWORD" '
-            'type="password" value="_NOCHANGE_" />'
-        ))
+        widget = factory('password', name='PASSWORD', value='secret')
+        self.assertEqual(
+            widget(),
+            (
+                '<input class="password" id="input-PASSWORD" name="PASSWORD" '
+                'type="password" value="_NOCHANGE_" />'
+            ),
+        )
 
         data = widget.extract({'PASSWORD': '_NOCHANGE_'})
         self.assertEqual(data.extracted, UNSET)
@@ -48,10 +48,13 @@ class TestPassword(YafowilTestCase):
         data = widget.extract({'PASSWORD': 'foo'})
         self.assertEqual(data.extracted, 'foo')
 
-        self.assertEqual(widget(data=data), (
-            '<input class="password" id="input-PASSWORD" name="PASSWORD" '
-            'type="password" value="foo" />'
-        ))
+        self.assertEqual(
+            widget(data=data),
+            (
+                '<input class="password" id="input-PASSWORD" name="PASSWORD" '
+                'type="password" value="foo" />'
+            ),
+        )
 
         widget.mode = 'display'
         self.assertEqual(widget(), '********')
@@ -62,7 +65,8 @@ class TestPassword(YafowilTestCase):
             name='PWD',
             props={
                 'strength': 5,  # max 4, does not matter, max is used
-            })
+            },
+        )
         data = widget.extract({'PWD': ''})
         self.assertEqual(data.errors, [ExtractionError('Password too weak')])
 
@@ -87,11 +91,11 @@ class TestPassword(YafowilTestCase):
             name='PWD',
             props={
                 'minlength': 3,
-            })
+            },
+        )
         data = widget.extract({'PWD': 'xx'})
         self.assertEqual(
-            data.errors,
-            [ExtractionError('Input must have at least 3 characters.')]
+            data.errors, [ExtractionError('Input must have at least 3 characters.')]
         )
 
         data = widget.extract({'PWD': 'xxx'})
@@ -103,14 +107,14 @@ class TestPassword(YafowilTestCase):
             name='PWD',
             props={
                 'ascii': True,
-            })
-        data = widget.extract({'PWD': u'äää'})
+            },
+        )
+        data = widget.extract({'PWD': 'äää'})
         self.assertEqual(
-            data.errors,
-            [ExtractionError('Input contains illegal characters.')]
+            data.errors, [ExtractionError('Input contains illegal characters.')]
         )
 
-        data = widget.extract({'PWD': u'xx'})
+        data = widget.extract({'PWD': 'xx'})
         self.assertEqual(data.errors, [])
 
         # Combine all validations
@@ -122,26 +126,25 @@ class TestPassword(YafowilTestCase):
                 'minlength': 6,
                 'ascii': True,
                 'strength': 4,
-            })
-        data = widget.extract({'PWD': u''})
+            },
+        )
+        data = widget.extract({'PWD': ''})
         self.assertEqual(data.errors, [ExtractionError('No Password given')])
 
-        data = widget.extract({'PWD': u'xxxxx'})
+        data = widget.extract({'PWD': 'xxxxx'})
         self.assertEqual(
-            data.errors,
-            [ExtractionError('Input must have at least 6 characters.')]
+            data.errors, [ExtractionError('Input must have at least 6 characters.')]
         )
 
-        data = widget.extract({'PWD': u'xxxxxä'})
+        data = widget.extract({'PWD': 'xxxxxä'})
         self.assertEqual(
-            data.errors,
-            [ExtractionError('Input contains illegal characters.')]
+            data.errors, [ExtractionError('Input contains illegal characters.')]
         )
 
-        data = widget.extract({'PWD': u'xxxxxx'})
+        data = widget.extract({'PWD': 'xxxxxx'})
         self.assertEqual(data.errors, [ExtractionError('Password too weak')])
 
-        data = widget.extract({'PWD': u'xX1*00'})
+        data = widget.extract({'PWD': 'xX1*00'})
         self.assertEqual(data.errors, [])
 
         # Emptyvalue
@@ -150,7 +153,8 @@ class TestPassword(YafowilTestCase):
             name='PWD',
             props={
                 'emptyvalue': 'DEFAULTPWD',  # <- not a good idea, but works
-            })
+            },
+        )
         data = widget.extract(request={'PWD': ''})
         self.assertEqual(data.name, 'PWD')
         self.assertEqual(data.value, UNSET)
@@ -165,11 +169,8 @@ class TestPassword(YafowilTestCase):
 
         # Persist
         widget = factory(
-            'password',
-            name='PWD',
-            props={
-                'persist_writer': write_mapping_writer
-            })
+            'password', name='PWD', props={'persist_writer': write_mapping_writer}
+        )
         data = widget.extract(request={'PWD': '1234'})
         model = dict()
         data.write(model)

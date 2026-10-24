@@ -19,10 +19,7 @@ factory.register(
         generic_emptyvalue_extractor,
     ],
     edit_renderers=[input_generic_renderer],
-    display_renderers=[
-        generic_display_renderer,
-        display_proxy_renderer
-    ]
+    display_renderers=[generic_display_renderer, display_proxy_renderer],
 )
 
 factory.doc['blueprint']['search'] = """\

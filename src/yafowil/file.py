@@ -17,6 +17,7 @@ from yafowil.utils import vocabulary
 # file
 ###############################################################################
 
+
 def file_extractor(widget, data):
     """Return a dict with following keys:
 
@@ -36,25 +37,24 @@ def file_extractor(widget, data):
     name = widget.dottedpath
     if name not in data.request:
         return UNSET
-    if not '{0}-action'.format(name) in data.request:
+    if f'{name}-action' not in data.request:
         value = data.request[name]
         if value:
             value['action'] = 'new'
         return value
     value = data.value
-    action = value['action'] = data.request.get(
-        '{0}-action'.format(name),
-        'keep'
-    )
+    action = value['action'] = data.request.get(f'{name}-action', 'keep')
     if action == 'delete':
         value['file'] = UNSET
     elif action == 'replace':
         new_val = data.request[name]
         if not new_val:
-            raise ExtractionError(_(
-                'file_replace_no_upload',
-                default='Cannot replace file. No file uploaded.'
-            ))
+            raise ExtractionError(
+                _(
+                    'file_replace_no_upload',
+                    default='Cannot replace file. No file uploaded.',
+                )
+            )
         value = new_val
         value['action'] = 'replace'
     return value
@@ -86,19 +86,13 @@ def mimetype_extractor(widget, data):
             break
     if not matches:
         message = _(
-            'file_invalid_mimetype',
-            default=u'Mimetype of uploaded file not matches'
+            'file_invalid_mimetype', default='Mimetype of uploaded file not matches'
         )
         raise ExtractionError(message)
     return extracted
 
 
-@managedprops(
-    'accept',
-    'placeholder',
-    'autofocus',
-    'required',
-    *css_managed_props)
+@managedprops('accept', 'placeholder', 'autofocus', 'required', *css_managed_props)
 def input_file_edit_renderer(widget, data):
     tag = data.tag
     input_attrs = input_attributes_common(widget, data, excludes=['value'])
@@ -112,18 +106,18 @@ def convert_bytes(value):
     value = float(value)
     if value >= 1099511627776:
         terabytes = value / 1099511627776
-        size = '{0:.2f}T'.format(terabytes)
+        size = f'{terabytes:.2f}T'
     elif value >= 1073741824:
         gigabytes = value / 1073741824
-        size = '{0:.2f}G'.format(gigabytes)
+        size = f'{gigabytes:.2f}G'
     elif value >= 1048576:
         megabytes = value / 1048576
-        size = '{0:.2f}M'.format(megabytes)
+        size = f'{megabytes:.2f}M'
     elif value >= 1024:
         kilobytes = value / 1024
-        size = '{0:.2f}K'.format(kilobytes)
+        size = f'{kilobytes:.2f}K'
     else:
-        size = '{0:.2f}b'.format(value)
+        size = f'{value:.2f}b'
     return size
 
 
@@ -135,15 +129,15 @@ def input_file_display_renderer(widget, data):
     }
     attrs.update(as_data_attrs(attr_value('data', widget, data)))
     if not value:
-        no_file_message = _('no_file', default=u'No file')
+        no_file_message = _('no_file', default='No file')
         return tag('div', no_file_message, **attrs)
     file_val = value['file']
     size = convert_bytes(len(file_val.read()))
     file_val.seek(0)
-    unknown_message = _('unknown', default=u'Unknown')
-    filename_message = _('filename', default=u'Filename: ')
-    mimetype_message = _('mimetype', default=u'Mimetype: ')
-    size_message = _('size', default=u'Size: ')
+    unknown_message = _('unknown', default='Unknown')
+    filename_message = _('filename', default='Filename: ')
+    mimetype_message = _('mimetype', default='Mimetype: ')
+    size_message = _('size', default='Size: ')
     filename = value.get('filename', unknown_message)
     mimetype = value.get('mimetype', unknown_message)
     return tag(
@@ -152,8 +146,9 @@ def input_file_display_renderer(widget, data):
             'ul',
             tag('li', tag('strong', filename_message), filename),
             tag('li', tag('strong', mimetype_message), mimetype),
-            tag('li', tag('strong', size_message), size)),
-        **attrs
+            tag('li', tag('strong', size_message), size),
+        ),
+        **attrs,
     )
 
 
@@ -163,9 +158,7 @@ def file_options_renderer(widget, data):
         return data.rendered
     tag = data.tag
     if data.request:
-        value = [
-            data.request.get('{0}-action'.format(widget.dottedpath), 'keep')
-        ]
+        value = [data.request.get(f'{widget.dottedpath}-action', 'keep')]
     else:
         value = ['keep']
     radio_class = attr_value('radio_class', widget, data)
@@ -177,37 +170,30 @@ def file_options_renderer(widget, data):
             'type': 'radio',
             'value': key,
             'checked': (key in value) and 'checked' or None,
-            'name_': '{0}-action'.format(widget.dottedpath),
+            'name_': f'{widget.dottedpath}-action',
             'id': cssid(widget, 'input', key),
             'class_': (cssclasses(widget, data) and radio_input_class)
-                      or cssclasses(widget, data) or radio_input_class
+            or cssclasses(widget, data)
+            or radio_input_class,
         }
         taginput = tag('input', **attrs)
         text = tag('span', term)
-        tags.append(tag(
-            'div',
-            taginput,
-            text,
-            **{
-                'id': cssid(widget, 'radio', key),
-                'class': radio_class or None
-            }
-        ))
-    return data.rendered + u''.join(tags)
+        tags.append(
+            tag(
+                'div',
+                taginput,
+                text,
+                **{'id': cssid(widget, 'radio', key), 'class': radio_class or None},
+            )
+        )
+    return data.rendered + ''.join(tags)
 
 
 factory.register(
     'file',
-    extractors=[
-        file_extractor,
-        mimetype_extractor,
-        generic_required_extractor
-    ],
-    edit_renderers=[
-        input_file_edit_renderer,
-        file_options_renderer
-    ],
-    display_renderers=[input_file_display_renderer]
+    extractors=[file_extractor, mimetype_extractor, generic_required_extractor],
+    edit_renderers=[input_file_edit_renderer, file_options_renderer],
+    display_renderers=[input_file_display_renderer],
 )
 
 factory.doc['blueprint']['file'] = """\
@@ -224,9 +210,9 @@ files of a given format.
 """
 
 factory.defaults['file.vocabulary'] = [
-    ('keep', _('file_keep', default=u'Keep Existing file')),
-    ('replace', _('file_replace', default=u'Replace existing file')),
-    ('delete', _('file_delete', default=u'Delete existing file')),
+    ('keep', _('file_keep', default='Keep Existing file')),
+    ('replace', _('file_replace', default='Replace existing file')),
+    ('delete', _('file_delete', default='Delete existing file')),
 ]
 factory.doc['props']['file.vocabulary'] = """\
 Vocabulary with available actions for existing files.

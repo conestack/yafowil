@@ -3,7 +3,7 @@ from yafowil.utils import get_plugin_names
 import copy
 
 
-class YafowilResources(object):
+class YafowilResources:
     """Object which can be used as base for resource publishing specific
     framework integration code.
 
@@ -29,7 +29,8 @@ class YafowilResources(object):
                 continue
             resources = copy.deepcopy(resources)
             resource_base = self.configure_resource_directory(
-                plugin_name, resources['resourcedir'])
+                plugin_name, resources['resourcedir']
+            )
             for js in resources['js']:
                 if js['group'] in js_skip:
                     continue
@@ -48,9 +49,11 @@ class YafowilResources(object):
         self.css_resources = [res['resource'] for res in all_css]
 
     def _is_remote_resource(self, resource):
-        return resource.startswith('http://') \
-            or resource.startswith('https://') \
+        return (
+            resource.startswith('http://')
+            or resource.startswith('https://')
             or resource.startswith('//')
+        )
 
     def configure_resource_directory(self, plugin_name, resourc_edir):
         """Register plugin specific resource directory to web publisher and

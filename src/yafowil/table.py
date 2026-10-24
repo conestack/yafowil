@@ -12,6 +12,7 @@ from yafowil.utils import managedprops
 # table
 ###############################################################################
 
+
 @managedprops('id', *css_managed_props)
 def table_renderer(widget, data):
     attrs = {
@@ -24,14 +25,9 @@ def table_renderer(widget, data):
 factory.register(
     'table',
     extractors=[compound_extractor],
-    edit_renderers=[
-        compound_renderer,
-        table_renderer
-    ],
-    display_renderers=[
-        compound_renderer,
-        table_renderer
-    ])
+    edit_renderers=[compound_renderer, table_renderer],
+    display_renderers=[compound_renderer, table_renderer],
+)
 
 factory.doc['blueprint']['table'] = """\
 ``<table>`` compound widget for table creation.
@@ -46,6 +42,7 @@ Value of table id attribute.
 # thead
 ###############################################################################
 
+
 def thead_renderer(widget, data):
     return data.tag('thead', data.rendered)
 
@@ -53,14 +50,9 @@ def thead_renderer(widget, data):
 factory.register(
     'thead',
     extractors=[compound_extractor],
-    edit_renderers=[
-        compound_renderer,
-        thead_renderer
-    ],
-    display_renderers=[
-        compound_renderer,
-        thead_renderer
-    ])
+    edit_renderers=[compound_renderer, thead_renderer],
+    display_renderers=[compound_renderer, thead_renderer],
+)
 
 factory.doc['blueprint']['thead'] = """\
 ``<thead>`` compound widget for table creation.
@@ -71,6 +63,7 @@ factory.doc['blueprint']['thead'] = """\
 # tbody
 ###############################################################################
 
+
 def tbody_renderer(widget, data):
     return data.tag('tbody', data.rendered)
 
@@ -78,14 +71,9 @@ def tbody_renderer(widget, data):
 factory.register(
     'tbody',
     extractors=[compound_extractor],
-    edit_renderers=[
-        compound_renderer,
-        tbody_renderer
-    ],
-    display_renderers=[
-        compound_renderer,
-        tbody_renderer
-    ])
+    edit_renderers=[compound_renderer, tbody_renderer],
+    display_renderers=[compound_renderer, tbody_renderer],
+)
 
 factory.doc['blueprint']['tbody'] = """\
 ``<tbody>`` compound widget for table creation.
@@ -95,6 +83,7 @@ factory.doc['blueprint']['tbody'] = """\
 ###############################################################################
 # tr
 ###############################################################################
+
 
 @managedprops('id', *css_managed_props)
 def tr_renderer(widget, data):
@@ -108,14 +97,9 @@ def tr_renderer(widget, data):
 factory.register(
     'tr',
     extractors=[compound_extractor],
-    edit_renderers=[
-        compound_renderer,
-        tr_renderer
-    ],
-    display_renderers=[
-        compound_renderer,
-        tr_renderer
-    ])
+    edit_renderers=[compound_renderer, tr_renderer],
+    display_renderers=[compound_renderer, tr_renderer],
+)
 
 factory.doc['blueprint']['tr'] = """\
 ``<tr>`` compound widget for table creation.
@@ -129,6 +113,7 @@ Value of id attribute.
 ###############################################################################
 # th
 ###############################################################################
+
 
 @managedprops('id', 'rowspan', 'colspan', 'label', *css_managed_props)
 def th_renderer(widget, data):
@@ -144,10 +129,7 @@ def th_renderer(widget, data):
     return data.tag('th', contents, **attrs)
 
 
-factory.register(
-    'th',
-    edit_renderers=[th_renderer],
-    display_renderers=[th_renderer])
+factory.register('th', edit_renderers=[th_renderer], display_renderers=[th_renderer])
 
 factory.doc['blueprint']['th'] = """\
 ``<th>`` compound widget for table creation.
@@ -175,6 +157,7 @@ is used.
 # td
 ###############################################################################
 
+
 @managedprops('id', 'rowspan', 'colspan', *css_managed_props)
 def td_renderer(widget, data):
     attrs = {
@@ -194,7 +177,8 @@ factory.register(
     'td',
     extractors=[hybrid_extractor],
     edit_renderers=[td_renderer],
-    display_renderers=[td_renderer])
+    display_renderers=[td_renderer],
+)
 
 factory.doc['blueprint']['td'] = """\
 ``<td>`` compound widget for table creation.

@@ -19,11 +19,14 @@ Simple plaintext widget.
 
 def plaintext():
     comp = factory('compound', name='yafowil-plaintext')
-    comp['plain'] = factory('#field:text', props={
-        'label': 'Plain Text Input',
-        'required': 'Input is required',
-        'help': 'Simple Plain Text Field',
-    })
+    comp['plain'] = factory(
+        '#field:text',
+        props={
+            'label': 'Plain Text Input',
+            'required': 'Input is required',
+            'help': 'Simple Plain Text Field',
+        },
+    )
     return {
         'widget': comp,
         'doc': DOC_PLAIN_TEXT,
@@ -48,10 +51,13 @@ Text input for email addresses.
 
 def email():
     comp = factory('compound', name='yafowil-email')
-    comp['email'] = factory('#field:email', props={
-        'label': 'E-Mail Input',
-        'help': 'E-Mail Address Field',
-    })
+    comp['email'] = factory(
+        '#field:email',
+        props={
+            'label': 'E-Mail Input',
+            'help': 'E-Mail Address Field',
+        },
+    )
     return {
         'widget': comp,
         'doc': DOC_EMAIL,
@@ -76,10 +82,13 @@ Input field accepting floating point numbers.
 
 def number():
     comp = factory('compound', name='yafowil-number')
-    comp['number'] = factory('#field:number', props={
-        'label': 'Number Input (float)',
-        'help': 'Field for floating point number input',
-    })
+    comp['number'] = factory(
+        '#field:number',
+        props={
+            'label': 'Number Input (float)',
+            'help': 'Field for floating point number input',
+        },
+    )
     return {
         'widget': comp,
         'doc': DOC_NUMBER,
@@ -105,11 +114,14 @@ Input field accepting integer values.
 
 def integer():
     comp = factory('compound', name='yafowil-integer')
-    comp['intnumber'] = factory('#field:number', props={
-        'label': 'Number Input (int)',
-        'datatype': 'integer',
-        'help': 'Field for integer input',
-    })
+    comp['intnumber'] = factory(
+        '#field:number',
+        props={
+            'label': 'Number Input (int)',
+            'datatype': 'integer',
+            'help': 'Field for integer input',
+        },
+    )
     return {
         'widget': comp,
         'doc': DOC_INT,
@@ -134,10 +146,13 @@ Password field.
 
 def password():
     comp = factory('compound', name='yafowil-password')
-    comp['password'] = factory('#field:password', props={
-        'label': 'Password Input',
-        'help': 'Field for password',
-    })
+    comp['password'] = factory(
+        '#field:password',
+        props={
+            'label': 'Password Input',
+            'help': 'Field for password',
+        },
+    )
     return {
         'widget': comp,
         'doc': DOC_PASSWORD,
@@ -162,10 +177,13 @@ URL field.
 
 def url():
     comp = factory('compound', name='yafowil-url')
-    comp['password'] = factory('#field:url', props={
-        'label': 'URL Input',
-        'help': 'Field for URL',
-    })
+    comp['password'] = factory(
+        '#field:url',
+        props={
+            'label': 'URL Input',
+            'help': 'Field for URL',
+        },
+    )
     return {
         'widget': comp,
         'doc': DOC_URL,
@@ -191,11 +209,14 @@ Textarea field.
 
 def textarea():
     comp = factory('compound', name='yafowil-textarea')
-    comp['textarea'] = factory('#field:textarea', props={
-        'label': 'Textarea',
-        'help': 'Textarea field',
-        'rows': 5,
-    })
+    comp['textarea'] = factory(
+        '#field:textarea',
+        props={
+            'label': 'Textarea',
+            'help': 'Textarea field',
+            'rows': 5,
+        },
+    )
     return {
         'widget': comp,
         'doc': DOC_TEXTAREA,
@@ -222,12 +243,15 @@ Selection with radio buttons.
 
 def radio():
     comp = factory('compound', name='yafowil-radio')
-    comp['radio'] = factory('#field:select', props={
-        'label': 'Select',
-        'help': 'Single selection as radio buttons',
-        'vocabulary': ['Python 2', 'Python 3'],
-        'format': 'radio',
-    })
+    comp['radio'] = factory(
+        '#field:select',
+        props={
+            'label': 'Select',
+            'help': 'Single selection as radio buttons',
+            'vocabulary': ['Python 2', 'Python 3'],
+            'format': 'radio',
+        },
+    )
     return {
         'widget': comp,
         'doc': DOC_RADIO,
@@ -254,12 +278,15 @@ Single selection dropdown.
 
 def dropdown():
     comp = factory('compound', name='yafowil-dropdown')
-    comp['dropdown'] = factory('#field:select', props={
-        'label': 'Select',
-        'help': 'Single selection as dropdown',
-        'vocabulary': ['Python', 'Java', 'Perl', 'Erlang', 'C', 'C++', 'C#'],
-        'format': 'block',
-    })
+    comp['dropdown'] = factory(
+        '#field:select',
+        props={
+            'label': 'Select',
+            'help': 'Single selection as dropdown',
+            'vocabulary': ['Python', 'Java', 'Perl', 'Erlang', 'C', 'C++', 'C#'],
+            'format': 'block',
+        },
+    )
     return {
         'widget': comp,
         'doc': DOC_DROPDOWN,
@@ -287,13 +314,16 @@ Multi selection with checkboxes.
 
 def checkbox():
     comp = factory('compound', name='yafowil-checkbox')
-    comp['checkbox'] = factory('#field:select', props={
-        'label': 'Select',
-        'help': 'Multiple selection with checkboxes',
-        'vocabulary': ['Python 2', 'Python 3'],
-        'format': 'checkbox',
-        'multivalued': True,
-    })
+    comp['checkbox'] = factory(
+        '#field:select',
+        props={
+            'label': 'Select',
+            'help': 'Multiple selection with checkboxes',
+            'vocabulary': ['Python 2', 'Python 3'],
+            'format': 'checkbox',
+            'multivalued': True,
+        },
+    )
     return {
         'widget': comp,
         'doc': DOC_CHECKBOX,
@@ -321,13 +351,16 @@ Multi selection as block.
 
 def block():
     comp = factory('compound', name='yafowil-block')
-    comp['block'] = factory('#field:select', props={
-        'label': 'Select',
-        'help': 'multiple as block',
-        'vocabulary': ['Python', 'Java', 'Perl', 'Erlang', 'C', 'C++', 'C#'],
-        'format': 'block',
-        'multivalued': True,
-    })
+    comp['block'] = factory(
+        '#field:select',
+        props={
+            'label': 'Select',
+            'help': 'multiple as block',
+            'vocabulary': ['Python', 'Java', 'Perl', 'Erlang', 'C', 'C++', 'C#'],
+            'format': 'block',
+            'multivalued': True,
+        },
+    )
     return {
         'widget': comp,
         'doc': DOC_BLOCK,
@@ -356,13 +389,16 @@ This is an example how to render it for Bootstrap 5
 
 def single_checkbox():
     comp = factory('compound', name='yafowil-single-checkbox')
-    comp['checkbox'] = factory('div:help:label:checkbox', props={
-        'label': 'Single checkbox',
-        'help': 'A single checkbox without vocabulary',
-        'div.class': 'form-check',
-        'label.class': 'form-check-label',
-        'label.position': 'after',
-    })
+    comp['checkbox'] = factory(
+        'div:help:label:checkbox',
+        props={
+            'label': 'Single checkbox',
+            'help': 'A single checkbox without vocabulary',
+            'div.class': 'form-check',
+            'label.class': 'form-check-label',
+            'label.position': 'after',
+        },
+    )
     return {
         'widget': comp,
         'doc': DOC_SINGLE_CHECKBOX,
@@ -387,10 +423,13 @@ Upload a file
 
 def fileupload():
     fileupload = factory('compound', name='yafowil-fileupload')
-    fileupload['file'] = factory('#field:file', props={
-        'label': 'File',
-        'help': 'Upload a single file',
-    })
+    fileupload['file'] = factory(
+        '#field:file',
+        props={
+            'label': 'File',
+            'help': 'Upload a single file',
+        },
+    )
     return {
         'widget': fileupload,
         'doc': DOC_FILEUPLOAD,
@@ -400,7 +439,17 @@ def fileupload():
 
 def get_example():
     return [
-        plaintext(), email(), number(), integer(), password(), url(),
-        textarea(), radio(), dropdown(), checkbox(), block(),
-        single_checkbox(), fileupload()
+        plaintext(),
+        email(),
+        number(),
+        integer(),
+        password(),
+        url(),
+        textarea(),
+        radio(),
+        dropdown(),
+        checkbox(),
+        block(),
+        single_checkbox(),
+        fileupload(),
     ]

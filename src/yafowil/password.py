@@ -16,6 +16,7 @@ import re
 # password
 ###############################################################################
 
+
 @managedprops('minlength')
 def minlength_extractor(widget, data):
     """Validate minlength of a string input.
@@ -33,11 +34,13 @@ def minlength_extractor(widget, data):
     minlength = attr_value('minlength', widget, data, -1)
     if minlength != -1:
         if len(val) < minlength:
-            raise ExtractionError(_(
-                'minlength_extraction_error',
-                default=u'Input must have at least ${len} characters.',
-                mapping={'len': minlength}
-            ))
+            raise ExtractionError(
+                _(
+                    'minlength_extraction_error',
+                    default='Input must have at least ${len} characters.',
+                    mapping={'len': minlength},
+                )
+            )
     return val
 
 
@@ -60,10 +63,9 @@ def ascii_extractor(widget, data):
     try:
         val.encode('ascii')
     except UnicodeEncodeError:
-        raise ExtractionError(_(
-            u'ascii_extractor_error',
-            default=u'Input contains illegal characters.'
-        ))
+        raise ExtractionError(
+            _('ascii_extractor_error', default='Input contains illegal characters.')
+        )
     return val
 
 
@@ -71,11 +73,7 @@ LOWER_CASE_RE = r'(?=.*[a-z])'
 UPPER_CASE_RE = r'(?=.*[A-Z])'
 DIGIT_RE = r'(?=.*[\d])'
 SPECIAL_CHAR_RE = r'(?=.*[\W])'
-RE_PASSWORD_ALL = [
-    LOWER_CASE_RE,
-    UPPER_CASE_RE,
-    DIGIT_RE,
-    SPECIAL_CHAR_RE]
+RE_PASSWORD_ALL = [LOWER_CASE_RE, UPPER_CASE_RE, DIGIT_RE, SPECIAL_CHAR_RE]
 PASSWORD_NOCHANGE_VALUE = '_NOCHANGE_'
 
 
@@ -122,8 +120,7 @@ def password_extractor(widget, data):
 def _pwd_value(widget, data):
     if data.extracted is not UNSET:
         return data.extracted
-    if data.value is not UNSET \
-       and data.value is not None:
+    if data.value is not UNSET and data.value is not None:
         return PASSWORD_NOCHANGE_VALUE
     return attr_value('default', widget, data)
 
@@ -136,10 +133,10 @@ def _pwd_value(widget, data):
     'autofocus',
     'placeholder',
     'autocomplete',
-    *css_managed_props)
+    *css_managed_props,
+)
 def password_edit_renderer(widget, data):
-    """Render password widget.
-    """
+    """Render password widget."""
     tag = data.tag
     input_attrs = input_attributes_common(widget, data)
     input_attrs['type'] = 'password'
@@ -152,7 +149,7 @@ def password_display_renderer(widget, data):
     value = _pwd_value(widget, data)
     if value == PASSWORD_NOCHANGE_VALUE:
         return attr_value('displayplaceholder', widget, data)
-    return u''
+    return ''
 
 
 factory.register(
@@ -163,10 +160,10 @@ factory.register(
         generic_emptyvalue_extractor,
         minlength_extractor,
         ascii_extractor,
-        password_extractor
+        password_extractor,
     ],
     edit_renderers=[password_edit_renderer],
-    display_renderers=[password_display_renderer]
+    display_renderers=[password_display_renderer],
 )
 
 factory.doc['blueprint']['password'] = """\
@@ -204,13 +201,14 @@ Integer value <= 4. Define how many rules must apply to consider a password
 valid.
 """
 
-factory.defaults['weak_password_message'] = _('weak_password_message',
-                                              default=u'Password too weak')
+factory.defaults['weak_password_message'] = _(
+    'weak_password_message', default='Password too weak'
+)
 factory.doc['props']['password.weak_password_message'] = """\
 Message shown if password is not strong enough.
 """
 
-factory.defaults['password.displayplaceholder'] = u'*' * 8
+factory.defaults['password.displayplaceholder'] = '*' * 8
 factory.doc['props']['password.displayplaceholder'] = """\
 Placeholder shown in display mode if password was set.
 """

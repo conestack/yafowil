@@ -17,6 +17,7 @@ from yafowil.utils import managedprops
 # number
 ###############################################################################
 
+
 @managedprops('min', 'max', 'step')
 def number_extractor(widget, data):
     val = data.extracted
@@ -24,15 +25,19 @@ def number_extractor(widget, data):
         return val
     min_val = attr_value('min', widget, data)
     if min_val is not None and val < min_val:
-        message = _('input_number_minimum_value',
-                    default=u'Value has to be at minimum ${min}.',
-                    mapping={'min': min_val})
+        message = _(
+            'input_number_minimum_value',
+            default='Value has to be at minimum ${min}.',
+            mapping={'min': min_val},
+        )
         raise ExtractionError(message)
     max_val = attr_value('max', widget, data)
     if max_val is not None and val > max_val:
-        message = _('input_number_maximum_value',
-                    default=u'Value has to be at maximum ${max}.',
-                    mapping={'max': max_val})
+        message = _(
+            'input_number_maximum_value',
+            default='Value has to be at maximum ${max}.',
+            mapping={'max': max_val},
+        )
         raise ExtractionError(message)
     step = attr_value('step', widget, data)
     if step:
@@ -41,21 +46,23 @@ def number_extractor(widget, data):
             if minimum:
                 message = _(
                     'input_number_step_and_minimum_value',
-                    default=u'Value ${val} has to be in stepping of ${step} '
-                            u'based on a floor value of ${minimum}',
+                    default='Value ${val} has to be in stepping of ${step} '
+                    'based on a floor value of ${minimum}',
                     mapping={
                         'val': val,
                         'step': step,
                         'minimum': minimum,
-                    })
+                    },
+                )
             else:
                 message = _(
                     'input_number_step_value',
-                    default=u'Value ${val} has to be in stepping of ${step}',
+                    default='Value ${val} has to be in stepping of ${step}',
                     mapping={
                         'val': val,
                         'step': step,
-                    })
+                    },
+                )
             raise ExtractionError(message)
     return val
 
@@ -70,10 +77,7 @@ factory.register(
         number_extractor,
     ],
     edit_renderers=[input_generic_renderer],
-    display_renderers=[
-        generic_display_renderer,
-        display_proxy_renderer
-    ]
+    display_renderers=[generic_display_renderer, display_proxy_renderer],
 )
 
 factory.doc['blueprint']['number'] = """\
@@ -96,9 +100,12 @@ are ``int`` and ``float``
 """
 
 factory.defaults['number.allowed_datatypes'] = [
-    int, float,
+    int,
+    float,
     # B/C
-    'int', 'integer', 'float'
+    'int',
+    'integer',
+    'float',
 ]
 
 factory.defaults['number.min'] = None

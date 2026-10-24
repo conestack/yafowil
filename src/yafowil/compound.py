@@ -13,10 +13,10 @@ from yafowil.utils import managedprops
 # compound
 ###############################################################################
 
+
 @managedprops('structural')
 def compound_extractor(widget, data):
-    """Delegates extraction to children.
-    """
+    """Delegates extraction to children."""
     for child in widget.values():
         # regular child widget, extract
         if not attr_value('structural', child, data):
@@ -37,10 +37,9 @@ def compound_extractor(widget, data):
 
 
 def compound_renderer(widget, data):
-    """Delegates rendering to children.
-    """
+    """Delegates rendering to children."""
     value = widget.getter
-    result = u''
+    result = ''
     for childname in widget:
         child = widget[childname]
         if attr_value('structural', child, data):
@@ -62,8 +61,8 @@ def compound_renderer(widget, data):
                     child.getter = value[childname]
                 else:
                     raise ValueError(
-                        u"Both compound and compound member "
-                        u"provide a value for '{0}'".format(childname)
+                        'Both compound and compound member '
+                        f"provide a value for '{childname}'"
                     )
         if subdata is None:
             result += child(request=data.request)
@@ -76,7 +75,8 @@ factory.register(
     'compound',
     extractors=[compound_extractor],
     edit_renderers=[compound_renderer],
-    display_renderers=[compound_renderer])
+    display_renderers=[compound_renderer],
+)
 
 factory.doc['blueprint']['compound'] = """\
 A blueprint to create a compound of widgets. This blueprint creates a node. A
@@ -94,10 +94,10 @@ will not have an own runtime-data.
 # hybrid
 ###############################################################################
 
+
 @managedprops('leaf')
 def hybrid_extractor(widget, data):
-    """This extractor can be used if a blueprint can act as compound or leaf.
-    """
+    """This extractor can be used if a blueprint can act as compound or leaf."""
     if len(widget) and not attr_value('leaf', widget, data):
         return compound_extractor(widget, data)
     return data.extracted
@@ -105,13 +105,12 @@ def hybrid_extractor(widget, data):
 
 @managedprops('leaf')
 def hybrid_renderer(widget, data):
-    """This renderer can be used if a blueprint can act as compound or leaf.
-    """
+    """This renderer can be used if a blueprint can act as compound or leaf."""
     if len(widget) and not attr_value('leaf', widget, data):
         rendered = compound_renderer(widget, data)
     else:
         rendered = data.rendered
-    return rendered if rendered else u''
+    return rendered if rendered else ''
 
 
 factory.defaults['leaf'] = None
@@ -133,12 +132,10 @@ side effects due to multiple child rendering and extraction.
 # div
 ###############################################################################
 
+
 @managedprops('id', *css_managed_props)
 def div_renderer(widget, data):
-    attrs = {
-        'id': attr_value('id', widget, data),
-        'class_': cssclasses(widget, data)
-    }
+    attrs = {'id': attr_value('id', widget, data), 'class_': cssclasses(widget, data)}
     attrs.update(as_data_attrs(attr_value('data', widget, data)))
     return data.tag('div', data.rendered, **attrs)
 
@@ -146,14 +143,9 @@ def div_renderer(widget, data):
 factory.register(
     'div',
     extractors=[hybrid_extractor],
-    edit_renderers=[
-        hybrid_renderer,
-        div_renderer
-    ],
-    display_renderers=[
-        hybrid_renderer,
-        div_renderer
-    ])
+    edit_renderers=[hybrid_renderer, div_renderer],
+    display_renderers=[hybrid_renderer, div_renderer],
+)
 
 factory.doc['blueprint']['div'] = """\
 Blueprint rendering a '<div>' element.
@@ -181,12 +173,10 @@ Dict containing data attributes for div tag.
 # fieldset
 ###############################################################################
 
+
 @managedprops('legend', *css_managed_props)
 def fieldset_renderer(widget, data):
-    fs_attrs = {
-        'id': cssid(widget, 'fieldset'),
-        'class_': cssclasses(widget, data)
-    }
+    fs_attrs = {'id': cssid(widget, 'fieldset'), 'class_': cssclasses(widget, data)}
     rendered = data.rendered
     legend = attr_value('legend', widget, data)
     if legend:
@@ -197,14 +187,9 @@ def fieldset_renderer(widget, data):
 factory.register(
     'fieldset',
     extractors=[compound_extractor],
-    edit_renderers=[
-        compound_renderer,
-        fieldset_renderer
-    ],
-    display_renderers=[
-        compound_renderer,
-        fieldset_renderer
-    ])
+    edit_renderers=[compound_renderer, fieldset_renderer],
+    display_renderers=[compound_renderer, fieldset_renderer],
+)
 
 factory.doc['blueprint']['fieldset'] = """\
 Renders a fieldset around the prior rendered output.
@@ -222,6 +207,7 @@ factory.defaults['fieldset.class'] = None
 # form
 ###############################################################################
 
+
 @managedprops('action', 'method', 'enctype', 'novalidate', *css_managed_props)
 def form_edit_renderer(widget, data):
     method = attr_value('method', widget, data)
@@ -233,7 +219,7 @@ def form_edit_renderer(widget, data):
         'enctype': enctype,
         'novalidate': noval,
         'class_': cssclasses(widget, data),
-        'id': 'form-{0}'.format('-'.join(widget.path)),
+        'id': 'form-{}'.format('-'.join(widget.path)),
     }
     form_attrs.update(as_data_attrs(attr_value('data', widget, data)))
     return data.tag('form', data.rendered, **form_attrs)
@@ -246,14 +232,9 @@ def form_display_renderer(widget, data):
 factory.register(
     'form',
     extractors=[compound_extractor],
-    edit_renderers=[
-        compound_renderer,
-        form_edit_renderer
-    ],
-    display_renderers=[
-        compound_renderer,
-        form_display_renderer
-    ])
+    edit_renderers=[compound_renderer, form_edit_renderer],
+    display_renderers=[compound_renderer, form_display_renderer],
+)
 
 factory.doc['blueprint']['form'] = """\
 A html-form element as a compound of widgets.

@@ -19,5 +19,5 @@ deprecated(
         'ITER_TYPES',
     ],
     'Python 2 compatibility is gone, use the builtins instead. Will be '
-    'removed in yafowil 5.0.'
+    'removed in yafowil 5.0.',
 )

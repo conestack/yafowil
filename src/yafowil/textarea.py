@@ -17,6 +17,7 @@ from yafowil.utils import managedprops
 # textarea
 ###############################################################################
 
+
 def textarea_attributes(widget, data):
     autofocus = attr_value('autofocus', widget, data) and 'autofocus' or None
     disabled = attr_value('disabled', widget, data) and 'disabled' or None
@@ -41,15 +42,22 @@ def textarea_attributes(widget, data):
 
 
 textarea_managed_props = [
-    'data', 'title', 'autofocus', 'cols', 'disabled',
-    'placeholder', 'readonly', 'required', 'rows', 'wrap',
+    'data',
+    'title',
+    'autofocus',
+    'cols',
+    'disabled',
+    'placeholder',
+    'readonly',
+    'required',
+    'rows',
+    'wrap',
 ] + css_managed_props
 
 
 @managedprops(*textarea_managed_props)
 def textarea_renderer(widget, data, custom_attrs={}):
-    """Renders text area.
-    """
+    """Renders text area."""
     tag = data.tag
     area_attrs = textarea_attributes(widget, data)
     area_attrs.update(custom_attrs)
@@ -64,13 +72,10 @@ factory.register(
     extractors=[
         generic_extractor,
         generic_required_extractor,
-        generic_emptyvalue_extractor
+        generic_emptyvalue_extractor,
     ],
     edit_renderers=[textarea_renderer],
-    display_renderers=[
-        generic_display_renderer,
-        display_proxy_renderer
-    ]
+    display_renderers=[generic_display_renderer, display_proxy_renderer],
 )
 
 factory.doc['blueprint']['textarea'] = """\
