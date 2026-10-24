@@ -10,9 +10,29 @@ from yafowil.tests import YafowilTestCase
 from yafowil.utils import EMPTY_VALUE
 import copy
 import uuid
+import warnings
+
+
+def ignore_string_datatype_deprecation(fn):
+    """Ignore the deprecation of ``datatype`` given as string, it is asserted by
+    ``test_string_datatype_is_deprecated``."""
+
+    def wrapper(self):
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                'ignore', message='Passing ``datatype`` as string', category=UserWarning
+            )
+            fn(self)
+
+    return wrapper
 
 
 class TestDatatypes(YafowilTestCase):
+    def test_string_datatype_is_deprecated(self):
+        with self.assertWarns(UserWarning) as cm:
+            self.assertEqual(convert_value_to_datatype('1', 'int'), 1)
+        self.assertTrue(str(cm.warning).startswith('Passing ``datatype`` as string'))
+
     def test_EMPTY_VALUE(self):
         self.assertEqual(repr(EMPTY_VALUE), '<EMPTY_VALUE>')
         self.assertEqual(str(EMPTY_VALUE), '')
@@ -123,6 +143,7 @@ class TestDatatypes(YafowilTestCase):
         converter = lookup_datatype_converter(float)
         self.assertIsInstance(converter, FloatDatatypeConverter)
 
+    @ignore_string_datatype_deprecation
     def test_convert_value_to_datatype(self):
         # Unknown string identifier
         with self.assertRaises(KeyError) as arc:
@@ -134,6 +155,7 @@ class TestDatatypes(YafowilTestCase):
         self.assertEqual(convert_value_to_datatype('', 'uuid'), EMPTY_VALUE)
         self.assertEqual(convert_value_to_datatype(None, 'uuid'), EMPTY_VALUE)
 
+    @ignore_string_datatype_deprecation
     def test_convert_value_to_datatype_bytes(self):
         # Convert to string by id
         self.assertEqual(convert_value_to_datatype(UNSET, 'str'), UNSET)
@@ -167,6 +189,7 @@ class TestDatatypes(YafowilTestCase):
             str(arc.exception),
         )
 
+    @ignore_string_datatype_deprecation
     def test_convert_value_to_datatype_unicode(self):
         # Convert to unicode by id
         self.assertEqual(convert_value_to_datatype(UNSET, 'unicode'), UNSET)
@@ -182,6 +205,7 @@ class TestDatatypes(YafowilTestCase):
         self.assertEqual(converted, 'unicode')
         self.assertTrue(isinstance(converted, str))
 
+    @ignore_string_datatype_deprecation
     def test_convert_value_to_datatype_int(self):
         # Convert to int by id
         self.assertEqual(convert_value_to_datatype(UNSET, 'int'), UNSET)
@@ -225,6 +249,7 @@ class TestDatatypes(YafowilTestCase):
         self.assertEqual(converted, 4)
         self.assertTrue(isinstance(converted, int))
 
+    @ignore_string_datatype_deprecation
     def test_convert_value_to_datatype_long(self):
         # Convert to long by id
         self.assertEqual(convert_value_to_datatype(UNSET, 'long'), UNSET)
@@ -244,6 +269,7 @@ class TestDatatypes(YafowilTestCase):
             str(arc.exception), "invalid literal for int() with base 10: 'a'"
         )
 
+    @ignore_string_datatype_deprecation
     def test_convert_value_to_datatype_float(self):
         # Convert to float by id
         self.assertEqual(convert_value_to_datatype(UNSET, 'float'), UNSET)
@@ -283,6 +309,7 @@ class TestDatatypes(YafowilTestCase):
         self.assertEqual(converted, 6.0)
         self.assertTrue(isinstance(converted, float))
 
+    @ignore_string_datatype_deprecation
     def test_convert_value_to_datatype_uuid(self):
         # Convert to uuid by id
         self.assertEqual(convert_value_to_datatype(UNSET, 'uuid'), UNSET)
@@ -353,6 +380,7 @@ class TestDatatypes(YafowilTestCase):
         self.assertEqual(convert_values_to_datatype('0', int), 0)
         self.assertEqual(convert_values_to_datatype(['0', '1'], int), [0, 1])
 
+    @ignore_string_datatype_deprecation
     def test_datatype_extractor(self):
         # No datatype given, no datatype conversion happens at all
         widget = factory('text', name='MYFIELD', value='')

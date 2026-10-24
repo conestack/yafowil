@@ -4,6 +4,7 @@ from yafowil.base import factory
 from yafowil.tests import fxml
 from yafowil.tests import wrapped_fxml
 from yafowil.tests import YafowilTestCase
+import warnings
 
 
 class TestCommon(YafowilTestCase):
@@ -250,80 +251,83 @@ class TestCommon(YafowilTestCase):
         self.assertEqual(data.extracted, b'\r\n\x01\x9a\x03\xff')
 
     def test_BC_imports(self):
-        # isort: off
-        # button
-        from yafowil.common import submit_renderer  # noqa
-        from yafowil.common import button_renderer  # noqa
+        # deprecated locations, the warnings are expected
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', DeprecationWarning)
+            # isort: off
+            # button
+            from yafowil.common import submit_renderer  # noqa
+            from yafowil.common import button_renderer  # noqa
 
-        # checkbox
-        from yafowil.common import checkbox_extractor  # noqa
-        from yafowil.common import checkbox_edit_renderer  # noqa
-        from yafowil.common import checkbox_display_renderer  # noqa
+            # checkbox
+            from yafowil.common import checkbox_extractor  # noqa
+            from yafowil.common import checkbox_edit_renderer  # noqa
+            from yafowil.common import checkbox_display_renderer  # noqa
 
-        # datatypes
-        from yafowil.common import generic_emptyvalue_extractor  # noqa
-        from yafowil.common import generic_datatype_extractor  # noqa
-        from yafowil.common import DATATYPE_LABELS  # noqa
+            # datatypes
+            from yafowil.common import generic_emptyvalue_extractor  # noqa
+            from yafowil.common import generic_datatype_extractor  # noqa
+            from yafowil.common import DATATYPE_LABELS  # noqa
 
-        # email
-        from yafowil.common import email_extractor  # noqa
+            # email
+            from yafowil.common import email_extractor  # noqa
 
-        # field
-        from yafowil.common import field_renderer  # noqa
-        from yafowil.common import label_renderer  # noqa
-        from yafowil.common import help_renderer  # noqa
-        from yafowil.common import error_renderer  # noqa
+            # field
+            from yafowil.common import field_renderer  # noqa
+            from yafowil.common import label_renderer  # noqa
+            from yafowil.common import help_renderer  # noqa
+            from yafowil.common import error_renderer  # noqa
 
-        # file
-        from yafowil.common import file_extractor  # noqa
-        from yafowil.common import mimetype_extractor  # noqa
-        from yafowil.common import input_file_edit_renderer  # noqa
-        from yafowil.common import convert_bytes  # noqa
-        from yafowil.common import input_file_display_renderer  # noqa
-        from yafowil.common import file_options_renderer  # noqa
+            # file
+            from yafowil.common import file_extractor  # noqa
+            from yafowil.common import mimetype_extractor  # noqa
+            from yafowil.common import input_file_edit_renderer  # noqa
+            from yafowil.common import convert_bytes  # noqa
+            from yafowil.common import input_file_display_renderer  # noqa
+            from yafowil.common import file_options_renderer  # noqa
 
-        # lines
-        from yafowil.common import lines_extractor  # noqa
-        from yafowil.common import lines_edit_renderer  # noqa
-        from yafowil.common import lines_display_renderer  # noqa
+            # lines
+            from yafowil.common import lines_extractor  # noqa
+            from yafowil.common import lines_edit_renderer  # noqa
+            from yafowil.common import lines_display_renderer  # noqa
 
-        # number
-        from yafowil.common import number_extractor  # noqa
+            # number
+            from yafowil.common import number_extractor  # noqa
 
-        # password
-        from yafowil.common import minlength_extractor  # noqa
-        from yafowil.common import ascii_extractor  # noqa
-        from yafowil.common import password_extractor  # noqa
-        from yafowil.common import password_edit_renderer  # noqa
-        from yafowil.common import password_display_renderer  # noqa
+            # password
+            from yafowil.common import minlength_extractor  # noqa
+            from yafowil.common import ascii_extractor  # noqa
+            from yafowil.common import password_extractor  # noqa
+            from yafowil.common import password_edit_renderer  # noqa
+            from yafowil.common import password_display_renderer  # noqa
 
-        # proxy
-        from yafowil.common import input_proxy_renderer  # noqa
+            # proxy
+            from yafowil.common import input_proxy_renderer  # noqa
 
-        # select
-        from yafowil.common import select_extractor  # noqa
-        from yafowil.common import select_exists_marker  # noqa
-        from yafowil.common import select_edit_renderer_props  # noqa
-        from yafowil.common import select_block_edit_renderer  # noqa
-        from yafowil.common import select_cb_edit_renderer  # noqa
-        from yafowil.common import select_edit_renderer  # noqa
-        from yafowil.common import select_display_renderer  # noqa
+            # select
+            from yafowil.common import select_extractor  # noqa
+            from yafowil.common import select_exists_marker  # noqa
+            from yafowil.common import select_edit_renderer_props  # noqa
+            from yafowil.common import select_block_edit_renderer  # noqa
+            from yafowil.common import select_cb_edit_renderer  # noqa
+            from yafowil.common import select_edit_renderer  # noqa
+            from yafowil.common import select_display_renderer  # noqa
 
-        # tag
-        from yafowil.common import tag_renderer  # noqa
+            # tag
+            from yafowil.common import tag_renderer  # noqa
 
-        # text
-        from yafowil.common import text_edit_renderer  # noqa
+            # text
+            from yafowil.common import text_edit_renderer  # noqa
 
-        # textarea
-        from yafowil.common import textarea_managed_props  # noqa
-        from yafowil.common import textarea_attributes  # noqa
-        from yafowil.common import textarea_renderer  # noqa
+            # textarea
+            from yafowil.common import textarea_managed_props  # noqa
+            from yafowil.common import textarea_attributes  # noqa
+            from yafowil.common import textarea_renderer  # noqa
 
-        # url
-        from yafowil.common import url_extractor  # noqa
+            # url
+            from yafowil.common import url_extractor  # noqa
 
-        # utils
-        from yafowil.utils import convert_value_to_datatype  # noqa
-        from yafowil.utils import convert_values_to_datatype  # noqa
-        # isort: on
+            # utils
+            from yafowil.utils import convert_value_to_datatype  # noqa
+            from yafowil.utils import convert_values_to_datatype  # noqa
+            # isort: on
