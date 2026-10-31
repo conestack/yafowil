@@ -2,7 +2,7 @@
 History
 =======
 
-4.1.0 (unreleased)
+4.1.0 (2026-10-31)
 ------------------
 
 - Modernise the code ruff flags as outdated: ``u''`` prefixes, ``class
